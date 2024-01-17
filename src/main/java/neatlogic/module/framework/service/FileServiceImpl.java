@@ -16,7 +16,7 @@ limitations under the License.
 
 package neatlogic.module.framework.service;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -24,21 +24,20 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.crossover.IFileCrossoverService;
-import neatlogic.framework.exception.file.*;
+import neatlogic.framework.exception.file.FileAccessDeniedException;
+import neatlogic.framework.exception.file.FileNotFoundException;
+import neatlogic.framework.exception.file.FilePathIllegalException;
+import neatlogic.framework.exception.file.FileTypeHandlerNotFoundException;
 import neatlogic.framework.exception.user.NoTenantException;
 import neatlogic.framework.file.core.FileOperationType;
 import neatlogic.framework.file.core.FileTypeHandlerFactory;
 import neatlogic.framework.file.core.IFileTypeHandler;
 import neatlogic.framework.file.dao.mapper.FileMapper;
-import neatlogic.framework.file.dto.FileTypeVo;
 import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.heartbeat.dao.mapper.ServerMapper;
 import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import neatlogic.framework.util.HttpRequestUtil;
-import com.alibaba.fastjson.JSONObject;
-import neatlogic.module.framework.file.handler.LocalFileSystemHandler;
-import neatlogic.module.framework.file.handler.MinioFileSystemHandler;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -62,7 +60,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Service
-public class FileServiceImpl implements FileService, IFileCrossoverService {
+public class FileServiceImpl implements IFileCrossoverService {
     static Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     /*查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看*/
@@ -157,114 +155,6 @@ public class FileServiceImpl implements FileService, IFileCrossoverService {
         }
     }
 
-    @Override
-    public FileVo saveFile(MultipartFile multipartFile, String type, FileTypeVo fileTypeConfigVo, JSONObject paramObj) throws Exception {
-        String tenantUuid = TenantContext.get().getTenantUuid();
-        if (multipartFile != null) {
-            String uniqueKey = paramObj.getString("uniqueKey");
-            IFileTypeHandler fileTypeHandler = FileTypeHandlerFactory.getHandler(type);
-            if (fileTypeHandler == null) {
-                throw new FileTypeHandlerNotFoundException(type);
-            }
-            if (fileTypeHandler.needSave() && fileTypeHandler.isUnique() && StringUtils.isBlank(uniqueKey)) {
-                throw new FileUniqueKeyEmptyException();
-            }
-            if (fileTypeHandler.beforeUpload(paramObj)) {
-                multipartFile.getName();
-                String userUuid = UserContext.get().getUserUuid(true);
-                String oldFileName = multipartFile.getOriginalFilename();
-                long size = multipartFile.getSize();
-                // 如果配置为空代表不受任何限制
-                if (fileTypeConfigVo != null) {
-                    boolean isAllowed = false;
-                    long maxSize = 0L;
-                    String fileExt = "";
-                    if (StringUtils.isNotBlank(oldFileName)) {
-                        fileExt = oldFileName.substring(oldFileName.lastIndexOf(".") + 1).toLowerCase();
-                    }
-                    JSONObject configObj = fileTypeConfigVo.getConfigObj();
-                    JSONArray whiteList = new JSONArray();
-                    JSONArray blackList = new JSONArray();
-                    if (size == 0) {
-                        throw new EmptyFileException();
-                    }
-                    if (configObj != null) {
-                        whiteList = configObj.getJSONArray("whiteList");
-                        blackList = configObj.getJSONArray("blackList");
-                        maxSize = configObj.getLongValue("maxSize");
-                    }
-                    if (whiteList != null && whiteList.size() > 0) {
-                        for (int i = 0; i < whiteList.size(); i++) {
-                            if (fileExt.equalsIgnoreCase(whiteList.getString(i))) {
-                                isAllowed = true;
-                                break;
-                            }
-                        }
-                    } else if (blackList != null && blackList.size() > 0) {
-                        isAllowed = true;
-                        for (int i = 0; i < blackList.size(); i++) {
-                            if (fileExt.equalsIgnoreCase(blackList.getString(i))) {
-                                isAllowed = false;
-                                break;
-                            }
-                        }
-                    } else {
-                        isAllowed = true;
-                    }
-                    if (!isAllowed) {
-                        throw new FileExtNotAllowedException(fileExt);
-                    }
-                    if (maxSize > 0 && size > maxSize) {
-                        throw new FileTooLargeException(size, maxSize);
-                    }
-                }
-
-
-                FileVo fileVo = new FileVo();
-                fileVo.setName(oldFileName);
-                fileVo.setSize(size);
-                fileVo.setUserUuid(userUuid);
-                fileVo.setType(type);
-                fileVo.setContentType(multipartFile.getContentType());
-                if (fileTypeHandler.needSave()) {
-                    FileVo oldFileVo = null;
-                    if (fileTypeHandler.isUnique()) {
-                        String uk = fileTypeHandler.getUniqueKey(uniqueKey);
-                        fileVo.setUniqueKey(uk);
-                        oldFileVo = fileMapper.getFileByNameAndUniqueKey(fileVo.getName(), uk);
-                    }
-                    String filePath;
-                    try {
-                        filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, tenantUuid, multipartFile.getInputStream(), fileVo.getId().toString(), fileVo.getContentType(), fileVo.getType());
-                    } catch (Exception ex) {
-                        //如果没有配置minioUrl，则表示不使用minio，无需抛异常
-                        if (StringUtils.isNotBlank(Config.MINIO_URL())) {
-                            logger.error(ex.getMessage(), ex);
-                        }
-                        // 如果minio出现异常，则上传到本地
-                        filePath = FileUtil.saveData(LocalFileSystemHandler.NAME, tenantUuid, multipartFile.getInputStream(), fileVo.getId().toString(), fileVo.getContentType(), fileVo.getType());
-                    }
-                    fileVo.setPath(filePath);
-                    if (oldFileVo == null) {
-                        fileMapper.insertFile(fileVo);
-                    } else {
-                        FileUtil.deleteData(oldFileVo.getPath());
-                        fileVo.setId(oldFileVo.getId());
-                        fileMapper.updateFile(fileVo);
-                    }
-                    fileTypeHandler.afterUpload(fileVo, paramObj);
-                    FileVo file = fileMapper.getFileById(fileVo.getId());
-                    file.setUrl("api/binary/file/download?id=" + fileVo.getId());
-
-                    return file;
-                } else {
-                    fileTypeHandler.analyze(multipartFile, paramObj);
-                    return fileVo;
-                }
-            }
-        }
-        return null;
-    }
 
     @Override
     public JSONObject readLocalFile(String path, int startIndex, int offset) {
@@ -273,7 +163,7 @@ public class FileServiceImpl implements FileService, IFileCrossoverService {
         if (path.startsWith(prefix)) {
             path = path.substring(prefix.length());
             path = dataHome + path;
-        }else{
+        } else {
             throw new FilePathIllegalException(path);
         }
         if (!path.startsWith("file:")) {
@@ -336,7 +226,7 @@ public class FileServiceImpl implements FileService, IFileCrossoverService {
                 .setReadTimeout(5000)
                 .sendRequest();
         String error = httpRequestUtil.getError();
-        if(StringUtils.isNotBlank(error)){
+        if (StringUtils.isNotBlank(error)) {
             throw new RuntimeException(error);
         }
         JSONObject resultJson = httpRequestUtil.getResultJson();
@@ -357,7 +247,7 @@ public class FileServiceImpl implements FileService, IFileCrossoverService {
         if (path.startsWith(prefix)) {
             path = path.substring(prefix.length());
             path = dataHome + path;
-        }else{
+        } else {
             throw new FilePathIllegalException(path);
         }
         if (!path.startsWith("file:")) {

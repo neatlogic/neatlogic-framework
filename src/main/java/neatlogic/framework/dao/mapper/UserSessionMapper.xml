@@ -19,11 +19,14 @@ limitations under the License.
 <mapper namespace="neatlogic.framework.dao.mapper.UserSessionMapper">
     <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="30000" size="100"/>
 
-    <select id="getUserSessionByUserUuid" parameterType="java.lang.String"
+    <select id="getUserSessionByTokenHash" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.UserSessionVo" useCache="false">
-        SELECT `user_uuid` as userUuid, `visit_time` as sessionTime
+        SELECT `user_uuid`         as userUuid,
+               `visit_time`        as sessionTime,
+               `auth_info`         as authInfoStr,
+               `token_create_time` as tokenCreateTime
         FROM `user_session`
-        WHERE `user_uuid` = #{value}
+        WHERE `token_hash` = #{value}
     </select>
 
     <select id="getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount"
@@ -133,12 +136,31 @@ limitations under the License.
     </select>
     <select id="getUserSessionCountByDate" resultType="java.lang.Integer">
         SELECT count(1)
-        FROM `user_session` b where b.`visit_time` &gt;= #{value}
+        FROM `user_session` b
+        where b.`visit_time` &gt;= #{value}
+    </select>
+    <select id="getUserSessionByUuid" resultType="neatlogic.framework.dto.UserSessionVo">
+        SELECT `user_uuid`         as userUuid,
+               `visit_time`        as sessionTime,
+               `auth_info`         as authInfoStr,
+               `token_create_time` as tokenCreateTime,
+               `token_hash`        as tokenHash
+        FROM `user_session`
+        WHERE `user_uuid` = #{value}
     </select>
 
-    <insert id="insertUserSession" parameterType="java.lang.String">
-        INSERT INTO `user_session` (`user_uuid`, `visit_time`)
-        VALUES (#{userUuid}, NOW(3))
+    <insert id="insertUserSession">
+        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
+        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfo})
+        ON DUPLICATE KEY
+            UPDATE `visit_time`        = NOW(3),
+                   `auth_info`         = #{authInfo},
+                   `token_create_time` = #{tokenCreateTime}
+    </insert>
+
+    <insert id="insertUserSessionWithoutTokenCreateTime">
+        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
+        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfo})
         ON DUPLICATE KEY
             UPDATE `visit_time` = NOW(3)
     </insert>
@@ -146,13 +168,24 @@ limitations under the License.
     <update id="updateUserSession" parameterType="java.lang.String">
         UPDATE `user_session`
         set `visit_time` = now(3)
-        WHERE `user_uuid` = #{userUuid}
+        WHERE `token_hash` = #{value}
     </update>
+
+    <delete id="deleteUserSessionByTokenHash" parameterType="java.lang.String">
+        DELETE
+        FROM `user_session`
+        where `token_hash` = #{value}
+    </delete>
 
     <delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
         DELETE
         FROM `user_session`
         where `user_uuid` = #{value}
+    </delete>
+    <delete id="deleteUserSessionByExpireTime" parameterType="java.lang.Long">
+        DELETE
+        FROM `user_session`
+        where UNIX_TIMESTAMP(`visit_time`)*1000 &lt; #{value}
     </delete>
 
 </mapper>

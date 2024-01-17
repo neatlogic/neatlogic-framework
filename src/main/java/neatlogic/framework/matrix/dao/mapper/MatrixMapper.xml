@@ -17,6 +17,21 @@
 		WHERE `uuid` = #{uuid}
 	</select>
 
+	<select id="getMatrixByLabel" parameterType="String" resultType="neatlogic.framework.matrix.dto.MatrixVo">
+		SELECT
+			`id`,
+			`uuid`,
+			`name`,
+			`label`,
+			`type`,
+			`fcu`,
+			`fcd`,
+			`lcu`,
+			`lcd`
+		FROM `matrix`
+		WHERE `label` = #{value}
+	</select>
+
 	<select id="checkMatrixIsExists" parameterType="java.lang.String" resultType="int">
 		SELECT COUNT(`uuid`) FROM `matrix` WHERE `uuid` = #{uuid}
 	</select>

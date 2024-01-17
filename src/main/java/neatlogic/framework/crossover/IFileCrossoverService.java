@@ -17,9 +17,6 @@ limitations under the License.
 package neatlogic.framework.crossover;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.file.dto.FileTypeVo;
-import neatlogic.framework.file.dto.FileVo;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,15 +34,6 @@ public interface IFileCrossoverService extends ICrossoverService {
     void deleteFile(Long fileId, JSONObject paramObj) throws Exception;
 
 
-    /**
-     * 保存上传的文件
-     * @param multipartFile 文件对象
-     * @param type 文件类型
-     * @param fileTypeConfigVo 文件配置
-     * @param paramObj 接口入参
-     * @return 文件vo
-     */
-    FileVo saveFile(MultipartFile multipartFile, String type, FileTypeVo fileTypeConfigVo, JSONObject paramObj) throws Exception;
     /**
      * 读取服务器本地文件内容
      * @param path 路径

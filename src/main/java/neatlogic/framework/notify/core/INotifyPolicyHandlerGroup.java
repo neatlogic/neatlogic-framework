@@ -15,7 +15,7 @@
  */
 
 package neatlogic.framework.notify.core;
-
+@Deprecated
 public interface INotifyPolicyHandlerGroup {
     String getValue();
 

@@ -94,7 +94,7 @@ public class LRCodeManager {
             throw new MoveTargetNodeIllegalException();
         }
         TreeNodeVo targetCatalog;
-        if (targetIdValue == null) {
+        if (targetIdValue == null || Objects.equals(targetIdValue.toString(), "0")) {
             targetCatalog = new TreeNodeVo();
             if (idValue instanceof Long) {
                 targetIdValue = 0;

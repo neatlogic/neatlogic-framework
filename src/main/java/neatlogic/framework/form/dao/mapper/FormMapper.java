@@ -16,12 +16,16 @@
 
 package neatlogic.framework.form.dao.mapper;
 
+import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.dto.ValueTextVo;
-import neatlogic.framework.form.dto.*;
-import org.apache.ibatis.annotations.Param;
+import neatlogic.framework.form.dto.FormAttributeVo;
+import neatlogic.framework.form.dto.FormCustomItemVo;
+import neatlogic.framework.form.dto.FormVersionVo;
+import neatlogic.framework.form.dto.FormVo;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 @Component("processFormMapper")
 public interface FormMapper {
@@ -47,6 +51,8 @@ public interface FormMapper {
 
     FormVo getFormByUuid(String formUuid);
 
+    FormVo getFormByName(String formName);
+
     FormVersionVo getFormVersionByUuid(String formVersionUuid);
 
     List<FormVersionVo> getFormVersionByFormUuid(String formUuid);
@@ -65,15 +71,15 @@ public interface FormMapper {
 
     List<FormAttributeVo> getFormAttributeListByFormUuidList(List<String> formUuidList);
 
-    List<FormAttributeMatrixVo> getFormAttributeMatrixByMatrixUuid(@Param("matrixUuid") String matrixUuid, @Param("startNum") int startNum, @Param("pageSize") int pageSize);
+    int getFormAttributeMatrixCount();
+
+    List<Map<String, Object>> getFormAttributeMatrixList(BasePageVo searchVo);
 
     List<FormVersionVo> getFormVersionListByFormConfigLikeKeyword(String value);
 
     List<FormVersionVo> getFormVersionList();
 
     int insertForm(FormVo formVo);
-
-    int insertFormAttributeMatrix(FormAttributeMatrixVo componentVo);
 
     int resetFormVersionIsActiveByFormUuid(String formUuid);
 
@@ -98,8 +104,6 @@ public interface FormMapper {
     int deleteFormVersionByFormUuid(String formUuid);
 
     int deleteFormVersionByUuid(String uuid);
-
-    int deleteFormAttributeMatrixByFormVersionUuid(String formVersionUuid);
 
     void deleteFormCustomItem(Long id);
 }

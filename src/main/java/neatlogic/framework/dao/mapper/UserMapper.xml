@@ -165,33 +165,21 @@ limitations under the License.
         </collection>
     </resultMap>
 
-    <select id="getUserByUuid" parameterType="java.lang.String" resultMap="userInfoMap" useCache="false">
+    <select id="getUserByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo" useCache="false">
         SELECT a.`id`,
-               a.`uuid`,
-               a.`user_id`          AS userId,
-               a.`user_name`        AS userName,
-               a.`email`,
-               a.`phone`,
-               e.`password`,
-               a.`pinyin`,
-               a.`is_active`        AS isActive,
-               a.`is_delete`        AS isDelete,
-               a.`user_info`        AS userInfo,
-               a.`vip_level`        AS vipLevel,
-               b.`role_uuid`        AS roleUuid,
-               r.`name`             AS roleName,
-               r.`description`,
-               c.`team_uuid`        AS teamUuid,
-               d.`name`             AS teamName,
-               d.`upward_name_path` AS upwardNamePath,
-               a.`is_super_admin`   as isSuperAdmin
+        a.`uuid`,
+        a.`user_id` AS userId,
+        a.`user_name` AS userName,
+        a.`email`,
+        a.`phone`,
+        a.`pinyin`,
+        a.`is_active` AS isActive,
+        a.`is_delete` AS isDelete,
+        a.`user_info` AS userInfo,
+        a.`vip_level` AS vipLevel,
+        a.`is_super_admin` as isSuperAdmin
         FROM `user` a
-                 LEFT JOIN `user_role` b ON a.`uuid` = b.`user_uuid`
-                 LEFT JOIN `user_team` c ON a.`uuid` = c.`user_uuid`
-                 LEFT JOIN `team` d ON c.`team_uuid` = d.`uuid`
-                 LEFT JOIN `role` r ON b.`role_uuid` = r.`uuid`
-                 LEFT JOIN `user_password` e ON a.`user_id` = e.`user_id` AND e.`is_active` = 1
-        WHERE a.`uuid` = #{value}
+        WHERE a.`uuid` = #{uuid}
     </select>
 
     <select id="getUserById" parameterType="java.lang.Long" resultMap="userInfoMap" useCache="false">
@@ -466,69 +454,33 @@ limitations under the License.
         WHERE `user_uuid` = #{userUuid}
     </select>
 
-    <select id="searchUserAllAuthByUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo"
-            resultType="neatlogic.framework.dto.UserAuthVo" useCache="false">
-        SELECT
-        ra.`auth_group` AS authGroup,
-        ra.`auth`
-        FROM `user_role` ur
-        JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid`
-        WHERE ur.`user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND ra.`auth` = #{auth}
-        </if>
-        UNION
+    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
         SELECT
         `auth_group` AS authGroup,
         `auth`
         FROM `user_authority`
-        WHERE `user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND `auth` = #{auth}
+        WHERE `user_uuid` = #{authenticationInfoVo.userUuid}
+        <if test="authenticationInfoVo.roleUuidList!= null and authenticationInfoVo.roleUuidList.size() > 0">
+            UNION
+            SELECT
+            ra.`auth_group` AS authGroup,
+            ra.`auth`
+            FROM `role_authority` ra
+            WHERE ra.`role_uuid` in
+            <foreach collection="authenticationInfoVo.roleUuidList" open="(" close=")" separator="," item="roleUuid">
+                #{roleUuid}
+            </foreach>
         </if>
-        UNION
-        SELECT
-        c.`auth_group` AS authGroup,
-        c.`auth`
-        FROM `user_team` a
-        JOIN `team_role` b ON b.`team_uuid` = a.`team_uuid`
-        JOIN `role_authority` c ON c.`role_uuid` = b.`role_uuid`
-        WHERE a.`user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND `auth` = #{auth}
-        </if>
-    </select>
-
-    <select id="searchUserAllAuthByUserAuthCache" parameterType="neatlogic.framework.dto.UserAuthVo"
-            resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
-        SELECT
-        ra.`auth_group` AS authGroup,
-        ra.`auth`
-        FROM `user_role` ur
-        JOIN `role_authority` ra ON ur.`role_uuid` = ra.`role_uuid`
-        WHERE ur.`user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND ra.`auth` = #{auth}
-        </if>
-        UNION
-        SELECT
-        `auth_group` AS authGroup,
-        `auth`
-        FROM `user_authority`
-        WHERE `user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND `auth` = #{auth}
-        </if>
-        UNION
-        SELECT
-        c.`auth_group` AS authGroup,
-        c.`auth`
-        FROM `user_team` a
-        JOIN `team_role` b ON b.`team_uuid` = a.`team_uuid`
-        JOIN `role_authority` c ON c.`role_uuid` = b.`role_uuid`
-        WHERE a.`user_uuid` = #{userUuid}
-        <if test="auth != null and auth != ''">
-            AND `auth` = #{auth}
+        <if test="authenticationInfoVo.userUuidList != null and authenticationInfoVo.userUuidList.size() > 0">
+            UNION
+            SELECT
+            `auth_group` AS authGroup,
+            `auth`
+            FROM `user_authority`
+            WHERE `user_uuid` in
+            <foreach collection="userUuidList" open="(" close=")" separator="," item="userUuid">
+                #{userUuid}
+            </foreach>
         </if>
     </select>
 
@@ -693,6 +645,26 @@ limitations under the License.
         Where `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
+        </foreach>
+        ORDER BY `id` DESC
+    </select>
+
+    <select id="getUserByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_id` AS userId,
+        `user_name` AS userName,
+        `email`,
+        `phone`,
+        `is_active` AS isActive,
+        `user_info` AS userInfo,
+        `vip_level` AS vipLevel
+        FROM `user`
+        Where `id` in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
         </foreach>
         ORDER BY `id` DESC
     </select>

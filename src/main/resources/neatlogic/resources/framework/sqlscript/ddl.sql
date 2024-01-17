@@ -239,17 +239,6 @@ CREATE TABLE IF NOT EXISTS `form_attribute` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单版本属性';
 
 -- ----------------------------
--- Table structure for form_attribute_matrix
--- ----------------------------
-CREATE TABLE IF NOT EXISTS `form_attribute_matrix` (
-  `form_version_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
-  `matrix_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '矩阵uuid',
-  `form_attribute_label` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '表单组件名称',
-  `form_attribute_uuid` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单组件uuid',
-  PRIMARY KEY (`form_version_uuid`,`matrix_uuid`,`form_attribute_uuid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单属性引用矩阵关系表';
-
--- ----------------------------
 -- Table structure for form_customitem
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `form_customitem` (
@@ -901,9 +890,11 @@ CREATE TABLE IF NOT EXISTS `role` (
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'uuid',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色名称',
   `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '角色描述',
+  `env` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '生效环境',
   PRIMARY KEY (`uuid`) USING BTREE,
-  KEY `id` (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色表';
+  KEY `id` (`id`) USING BTREE,
+  KEY `idx_env` (`env`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='角色表';
 
 -- ----------------------------
 -- Table structure for role_authority
@@ -1331,9 +1322,12 @@ CREATE TABLE IF NOT EXISTS `user_role` (
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `user_session` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
+  `token_hash` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'token哈希值',
+  `token_create_time` bigint DEFAULT NULL COMMENT 'token创建的时间',
   `visit_time` timestamp(3) NULL DEFAULT NULL COMMENT '访问时间',
-  PRIMARY KEY (`user_uuid`) USING HASH
-) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户session表';
+  `auth_info` varchar(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户角色分组信息',
+  PRIMARY KEY (`token_hash`) USING HASH
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=FIXED COMMENT='用户session表';
 
 -- ----------------------------
 -- Table structure for user_team
@@ -1419,5 +1413,41 @@ CREATE TABLE IF NOT EXISTS `mail_server`  (
   `domain` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '域名',
   PRIMARY KEY (`uuid`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '邮件服务器表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for extramenu
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `extramenu`
+(
+    `id`          BIGINT                                                       NOT NULL COMMENT 'id',
+    `name`        VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
+    `type`        tinyint(1)                                                   NOT NULL DEFAULT '0' COMMENT '类型，0：目录，1：菜单',
+    `is_active`   tinyint(1)                                                   NOT NULL DEFAULT '0' COMMENT '是否激活',
+    `url`         VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci         DEFAULT NULL COMMENT '跳转链接',
+    `description` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci        DEFAULT NULL COMMENT '描述',
+    `parent_id`   BIGINT                                                                DEFAULT NULL COMMENT '父id',
+    `lft`         INT                                                                   DEFAULT NULL COMMENT '左编码',
+    `rht`         INT                                                                   DEFAULT NULL COMMENT '右编码',
+    KEY `idx_lft_rht` (`lft`, `rht`),
+    KEY `idx_parent_id` (`parent_id`)
+) ENGINE = INNODB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci COMMENT ='附加菜单表';
+
+-- ----------------------------
+-- Table structure for extramenu_authority
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `extramenu_authority`
+(
+    `menu_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                          NOT NULL COMMENT '菜单目录id',
+    `type`    enum ('common','user','team','role') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
+    `uuid`    varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                          NOT NULL COMMENT 'uuid',
+    PRIMARY KEY (`menu_id`, `type`, `uuid`) USING BTREE,
+    KEY `idx_uuid` (`uuid`) USING BTREE,
+    KEY `idx_menu_id` (`menu_id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_general_ci COMMENT ='附加菜单授权表';
+
 
 SET FOREIGN_KEY_CHECKS = 1;

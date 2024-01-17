@@ -23,6 +23,7 @@ import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.common.util.TenantUtil;
@@ -102,7 +103,7 @@ public class AnonymousApiDispatcher {
         RequestContext.get().setApiRate(qps);
         //从令牌桶拿到令牌才能继续访问，否则直接返回，提示“系统繁忙，请稍后重试”
         if (!RateLimiterTokenBucket.tryAcquire()) {
-            response.setStatus(429);
+            response.setStatus(ResponseCode.RATE_LIMITER_TOKEN_BUCKET.getCode());
 //            returnObj.put("Message", "系统繁忙，请稍后重试");
             JSONObject returnV = new JSONObject();
             returnV.put("rejectSource", RequestContext.get().getRejectSource().getValue());
@@ -118,7 +119,7 @@ public class AnonymousApiDispatcher {
             IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
             FieldValidResultVo validResultVo = restComponent.doValid(interfaceVo, paramObj, validField);
             if (StringUtils.isNotBlank(validResultVo.getMsg())) {
-                response.setStatus(530);
+                response.setStatus(ResponseCode.API_FIELD_INVALID.getCode());
                 returnObj.put("Message", validResultVo.getMsg());
             }
             returnObj.put("Status", validResultVo.getStatus());
@@ -232,16 +233,16 @@ public class AnonymousApiDispatcher {
         try {
             doIt(request, response, token, false, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -289,14 +290,14 @@ public class AnonymousApiDispatcher {
 
             doIt(request, response, token, tokenHasEncrypted, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
-            response.setStatus(524);
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -306,14 +307,14 @@ public class AnonymousApiDispatcher {
                 returnObj.put("Param", ex.getParam());
             }
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
@@ -357,14 +358,14 @@ public class AnonymousApiDispatcher {
 
             doIt(request, response, token, tokenHasEncrypted, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
-            response.setStatus(524);
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -374,7 +375,7 @@ public class AnonymousApiDispatcher {
                 returnObj.put("Param", ex.getParam());
             }
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -382,7 +383,7 @@ public class AnonymousApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -420,14 +421,14 @@ public class AnonymousApiDispatcher {
 
             doIt(request, response, token, tokenHasEncrypted, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
-            response.setStatus(524);
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -437,7 +438,7 @@ public class AnonymousApiDispatcher {
                 returnObj.put("Param", ex.getParam());
             }
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -445,7 +446,7 @@ public class AnonymousApiDispatcher {
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -492,16 +493,16 @@ public class AnonymousApiDispatcher {
         try {
             doIt(request, response, token, tokenHasEncrypted, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -561,7 +562,7 @@ public class AnonymousApiDispatcher {
 
             doIt(request, response, token, tokenHasEncrypted, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
-            response.setStatus(524);
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -569,7 +570,7 @@ public class AnonymousApiDispatcher {
             returnObj.put("Message", ex.getMessage());
 
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
@@ -579,14 +580,14 @@ public class AnonymousApiDispatcher {
                 returnObj.put("Param", ex.getParam());
             }
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             if (logger.isWarnEnabled()) {
                 logger.warn(ex.getMessage(), ex);
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
@@ -640,20 +641,20 @@ public class AnonymousApiDispatcher {
         try {
             doIt(request, response, token, tokenHasEncrypted, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ResubmitException ex) {
-            response.setStatus(524);
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }

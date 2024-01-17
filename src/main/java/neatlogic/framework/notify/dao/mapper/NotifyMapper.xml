@@ -34,6 +34,20 @@
 	Limit 1
 	</select>
 
+	<select id="getNotifyPolicyListByName" parameterType="java.lang.String" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
+		SELECT
+			`id`,
+			`name`,
+			`is_default` AS isDefault,
+			`handler`,
+			`fcd`,
+			`fcu`,
+			`lcd`,
+			`lcu`
+		FROM `notify_policy`
+		WHERE `name` = #{value}
+	</select>
+
 	<select id="getNotifyPolicyListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.notify.dto.NotifyPolicyVo">
 	SELECT
 	`id`,

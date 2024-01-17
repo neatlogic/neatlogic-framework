@@ -212,6 +212,14 @@ limitations under the License.
         WHERE `uuid` = #{value}
     </select>
 
+    <select id="getFormByName" parameterType="java.lang.String" resultType="neatlogic.framework.form.dto.FormVo">
+        SELECT `uuid`,
+               `name`,
+               `is_active` AS isActive
+        FROM `form`
+        WHERE `name` = #{value}
+    </select>
+
     <select id="getFormVersionByFormUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.form.dto.FormVersionVo">
         SELECT `uuid`,
@@ -300,18 +308,16 @@ limitations under the License.
         </foreach>
     </select>
 
-    <select id="getFormAttributeMatrixByMatrixUuid" resultType="neatlogic.framework.form.dto.FormAttributeMatrixVo">
-        select a.`matrix_uuid`          AS matrixUuid,
-               a.`form_version_uuid`    AS formVersionUuid,
-               a.`form_attribute_label` AS formAttributeLabel,
-               a.`form_attribute_uuid`  AS formAttributeUuid,
-               b.`version`,
-               c.`uuid`                 AS formUuid,
-               c.`name`                 AS formName
-        FROM `form_attribute_matrix` a
-                 JOIN form_version b ON b.`uuid` = a.`form_version_uuid`
-                 JOIN form c ON c.`uuid` = b.`form_uuid`
-        WHERE a.`matrix_uuid` = #{matrixUuid}
+    <select id="getFormAttributeMatrixCount" resultType="int">
+        SELECT COUNT(1) FROM `form_attribute_matrix`
+    </select>
+
+    <select id="getFormAttributeMatrixList" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="java.util.HashMap">
+        select `matrix_uuid`          AS matrixUuid,
+               `form_version_uuid`    AS formVersionUuid,
+               `form_attribute_label` AS formAttributeLabel,
+               `form_attribute_uuid`  AS formAttributeUuid
+        FROM `form_attribute_matrix`
         LIMIT #{startNum}, #{pageSize}
     </select>
 
@@ -472,17 +478,6 @@ limitations under the License.
                 #{data})
     </insert>
 
-    <insert id="insertFormAttributeMatrix" parameterType="neatlogic.framework.form.dto.FormAttributeMatrixVo">
-        INSERT IGNORE INTO `form_attribute_matrix` (`form_version_uuid`,
-                                                    `matrix_uuid`,
-                                                    `form_attribute_uuid`,
-                                                    `form_attribute_label`)
-        VALUES (#{formVersionUuid},
-                #{matrixUuid},
-                #{formAttributeUuid},
-                #{formAttributeLabel})
-    </insert>
-
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">
         DELETE
         FROM `form_attribute`
@@ -505,12 +500,6 @@ limitations under the License.
         DELETE
         FROM `form_version`
         WHERE `uuid` = #{uuid}
-    </delete>
-
-    <delete id="deleteFormAttributeMatrixByFormVersionUuid" parameterType="java.lang.String">
-        DELETE
-        FROM `form_attribute_matrix`
-        WHERE `form_version_uuid` = #{formVersionUuid}
     </delete>
 
     <delete id="deleteFormCustomItem" parameterType="java.lang.Long">

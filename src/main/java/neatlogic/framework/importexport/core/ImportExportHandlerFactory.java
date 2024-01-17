@@ -22,7 +22,6 @@ import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBas
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.file.dao.mapper.FileMapper;
 import neatlogic.framework.file.dto.FileVo;
@@ -31,8 +30,6 @@ import neatlogic.framework.importexport.dto.*;
 import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import neatlogic.framework.importexport.exception.ImportExportTypeInconsistencyException;
 import neatlogic.framework.importexport.exception.ImportNoAuthException;
-import neatlogic.module.framework.file.handler.LocalFileSystemHandler;
-import neatlogic.module.framework.file.handler.MinioFileSystemHandler;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +49,7 @@ import java.util.zip.ZipInputStream;
 @RootComponent
 public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
-    private static Logger logger = LoggerFactory.getLogger(ImportExportHandlerFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImportExportHandlerFactory.class);
 
     private static Map<String, ImportExportHandler> componentMap = new HashMap<>();
 
@@ -91,6 +88,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
     /**
      * 导入数据
+     *
      * @param multipartFile 文件信息
      * @param targetType    导入目标类型
      * @param userSelection 用户选择的依赖导入选项
@@ -102,7 +100,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
         if (StringUtils.isNotBlank(userSelection)) {
             JSONObject userSelectionObj = JSONObject.parseObject(userSelection);
             if (MapUtils.isNotEmpty(userSelectionObj)) {
-                checkAll = userSelectionObj.getBooleanValue("checkAll");
+                checkAll = userSelectionObj.getBooleanValue("checkedAll");
                 JSONArray typeArray = userSelectionObj.getJSONArray("typeList");
                 if (CollectionUtils.isNotEmpty(typeArray)) {
                     typeList = typeArray.toJavaList(ImportDependencyTypeVo.class);
@@ -144,16 +142,29 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
                             throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), targetType);
                         }
+                        boolean alreadyExists = false;
+                        JSONObject resultObj = new JSONObject();
+                        ImportExportBaseInfoVo mainImportExportBaseInfoVo = new ImportExportBaseInfoVo(mainImportExportVo.getType(), mainImportExportVo.getPrimaryKey(), mainImportExportVo.getName());
+                        if (importExportHandler.checkIsExists(mainImportExportBaseInfoVo)) {
+                            mainImportExportBaseInfoVo.setType(importExportHandler.getType().getText());
+                            resultObj.put("alreadyExists", mainImportExportBaseInfoVo);
+                            alreadyExists = true;
+                        }
                         List<ImportExportBaseInfoVo> dependencyBaseInfoList = mainImportExportVo.getDependencyBaseInfoList();
                         if (CollectionUtils.isNotEmpty(dependencyBaseInfoList) && StringUtils.isBlank(userSelection)) {
                             List<ImportDependencyTypeVo> importDependencyTypeList = importExportHandler.checkDependencyList(dependencyBaseInfoList);
                             if (CollectionUtils.isNotEmpty(importDependencyTypeList)) {
-                                JSONObject resultObj = new JSONObject();
                                 resultObj.put("checkedAll", false);
                                 resultObj.put("typeList", importDependencyTypeList);
                                 return resultObj;
+                            } else {
+                                checkAll = true;
+                                resultObj.put("checkedAll", true);
+                                resultObj.put("typeList", new ArrayList<>());
                             }
-                            checkAll = true;
+                        }
+                        if (alreadyExists) {
+                            return resultObj;
                         }
                     }
                 }
@@ -258,19 +269,8 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                             out.write(buf, 0, len);
                         }
                         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-                        String filePath;
-                        try {
-                            filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, tenantUuid, in, fileVo.getId().toString(), fileVo.getContentType(), fileVo.getType());
-                        } catch (Exception ex) {
-                            //如果没有配置minioUrl，则表示不使用minio，无需抛异常
-                            if (StringUtils.isNotBlank(Config.MINIO_URL())) {
-                                logger.error(ex.getMessage(), ex);
-                            }
-                            // 如果minio出现异常，则上传到本地
-                            filePath = FileUtil.saveData(LocalFileSystemHandler.NAME, tenantUuid, in, fileVo.getId().toString(), fileVo.getContentType(), fileVo.getType());
-                        } finally {
-                            in.close();
-                        }
+                        String filePath = FileUtil.saveData(tenantUuid, in, fileVo.getId().toString(), fileVo.getContentType(), fileVo.getType());
+                        in.close();
                         fileVo.setPath(filePath);
                         fileMapper.updateFile(fileVo);
                     }
@@ -284,6 +284,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
     /**
      * 获取新的primary，如果返回结果为null，说明primary没有变化
+     *
      * @param type
      * @param oldPrimary
      * @param primaryChangeList
@@ -300,6 +301,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
     /**
      * 检查是否需要导入数据
+     *
      * @param typeList
      * @param type
      * @param primaryKey

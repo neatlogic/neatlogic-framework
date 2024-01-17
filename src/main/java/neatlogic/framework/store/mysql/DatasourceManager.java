@@ -118,23 +118,27 @@ public class DatasourceManager {
         tenantDatasource.setUsername(datasourceVo.getUsername());
         tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
         tenantDatasource.setPoolName("HikariCP_"+ (isDataDB ? "DATA_" : StringUtils.EMPTY) + datasourceVo.getTenantUuid());
-        tenantDatasource.setMaximumPoolSize(20);
+        setDataSourceConfig(tenantDatasource);
+        return tenantDatasource;
+    }
+
+    public static void setDataSourceConfig(NeatLogicBasicDataSource dataSource){
+        dataSource.setMaximumPoolSize(20);
         //以下是针对Mysql的参数优化
         //This sets the number of prepared statements that the MySQL driver will cache per connection. The default is a conservative 25. We recommend setting this to between 250-500.
-        tenantDatasource.addDataSourceProperty("prepStmtCacheSize", 250);
+        dataSource.addDataSourceProperty("prepStmtCacheSize", 250);
         //This is the maximum length of a prepared SQL statement that the driver will cache. The MySQL default is 256. In our experience, especially with ORM frameworks like Hibernate, this default is well below the threshold of generated statement lengths. Our recommended setting is 2048.
-        tenantDatasource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+        dataSource.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
         //Neither of the above parameters have any effect if the cache is in fact disabled, as it is by default. You must set this parameter to true.
-        tenantDatasource.addDataSourceProperty("cachePrepStmts", true);
+        dataSource.addDataSourceProperty("cachePrepStmts", true);
         //Newer versions of MySQL support server-side prepared statements, this can provide a substantial performance boost. Set this property to true.
-        tenantDatasource.addDataSourceProperty("useServerPrepStmts", true);
-        tenantDatasource.addDataSourceProperty("useLocalSessionState", true);
-        tenantDatasource.addDataSourceProperty("rewriteBatchedStatements", true);
-        tenantDatasource.addDataSourceProperty("cacheResultSetMetadata", true);
-        tenantDatasource.addDataSourceProperty("cacheServerConfiguration", true);
-        tenantDatasource.addDataSourceProperty("elideSetAutoCommits", true);
-        tenantDatasource.addDataSourceProperty("maintainTimeStats", false);
-        tenantDatasource.setConnectionTimeout(5000);
-        return tenantDatasource;
+        dataSource.addDataSourceProperty("useServerPrepStmts", true);
+        dataSource.addDataSourceProperty("useLocalSessionState", true);
+        dataSource.addDataSourceProperty("rewriteBatchedStatements", true);
+        dataSource.addDataSourceProperty("cacheResultSetMetadata", true);
+        dataSource.addDataSourceProperty("cacheServerConfiguration", true);
+        dataSource.addDataSourceProperty("elideSetAutoCommits", true);
+        dataSource.addDataSourceProperty("maintainTimeStats", false);
+        dataSource.setConnectionTimeout(5000);
     }
 }

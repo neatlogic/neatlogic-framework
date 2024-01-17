@@ -22,6 +22,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.dao.mapper.UserMapper;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.*;
@@ -39,52 +40,53 @@ import java.util.Set;
 @Service
 @OperationType(type = OperationTypeEnum.SEARCH)
 public class ModuleListApi extends PrivateApiComponentBase {
-	@Autowired
-	UserMapper userMapper;
+    @Autowired
+    UserMapper userMapper;
 
-	@Override
-	public String getToken() {
-		return "/module/list";
-	}
+    @Override
+    public String getToken() {
+        return "/module/list";
+    }
 
-	@Override
-	public String getName() {
-		return "获取租户激活模块接口";
-	}
+    @Override
+    public String getName() {
+        return "获取租户激活模块接口";
+    }
 
-	@Override
-	public String getConfig() {
-		return null;
-	}
+    @Override
+    public String getConfig() {
+        return null;
+    }
 
-	@Input({})
-	@Output({
-		@Param( name = "value", type = ApiParamType.STRING, desc = "模块"),
-		@Param( name = "text", type = ApiParamType.STRING, desc = "模块名") 
-		})
-	@Description(desc = "获取租户激活模块接口")
-	@Override
-	public Object myDoService(JSONObject jsonObj) throws Exception {
-		JSONArray resultArray = new JSONArray();
-		 Set<String> authGroupSet = new HashSet<String>();
+    @Input({})
+    @Output({
+            @Param(name = "value", type = ApiParamType.STRING, desc = "模块"),
+            @Param(name = "text", type = ApiParamType.STRING, desc = "模块名")
+    })
+    @Description(desc = "获取租户激活模块接口")
+    @Override
+    public Object myDoService(JSONObject jsonObj) throws Exception {
+        JSONArray resultArray = new JSONArray();
+        Set<String> authGroupSet = new HashSet<String>();
         //获取用户权限
-        List<UserAuthVo>  userAuthList = userMapper.searchUserAllAuthByUserAuth(new UserAuthVo(UserContext.get().getUserUuid()));
-        for(UserAuthVo userAuth:userAuthList) {
-        	authGroupSet.add(userAuth.getAuthGroup());
+        AuthenticationInfoVo authenticationInfoVo = UserContext.get().getAuthenticationInfoVo();
+        List<UserAuthVo> userAuthList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo);
+        for (UserAuthVo userAuth : userAuthList) {
+            authGroupSet.add(userAuth.getAuthGroup());
         }
-		Set<String> checkSet = new HashSet<>();
-		for (ModuleVo moduleVo : TenantContext.get().getActiveModuleList()) {
-			if (authGroupSet.contains(moduleVo.getGroup())&&!checkSet.contains(moduleVo.getGroup())) {
-				checkSet.add(moduleVo.getGroup());
-				JSONObject returnObj = new JSONObject();
-				returnObj.put("value", moduleVo.getGroup());
-				returnObj.put("text", $.t(moduleVo.getGroupName()));
-				returnObj.put("sort", moduleVo.getGroupSort());
-				resultArray.add(returnObj);
-			}
-		}
-		resultArray.sort(Comparator.comparing(obj-> ((JSONObject) obj).getInteger("sort")));
-		
-		return resultArray;
-	}
+        Set<String> checkSet = new HashSet<>();
+        for (ModuleVo moduleVo : TenantContext.get().getActiveModuleList()) {
+            if (authGroupSet.contains(moduleVo.getGroup()) && !checkSet.contains(moduleVo.getGroup())) {
+                checkSet.add(moduleVo.getGroup());
+                JSONObject returnObj = new JSONObject();
+                returnObj.put("value", moduleVo.getGroup());
+                returnObj.put("text", $.t(moduleVo.getGroupName()));
+                returnObj.put("sort", moduleVo.getGroupSort());
+                resultArray.add(returnObj);
+            }
+        }
+        resultArray.sort(Comparator.comparing(obj -> ((JSONObject) obj).getInteger("sort")));
+
+        return resultArray;
+    }
 }

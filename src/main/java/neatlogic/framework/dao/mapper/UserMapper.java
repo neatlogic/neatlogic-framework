@@ -55,7 +55,7 @@ public interface UserMapper {
 
     UserVo getUserById(Long id);
 
-    UserVo getUserByUuid(String uuid);
+    UserVo getUserByUuid(@Param("uuid") String uuid);
 
     UserVo getUserSimpleInfoByUuid(String uuid);
 
@@ -73,9 +73,7 @@ public interface UserMapper {
 
     List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
 
-    List<UserAuthVo> searchUserAllAuthByUserAuth(UserAuthVo userAuthVo);
-
-    List<UserAuthVo> searchUserAllAuthByUserAuthCache(UserAuthVo userAuthVo);
+    List<UserAuthVo> searchUserAllAuthByUserAuth(@Param("authenticationInfoVo") AuthenticationInfoVo authenticationInfoVo);
 
     List<RoleAuthVo> searchUserRoleAuthByUserUuid(String userUuid);
 
@@ -92,6 +90,8 @@ public interface UserMapper {
     UserVo getActiveUserByUserId(UserVo userVo);
 
     List<UserVo> getUserByUserUuidList(List<String> userUuidList);
+
+    List<UserVo> getUserByIdList(List<Long> idList);
 
     List<AuthVo> getUserCountByAuth();
 

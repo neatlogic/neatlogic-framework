@@ -20,23 +20,24 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.springframework.util.DigestUtils;
 
-import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Locale;
 
-public class Md5Handler implements TypeHandler<Object> {
+public class Md5Handler implements TypeHandler<Object>, NeatLogicTypeHandler<Object> {
 
     @Override
     public void setParameter(PreparedStatement ps, int i, Object parameter, JdbcType jdbcType) throws SQLException {
+        ps.setObject(i, handleParameter(parameter));
+    }
+
+    @Override
+    public Object handleParameter(Object parameter) {
         if (parameter != null) {
             String parameterStr = parameter.toString().toLowerCase(Locale.ROOT);
             parameter = DigestUtils.md5DigestAsHex(parameterStr.getBytes());
         }
-        ps.setObject(i, parameter);
+        return parameter;
     }
-
 
     @Override
     public String getResult(ResultSet rs, String columnName) throws SQLException {
@@ -52,5 +53,4 @@ public class Md5Handler implements TypeHandler<Object> {
     public String getResult(CallableStatement cs, int columnIndex) throws SQLException {
         return cs.getString(columnIndex);
     }
-
 }

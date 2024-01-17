@@ -96,14 +96,16 @@ public class FileImportExportHandler extends ImportExportHandlerBase {
                 while ((len = in.read(buf)) != -1) {
                     out.write(buf, 0, len);
                 }
-                zipOutputStream.putNextEntry(new ZipEntry("attachment-folder/" + fileVo.getId() + "/" + fileVo.getName()));
-                zipOutputStream.write(out.toByteArray());
-                zipOutputStream.closeEntry();
-                in.close();
-                out.reset();
-            }
-            if (logger.isWarnEnabled()) {
-                logger.warn("export file: " + fileVo.getName());
+                if (zipOutputStream != null) {
+                    zipOutputStream.putNextEntry(new ZipEntry("attachment-folder/" + fileVo.getId() + "/" + fileVo.getName()));
+                    zipOutputStream.write(out.toByteArray());
+                    zipOutputStream.closeEntry();
+                    in.close();
+                    out.reset();
+                    if (logger.isWarnEnabled()) {
+                        logger.warn("export file: " + fileVo.getName());
+                    }
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

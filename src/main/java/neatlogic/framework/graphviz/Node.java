@@ -87,7 +87,7 @@ public class Node {
         }
         // lobelloc控制label位置
         return "\"" + this.id + "\"[shape=\"none\"," + propString + ",labelloc=\"b\",imagepos=\"tc\",height="
-                + (1 + 0.4 * segment) + "]";
+                + (0.85 + 0.4 * segment) + "]";
     }
 
     public static class Builder {
@@ -99,7 +99,7 @@ public class Node {
         private String image;
         private String icon;
         private int segment;
-        private String fontname = "PingFangSC-Regular";
+        private String fontname = "Times";
 
 
         public Builder(String _id) {
@@ -116,7 +116,7 @@ public class Node {
         public Builder withLabel(String _label) {
             if (StringUtils.isNotBlank(_label)) {
                 _label = _label.trim();
-                List<String> labelList = new ArrayList<>();
+                /*List<String> labelList = new ArrayList<>();
                 int s = _label.length() / LABEL_LENGTH;
                 for (int i = 0; i < s; i++) {
                     labelList.add(_label.substring(0, Math.min(LABEL_LENGTH, _label.length())));
@@ -133,8 +133,9 @@ public class Node {
                         segment++;
                     }
                     returnLabel.append(lb);
-                }
-                this.label = returnLabel.toString();
+                }*/
+                segment = 0;
+                this.label = _label;//returnLabel.toString();
             }
             return this;
         }

@@ -23,11 +23,14 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserSessionMapper {
-    UserSessionVo getUserSessionByUserUuid(String userUuid);
+    UserSessionVo getUserSessionByTokenHash(String userUuid);
+
+    List<UserSessionVo> getUserSessionByUuid(String userUuid);
 
     int getAllOnlineUserCount(Date sessionTime);
 
     List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
+
     int getOnlineUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidListAndGreaterThanSessionTimeCount(
             @Param("userUuidList") List<String> userUuidList,
             @Param("teamUuidList") List<String> teamUuidList,
@@ -47,10 +50,16 @@ public interface UserSessionMapper {
 
     int getUserSessionCountByDate(String limitDate);
 
-    int insertUserSession(String userUuid);
+    int insertUserSession(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfo") String authInfo);
 
-    int updateUserSession(String userUuid);
+    int insertUserSessionWithoutTokenCreateTime(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfo") String authInfo);
 
-    int deleteUserSessionByUserUuid(String userUuid);
+    int updateUserSession(String tokenHash);
+
+    int deleteUserSessionByTokenHash(String tokenHash);
+
+    void deleteUserSessionByUserUuid(String userUuid);
+
+    int deleteUserSessionByExpireTime(Long expireTime);
 
 }

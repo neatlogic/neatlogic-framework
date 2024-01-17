@@ -27,16 +27,24 @@ import java.util.List;
 public interface AuthenticationInfoService {
 
     /**
-     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
-     * @param userUuid
-     * @return
+     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。无需过滤不符合规则的角色
+     *
+     * @param userUuid 用户uuid
      */
     AuthenticationInfoVo getAuthenticationInfo(String userUuid);
 
     /**
      * 查询用户鉴权时，需要用到到userUuidList、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。
-     * @param userUuidList
-     * @return
+     *
+     * @param userUuidList 用户uuid列表
      */
     AuthenticationInfoVo getAuthenticationInfo(List<String> userUuidList);
+
+    /**
+     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。可以控制是否过滤不符合规则的角色
+     *
+     * @param userUuid   用户uuid
+     * @param isRuleRole 是否过滤不符合规则的角色
+     */
+    AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole);
 }

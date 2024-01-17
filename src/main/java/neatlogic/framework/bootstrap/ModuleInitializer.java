@@ -22,6 +22,7 @@ import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.exception.module.ModuleInitRuntimeException;
 import neatlogic.framework.sqlfile.ScriptRunnerManager;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
@@ -103,7 +104,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     }
                 }
             }
-        } catch (RuntimeException ex) {
+        } catch (ModuleInitRuntimeException ex) {
             System.out.println(ex.getMessage());
             System.exit(1);
         } catch (Exception ex) {
@@ -202,9 +203,9 @@ public class ModuleInitializer implements WebApplicationInitializer {
             logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
-            JdbcUtil.closeConnection(neatlogicConn);
-            JdbcUtil.closeStatement(tenantStatement);
             JdbcUtil.closeResultSet(tenantResultSet);
+            JdbcUtil.closeStatement(tenantStatement);
+            JdbcUtil.closeConnection(neatlogicConn);
         }
         return activeTenantList;
     }
@@ -342,6 +343,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             }
         } catch (Exception ex) {
             logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
+            System.out.println("从数据库查询所有激活租户时发生异常: " + ex.getMessage());
             throw new Exception(ex);
         } finally {
             JdbcUtil.closeConnection(neatlogicConn);
@@ -388,8 +390,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     //String latestVersion = moduleLatestVersionMap.get(moduleId); //
                     //第一次启用基线。 即该租户该模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
                     if (!moduleVersionMap.containsKey(moduleId) || StringUtils.isBlank(moduleVersionMap.get(moduleId)) || moduleVersionMap.get(moduleId) == null) {
-                        //选择当天作为最新版本，为了后续自动更新版本
-                        String latestVersion = TimeUtil.convertDateToString(new Date(), TimeUtil.YYYY_MM_DD);
+                        //忽略今天及以前的版本，选择明天作为最新版本，为了后续自动更新版本
+                        String latestVersion = TimeUtil.addDateByDay(new Date(), 1, TimeUtil.YYYY_MM_DD);
                         insertTenantModuleVersionSql(tenant.getUuid(), moduleId, latestVersion);
                         //如果模块版本小于最新版本，则执行sql并更新为最新版本
                     } else {
@@ -426,8 +428,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
             } else {
                 //第一次启用基线。 即该租户所有模块没有版本基线，则直接更新版本基线，不执行sql，启动服务后需要手动更新对比schema后重启tomcat实例服务
                 for (ModuleVo moduleVo : moduleVoList) {
-                    //选择当天作为最新版本，为了后续自动更新版本
-                    String latestVersion = TimeUtil.convertDateToString(new Date(), TimeUtil.YYYY_MM_DD);
+                    //忽略今天及以前的版本，选择明天作为最新版本，为了后续自动更新版本
+                    String latestVersion = TimeUtil.addDateByDay(new Date(), 1, TimeUtil.YYYY_MM_DD);
                     insertTenantModuleVersionSql(tenant.getUuid(), moduleVo.getId(), latestVersion);
                 }
             }
@@ -441,8 +443,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
      * 插入租户模块信息
      */
     private void insertTenantModuleVersionSql(String tenantUuid, String moduleId, String version) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection();
-             PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()")) {
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module` (`tenant_uuid`,`module_id`,`version`,`fcd`,`lcd`) VALUES (?,?,?,now(),now()) ON DUPLICATE KEY UPDATE version = ?,`lcd` = now()")) {
             statement.setString(1, tenantUuid);
             statement.setString(2, moduleId);
             statement.setString(3, version);

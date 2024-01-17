@@ -16,13 +16,14 @@
 
 package neatlogic.framework.asynchronization.threadlocal;
 
-import neatlogic.framework.common.constvalue.SystemUser;
-import neatlogic.framework.dto.AuthenticationInfoVo;
-import neatlogic.framework.dto.UserVo;
-import neatlogic.framework.exception.user.NoUserException;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.dto.AuthenticationInfoVo;
+import neatlogic.framework.dto.JwtVo;
+import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.exception.user.NoUserException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class UserContext implements Serializable {
@@ -50,6 +52,10 @@ public class UserContext implements Serializable {
     //是否超级管理员
     private Boolean isSuperAdmin = false;
 
+    private String tokenHash;
+
+    private JwtVo jwtVo;
+
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
         if (_userContext != null) {
@@ -62,6 +68,7 @@ public class UserContext implements Serializable {
             // context.setRequest(_userContext.getRequest());
             // context.setResponse(_userContext.getResponse());
             context.setAuthenticationInfoVo(_userContext.getAuthenticationInfoVo());
+            context.setJwtVo(_userContext.getJwtVo());
             context.setIsSuperAdmin(_userContext.getIsSuperAdmin());
         }
         instance.set(context);
@@ -80,12 +87,12 @@ public class UserContext implements Serializable {
         context.setTimezone(timezone);
         List<String> roleUuidList = new ArrayList<>();
         JSONArray roleList = jsonObj.getJSONArray("rolelist");
-        if (roleList != null && roleList.size() > 0) {
+        if (roleList != null && !roleList.isEmpty()) {
             for (int i = 0; i < roleList.size(); i++) {
                 roleUuidList.add(roleList.getString(i));
             }
         }
-        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList));
+        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList, new HashSet<>()));
         instance.set(context);
         return context;
     }
@@ -102,6 +109,10 @@ public class UserContext implements Serializable {
         context.setResponse(response);
         context.setTimezone(timezone);
         context.setAuthenticationInfoVo(authenticationInfoVo);
+        if (userVo.getJwtVo() != null) {
+            context.setTokenHash(userVo.getJwtVo().getTokenHash());
+        }
+        context.setJwtVo(userVo.getJwtVo());
         instance.set(context);
         return context;
     }
@@ -225,7 +236,7 @@ public class UserContext implements Serializable {
 
     public AuthenticationInfoVo getAuthenticationInfoVo() {
         if (authenticationInfoVo == null) {
-            authenticationInfoVo = new AuthenticationInfoVo(userUuid, new ArrayList<>(), new ArrayList<>());
+            authenticationInfoVo = new AuthenticationInfoVo(userUuid);
         }
         return authenticationInfoVo;
     }
@@ -259,8 +270,24 @@ public class UserContext implements Serializable {
     }
 
     public void setIsSuperAdmin(Boolean isSuperAdmin) {
-        if(isSuperAdmin != null) {
+        if (isSuperAdmin != null) {
             this.isSuperAdmin = isSuperAdmin;
         }
+    }
+
+    public String getTokenHash() {
+        return tokenHash;
+    }
+
+    public void setTokenHash(String tokenHash) {
+        this.tokenHash = tokenHash;
+    }
+
+    public JwtVo getJwtVo() {
+        return jwtVo;
+    }
+
+    public void setJwtVo(JwtVo jwtVo) {
+        this.jwtVo = jwtVo;
     }
 }

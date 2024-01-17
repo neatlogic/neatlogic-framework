@@ -53,6 +53,10 @@ public interface RoleMapper {
 
     List<RoleVo> getRoleByUuidList(List<String> uuidList);
 
+    List<RoleVo> getRoleByIdList(List<Long> idList);
+
+    List<RoleVo> getRoleRuleByUuidList(List<String> uuidList);
+
     List<String> getRoleUuidListByUuidList(List<String> uuidList);
 
     List<AuthVo> getRoleCountByAuth();
@@ -69,7 +73,9 @@ public interface RoleMapper {
 
     List<RoleTeamVo> getRoleTeamListByRoleUuidList(@Param("list") List<String> roleList);
 
-    List<RoleUserVo> getRoleUserListByRoleUuidList(@Param("list")List<String> roleList);
+    List<RoleUserVo> getRoleUserListByRoleUuidList(@Param("list") List<String> roleList);
+
+    List<String> getRoleUuidListByTeamUuidList(@Param("teamUuidList") List<String> teamUuidList);
 
     List<String> getRoleUuidListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("checkedChildren") Integer checkedChildren);
 
@@ -79,7 +85,7 @@ public interface RoleMapper {
      * @param uuidList
      * @return
      */
-    List<RoleVo> getRoleListByTeamUuidList(List<String> uuidList);
+    List<RoleVo> getRoleListWithTeamByTeamUuidList(List<String> uuidList);
 
     /**
      * 根据team的左右编码查询父分组的并且可穿透的roleList

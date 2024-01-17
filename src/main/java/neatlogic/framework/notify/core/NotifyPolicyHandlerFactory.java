@@ -24,19 +24,19 @@ import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.module.ModuleVo;
-import neatlogic.framework.notify.dto.NotifyPolicyHandlerVo;
 import neatlogic.framework.notify.dto.NotifyTreeVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 @RootComponent
 public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
-
-    private static final List<NotifyPolicyHandlerVo> notifyPolicyHandlerList = new ArrayList<>();
 
     private static final Map<String, INotifyPolicyHandler> notifyPolicyHandlerMap = new HashMap<>();
 
@@ -44,38 +44,28 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
 
     private static final Map<String, NotifyTreeVo> moduleTreeVoMap = new HashMap<>();
 
-    private static final List<NotifyTreeVo> notifyPolicyTreeVoList = new ArrayList<>();
+//    private static final List<NotifyTreeVo> notifyPolicyTreeVoList = new ArrayList<>();
 
-    private static final Map<String, NotifyTreeVo> notifyPolicyGroupTreeVoMap = new HashMap<>();
+//    private static final Map<String, NotifyTreeVo> notifyPolicyGroupTreeVoMap = new HashMap<>();
+
+    private static final Map<String, String> handler2ModuleGroupIdMap = new HashMap<>();
+
+    private static final Map<String, String> handler2ModuleIdMap = new HashMap<>();
 
     public static INotifyPolicyHandler getHandler(String handler) {
         return notifyPolicyHandlerMap.get(handler);
     }
 
-    public static NotifyPolicyHandlerVo getNotifyPolicyHandlerVo(String handler) {
-        for (NotifyPolicyHandlerVo notifyPolicyHandlerVo : notifyPolicyHandlerList) {
-            if (Objects.equals(notifyPolicyHandlerVo.getHandler(), handler)) {
-                try {
-                    return notifyPolicyHandlerVo.clone();
-                } catch (CloneNotSupportedException e) {
-                    return notifyPolicyHandlerVo;
-                }
-            }
-        }
-        return null;
+    public static List<INotifyPolicyHandler> getHandlerList() {
+        return new ArrayList<>(notifyPolicyHandlerMap.values());
     }
-    public static List<NotifyPolicyHandlerVo> getNotifyPolicyHandlerList() {
-        List<NotifyPolicyHandlerVo> notifyPolicyHandlerVoList = new ArrayList<>();
-        notifyPolicyHandlerList.forEach(o -> {
-            try {
-                NotifyPolicyHandlerVo handlerVo = o.clone();
-                handlerVo.setName($.t(handlerVo.getName()));
-                notifyPolicyHandlerVoList.add(handlerVo);
-            } catch (CloneNotSupportedException e) {
-                notifyPolicyHandlerVoList.add(o);
-            }
-        });
-        return notifyPolicyHandlerVoList;
+
+    public static String getModuleIdByHandler(String handler) {
+        return handler2ModuleIdMap.get(handler);
+    }
+
+    public static String getModuleGroupIdByHandler(String handler) {
+        return handler2ModuleGroupIdMap.get(handler);
     }
 
     public static List<NotifyTreeVo> getModuleTreeVoList() {
@@ -159,9 +149,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         return resultList;
     }
 
-    public static List<NotifyTreeVo> getNotifyPolicyTreeVoList() {
-        return notifyPolicyTreeVoList;
-    }
+//    public static List<NotifyTreeVo> getNotifyPolicyTreeVoList() {
+//        return notifyPolicyTreeVoList;
+//    }
 
     @Override
     public void onInitialized(NeatLogicWebApplicationContext context) {
@@ -171,29 +161,26 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
             INotifyPolicyHandler notifyPolicyHandler = entry.getValue();
             if (notifyPolicyHandler.isPublic()) {
                 notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
-                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getId(), moduleVo.getGroup(), notifyPolicyHandler.isAllowMultiPolicy()));
+                handler2ModuleGroupIdMap.put(notifyPolicyHandler.getClassName(), moduleVo.getGroup());
+                handler2ModuleIdMap.put(notifyPolicyHandler.getClassName(), moduleVo.getId());
+//                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getId(), moduleVo.getGroup(), notifyPolicyHandler.isAllowMultiPolicy()));
 
-                INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
-                if (notifyPolicyHandlerGroup == null) {
-                    notifyPolicyTreeVoList.add(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
-                } else {
-                    NotifyTreeVo notifyPolicyGroupTreeVo = notifyPolicyGroupTreeVoMap.get(notifyPolicyHandlerGroup.getValue());
-                    if (notifyPolicyGroupTreeVo == null) {
-                        notifyPolicyGroupTreeVo = new NotifyTreeVo(notifyPolicyHandlerGroup.getValue(), notifyPolicyHandlerGroup.getText());
-                        notifyPolicyGroupTreeVoMap.put(notifyPolicyHandlerGroup.getValue(), notifyPolicyGroupTreeVo);
-                        notifyPolicyTreeVoList.add(notifyPolicyGroupTreeVo);
-                    }
-                    notifyPolicyGroupTreeVo.addChildren(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
-                }
+//                INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
+//                if (notifyPolicyHandlerGroup == null) {
+//                    notifyPolicyTreeVoList.add(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+//                } else {
+//                    NotifyTreeVo notifyPolicyGroupTreeVo = notifyPolicyGroupTreeVoMap.get(notifyPolicyHandlerGroup.getValue());
+//                    if (notifyPolicyGroupTreeVo == null) {
+//                        notifyPolicyGroupTreeVo = new NotifyTreeVo(notifyPolicyHandlerGroup.getValue(), notifyPolicyHandlerGroup.getText());
+//                        notifyPolicyGroupTreeVoMap.put(notifyPolicyHandlerGroup.getValue(), notifyPolicyGroupTreeVo);
+//                        notifyPolicyTreeVoList.add(notifyPolicyGroupTreeVo);
+//                    }
+//                    notifyPolicyGroupTreeVo.addChildren(new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName()));
+//                }
             }
 
             NotifyTreeVo treeVo = new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName());
             List<NotifyTreeVo> children = new ArrayList<>();
-//            if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerListForNotifyTree())) {
-//                for (NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerListForNotifyTree()) {
-//                    children.add(new NotifyTreeVo(notifyTriggerVo.getTrigger(), notifyTriggerVo.getTriggerName()));
-//                }
-//            }
             if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerList())) {
                 for (NotifyTriggerVo notifyTriggerVo : notifyPolicyHandler.getNotifyTriggerList()) {
                     children.add(new NotifyTreeVo(notifyTriggerVo.getTrigger(), notifyTriggerVo.getTriggerName()));

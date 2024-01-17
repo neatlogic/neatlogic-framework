@@ -48,7 +48,7 @@ limitations under the License.
         a.`description`
         FROM `role` a
         LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
-       <where>
+        <where>
             <if test="keyword != null and keyword != ''">
                 AND (name LIKE CONCAT('%',#{keyword}, '%') OR description LIKE CONCAT('%',#{keyword}, '%'))
             </if>
@@ -58,13 +58,13 @@ limitations under the License.
             <if test="auth != null and auth != ''">
                 AND c.`auth` = #{auth}
             </if>
-           <if test="roleUuidList != null and roleUuidList.size()>0">
-               and uuid in
-               <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
-                   #{roleUuid}
-               </foreach>
-           </if>
-       </where>
+            <if test="roleUuidList != null and roleUuidList.size()>0">
+                and uuid in
+                <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
+                    #{roleUuid}
+                </foreach>
+            </if>
+        </where>
         GROUP BY a.`uuid`
         ORDER BY a.`id` DESC
         <if test="needPage == true">
@@ -126,7 +126,8 @@ limitations under the License.
         SELECT `id`,
                `uuid`,
                `name`,
-               `description`
+               `description`,
+               `rule`
         FROM `role`
         WHERE `uuid` = #{value}
     </select>
@@ -146,7 +147,35 @@ limitations under the License.
         `id`,
         `uuid`,
         `name`,
-        `description`
+        `description`,
+        `rule`
+        FROM `role`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getRoleByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `description`,
+        `rule`
+        FROM `role`
+        WHERE `id` in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getRoleRuleByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="false">
+        SELECT
+        `uuid`,
+        `rule`
         FROM `role`
         WHERE `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
@@ -210,15 +239,14 @@ limitations under the License.
     </select>
 
     <select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
-        select `role_uuid`
-        from `user_role`
-        where `user_uuid` = #{value}
+        select ur.`role_uuid`
+        from `user_role` ur join `role` r on ur.`role_uuid` = r.`uuid`
+        where ur.`user_uuid` = #{value}
     </select>
 
     <select id="getRoleTeamListByRoleUuid" resultType="neatlogic.framework.dto.RoleTeamVo">
-        SELECT
-        `team_uuid` AS teamUuid,
-        `checked_children` AS checkedChildren
+        SELECT `team_uuid`        AS teamUuid,
+               `checked_children` AS checkedChildren
         FROM `team_role`
         WHERE `role_uuid` = #{value}
     </select>
@@ -257,13 +285,22 @@ limitations under the License.
     </select>
 
     <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String" useCache="false">
-        SELECT `role_uuid` FROM `team_role` WHERE `team_uuid` IN
+        select tr.`role_uuid`
+        FROM `team_role` tr  join `role` r on tr.`role_uuid` = r.`uuid`
+        WHERE tr.`team_uuid` IN
         <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
             #{teamUuid}
         </foreach>
-        <if test="checkedChildren != null">
-            AND `checked_children` = #{checkedChildren}
-        </if>
+        AND tr.`checked_children` = #{checkedChildren}
+    </select>
+
+    <select id="getRoleUuidListByTeamUuidList" resultType="java.lang.String" useCache="false">
+        select tr.`role_uuid`
+        FROM `team_role` tr  join `role` r on tr.`role_uuid` = r.`uuid`
+        WHERE tr.`team_uuid` IN
+        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+            #{teamUuid}
+        </foreach>
     </select>
 
     <resultMap id="roleTeamMap" type="neatlogic.framework.dto.RoleVo">
@@ -277,14 +314,14 @@ limitations under the License.
         </collection>
     </resultMap>
 
-    <select id="getRoleListByTeamUuidList" resultMap="roleTeamMap">
-        SELECT t.uuid       as parentTeamUuid,
-               t.`name`     as parentTeamName,
-               tr.role_uuid as roleUuid,
-               r.`name`     as roleName
+    <select id="getRoleListWithTeamByTeamUuidList" resultMap="roleTeamMap">
+        SELECT t.uuid as parentTeamUuid,
+        t.`name` as parentTeamName,
+        tr.role_uuid as roleUuid,
+        r.`name` as roleName
         FROM team t
-                 JOIN team_role tr ON tr.team_uuid = t.uuid
-                 LEFT JOIN role r ON r.uuid = tr.role_uuid
+        JOIN team_role tr ON tr.team_uuid = t.uuid
+        LEFT JOIN role r ON r.uuid = tr.role_uuid
         WHERE t.uuid IN
         <foreach collection="list" item="uuid" open="(" separator="," close=")">
             #{uuid}
@@ -312,7 +349,7 @@ limitations under the License.
         from team_role a
         where a.role_uuid in
         <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
-             #{roleUuid}
+            #{roleUuid}
         </foreach>
         GROUP BY a.role_uuid
     </select>
@@ -339,10 +376,9 @@ limitations under the License.
         </foreach>
     </select>
 
-
     <insert id="insertRole" parameterType="neatlogic.framework.dto.RoleVo">
-        INSERT INTO `role` (`id`, `uuid`, `name`, `description`)
-        VALUES (#{id}, #{uuid}, #{name}, #{description})
+        INSERT INTO `role` (`id`, `uuid`, `name`, `description`, `rule`)
+        VALUES (#{id}, #{uuid}, #{name}, #{description}, #{rule})
     </insert>
 
     <insert id="replaceRoleUser" parameterType="neatlogic.framework.dto.RoleUserVo">
@@ -374,7 +410,8 @@ limitations under the License.
     <update id="updateRole" parameterType="neatlogic.framework.dto.RoleVo">
         UPDATE `role`
         SET `name`        = #{name},
-            `description` = #{description}
+            `description` = #{description},
+            `rule`         = #{rule}
         WHERE `uuid` = #{uuid}
     </update>
 

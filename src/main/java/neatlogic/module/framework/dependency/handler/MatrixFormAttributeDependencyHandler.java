@@ -16,15 +16,11 @@ limitations under the License.
 
 package neatlogic.module.framework.dependency.handler;
 
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dependency.constvalue.FrameworkFromType;
 import neatlogic.framework.dependency.core.CustomTableDependencyHandlerBase;
 import neatlogic.framework.dependency.core.IFromType;
 import neatlogic.framework.dependency.dto.DependencyInfoVo;
 import neatlogic.framework.form.dao.mapper.FormMapper;
-import neatlogic.framework.form.dto.FormAttributeMatrixVo;
-import com.alibaba.fastjson.JSONObject;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -36,7 +32,8 @@ import java.util.List;
  * @author: linbq
  * @since: 2021/4/1 11:42
  **/
-@Service
+//@Service
+@Deprecated
 public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyHandlerBase {
 
     @Resource
@@ -88,23 +85,23 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
         if (dependencyObj == null) {
             return null;
         }
-        if (dependencyObj instanceof FormAttributeMatrixVo) {
-            FormAttributeMatrixVo formAttributeMatrixVo = (FormAttributeMatrixVo) dependencyObj;
-            JSONObject dependencyInfoConfig = new JSONObject();
-            dependencyInfoConfig.put("formUuid", formAttributeMatrixVo.getFormUuid());
-//            dependencyInfoConfig.put("formName", formAttributeMatrixVo.getFormName());
-//            dependencyInfoConfig.put("formVersion", formAttributeMatrixVo.getVersion());
-            dependencyInfoConfig.put("formVersionUuid", formAttributeMatrixVo.getFormVersionUuid());
-//            dependencyInfoConfig.put("attributeLabel", formAttributeMatrixVo.getFormAttributeLabel());
-            List<String> pathList = new ArrayList<>();
-            pathList.add("表单管理");
-            pathList.add(formAttributeMatrixVo.getFormName());
-            pathList.add(formAttributeMatrixVo.getVersion());
-            String lastName = formAttributeMatrixVo.getFormAttributeLabel();
-//            String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
-            String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formUuid}&currentVersionUuid=${DATA.formVersionUuid}";
-            return new DependencyInfoVo(formAttributeMatrixVo.getFormAttributeUuid(), dependencyInfoConfig, lastName, pathList, urlFormat, this.getGroupName());
-        }
+//        if (dependencyObj instanceof FormAttributeMatrixVo) {
+//            FormAttributeMatrixVo formAttributeMatrixVo = (FormAttributeMatrixVo) dependencyObj;
+//            JSONObject dependencyInfoConfig = new JSONObject();
+//            dependencyInfoConfig.put("formUuid", formAttributeMatrixVo.getFormUuid());
+////            dependencyInfoConfig.put("formName", formAttributeMatrixVo.getFormName());
+////            dependencyInfoConfig.put("formVersion", formAttributeMatrixVo.getVersion());
+//            dependencyInfoConfig.put("formVersionUuid", formAttributeMatrixVo.getFormVersionUuid());
+////            dependencyInfoConfig.put("attributeLabel", formAttributeMatrixVo.getFormAttributeLabel());
+//            List<String> pathList = new ArrayList<>();
+//            pathList.add("表单管理");
+//            pathList.add(formAttributeMatrixVo.getFormName());
+//            pathList.add(formAttributeMatrixVo.getVersion());
+//            String lastName = formAttributeMatrixVo.getFormAttributeLabel();
+////            String pathFormat = "表单-${DATA.formName}-${DATA.formVersion}-${DATA.attributeLabel}";
+//            String urlFormat = "/" + TenantContext.get().getTenantUuid() + "/framework.html#/form-edit?uuid=${DATA.formUuid}&currentVersionUuid=${DATA.formVersionUuid}";
+//            return new DependencyInfoVo(formAttributeMatrixVo.getFormAttributeUuid(), dependencyInfoConfig, lastName, pathList, urlFormat, this.getGroupName());
+//        }
         return null;
     }
 
@@ -129,13 +126,13 @@ public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyH
     @Override
     public List<DependencyInfoVo> getDependencyList(Object from, int startNum, int pageSize) {
         List<DependencyInfoVo> resultList = new ArrayList<>();
-        List<FormAttributeMatrixVo> callerList = formMapper.getFormAttributeMatrixByMatrixUuid((String) from, startNum, pageSize);
-        for (FormAttributeMatrixVo caller : callerList) {
-            DependencyInfoVo valueTextVo = parse(caller);
-            if (valueTextVo != null) {
-                resultList.add(valueTextVo);
-            }
-        }
+//        List<FormAttributeMatrixVo> callerList = formMapper.getFormAttributeMatrixByMatrixUuid((String) from, startNum, pageSize);
+//        for (FormAttributeMatrixVo caller : callerList) {
+//            DependencyInfoVo valueTextVo = parse(caller);
+//            if (valueTextVo != null) {
+//                resultList.add(valueTextVo);
+//            }
+//        }
         return resultList;
     }
 }

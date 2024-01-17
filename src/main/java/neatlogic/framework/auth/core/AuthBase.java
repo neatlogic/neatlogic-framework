@@ -21,32 +21,42 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.List;
 
 public abstract class AuthBase {
-	public final String getAuthName() {
-		return this.getClass().getSimpleName();
-	}
+    public final String getAuthName() {
+        return this.getClass().getSimpleName();
+    }
 
-	public abstract String getAuthDisplayName();
+    public abstract String getAuthDisplayName();
 
-	public abstract String getAuthIntroduction();
+    public abstract String getAuthIntroduction();
 
-	public abstract String getAuthGroup();
+    public abstract String getAuthGroup();
 
-	public abstract Integer getSort();
+    public abstract Integer getSort();
 
-	public boolean checkInvalid(){
-		return true;
-	};
+    public boolean checkInvalid() {
+        return true;
+    }
 
-	/**
-	 * 标记 用于标识base
-	 * @return true|false
-	 */
-	public boolean getIsDefault(){
-		return false;
-	}
+    ;
 
-	public List<Class<? extends AuthBase>> getIncludeAuths(){
-		return (List<Class<? extends AuthBase>>) CollectionUtils.EMPTY_COLLECTION;
-	}
+    /**
+     * 是否在前端页面展示，目前用于跨模块调接口权限授权，即A include B,B无需授权
+     */
+    public boolean isShow() {
+        return true;
+    }
+
+    /**
+     * 标记 用于标识base
+     *
+     * @return true|false
+     */
+    public boolean getIsDefault() {
+        return false;
+    }
+
+    public List<Class<? extends AuthBase>> getIncludeAuths() {
+        return (List<Class<? extends AuthBase>>) CollectionUtils.EMPTY_COLLECTION;
+    }
 
 }

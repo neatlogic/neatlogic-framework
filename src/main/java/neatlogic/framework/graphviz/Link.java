@@ -84,7 +84,7 @@ public class Link {
         private String fontcolor;
         private String style;
 
-        private String fontname = "PingFangSC-Regular";
+        private String fontname = "Times";
 
         public Builder(String _from, String _to) {
             this.from = _from;

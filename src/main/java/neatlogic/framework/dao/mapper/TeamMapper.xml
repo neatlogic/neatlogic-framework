@@ -147,32 +147,6 @@ limitations under the License.
         </where>
     </select>
 
-    <select id="searchTeamForSelect" parameterType="neatlogic.framework.dto.TeamVo"
-            resultType="neatlogic.framework.common.dto.ValueTextVo" useCache="false">
-        SELECT
-        CONCAT("team#",`uuid`) AS `value`,
-        `name` as `text`
-        FROM `team`
-        <where>
-            <if test="keyword != null and keyword != ''">
-                and `name` LIKE CONCAT('%', #{keyword}, '%')
-            </if>
-            <if test="parentUuid != null and parentUuid != ''">
-                and `parent_uuid` = #{parentUuid}
-            </if>
-            <if test="level != null and level != ''">
-                and `level` = #{level}
-            </if>
-            <if test="isDelete != null">
-                and `is_delete` = #{isDelete}
-            </if>
-        </where>
-        ORDER BY `lft`
-        <if test="needPage == true">
-            LIMIT #{startNum}, #{pageSize}
-        </if>
-    </select>
-
     <select id="getTeam" parameterType="neatlogic.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
         SELECT
         a.`id`,
@@ -227,13 +201,13 @@ limitations under the License.
                a.`rht`,
                a.`level`
         FROM `team` a
-        WHERE `uuid` = #{uuid}
+        WHERE a.`uuid` = #{uuid} and a.`is_delete` = 0
     </select>
 
     <select id="checkTeamIsExists" parameterType="string" resultType="int" useCache="false">
         SELECT COUNT(`uuid`)
         FROM `team`
-        WHERE `uuid` = #{uuid}
+        WHERE `uuid` = #{uuid} and `is_delete` = 0
     </select>
 
     <select id="getTeamUuidListByUuidList" parameterType="java.util.List" resultType="java.lang.String"
@@ -246,6 +220,7 @@ limitations under the License.
         <foreach collection="list" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
+        and `is_delete` = 0
     </select>
 
     <resultMap id="childrenTeamMap" type="neatlogic.framework.dto.TeamVo">
@@ -258,20 +233,6 @@ limitations under the License.
         <result property="level" column="level"/>
         <result property="childCount" column="childCount"/>
     </resultMap>
-
-    <select id="getTeamByParentUuid" parameterType="java.lang.String" resultMap="childrenTeamMap" useCache="false">
-        SELECT a.`id`,
-               a.`uuid`,
-               a.`name`,
-               a.`parent_uuid`                                              AS parentUuid,
-               a.`lft`,
-               a.`rht`,
-               a.`level`,
-               (SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`
-        FROM `team` a
-        WHERE a.`parent_uuid` = #{value}
-        ORDER BY `lft` ASC
-    </select>
 
     <select id="getTeamUuidByLevelListAndTeamList"
             resultMap="childrenTeamMap" useCache="false">
@@ -294,6 +255,7 @@ limitations under the License.
             a.`lft` &lt;= #{team.lft} and a.`rht` >= #{team.rht}
         </foreach>
         )
+        and a.`is_delete` = 0
     </select>
 
     <select id="getAllSonTeamByParentTeamList" parameterType="neatlogic.framework.dto.TeamVo"
@@ -311,6 +273,7 @@ limitations under the License.
         <foreach collection="list" item="team" separator=") or (" open="(" close=")">
             a.`lft` >= #{team.lft} and a.`rht` &lt;= #{team.rht}
         </foreach>
+        and a.`is_delete` = 0
     </select>
 
     <select id="searchUserCountByTeamUuid" parameterType="java.lang.String" resultType="int" useCache="false">
@@ -336,13 +299,34 @@ limitations under the License.
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
+        and `is_delete` = 0
+    </select>
+
+    <select id="getTeamByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `parent_uuid` AS parentUuid,
+        `level`,
+        `lft`,
+        `rht`,
+        `upward_uuid_path` AS upwardUuidPath,
+        `upward_name_path` AS upwardNamePath
+        FROM `team`
+        WHERE `id` in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        and `is_delete` = 0
     </select>
 
     <select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String"
             useCache="true">
         SELECT ut.`team_uuid`
         FROM `user_team` ut
-                 JOIN team t ON t.`uuid` = ut.`team_uuid`
+                 JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0
         WHERE ut.`user_uuid` = #{userUuid};
     </select>
 
@@ -350,7 +334,7 @@ limitations under the License.
             useCache="true">
         SELECT t.uuid, t.name, t.lft, t.rht
         FROM `user_team` ut
-                 JOIN team t ON t.`uuid` = ut.`team_uuid`
+                 JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0
         WHERE ut.`user_uuid` = #{userUuid};
     </select>
 
@@ -358,18 +342,11 @@ limitations under the License.
             useCache="true">
         SELECT t.uuid, t.name, t.lft, t.rht
         FROM `user_team` ut
-        JOIN team t ON t.`uuid` = ut.`team_uuid`
+        JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0
         WHERE ut.`user_uuid` in
         <foreach collection="list" separator="," open="(" close=")" item="userUuid">
             #{userUuid}
         </foreach>
-    </select>
-
-    <select id="getTeamLockByUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
-        SELECT `uuid`
-        FROM `team`
-        WHERE `uuid` = #{value} FOR
-        UPDATE
     </select>
 
     <select id="getTeamByParentUuidAndStartNum" resultType="neatlogic.framework.dto.TeamVo" useCache="false">
@@ -381,37 +358,9 @@ limitations under the License.
                a.`rht`
         FROM `team` a
         WHERE a.`parent_uuid` = #{parentUuid}
+          and a.`is_delete` = 0
         ORDER BY a.`lft` ASC
         limit #{startNum}, 1
-    </select>
-
-    <select id="checkTeamIsExistsByLeftRightCode" resultType="int" useCache="false">
-        SELECT COUNT(1)
-        FROM `team`
-        WHERE `uuid` = #{uuid}
-          AND `lft` &gt; #{lft}
-          AND `rht` &lt; #{rht}
-    </select>
-
-    <select id="getTeamUserUuidListByLftRhtLevelTitle" resultType="java.lang.String" useCache="false">
-        SELECT b.`user_uuid`
-        FROM `team` a
-                 JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title` = #{title}
-                 JOIN `user` c ON c.`uuid` = b.`user_uuid` AND c.`is_active` = 1
-        WHERE a.`level` = #{level}
-          AND a.`lft` &lt;= #{lft}
-          AND a.`rht` &gt;= #{rht}
-          and a.`is_delete` != 1
-    </select>
-
-    <select id="getTeamUserUuidListByLftRhtTitle" resultType="java.lang.String" useCache="false">
-        SELECT b.`user_uuid`
-        FROM `team` a
-                 JOIN `user_team` b ON b.`team_uuid` = a.`uuid` AND b.`title` = #{title}
-                 JOIN `user` c ON c.`uuid` = b.`user_uuid` AND c.`is_active` = 1
-        WHERE a.`lft` &lt;= #{lft}
-          AND a.`rht` &gt;= #{rht}
-          and a.`is_delete` != 1
     </select>
 
     <select id="getAncestorsAndSelfByLftRht" resultMap="childrenTeamMap" useCache="false">
@@ -425,42 +374,12 @@ limitations under the License.
         a.`level`,
         0 as `childCount`
         FROM `team` a
-        WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht} and a.`is_delete` != 1
+        WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht} and a.`is_delete` = 0
         <if test="level != null and level != ''">
             AND a.`level` = #{level}
         </if>
         ORDER BY `lft` ASC
     </select>
-
-    <select id="getUpwardTeamNameListByLftRht" resultType="java.lang.String" useCache="false">
-        SELECT `name`
-        FROM `team`
-        WHERE `lft` &lt;= #{lft}
-          AND `rht` &gt;= #{rht}
-          and `is_delete` = 0
-        ORDER BY `lft` ASC
-    </select>
-
-    <!--<select id="getTeamUserCountAndChildCountListByUuidList" resultType="neatlogic.framework.dto.TeamVo"
-            useCache="false">
-        SELECT
-        a.`uuid`,
-        COUNT(DISTINCT b.`user_uuid`) AS userCount,
-        COUNT(DISTINCT c.`uuid`) AS childCount
-        FROM `team` a
-        LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`
-        LEFT JOIN `team` c ON c.`parent_uuid` = a.`uuid`
-        LEFT JOIN `user` d ON b.`user_uuid` = d.`uuid`
-        <if test="isActive != null">
-            and d.`is_active` = #{isActive}
-        </if>
-        WHERE a.`is_delete` != 1
-        and a.`uuid` IN
-        <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
-            #{teamUuid}
-        </foreach>
-        GROUP BY a.`uuid`
-    </select>-->
 
     <select id="getTeamUserCountListByUuidList" resultType="neatlogic.framework.dto.TeamVo"
             useCache="false">
@@ -473,7 +392,7 @@ limitations under the License.
         <if test="isActive != null">
             and c.`is_active` = #{isActive}
         </if>
-        WHERE a.`is_delete` != 1
+        WHERE a.`is_delete` = 0
         and a.`uuid` IN
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
@@ -487,8 +406,8 @@ limitations under the License.
         a.`uuid`,
         COUNT(DISTINCT b.`uuid`) AS childCount
         FROM `team` a
-        LEFT JOIN `team` b ON b.`parent_uuid` = a.`uuid` and b.`is_delete` != 1
-        WHERE a.`is_delete` != 1
+        LEFT JOIN `team` b ON b.`parent_uuid` = a.`uuid` and b.`is_delete` = 0
+        WHERE a.`is_delete` = 0
         and a.`uuid` IN
         <foreach collection="list" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
@@ -506,51 +425,16 @@ limitations under the License.
                (SELECT `user_info` from `user` WHERE `uuid` = a.`user_uuid`) as userInfo,
                (SELECT `vip_level` from `user` WHERE `uuid` = a.`user_uuid`) as userVipLevel
         FROM `user_team` a
+                 JOIN `team` t ON a.`team_uuid` = t.`uuid` and t.`is_delete` = 0
                  JOIN `user` b ON b.`uuid` = a.`user_uuid`
         WHERE a.`team_uuid` = #{value}
         ORDER BY a.`id`
     </select>
 
-    <select id="getMaxRhtCode" resultType="java.lang.Integer" useCache="false">
-        SELECT MAX(`rht`)
-        FROM `team`
-    </select>
-
-    <select id="getTeamCount" resultType="int" useCache="false">
-        SELECT count(1)
-        FROM `team`
-    </select>
-
-    <!--	<select id="checkLeftRightCodeIsWrong" resultType="int" useCache="false">-->
-    <!--		SELECT COUNT(a.`uuid`) FROM (-->
-    <!--		(SELECT `uuid` FROM `team` WHERE `lft` IS NULL OR `rht` IS NULL limit 1)-->
-    <!--		UNION-->
-    <!--		(SELECT `uuid` FROM `team` WHERE `lft` &lt; 2 OR `rht` &lt; 3 limit 1)-->
-    <!--		UNION-->
-    <!--		(SELECT parent.`uuid` FROM `team` parent-->
-    <!--		JOIN `team` child ON child.`parent_uuid`=parent.`uuid` AND (child.`lft` &lt;= parent.`lft` OR child.`rht` &gt;= parent.`rht`) limit 1)-->
-    <!--		UNION-->
-    <!--		(SELECT parent.`uuid` FROM `team` parent-->
-    <!--		LEFT JOIN `team` child ON child.`parent_uuid` = parent.`uuid`-->
-    <!--		WHERE child.uuid IS NULL AND parent.`rht` - parent.`lft` != 1 limit 1)-->
-    <!--		) a-->
-    <!--	</select>-->
-
     <select id="getTeamUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
         select `uuid`
         from `team`
-        where `name` = #{value}
-    </select>
-
-    <select id="getTeamUuidAndNameMapList" resultType="neatlogic.framework.common.dto.ValueTextVo">
-        SELECT
-        CONCAT('team#', `uuid`) as `value`,
-        `name` as `text`
-        FROM `team`
-        WHERE `name` in
-        <foreach collection="list" item="text" separator="," open="(" close=")">
-            #{text}
-        </foreach>
+        where `name` = #{value} and `is_delete` = 0
     </select>
 
     <select id="getRepeatTeamNameByNameList" parameterType="java.util.List"
@@ -563,6 +447,7 @@ limitations under the License.
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
+        and `is_delete` = 0
         group by `name`
     </select>
 
@@ -571,6 +456,7 @@ limitations under the License.
         FROM `team`
         WHERE `lft` &gt; #{lft}
           AND `rht` &lt; #{rht}
+          and `is_delete` = 0
     </select>
 
     <resultMap id="teamUserTitleMap" type="neatlogic.framework.dto.TeamUserTitleVo">
@@ -603,21 +489,7 @@ limitations under the License.
         from `team_user_title`
         where `title_id` = #{value}
     </select>
-    <select id="getTeamUserTitleListByTeamUuidList" resultMap="teamUserTitleMap">
-        SELECT tut.`team_uuid` AS teamUuid,
-        u.`user_name` AS userName,
-        u.`user_id` AS userId,
-        u.`uuid` as userUuid,
-        u.`user_info` AS userInfo,
-        ut.`name` AS title
-        FROM `team_user_title` tut
-        LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
-        LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
-        where tut.`team_uuid` in
-        <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
-            #{teamUuid}
-        </foreach>
-    </select>
+
     <select id="getTeamUserTitleListByTeamlrAndTitleId" resultMap="teamUserTitleMap">
         SELECT tut.`team_uuid` AS teamUuid,
                u.`user_name`   AS userName,
@@ -645,15 +517,7 @@ limitations under the License.
         WHERE `user_uuid` = #{value}
     </select>
 
-    <!--<select id="getTeamUuidbyUpwardNamePath" parameterType="java.util.List" resultType="neatlogic.framework.dto.TeamVo">
-        SELECT  upward_name_path AS upwardNamePath ,`uuid` FROM `team`
-        WHERE upward_name_path in
-        <foreach collection="list" item="namePath" open="(" separator="," close=")">
-            #{namePath}
-        </foreach>
-    </select>-->
-
-    <select id="getTeamUuidbyUpwardNamePath" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="getTeamUuidByUpwardNamePath" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT `uuid` FROM `team` WHERE `upward_name_path` = #{value}
     </select>
 
@@ -713,50 +577,6 @@ limitations under the License.
              `lcd` = #{lcd}
     </insert>
 
-    <insert id="batchSaveTeam" parameterType="java.util.List">
-        INSERT INTO `team` (`id`,
-                            `uuid`,
-                            `name`,
-                            `parent_uuid`,
-                            `lft`,
-                            `rht`,
-                            `level`,
-                            `upward_uuid_path`,
-                            `upward_name_path`,
-                            `is_delete`,
-                            `source`,
-                            `lcd`)
-        VALUES
-        <foreach collection="list" item="item" separator=",">
-            (
-            #{item.id},
-            #{item.uuid},
-            #{item.name},
-            #{item.parentUuid},
-            #{item.lft},
-            #{item.rht},
-            #{item.level},
-            #{item.upwardUuidPath},
-            #{item.upwardNamePath},
-            0,
-            #{item.source},
-            NOW()
-            )
-        </foreach>
-        on DUPLICATE KEY UPDATE
-        uuid=values(uuid),
-        `name`=values(name),
-        parent_uuid=values(parent_uuid),
-        lft=values(lft),
-        rht=values(rht),
-        `level`=values(`level`),
-        upward_uuid_path=values(upward_uuid_path),
-        upward_name_path=values(upward_name_path),
-        is_delete=values(is_delete),
-        `source`=values(source),
-        lcd=values(lcd)
-    </insert>
-
     <insert id="insertTeamUser" parameterType="neatlogic.framework.dto.TeamUserVo">
         INSERT INTO `user_team` (`team_uuid`,
                                  `user_uuid`)
@@ -781,83 +601,6 @@ limitations under the License.
         `lcd` = NOW()
         WHERE `uuid` = #{uuid}
     </update>
-
-    <update id="updateTeamParentUuidByUuid" parameterType="neatlogic.framework.dto.TeamVo">
-        UPDATE `team`
-        SET `parent_uuid` = #{parentUuid}
-        WHERE `uuid` = #{uuid}
-    </update>
-
-    <update id="updateTeamParentUuidAndNameByUuid" parameterType="neatlogic.framework.dto.TeamVo">
-        UPDATE `team`
-        SET `parent_uuid` = #{parentUuid},
-            `name`        = #{name}
-        WHERE `uuid` = #{uuid}
-    </update>
-
-    <update id="updateTeamLeftRightCode">
-        UPDATE `team`
-        SET `lft` = #{lft},
-            `rht` = #{rht}
-        WHERE `uuid` = #{uuid}
-    </update>
-
-    <!--<update id="batchUpdateTeamLeftCode">
-        UPDATE `team`
-        set `lft` = `lft` + #{step}
-        WHERE `lft` &gt;= #{minCode}
-    </update>-->
-
-    <!--<update id="batchUpdateTeamRightCode">
-        UPDATE `team`
-        set `rht` = `rht` + #{step}
-        WHERE `rht` &gt;= #{minCode}
-    </update>-->
-
-    <update id="batchUpdateTeamLeftRightCodeByLeftRightCode">
-        UPDATE `team`
-        SET `lft` = `lft` + #{step},
-            `rht` = `rht` + #{step}
-        WHERE `lft` &gt;= #{lft}
-          AND `rht` &lt;= #{rht}
-    </update>
-
-    <update id="updateTeamUserTitle" parameterType="neatlogic.framework.dto.TeamUserVo">
-        UPDATE `user_team`
-        SET `title` = #{title}
-        WHERE `team_uuid` = #{teamUuid}
-          AND `user_uuid` = #{userUuid}
-    </update>
-
-    <!--<update id="updateUpwardUuidPathByLftRht">
-        UPDATE `team` a SET a.`upward_uuid_path` = (
-        SELECT GROUP_CONCAT(b.`uuid` ORDER BY b.`lft`) FROM `team` b
-        WHERE b.`lft` &lt;= a.`lft` AND b.`rht` &gt;= a.`rht` GROUP BY a.`uuid`
-        )
-        <where>
-            <if test="lft != null">
-                AND a.`lft` &gt;= #{lft}
-            </if>
-            <if test="rht != null">
-                AND a.`rht` &lt;= #{rht}
-            </if>
-        </where>
-    </update>-->
-
-    <!--<update id="updateUpwardNamePathByLftRht">
-        UPDATE `team` a SET a.`upward_name_path` = (
-        SELECT GROUP_CONCAT(b.`name` ORDER BY b.`lft` SEPARATOR '/') FROM `team` b
-        WHERE b.`lft` &lt;= a.`lft` AND b.`rht` &gt;= a.`rht` GROUP BY a.`uuid`
-        )
-        <where>
-            <if test="lft != null">
-                AND a.`lft` &gt;= #{lft}
-            </if>
-            <if test="rht != null">
-                AND a.`rht` &lt;= #{rht}
-            </if>
-        </where>
-    </update>-->
 
     <update id="updateUpwardUuidPathByLftRht">
         UPDATE `team` d
@@ -906,13 +649,6 @@ limitations under the License.
           AND (`lcd` &lt; #{lcd} OR `lcd` IS NULL)
     </update>
 
-    <!--	<delete id="deleteTeamByLeftRightCode">-->
-    <!--		DELETE a, b-->
-    <!--		FROM `team` a-->
-    <!--		LEFT JOIN `user_team` b ON b.`team_uuid` = a.`uuid`-->
-    <!--		WHERE a.`lft` &gt;= #{lft} AND a.`rht` &lt;= #{rht}-->
-    <!--	</delete>-->
-
     <delete id="deleteTeamUserByTeamUuid" parameterType="java.lang.String">
         DELETE
         FROM `user_team`
@@ -948,22 +684,10 @@ limitations under the License.
             #{teamUuid}
         </foreach>
     </delete>
-    <delete id="deleteTeamUserTitleByTeamUuidAndTitle">
-        DELETE
-        FROM `team_user_title`
-        WHERE `team_uuid` = #{teamUuid}
-          AND `title_id` = #{titleId};
-    </delete>
+
     <delete id="deleteTeamUserTitleByTeamUuid">
         DELETE
         FROM `team_user_title`
         WHERE `team_uuid` = #{value}
     </delete>
-    <!--<delete id="deleteTeamByUuid" parameterType="java.lang.String"> -->
-    <!--DELETE a, b, c -->
-    <!--FROM `team` a -->
-    <!--LEFT JOIN `team_tag` b ON b.`team_uuid` = a.`uuid` -->
-    <!--LEFT JOIN `user_team` c ON c.`team_uuid` = a.`uuid` -->
-    <!--WHERE a.`uuid` = #{uuid} -->
-    <!--</delete> -->
 </mapper>

@@ -17,10 +17,9 @@ limitations under the License.
 package neatlogic.module.framework.form.service;
 
 import com.alibaba.fastjson.JSONArray;
-import neatlogic.framework.common.dto.ValueTextVo;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 
@@ -29,9 +28,15 @@ import java.util.List;
 public interface FormService {
     /**
      * 保存表单属性与其他功能的引用关系
-     * @param formAttributeVo
+     * @param formVersion
      */
-    void saveDependency(FormAttributeVo formAttributeVo);
+    void saveDependency(FormVersionVo formVersion);
+
+    /**
+     * 删除表单属性与其他功能的引用关系
+     * @param formVersion
+     */
+    void deleteDependency(FormVersionVo formVersion);
 
     /**
      * 表格输入组件密码类型加密
@@ -39,7 +44,7 @@ public interface FormService {
      */
     JSONArray staticListPasswordEncrypt(JSONArray data, JSONObject config);
 
-    List<ValueTextVo> textConversionValueForSelectHandler(Object text, JSONObject config);
+    JSONArray textConversionValueForSelectHandler(Object text, JSONObject config);
 
     /**
      * 校验表单数据有效性，并针对特殊组件数据进行相应处理，如密码类型组件对数据进行加密处理
@@ -61,4 +66,41 @@ public interface FormService {
     boolean isModifiedFormData(List<FormAttributeVo> formAttributeList,
                                List<? extends AttributeDataVo> newFormAttributeDataList,
                                List<? extends AttributeDataVo> oldFormAttributeDataList);
+
+    /**
+     * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
+     * @param formConfig
+     * @return
+     */
+    List<FormAttributeVo> getAllFormAttributeList(JSONObject formConfig);
+
+    /**
+     * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
+     * @param formConfig
+     * @return
+     */
+    List<FormAttributeVo> getAllFormAttributeList(String formConfig);
+
+    /**
+     * 根据表单配置信息，表单组件uuid，场景uuid，获取表单组件信息
+     * @param formConfig
+     * @param attributeUuid
+     * @param sceneUuid
+     * @return
+     */
+    FormAttributeVo getFormAttribute(JSONObject formConfig, String attributeUuid, String sceneUuid);
+    /**
+     * 获取表单组件类型
+     * @param attributeUuid 属性唯一标识
+     * @param formConfig 表单版本配置信息
+     * @return
+     */
+    String getFormAttributeHandler(String attributeUuid, JSONObject formConfig);
+    /**
+     * 获取表单组件类型
+     * @param attributeUuid 属性唯一标识
+     * @param formConfig 表单版本配置信息
+     * @return
+     */
+    String getFormAttributeHandler(String attributeUuid, String formConfig);
 }

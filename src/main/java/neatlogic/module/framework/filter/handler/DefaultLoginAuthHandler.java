@@ -16,11 +16,11 @@ limitations under the License.
 
 package neatlogic.module.framework.filter.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +43,11 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
     @Override
     public String getType() {
         return "default";
+    }
+
+    @Override
+    public boolean isNeedAuth(){
+        return false;
     }
 
     @Override
@@ -96,6 +101,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                 String jwt = authorization.substring(7);
                 String[] jwtParts = jwt.split("\\.");
                 if (jwtParts.length == 3) {
+                    userVo.setJwtVo(new JwtVo(jwtParts));
                     SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
                     Mac mac;
                     try {
@@ -110,9 +116,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                             userVo.setUserId(jwtBodyObj.getString("userid"));
                             userVo.setUserName(jwtBodyObj.getString("username"));
                             userVo.setIsSuperAdmin(jwtBodyObj.getBoolean("isSuperAdmin"));
-                            if(jwtBodyObj.getJSONArray("rolelist") != null) {
-                                userVo.setRoleUuidList(JSONArray.parseArray(jwtBodyObj.getJSONArray("rolelist").toJSONString(),String.class));
-                            }
+                            userVo.getJwtVo().setTokenCreateTime(jwtBodyObj.getLong("createTime"));
                             return userVo;
                         }
                     } catch (NoSuchAlgorithmException | InvalidKeyException e) {
@@ -129,11 +133,6 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
     @Override
     public String myDirectUrl() {
         return Config.DIRECT_URL();
-    }
-
-    @Override
-    public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        return userMapper.getUserByUserIdAndPassword(userVo);
     }
 
 }

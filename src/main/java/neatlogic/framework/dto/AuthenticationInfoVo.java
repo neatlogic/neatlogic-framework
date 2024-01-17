@@ -19,17 +19,21 @@ package neatlogic.framework.dto;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author linbq
  * @since 2021/8/2 20:19
  **/
-public class AuthenticationInfoVo {
+public class AuthenticationInfoVo{
     private String userUuid;
     private final List<String> userUuidList = new ArrayList<>();
     private final List<String> teamUuidList = new ArrayList<>();
     private final List<String> roleUuidList = new ArrayList<>();
+    private Set<String> headerSet = new HashSet<>(); //使用到的header
+
 
     public boolean validUser(List<String> userUuidList) {
         return userUuidList.contains(userUuid);
@@ -56,17 +60,26 @@ public class AuthenticationInfoVo {
         }
         return false;
     }
+    public AuthenticationInfoVo() {
 
-    public AuthenticationInfoVo(String userUuid, List<String> teamUuidList, List<String> roleUuidList) {
+    }
+
+    public AuthenticationInfoVo(String userUuid) {
+        this.userUuid = userUuid;
+    }
+
+    public AuthenticationInfoVo(String userUuid, List<String> teamUuidList, List<String> roleUuidList, Set<String> headerSet ) {
         this.userUuid = userUuid;
         this.teamUuidList.addAll(teamUuidList);
         this.roleUuidList.addAll(roleUuidList);
+        this.headerSet.addAll(headerSet);
     }
 
-    public AuthenticationInfoVo(List<String> userUuidList, List<String> teamUuidList, List<String> roleUuidList) {
+    public AuthenticationInfoVo(List<String> userUuidList, List<String> teamUuidList, List<String> roleUuidList, Set<String> headerSet) {
         this.userUuidList.addAll(userUuidList);
         this.teamUuidList.addAll(teamUuidList);
         this.roleUuidList.addAll(roleUuidList);
+        this.headerSet.addAll(headerSet);
     }
 
     public String getUserUuid() {
@@ -87,5 +100,13 @@ public class AuthenticationInfoVo {
 
     public List<String> getRoleUuidList() {
         return roleUuidList;
+    }
+
+    public Set<String> getHeaderSet() {
+        return headerSet;
+    }
+
+    public void setHeaderSet(Set<String> headerSet) {
+        this.headerSet = headerSet;
     }
 }

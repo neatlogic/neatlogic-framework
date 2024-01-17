@@ -117,6 +117,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 attributeVo.setUuid(targetAttributeUuid);
                 attributeMapper.insertMatrixAttribute(attributeVo);
             }
+            sourceColumnList.add("sort");
+            targetColumnList.add("sort");
             attributeMapper.createMatrixDynamicTable(attributeVoList, targetUuid);
             //数据拷贝
             matrixDataMapper.insertDynamicTableDataForCopy(sourceUuid, sourceColumnList, targetUuid, targetColumnList);
@@ -484,7 +486,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         if (CollectionUtils.isNotEmpty(valueList)) {
                             filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), SearchExpression.EQ.getExpression(), valueList));
                         } else {
-                            return resultList;
+                            continue;
                         }
                         dataVo.setKeyword(null);
                     } else {

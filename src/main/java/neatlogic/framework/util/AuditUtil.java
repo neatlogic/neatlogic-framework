@@ -16,14 +16,12 @@
 
 package neatlogic.framework.util;
 
+import com.alibaba.fastjson.JSON;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.audit.AuditVoHandler;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.restful.dao.mapper.ApiAuditMapper;
-import neatlogic.module.framework.file.handler.LocalFileSystemHandler;
-import neatlogic.module.framework.file.handler.MinioFileSystemHandler;
-import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,7 +51,9 @@ public class AuditUtil {
     /*查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看*/
     public final static long maxFileSize = 1024 * 1024;
 
-    /** 可导出的最大字节数 **/
+    /**
+     * 可导出的最大字节数
+     **/
     public final static long maxExportSize = 1024;
 
     private static final Logger logger = LoggerFactory.getLogger(AuditUtil.class);
@@ -106,14 +106,9 @@ public class AuditUtil {
         if (StringUtils.isBlank(filePath)) {
             InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
             try {
-                filePath = FileUtil.saveData(MinioFileSystemHandler.NAME, TenantContext.get().getTenantUuid(), inputStream, fileHash, "text/plain", fileType);
-            } catch (Exception e) {
-                logger.warn("Minio访问失败，自动切换成本地存储模式");
-                try {
-                    filePath = FileUtil.saveData(LocalFileSystemHandler.NAME, TenantContext.get().getTenantUuid(), inputStream, fileHash, "text/plain", fileType);
-                } catch (Exception e1) {
-                    logger.error(e1.getMessage(), e1);
-                }
+                filePath = FileUtil.saveData(TenantContext.get().getTenantUuid(), inputStream, fileHash, "text/plain", fileType);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
             } finally {
                 if (StringUtils.isNotBlank(filePath)) {
                     apiAuditMapper.insertAuditFile(fileHash, filePath);
@@ -121,7 +116,7 @@ public class AuditUtil {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage(), e);
                 }
             }
         }
@@ -178,8 +173,8 @@ public class AuditUtil {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-        }finally {
-            if(in != null){
+        } finally {
+            if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {

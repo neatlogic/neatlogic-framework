@@ -17,6 +17,7 @@ limitations under the License.
 package neatlogic.module.framework.login.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
@@ -39,6 +40,7 @@ import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.tenant.TenantUnActiveException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
+import neatlogic.framework.exception.user.UserNotFoundException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
@@ -50,6 +52,7 @@ import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.module.framework.service.LoginService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,9 +99,14 @@ public class LoginController {
         JSONObject returnObj = new JSONObject();
         JSONObject jsonObj = JSONObject.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
+        //初始化request上下文
+        RequestContext.init(request, request.getRequestURI(), response);
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");
+            if (StringUtils.isBlank(userId)) {
+                throw new UserNotFoundException(userId);
+            }
             String password = jsonObj.getString("password");
             String authType = "default";
             if (StringUtils.isNotBlank(jsonObj.getString("authType"))) {
@@ -131,12 +139,18 @@ public class LoginController {
             userVo.setTenant(tenant);
 
             UserVo checkUserVo = null;
-            if (Config.ENABLE_SUPERADMIN() && Config.SUPERADMIN().equals(userVo.getUserId())) {
-                String superadminPsw = Config.SUPERADMIN_PASSWORD();
-                superadminPsw = RC4Util.decrypt(superadminPsw);
-                superadminPsw = "{MD5}" + Md5Util.encryptMD5(superadminPsw);
-                if (password.equals(superadminPsw)) {
+            AuthenticationInfoVo authenticationInfoVo = null;
+            if (Config.ENABLE_MAINTENANCE() && Config.MAINTENANCE().equals(userVo.getUserId())) {
+                String maintenancePassword = Config.MAINTENANCE_PASSWORD();
+                maintenancePassword = RC4Util.decrypt(maintenancePassword);
+                if (Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(), "md5")) {
+                    maintenancePassword = "{MD5}" + Md5Util.encryptMD5(maintenancePassword);
+                } else if (Objects.equals(Config.LOGIN_AUTH_PASSWORD_ENCRYPT(), "base64")) {
+                    maintenancePassword = "{BS}" + new String(Base64.getEncoder().encode(maintenancePassword.getBytes()));
+                }
+                if (password.equals(maintenancePassword)) {
                     checkUserVo = MaintenanceMode.getMaintenanceUser();
+                    authenticationInfoVo = new AuthenticationInfoVo(checkUserVo.getUuid());
                 }
             } else {
                 if (Config.ENABLE_NO_SECRET()) {
@@ -155,7 +169,7 @@ public class LoginController {
                 }
                 if (checkUserVo != null) {
                     String timezone = "+8:00";
-                    AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                         loginPostProcessor.loginAfterInitialization();
@@ -165,15 +179,22 @@ public class LoginController {
 
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo);
+                String AuthenticationInfoStr = null;
+                if (authenticationInfoVo != null) {
+                    if(CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())){
+                        authenticationInfoVo.setHeaderSet(null);
+                        AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
+                    }
+                }
                 // 保存 user 登录访问时间
-                userSessionMapper.insertUserSession(checkUserVo.getUuid());
+                userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
                 //更新租户visitTime
                 TenantContext.get().setUseDefaultDatasource(true);
-                if(!tenantVisitSet.contains(tenant)) {
+                if (!tenantVisitSet.contains(tenant)) {
                     tenantMapper.updateTenantVisitTime(tenant);
                     tenantVisitSet.add(tenant);
                 }
-                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo);
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());

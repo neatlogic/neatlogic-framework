@@ -24,13 +24,13 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.InputFrom;
+import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.exception.integration.AuthenticateException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.exception.type.ComponentNotFoundException;
@@ -70,8 +70,6 @@ import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/public/api/")
@@ -88,18 +86,6 @@ public class PublicApiDispatcher {
     @Resource
     private AuthenticationInfoService authenticationInfoService;
 
-    private static final Map<Integer, String> errorMap = new HashMap<>();
-
-    public PublicApiDispatcher() {
-        errorMap.put(408, "请求已超时");
-        errorMap.put(400, "由于包含语法错误，当前请求无法被服务器理解");
-        errorMap.put(412, "请求头缺少认证信息");
-        errorMap.put(410, "服务不可用");
-        errorMap.put(401, "用户验证失败");
-        errorMap.put(403, "禁止访问");
-        errorMap.put(470, "访问频率过高，请稍后访问");
-        errorMap.put(521, "访问频率过高，请稍后访问");
-    }
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         InputFromContext.init(InputFrom.RESTFUL);
@@ -166,7 +152,7 @@ public class PublicApiDispatcher {
         RequestContext.get().setApiRate(qps);
         //从令牌桶拿到令牌才能继续访问，否则直接返回，提示“系统繁忙，请稍后重试”
         if (!RateLimiterTokenBucket.tryAcquire()) {
-            response.setStatus(429);
+            response.setStatus(ResponseCode.RATE_LIMITER_TOKEN_BUCKET.getCode());
 //            returnObj.put("Message", "系统繁忙，请稍后重试");
             JSONObject returnV = new JSONObject();
             returnV.put("rejectSource", RequestContext.get().getRejectSource().getValue());
@@ -180,10 +166,7 @@ public class PublicApiDispatcher {
         if (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/"))) {
             IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
             if (apiAuth != null) {
-                int result = apiAuth.auth(interfaceVo, paramObj, request);
-                if (result != 1) {
-                    throw new AuthenticateException(errorMap.get(result));
-                }
+                apiAuth.auth(interfaceVo, paramObj, request);
             }
         }
 
@@ -278,16 +261,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -328,15 +311,15 @@ public class PublicApiDispatcher {
 
             doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
             logger.error(ex.getMessage(), ex);
@@ -367,20 +350,20 @@ public class PublicApiDispatcher {
             doIt(request, response, token, ApiType.STREAM, paramObj, returnObj, "doservice");
         } catch (TenantNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(521);
+            response.setStatus(ResponseCode.TENANT_NOTFOUND.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -411,16 +394,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -450,16 +433,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -490,16 +473,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.BINARY, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -518,16 +501,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.OBJECT, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -544,16 +527,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.STREAM, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
@@ -570,16 +553,16 @@ public class PublicApiDispatcher {
         try {
             doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
-            response.setStatus(520);
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (PermissionDeniedException ex) {
-            response.setStatus(523);
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
-            response.setStatus(500);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }

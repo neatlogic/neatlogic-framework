@@ -19,12 +19,10 @@ package neatlogic.module.framework.notify.exception;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.auth.label.NOTIFY_POLICY_MODIFY;
 import neatlogic.framework.dto.ConditionParamVo;
-import neatlogic.framework.notify.core.INotifyPolicyHandlerGroup;
 import neatlogic.framework.notify.core.NotifyHandlerType;
 import neatlogic.framework.notify.core.NotifyPolicyHandlerBase;
 import neatlogic.framework.notify.dto.NotifyTriggerTemplateVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
-import neatlogic.framework.util.I18nUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ import java.util.List;
 public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
     @Override
     public String getName() {
-        return "通知异常";
+        return "term.framework.exceptionnotify";
     }
 
     /**
@@ -49,10 +47,10 @@ public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
         return NOTIFY_POLICY_MODIFY.class.getSimpleName();
     }
 
-    @Override
-    public INotifyPolicyHandlerGroup getGroup() {
-        return null;
-    }
+//    @Override
+//    public INotifyPolicyHandlerGroup getGroup() {
+//        return null;
+//    }
 
     @Override
     protected List<NotifyTriggerVo> myNotifyTriggerList() {

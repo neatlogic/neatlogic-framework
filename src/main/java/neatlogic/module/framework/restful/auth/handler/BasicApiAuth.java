@@ -16,6 +16,7 @@
 
 package neatlogic.module.framework.restful.auth.handler;
 
+import neatlogic.framework.exception.integration.AuthenticateException;
 import neatlogic.framework.restful.auth.core.ApiAuthBase;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.PublicApiAuthType;
@@ -53,17 +54,17 @@ public class BasicApiAuth extends ApiAuthBase {
                         long requestTime = Long.parseLong(request.getHeader("x-access-date"));
                         long timeDiff = System.currentTimeMillis() - requestTime;
                         if (timeDiff < 0 || timeDiff > 1000L * interfaceVo.getTimeout()) {
-                            return 408; //超時
+                            throw new AuthenticateException("请求已超时");
                         }
                     }
                 } else {
-                    return 401;//用户验证失败
+                    throw new AuthenticateException("用户验证失败");
                 }
             } else {
-                return 401;//用户验证失败
+                throw new AuthenticateException("用户验证失败");
             }
         } else {
-            return 412;// 请求头缺少认证信息
+            throw new AuthenticateException("请求头缺少认证信息");
         }
         return 1;
     }

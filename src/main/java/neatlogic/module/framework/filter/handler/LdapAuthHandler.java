@@ -18,13 +18,14 @@ package neatlogic.module.framework.filter.handler;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.nacos.api.utils.StringUtils;
-import com.google.common.base.Strings;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.exception.auth.AuthEncryptException;
 import neatlogic.framework.exception.login.LoginAuthConfigNoFoundException;
 import neatlogic.framework.exception.login.LoginAuthUserNotFoundException;
 import neatlogic.framework.exception.user.UserAuthFailedException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.util.$;
 import org.springframework.stereotype.Service;
 
 import javax.naming.AuthenticationException;
@@ -59,17 +60,22 @@ public class LdapAuthHandler extends LoginAuthHandlerBase {
 
         String userId = userVo.getUserId();
         //支持邮箱登录
-        if(userId.indexOf("@") > -1){
+        if (userId.contains("@")) {
             userId = userId.substring(0, userId.indexOf("@"));
         }
-        String password = userVo.getPassword().replace("{BS}" , "");
-        byte[] pwdDecode = Base64.getDecoder().decode(password);
+        String password = userVo.getPassword().replace("{BS}", "");
+        byte[] pwdDecode;
+        try {
+            pwdDecode = Base64.getDecoder().decode(password);
+        } catch (Exception ex) {
+            throw new AuthEncryptException("base64");
+        }
         String credentials = new String(pwdDecode);
 
         String ldapUrl = Config.LDAP_SERVER_URL();
         String userDn = Config.LDAP_USER_DN().replace("{0}", userId);
 
-        if(StringUtils.isBlank(userDn)){
+        if (StringUtils.isBlank(userDn)) {
             throw new LoginAuthConfigNoFoundException("ldap");
         }
 
@@ -80,32 +86,34 @@ public class LdapAuthHandler extends LoginAuthHandlerBase {
         ldapEnv.put(Context.SECURITY_AUTHENTICATION, "simple");
         ldapEnv.put(Context.SECURITY_PRINCIPAL, userDn);
         ldapEnv.put(Context.SECURITY_CREDENTIALS, credentials);
-        UserVo checkUserVo = null ;
-        boolean isFailed = true;
+        UserVo checkUserVo = null;
         try {
             dirCtx = new InitialDirContext(ldapEnv);
             checkUserVo = userMapper.getActiveUserByUserId(userVo);
-            isFailed = false;
-            logger.info("[Ldap认证成功]user dn:" + userDn);
+            if (checkUserVo == null) {//认证通过，但数据库内没用户
+                throw new LoginAuthUserNotFoundException();
+            }
+            logger.info($.t("nmffh.ldapauthhandler.mylogin.succeed") + userDn);
         } catch (AuthenticationException e) {
-            logger.info("[Ldap认证失败]user dn:" + userDn + "，错误信息:" + e.getMessage());
-            isFailed = true ;
+            logger.info($.t("nmffh.ldapauthhandler.mylogin.failed") + userDn + "，" + e.getMessage(), e);
+            throw new UserAuthFailedException();
         } catch (NamingException e) {
-            logger.error("[Ldap认证失败]" + e.getMessage());
-            isFailed = true ;
+            logger.error($.t("nmffh.ldapauthhandler.mylogin.faileda") + e.getMessage(), e);
+            throw new UserAuthFailedException();
         } finally {
             try {
-                dirCtx.close();
+                if (dirCtx != null) {
+                    dirCtx.close();
+                }
             } catch (Exception e) {
-                logger.error("[Ldap认证失败]" + e.getMessage());
+                logger.error($.t("nmffh.ldapauthhandler.mylogin.faileda") + e.getMessage(), e);
             }
-            dirCtx = null;
-        }
-        if(isFailed){
-            throw new UserAuthFailedException();
-        }else if(checkUserVo == null){//认证通过，但数据库内没用户
-            throw new LoginAuthUserNotFoundException();
         }
         return checkUserVo;
+    }
+
+    @Override
+    public boolean isNeedAuth(){
+        return false;
     }
 }

@@ -21,6 +21,8 @@ import neatlogic.framework.exception.util.javascript.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -32,6 +34,7 @@ import java.util.Set;
  * 区间运算支持数字型、日期型、时间型和日期时间型
  */
 public class between {
+    private final static Logger logger = LoggerFactory.getLogger(between.class);
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
@@ -49,10 +52,12 @@ public class between {
                     }
                 }
             } else {
-                throw new ValueNumberIsNotEqualException(prefix);
+                logger.error(new ValueNumberIsNotEqualException(prefix).getMessage());
+                return false;
             }
         }
-        throw new ValueIsNullException(prefix);
+        logger.error(new ValueIsNullException(prefix).getMessage());
+        return false;
     }
 
     private static boolean compare(String dataValue, String valueBefore, String valueAfter, String label) {
@@ -76,7 +81,8 @@ public class between {
                 }
             }
             if (!(transferValue >= transferValueBefore && transferValue <= transferValueAfter)) {
-                throw new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter);
+                logger.error(new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter).getMessage());
+                return false;
             }
             return true;
         } else if (isDate(dataValue) || isDateTime(dataValue) || isTime(dataValue)) {
@@ -106,24 +112,28 @@ public class between {
                 }
                 if (transferValueBefore != null && transferValueAfter != null) {
                     if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
-                        throw new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter);
+                        logger.error(new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter).getMessage());
+                        return false;
                     }
                     return true;
                 } else if (transferValueBefore != null) {
                     if (!transferValue.after(transferValueBefore)) {
-                        throw new ValueNotAfterException(prefix, dataValue, valueBefore);
+                        logger.error(new ValueNotAfterException(prefix, dataValue, valueBefore).getMessage());
+                        return false;
                     }
                     return true;
                 } else if (transferValueAfter != null) {
                     if (!transferValue.before(transferValueAfter)) {
-                        throw new ValueNotBeforeException(prefix, dataValue, valueAfter);
+                        logger.error(new ValueNotBeforeException(prefix, dataValue, valueAfter).getMessage());
+                        return false;
                     }
                     return true;
                 }
             } catch (ParseException ignored) {
             }
         }
-        throw new ValueIsIrregularException(prefix);
+        logger.error(new ValueIsIrregularException(prefix).getMessage());
+        return false;
     }
 
     private final static Set<Character> numberCharSet = new HashSet<>();

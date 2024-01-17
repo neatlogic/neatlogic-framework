@@ -22,7 +22,9 @@ import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.SystemUser;
 import neatlogic.framework.dao.mapper.UserMapper;
+import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
+import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -34,9 +36,16 @@ public class AuthActionChecker {
 
     private static UserMapper userMapper;
 
+    private static AuthenticationInfoService authenticationInfoService;
+
     @Resource
     public void setUserMapper(UserMapper _userMapper) {
         userMapper = _userMapper;
+    }
+
+    @Resource
+    public void setAuthenticationInfoService(AuthenticationInfoService _authenticationInfoService) {
+        authenticationInfoService = _authenticationInfoService;
     }
 
     @SafeVarargs
@@ -95,7 +104,7 @@ public class AuthActionChecker {
      */
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
         //维护模式下且是维护用户 || ,指定权限无需鉴权
-        if (Config.ENABLE_SUPERADMIN() && userUuid.equals(Config.SUPERADMIN()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
+        if (Config.ENABLE_MAINTENANCE() && userUuid.equals(Config.MAINTENANCE()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
             return true;
         }
         //系统用户无需鉴权
@@ -110,7 +119,13 @@ public class AuthActionChecker {
             return false;
         }
         //判断从数据库查询的用户权限是否满足
-        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuthCache(new UserAuthVo(userUuid));
+        AuthenticationInfoVo authenticationInfoVo;
+        if (UserContext.get() != null) {
+            authenticationInfoVo = UserContext.get().getAuthenticationInfoVo();
+        } else {
+            authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userUuid);
+        }
+        List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo);
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
         List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(contains)) {
@@ -179,8 +194,10 @@ public class AuthActionChecker {
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
                     AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
-                    userAuthList.add(new UserAuthVo(auth));
-                    getUserAuthListByAuth(auth, userAuthList);
+                    if (auth != null) {
+                        userAuthList.add(new UserAuthVo(auth));
+                        getUserAuthListByAuth(auth, userAuthList);
+                    }
                 }
             }
         }

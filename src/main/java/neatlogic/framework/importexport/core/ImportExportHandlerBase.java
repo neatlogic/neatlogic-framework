@@ -33,6 +33,9 @@ import java.util.zip.ZipOutputStream;
 public abstract class ImportExportHandlerBase implements ImportExportHandler {
 
     private static Logger logger = LoggerFactory.getLogger(ImportExportHandlerBase.class);
+
+    protected final String IMPORT = "import";
+    protected final String EXPORT = "export";
     /**
      * 检查导入依赖列表中的对象是否已经存在，存在则需要让用户决定是否覆盖
      * @param dependencyBaseInfoList
@@ -130,16 +133,18 @@ public abstract class ImportExportHandlerBase implements ImportExportHandler {
         dependencyList.add(dependencyVo);
         ImportExportVo importExportVo = importExportHandler.exportData(primaryKey, dependencyList, zipOutputStream);
         if (importExportVo != null) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("export data: " + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
-            }
             dependencyVo.setName(importExportVo.getName());
-            try {
-                zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
-                zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));
-                zipOutputStream.closeEntry();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
+            if (zipOutputStream != null) {
+                if (logger.isWarnEnabled()) {
+                    logger.warn("export data: " + importExportVo.getType() + "-" + importExportVo.getName() + "-" + importExportVo.getPrimaryKey());
+                }
+                try {
+                    zipOutputStream.putNextEntry(new ZipEntry("dependency-folder/" + importExportVo.getPrimaryKey() + ".json"));
+                    zipOutputStream.write(JSONObject.toJSONBytes(importExportVo));
+                    zipOutputStream.closeEntry();
+                } catch (IOException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         }
     }

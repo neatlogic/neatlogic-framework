@@ -83,5 +83,4 @@ public class UserAuthVo extends BasePageVo implements Serializable {
         }
         return authName;
     }
-
 }

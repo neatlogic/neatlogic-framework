@@ -531,10 +531,10 @@ public class Config {
 
             JMS_URL = prop.getProperty("jms.url", "tcp://localhost:8161");
 
-            MINIO_URL = prop.getProperty("alioss.url");
-            MINIO_ACCESSKEY = prop.getProperty("alioss.accesskey", "aliossadmin");
-            MINIO_SECRETKEY = prop.getProperty("alioss.secretkey", "aliossadmin");
-            MINIO_BUCKET = prop.getProperty("alioss.bucket", "neatlogic");
+            ALIOSS_URL = prop.getProperty("alioss.url");
+            ALIOSS_ACCESSKEY = prop.getProperty("alioss.accesskey", "aliossadmin");
+            ALIOSS_SECRETKEY = prop.getProperty("alioss.secretkey", "aliossadmin");
+            ALIOSS_BUCKET = prop.getProperty("alioss.bucket", "neatlogic");
 
             MINIO_URL = prop.getProperty("minio.url");
             MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");

@@ -31,7 +31,7 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        if(StringUtils.isNotBlank(Config.ALIOSS_URL())) {
+        if (StringUtils.isNotBlank(Config.getConfigProperty("alioss.url"))) {
             // 创建ClientConfiguration。ClientConfiguration是OSSClient的配置类，可配置代理、连接超时、最大连接数等参数。
             ClientConfiguration conf = new ClientConfiguration();
             // 设置OSSClient允许打开的最大HTTP连接数，默认为1024个。
@@ -46,8 +46,8 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
             conf.setIdleConnectionTime(60000);
             // 设置失败请求重试次数，默认为3次。
             conf.setMaxErrorRetry(5);
-            CredentialsProvider credentialsProvider = new DefaultCredentialProvider(Config.ALIOSS_ACCESSKEY(), Config.ALIOSS_SECRETKEY());
-            this.ossClient = new OSSClient(Config.ALIOSS_URL(), credentialsProvider, conf);
+            CredentialsProvider credentialsProvider = new DefaultCredentialProvider(Config.getConfigProperty("alioss.accesskey", "aliossadmin"), Config.getConfigProperty("alioss.secretkey", "aliossadmin"));
+            this.ossClient = new OSSClient(Config.getConfigProperty("alioss.url"), credentialsProvider, conf);
         }
     }
 
@@ -59,21 +59,22 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
      */
     @Override
     public String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
+        String bucket = Config.getConfigProperty("alioss.bucket", "neatlogic");
         if (ossClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("alioss");
         }
         // 检查存储桶是否已经存在
-        boolean bucketExists = ossClient.doesBucketExist(Config.MINIO_BUCKET());
+        boolean bucketExists = ossClient.doesBucketExist(bucket);
         if (!bucketExists) {
             // 创建一个名为bucketName的存储桶，用于存储照片等zip文件。
-            ossClient.createBucket(Config.ALIOSS_BUCKET());
+            ossClient.createBucket(Config.getConfigProperty("alioss.bucket", "neatlogic"));
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
         String finalPath = "/" + tenantUuid + "/upload/" + fileType + "/" + format.format(new Date()) + "/" + fileId;
         // 使用putObject上传一个文件到存储桶中
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentType(contentType);
-        ossClient.putObject(Config.ALIOSS_BUCKET(), finalPath, inputStream, metadata);
+        ossClient.putObject(bucket, finalPath, inputStream, metadata);
 //		fileVo.setPath("minio:" + finalPath);
         return AliossFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
     }
@@ -83,7 +84,7 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
         if (ossClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("alioss");
         }
-        return ossClient.getObject(Config.ALIOSS_BUCKET(), path.replaceAll(NAME.toLowerCase() + ":", "")).getObjectContent();
+        return ossClient.getObject(Config.getConfigProperty("alioss.bucket", "neatlogic"), path.replaceAll(NAME.toLowerCase() + ":", "")).getObjectContent();
     }
 
     @Override
@@ -93,7 +94,7 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
         }
         if (StringUtils.isNotBlank(filePath) && filePath.startsWith(NAME.toLowerCase() + ":")) {
             String path = filePath.replaceAll(NAME.toLowerCase() + ":", "");
-            ossClient.deleteObject(Config.ALIOSS_BUCKET(), path);
+            ossClient.deleteObject(Config.getConfigProperty("alioss.bucket", "neatlogic"), path);
         } else {
             throw new FilePathIllegalException(filePath);
         }
@@ -104,7 +105,7 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
         if (ossClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("alioss");
         }
-        return ossClient.getObjectMetadata(Config.ALIOSS_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", "")).getContentLength();
+        return ossClient.getObjectMetadata(Config.getConfigProperty("alioss.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", "")).getContentLength();
     }
 
     @Override
@@ -112,7 +113,7 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
         if (ossClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("alioss");
         }
-        ossClient.doesObjectExist(Config.ALIOSS_BUCKET(), filePath.replaceAll(NAME.toLowerCase() + ":", ""));
+        ossClient.doesObjectExist(Config.getConfigProperty("alioss.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", ""));
         return true;
     }
 

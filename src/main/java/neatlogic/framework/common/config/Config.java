@@ -276,37 +276,6 @@ public class Config {
         return LOGIN_FAILED_TIMES_CAPTCHA;
     }
 
-    public static String ALIOSS_URL() {
-        return ALIOSS_URL;
-    }
-
-    public static String ALIOSS_ACCESSKEY() {
-        return ALIOSS_ACCESSKEY;
-    }
-
-    public static String ALIOSS_SECRETKEY() {
-        return ALIOSS_SECRETKEY;
-    }
-
-    public static String ALIOSS_BUCKET() {
-        return ALIOSS_BUCKET;
-    }
-
-    public static String MINIO_URL() {
-        return MINIO_URL;
-    }
-
-    public static String MINIO_ACCESSKEY() {
-        return MINIO_ACCESSKEY;
-    }
-
-    public static String MINIO_SECRETKEY() {
-        return MINIO_SECRETKEY;
-    }
-
-    public static String MINIO_BUCKET() {
-        return MINIO_BUCKET;
-    }
 
     public static String MOBILE_TEST_USER() {
         return MOBILE_TEST_USER;
@@ -419,6 +388,8 @@ public class Config {
     public static String AUTOEXEC_TOKEN() {
         return AUTOEXEC_TOKEN;
     }
+
+    public static Properties properties = new Properties();
 
     private void initConfigFile() {
         try {
@@ -536,17 +507,8 @@ public class Config {
             MONGO_DATABASE = prop.getProperty("mongo.database", "neatlogic");
 
             JMS_URL = prop.getProperty("jms.url", "tcp://localhost:8161");
+            FILE_HANDLER = prop.getProperty("file.handler", "FILE");
 
-            ALIOSS_URL = prop.getProperty("alioss.url");
-            ALIOSS_ACCESSKEY = prop.getProperty("alioss.accesskey", "aliossadmin");
-            ALIOSS_SECRETKEY = prop.getProperty("alioss.secretkey", "aliossadmin");
-            ALIOSS_BUCKET = prop.getProperty("alioss.bucket", "neatlogic");
-            FILE_HANDLER = prop.getProperty("file.handler","FILE");
-
-            MINIO_URL = prop.getProperty("minio.url");
-            MINIO_ACCESSKEY = prop.getProperty("minio.accesskey", "minioadmin");
-            MINIO_SECRETKEY = prop.getProperty("minio.secretkey", "minioadmin");
-            MINIO_BUCKET = prop.getProperty("minio.bucket", "neatlogic");
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");
             MOBILE_IS_ONLINE = Boolean.parseBoolean(prop.getProperty("mobile.is.online", "false"));
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
@@ -592,10 +554,16 @@ public class Config {
                     e.printStackTrace();
                 }
             }
+            properties = prop;
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
     }
+
+    public static Properties getProperties() {
+        return properties;
+    }
+
 
     private static String getProperty(String configFile, String keyName, String defaultValue, boolean isRequired) {
         String value = null;
@@ -613,6 +581,14 @@ public class Config {
             throw new RuntimeException(String.format("%s is not exist", keyName));
         }
         return value;
+    }
+
+    public static String getConfigProperty(String key, String defaultValue) {
+        return properties.getProperty(key, defaultValue);
+    }
+
+    public static String getConfigProperty(String key) {
+        return properties.getProperty(key);
     }
 
     public static String getProperty(String configFile, String keyName) {

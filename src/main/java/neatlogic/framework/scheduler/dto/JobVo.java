@@ -16,11 +16,11 @@
 
 package neatlogic.framework.scheduler.dto;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.scheduler.core.SchedulerManager;
-import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -169,6 +169,17 @@ public class JobVo extends BasePageVo {
 
     public void setJobStatus(JobStatusVo jobStatus) {
         this.jobStatus = jobStatus;
+    }
+
+    //该租户是否拥有该作业的模块
+    public Integer getIsTenantHasModuleGroup() {
+        if (StringUtils.isNotBlank(this.handler)) {
+            JobClassVo jobClass = SchedulerManager.getJobClassByClassName(this.handler);
+            if (jobClass != null) {
+                return TenantContext.get().containsModule(jobClass.getModuleId()) ? 1 : 0;
+            }
+        }
+        return 0;
     }
 
 }

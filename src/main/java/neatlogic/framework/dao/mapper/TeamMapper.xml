@@ -334,7 +334,7 @@ limitations under the License.
             useCache="true">
         SELECT t.uuid, t.name, t.lft, t.rht
         FROM `user_team` ut
-                 JOIN team t ON t.`uuid` = ut.`team_uuid` c
+                 JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0
         WHERE ut.`user_uuid` = #{userUuid};
     </select>
 
@@ -342,7 +342,7 @@ limitations under the License.
             useCache="true">
         SELECT t.uuid, t.name, t.lft, t.rht
         FROM `user_team` ut
-        JOIN team t ON t.`uuid` = ut.`team_uuid` c
+        JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0
         WHERE ut.`user_uuid` in
         <foreach collection="list" separator="," open="(" close=")" item="userUuid">
             #{userUuid}

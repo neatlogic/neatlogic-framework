@@ -76,16 +76,6 @@ public class Config {
 
     private static String JMS_URL;
 
-    private static String ALIOSS_URL;
-    private static String ALIOSS_BUCKET;
-    private static String ALIOSS_ACCESSKEY;
-    private static String ALIOSS_SECRETKEY;
-
-
-    private static String MINIO_URL;
-    private static String MINIO_BUCKET;
-    private static String MINIO_ACCESSKEY;
-    private static String MINIO_SECRETKEY;
 
     private static String MOBILE_TEST_USER;//移动端测试用户
     private static Boolean MOBILE_IS_ONLINE;//是否启动移动端

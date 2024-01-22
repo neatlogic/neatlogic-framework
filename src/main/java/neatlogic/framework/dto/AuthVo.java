@@ -1,6 +1,7 @@
 package neatlogic.framework.dto;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.util.$;
 
 public class AuthVo {
@@ -12,6 +13,7 @@ public class AuthVo {
     private String displayName;
     private String description;
     private String authGroupName;
+    private String authGroup;
     private int userCount;
     private int roleCount;
     private int sort;
@@ -27,11 +29,12 @@ public class AuthVo {
         this.sort = sort;
     }
 
-    public AuthVo(String name, String displayName, String description, String authGroupName, int sort) {
+    public AuthVo(String name, String displayName, String description, ModuleGroupVo authGroup, int sort) {
         this.name = name;
         this.displayName = displayName;
         this.description = description;
-        this.authGroupName = authGroupName;
+        this.authGroupName = authGroup.getGroupName();
+        this.authGroup = authGroup.getGroup();
         this.sort = sort;
     }
 
@@ -97,5 +100,13 @@ public class AuthVo {
 
     public void setAuthGroupName(String authGroupName) {
         this.authGroupName = authGroupName;
+    }
+
+    public String getAuthGroup() {
+        return authGroup;
+    }
+
+    public void setAuthGroup(String authGroup) {
+        this.authGroup = authGroup;
     }
 }

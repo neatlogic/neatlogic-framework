@@ -134,6 +134,12 @@
         <property name="brokerURL">
             <value>${jms.url}</value>
         </property>
+        <property name="user">
+            <value>${jms.user}</value>
+        </property>
+        <property name="password">
+            <value>${jms.password}</value>
+        </property>
     </bean>
 
     <bean id="myCachedConnectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">

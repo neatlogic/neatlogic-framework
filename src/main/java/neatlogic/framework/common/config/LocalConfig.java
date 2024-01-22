@@ -103,6 +103,8 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             mongoPwd = RC4Util.decrypt(mongoPwd);
             dbConfigMap.put("mongo.url", "mongodb://" + mongoUser + ":" + mongoPwd + "@" + mongoHost + "/" + mongoDb);
             dbConfigMap.put("jms.url", prop.getProperty("jms.url", "tcp://localhost:8161"));
+            dbConfigMap.put("jms.user", prop.getProperty("jms.user","neatlogic"));
+            dbConfigMap.put("jms.password", prop.getProperty("jms.password","123456"));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }

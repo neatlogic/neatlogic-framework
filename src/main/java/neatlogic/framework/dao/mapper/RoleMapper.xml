@@ -87,8 +87,7 @@ limitations under the License.
         CONCAT("role#",a.`uuid`) AS `value`,
         a.`name` as `text`
         FROM `role` a
-        WHERE
-        1=1
+        WHERE `is_delete` = 0
         <if test="keyword != null and keyword != ''">
             AND (a.`name` LIKE CONCAT('%',#{keyword}, '%') OR a.`description` LIKE CONCAT('%',#{keyword}, '%'))
         </if>
@@ -173,7 +172,7 @@ limitations under the License.
         `description`,
         `rule`
         FROM `role`
-        WHERE `uuid` in
+        WHERE `is_delete` = 0 AND `uuid` IN
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
@@ -188,7 +187,7 @@ limitations under the License.
         `description`,
         `rule`
         FROM `role`
-        WHERE `id` in
+        WHERE `is_delete` = 0 AND `id` in
         <foreach collection="list" item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
@@ -200,7 +199,7 @@ limitations under the License.
         `uuid`,
         `rule`
         FROM `role`
-        WHERE `uuid` in
+        WHERE `is_delete` = 0 AND `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
@@ -216,13 +215,13 @@ limitations under the License.
     <select id="getRoleUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
         select `uuid`
         from `role`
-        where `name` = #{value}
+        where `is_delete` = 0 AND `name` = #{value}
     </select>
 
     <select id="getRoleUuidByNameList" parameterType="java.util.List" resultType="java.lang.String">
         select `uuid`
         from `role`
-        where `name` in
+        where `is_delete` = 0 AND `name` in
         <foreach collection="nameList" item="text" separator="," open="(" close=")">
             #{text}
         </foreach>
@@ -233,7 +232,7 @@ limitations under the License.
         CONCAT('role#', `uuid`) as `value`,
         `name` as `text`
         FROM `role`
-        WHERE `name` in
+        WHERE `is_delete` = 0 AND `name` in
         <foreach collection="list" item="text" separator="," open="(" close=")">
             #{text}
         </foreach>
@@ -393,7 +392,7 @@ limitations under the License.
         DISTINCT
         `uuid`
         FROM `role`
-        WHERE `uuid` in
+        WHERE `is_delete` = 0 AND `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>

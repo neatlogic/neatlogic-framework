@@ -25,18 +25,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
  **/
 public class WorkAssignmentUnitVo {
-    @EntityField(name = "类型", type = ApiParamType.STRING)
+    @EntityField(name = "common.type", type = ApiParamType.STRING)
     private String initType;
     @EntityField(name = "uuid", type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "名称", type = ApiParamType.STRING)
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "VIP级别(0,1,2,3,4,5)", type = ApiParamType.ENUM)
+    @EntityField(name = "term.framework.user.viplevel", type = ApiParamType.ENUM)
     private Integer vipLevel;
-    @EntityField(name = "头像", type = ApiParamType.STRING)
+    @EntityField(name = "common.avatar", type = ApiParamType.STRING)
     private String avatar;
-    @EntityField(name = "拼音", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.pinyin", type = ApiParamType.STRING)
     private String pinyin;
+    @EntityField(name = "common.isdeleted", type = ApiParamType.ENUM)
+    private Integer isDelete;
 
     public WorkAssignmentUnitVo(UserVo userVo){
         this.initType = GroupSearch.USER.getValue();
@@ -45,16 +47,19 @@ public class WorkAssignmentUnitVo {
         this.vipLevel = userVo.getVipLevel();
         this.avatar = userVo.getAvatar();
         this.pinyin = userVo.getPinyin();
+        this.isDelete = userVo.getIsDelete();
     }
     public WorkAssignmentUnitVo(TeamVo teamVo){
         this.initType = GroupSearch.TEAM.getValue();
         this.uuid = teamVo.getUuid();
         this.name = teamVo.getName();
+        this.isDelete = teamVo.getIsDelete();
     }
     public WorkAssignmentUnitVo(RoleVo roleVo){
         this.initType = GroupSearch.ROLE.getValue();
         this.uuid = roleVo.getUuid();
         this.name = roleVo.getName();
+        this.isDelete = roleVo.getIsDelete();
     }
     public String getInitType() {
         return initType;
@@ -102,5 +107,13 @@ public class WorkAssignmentUnitVo {
 
     public void setPinyin(String pinyin) {
         this.pinyin = pinyin;
+    }
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
     }
 }

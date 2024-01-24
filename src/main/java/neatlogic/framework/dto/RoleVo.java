@@ -34,16 +34,16 @@ public class RoleVo extends BasePageVo implements Serializable {
 
     public static final String USER_DEFAULT_ROLE = "R_SYSTEM_USER";
     private Long id;
-    @EntityField(name = "角色uuid",
+    @EntityField(name = "common.uuid",
             type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "角色名称",
+    @EntityField(name = "common.name",
             type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "角色描述",
+    @EntityField(name = "common.description",
             type = ApiParamType.STRING)
     private String description;
-    @EntityField(name = "生效规则",
+    @EntityField(name = "common.rule",
             type = ApiParamType.STRING)
     private String rule;
     private int userCount;
@@ -61,8 +61,11 @@ public class RoleVo extends BasePageVo implements Serializable {
     /**
      * 此字段专供前端使用，用于渲染头像时区分对象类型，取值范围[user,team,role]
      */
-    @EntityField(name = "前端初始化类型，取值范围[user,team,role]", type = ApiParamType.STRING)
+    @EntityField(name = "common.inittype", type = ApiParamType.STRING)
     private final String initType = GroupSearch.ROLE.getValue();
+
+    @EntityField(name = "common.isdeleted", type = ApiParamType.ENUM)
+    private Integer isDelete;
 
     public RoleVo() {
     }
@@ -184,5 +187,13 @@ public class RoleVo extends BasePageVo implements Serializable {
 
     public void setRule(String rule) {
         this.rule = rule;
+    }
+
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
     }
 }

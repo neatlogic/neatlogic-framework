@@ -890,11 +890,11 @@ CREATE TABLE IF NOT EXISTS `role` (
   `uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'uuid',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '角色名称',
   `description` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '角色描述',
-  `env` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '生效环境',
+  `rule` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '生效规则',
+  `is_delete` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否已删除',
   PRIMARY KEY (`uuid`) USING BTREE,
-  KEY `id` (`id`) USING BTREE,
-  KEY `idx_env` (`env`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC COMMENT='角色表';
+  KEY `id` (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='角色表';
 
 -- ----------------------------
 -- Table structure for role_authority

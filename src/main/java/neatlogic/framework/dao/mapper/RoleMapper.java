@@ -27,6 +27,8 @@ public interface RoleMapper {
 
     int checkRoleIsExists(String uuid);
 
+    int checkRoleNameIsIsRepeat(RoleVo roleVo);
+
     List<RoleVo> searchRole(RoleVo roleVo);
 
     List<RoleVo> getRoleListByAuthName(String auth);
@@ -48,6 +50,8 @@ public interface RoleMapper {
     int searchRoleUserCountByRoleUuid(String roleUuid);
 
     RoleVo getRoleByUuid(String uuid);
+
+    RoleVo getRoleByName(String name);
 
     RoleVo getRoleSimpleInfoByUuid(String uuid);
 
@@ -109,11 +113,13 @@ public interface RoleMapper {
 
     int updateTeamRole(RoleTeamVo roleTeamVo);
 
+    int updateRoleIsDeletedByUuid(String uuid);
+
     int deleteRoleAuthByRoleUuid(String roleUuid);
 
     int deleteRoleAuth(RoleAuthVo roleAuthVo);
 
-    int deleteRoleByUuid(String uuid);
+//    int deleteRoleByUuid(String uuid);
 
     int deleteMenuRoleByRoleUuid(String roleUuid);
 

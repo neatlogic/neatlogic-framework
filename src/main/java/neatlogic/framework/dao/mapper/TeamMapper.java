@@ -15,6 +15,8 @@ public interface TeamMapper {
 
     int checkTeamIsExists(String uuid);
 
+    int checkTeamNameIsIsRepeat(TeamVo teamVo);
+
     List<String> getTeamUuidListByUuidList(List<String> uuidList);
 
     TeamVo getTeamByUuid(String uuid);
@@ -35,6 +37,8 @@ public interface TeamMapper {
 
     List<TeamVo> getTeamByUuidList(List<String> teamUuidList);
 
+    List<TeamVo> getTeamListContainsDeletedByUuidList(List<String> teamUuidList);
+
     List<TeamVo> getTeamByIdList(List<Long> idList);
 
     List<String> getTeamUuidListByUserUuid(String userUuid);
@@ -54,6 +58,8 @@ public interface TeamMapper {
     List<TeamUserVo> getTeamUserListByTeamUuid(String teamUuid);
 
     List<String> getTeamUuidByName(String name);
+
+    TeamVo getTeamByNameAndParentUuid(TeamVo teamVo);
 
     List<TeamVo> getRepeatTeamNameByNameList(List<String> list);
 
@@ -85,13 +91,15 @@ public interface TeamMapper {
 
     int updateUpwardNamePathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
+    int updateTeamIsDeletedByUuidList(List<String> uuidList);
+
     int deleteTeamUserByTeamUuid(String teamUuid);
 
     int deleteTeamUserByTeamUuidList(List<String> teamUuidList);
 
     int deleteTeamUserByTeamUuidAndUserUuidList(@Param("teamUuid") String teamUuid, @Param("userUuidList") List<String> userUuidList);
 
-    int deleteTeamByUuidList(List<String> uuidList);
+//    int deleteTeamByUuidList(List<String> uuidList);
 
     int deleteTeamRoleByTeamUuidList(List<String> teamUuidList);
 

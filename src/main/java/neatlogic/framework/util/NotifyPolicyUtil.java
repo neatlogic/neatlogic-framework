@@ -222,7 +222,7 @@ public class NotifyPolicyUtil {
                 notifyVo.setCallerMessageHandlerClass(newsHandlerClass);
                 notifyVo.setCallerNotifyPolicyVo(notifyPolicyVo);
                 boolean isSentSuccessfully = handler.execute(notifyVo);
-                audit(policyHandler.getName(), notifyPolicyVo.getName(), notifyTriggerType.getText(), handler.getName(), isSentSuccessfully, notifyVo.getTitle(), notifyAuditMessage, notifyVo);
+                audit($.t(policyHandler.getName()), notifyPolicyVo.getName(), notifyTriggerType.getText(), handler.getName(), isSentSuccessfully, notifyVo.getTitle(), notifyAuditMessage, notifyVo);
             }
         }
     }

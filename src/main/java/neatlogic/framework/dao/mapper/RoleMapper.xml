@@ -28,9 +28,17 @@ limitations under the License.
     </select>
 
     <select id="checkRoleIsExists" parameterType="java.lang.String" resultType="int" useCache="false">
-        SELECT COUNT(`uuid`)
+        SELECT COUNT(1)
         FROM `role`
-        WHERE `uuid` = #{uuid}
+        WHERE `uuid` = #{uuid} and `is_delete` = 0
+    </select>
+
+    <select id="checkRoleNameIsIsRepeat" parameterType="neatlogic.framework.dto.RoleVo" resultType="int" useCache="false">
+        SELECT COUNT(1)
+        FROM `role`
+        WHERE `name` = #{name}
+          AND `uuid` != #{uuid}
+          AND `is_delete` = 0
     </select>
 
     <resultMap id="roleMap" type="neatlogic.framework.dto.RoleVo">
@@ -49,6 +57,7 @@ limitations under the License.
         FROM `role` a
         LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
         <where>
+            `is_delete` = 0
             <if test="keyword != null and keyword != ''">
                 AND (name LIKE CONCAT('%',#{keyword}, '%') OR description LIKE CONCAT('%',#{keyword}, '%'))
             </if>
@@ -102,8 +111,7 @@ limitations under the License.
         COUNT(DISTINCT (a.`uuid`))
         FROM `role` a
         LEFT JOIN `role_authority` b ON a.`uuid` = b.`role_uuid`
-        WHERE
-        1=1
+        WHERE `is_delete` = 0
         <if test="keyword != null and keyword != ''">
             AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
         </if>
@@ -132,11 +140,26 @@ limitations under the License.
         WHERE `uuid` = #{value}
     </select>
 
+    <select id="getRoleByName" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="true">
+        SELECT `id`,
+               `uuid`,
+               `name`,
+               `description`,
+               `rule`,
+               `is_delete` AS isDelete
+        FROM `role`
+        WHERE `name` = #{value}
+    </select>
+
     <select id="getRoleSimpleInfoByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
             useCache="true">
         SELECT `id`,
                `uuid`,
-               `name`
+               `name`,
+               `description`,
+               `rule`,
+               `is_delete` AS isDelete
         FROM `role`
         WHERE `uuid` = #{value}
     </select>
@@ -377,8 +400,8 @@ limitations under the License.
     </select>
 
     <insert id="insertRole" parameterType="neatlogic.framework.dto.RoleVo">
-        INSERT INTO `role` (`id`, `uuid`, `name`, `description`, `rule`)
-        VALUES (#{id}, #{uuid}, #{name}, #{description}, #{rule})
+        INSERT INTO `role` (`id`, `uuid`, `name`, `description`, `rule`, `is_delete`)
+        VALUES (#{id}, #{uuid}, #{name}, #{description}, #{rule}, 0)
     </insert>
 
     <insert id="replaceRoleUser" parameterType="neatlogic.framework.dto.RoleUserVo">
@@ -411,7 +434,8 @@ limitations under the License.
         UPDATE `role`
         SET `name`        = #{name},
             `description` = #{description},
-            `rule`         = #{rule}
+            `rule`        = #{rule},
+            `is_delete`   = #{isDelete}
         WHERE `uuid` = #{uuid}
     </update>
 
@@ -422,11 +446,17 @@ limitations under the License.
           AND `team_uuid` = #{teamUuid}
     </update>
 
-    <delete id="deleteRoleByUuid" parameterType="java.lang.String">
+    <update id="updateRoleIsDeletedByUuid" parameterType="java.lang.String">
+        UPDATE `role`
+        SET `is_delete` = 1
+        WHERE `uuid` = #{value}
+    </update>
+
+    <!--<delete id="deleteRoleByUuid" parameterType="java.lang.String">
         DELETE
         FROM `role`
         WHERE `uuid` = #{value}
-    </delete>
+    </delete>-->
 
     <delete id="deleteRoleAuthByRoleUuid" parameterType="string">
         DELETE

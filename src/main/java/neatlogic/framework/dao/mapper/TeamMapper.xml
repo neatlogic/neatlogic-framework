@@ -178,7 +178,8 @@ limitations under the License.
         SELECT
         a.`id`,
         a.`uuid`,
-        a.`name`
+        a.`name`,
+        a.`is_delete` AS isDelete
         FROM
         `team` a
         <where>
@@ -205,9 +206,18 @@ limitations under the License.
     </select>
 
     <select id="checkTeamIsExists" parameterType="string" resultType="int" useCache="false">
-        SELECT COUNT(`uuid`)
+        SELECT COUNT(1)
         FROM `team`
         WHERE `uuid` = #{uuid} and `is_delete` = 0
+    </select>
+
+    <select id="checkTeamNameIsIsRepeat" parameterType="neatlogic.framework.dto.TeamVo" resultType="int" useCache="false">
+        SELECT COUNT(1)
+        FROM `team`
+        WHERE `name` = #{name}
+          AND `parent_uuid` = #{parentUuid}
+          AND `uuid` != #{uuid}
+          AND `is_delete` = 0
     </select>
 
     <select id="getTeamUuidListByUuidList" parameterType="java.util.List" resultType="java.lang.String"
@@ -300,6 +310,26 @@ limitations under the License.
             #{item}
         </foreach>
         and `is_delete` = 0
+    </select>
+
+    <select id="getTeamListContainsDeletedByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TeamVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `parent_uuid` AS parentUuid,
+        `level`,
+        `lft`,
+        `rht`,
+        `is_delete` AS isDelete,
+        `upward_uuid_path` AS upwardUuidPath,
+        `upward_name_path` AS upwardNamePath
+        FROM `team`
+        WHERE `uuid` in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
     </select>
 
     <select id="getTeamByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.TeamVo"
@@ -437,6 +467,17 @@ limitations under the License.
         where `name` = #{value} and `is_delete` = 0
     </select>
 
+    <select id="getTeamByNameAndParentUuid" parameterType="neatlogic.framework.dto.TeamVo" resultType="neatlogic.framework.dto.TeamVo">
+        select
+            `id`,
+            `uuid`,
+            `name`,
+            `parent_uuid` AS `parentUuid`
+        from `team`
+        where `name` = #{name}
+        and `parent_uuid` = #{parentUuid}
+    </select>
+
     <select id="getRepeatTeamNameByNameList" parameterType="java.util.List"
             resultType="neatlogic.framework.dto.TeamVo">
         select
@@ -546,6 +587,17 @@ limitations under the License.
                 0,
                 #{source},
                 NOW())
+        ON DUPLICATE KEY UPDATE
+             `name` = #{name},
+             `parent_uuid` = #{parentUuid},
+             `lft` = #{lft},
+             `rht` = #{rht},
+             `level` = #{level},
+             `upward_uuid_path` = #{upwardUuidPath},
+             `upward_name_path` = #{upwardNamePath},
+             `is_delete` = 0,
+             `source` = #{source},
+             `lcd` = NOW()
     </insert>
 
     <insert id="insertTeamForLdap" parameterType="neatlogic.framework.dto.TeamVo">
@@ -649,6 +701,15 @@ limitations under the License.
           AND (`lcd` &lt; #{lcd} OR `lcd` IS NULL)
     </update>
 
+    <update id="updateTeamIsDeletedByUuidList" parameterType="java.lang.String">
+        UPDATE `team`
+        SET `is_delete` = 1
+        WHERE `uuid`  IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </update>
+
     <delete id="deleteTeamUserByTeamUuid" parameterType="java.lang.String">
         DELETE
         FROM `user_team`
@@ -671,12 +732,12 @@ limitations under the License.
         </foreach>
     </delete>
 
-    <delete id="deleteTeamByUuidList" parameterType="java.util.List">
+    <!--<delete id="deleteTeamByUuidList" parameterType="java.util.List">
         DELETE FROM `team` WHERE `uuid` IN
         <foreach collection="list" item="uuid" open="(" separator="," close=")">
             #{uuid}
         </foreach>
-    </delete>
+    </delete>-->
 
     <delete id="deleteTeamRoleByTeamUuidList" parameterType="java.util.List">
         DELETE FROM `team_role` WHERE `team_uuid` IN

@@ -14,9 +14,7 @@ public interface DatasourceMapper {
 
 	List<String> getUserGrants(String tenantUuid);
 
-	int updateDatabaseUserPwd(@Param("tenantUuid") String tenantId, @Param("password") String password);
-
-	int updateDatasourcePasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
+	int updateDatabaseUserPwd(@Param("tenantUuid") String tenantUuid, @Param("password") String password);
 
 	int insertDatasource(DatasourceVo datasourceVo);
 

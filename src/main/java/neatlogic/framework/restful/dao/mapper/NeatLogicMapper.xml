@@ -3,7 +3,6 @@
 <mapper namespace="neatlogic.framework.restful.dao.mapper.NeatLogicMapper">
 	<select id="getMongodbByTenant" resultType="neatlogic.framework.dto.MongoDbVo">
 		SELECT
-			`tenant_id` AS tenantId,
 			`tenant_uuid` AS tenantUuid,
 			`database`,
 			`username`,
@@ -16,7 +15,6 @@
 	</select>
     <select id="getMongodbList" resultType="neatlogic.framework.dto.MongoDbVo">
 		SELECT
-			`tenant_id` AS tenantId,
 			`tenant_uuid` AS tenantUuid,
 			`database`,
 			`username`,

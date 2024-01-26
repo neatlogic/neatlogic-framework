@@ -20,8 +20,6 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
 public class TenantModuleGroupVo {
-    @EntityField(name = "租户id", type = ApiParamType.LONG)
-    private Long tenantId;
     @EntityField(name = "租户uuid", type = ApiParamType.STRING)
     private String tenantUuid;
     @EntityField(name = "模块组", type = ApiParamType.STRING)
@@ -37,14 +35,6 @@ public class TenantModuleGroupVo {
     public TenantModuleGroupVo(String moduleGroup, String version) {
         this.moduleGroup = moduleGroup;
         this.version = version;
-    }
-
-    public Long getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
     }
 
     public String getTenantUuid() {

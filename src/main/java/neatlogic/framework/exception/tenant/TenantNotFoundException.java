@@ -27,7 +27,4 @@ public class TenantNotFoundException extends ApiRuntimeException {
         super("nff.jsonwebtokenvalidfilter.dofilterinternal.lacktenant", tenant);
     }
 
-    public TenantNotFoundException(Long tenantId) {
-        super("nff.jsonwebtokenvalidfilter.dofilterinternal.lacktenant", tenantId);
-    }
 }

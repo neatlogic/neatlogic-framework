@@ -25,7 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Random;
 
 public class MongoDbVo {
-    private Long tenantId;
     private String tenantUuid;
     private String host;
     private String database;
@@ -42,8 +41,7 @@ public class MongoDbVo {
 
     }
 
-    public MongoDbVo(Long _tenantId, String _tenantUuid, boolean generatePwd) {
-        this.tenantId = _tenantId;
+    public MongoDbVo( String _tenantUuid, boolean generatePwd) {
         this.tenantUuid = _tenantUuid;
         // 生成随机密码
         if (generatePwd) {
@@ -120,15 +118,6 @@ public class MongoDbVo {
 
     public void setPasswordCipher(String passwordCipher) {
         this.passwordCipher = passwordCipher;
-    }
-
-
-    public Long getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
     }
 
     public String getHost() {

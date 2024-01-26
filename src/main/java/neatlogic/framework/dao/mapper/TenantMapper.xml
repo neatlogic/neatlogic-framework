@@ -10,7 +10,7 @@
 
     <select id="getTenantModuleGroupByTenantUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.TenantModuleGroupVo">
-        SELECT `tenant_id`    as tenantId,
+        SELECT
                `tenant_uuid`  as tenantUuid,
                `module_group` AS moduleGroup
         FROM `tenant_modulegroup`
@@ -77,7 +77,6 @@
     <select id="searchTenant" parameterType="neatlogic.framework.dto.TenantVo"
             resultType="neatlogic.framework.dto.TenantVo">
         SELECT
-        `id`,
         `uuid`,
         `name`,
         `is_active` AS isActive,
@@ -88,7 +87,7 @@
         FROM
         `tenant`
         <include refid="searchTenantCondition"/>
-        ORDER BY id DESC
+        ORDER BY `fcd`,`uuid` DESC
     </select>
 
     <select id="searchTenantCount" parameterType="neatlogic.framework.dto.TenantVo" resultType="int">
@@ -103,39 +102,25 @@
         SELECT COUNT(1)
         FROM `tenant`
         WHERE uuid = #{uuid}
-          and id != #{id}
     </select>
 
     <select id="getTenantByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TenantVo">
-        SELECT `id`,
+        SELECT
                `uuid`,
                `name`,
                `is_active`   AS isActive,
                `expire_date` AS expireDate,
                `status`,
-               `description`
+               `description`,
+               `is_need_demo` as isNeedDemo
         FROM `tenant`
         WHERE `uuid` = #{value}
     </select>
 
-    <select id="getTenantById" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.TenantVo">
-        SELECT `id`,
-               `uuid`,
-               `name`,
-               `is_active`    AS isActive,
-               `is_need_demo` AS isNeedDemo,
-               `expire_date`  AS expireDate,
-               `status`,
-               `error_msg`    as errorMsg,
-               `description`
-        FROM `tenant`
-        WHERE `id` = #{value}
-    </select>
-
     <select id="getAllActiveTenant" resultType="neatlogic.framework.dto.TenantVo">
-        SELECT t.`uuid`,
+        SELECT
+               t.`uuid`,
                t.`name`,
-               t.`id`,
                t.visit_time as visitTime
         FROM `tenant` t
                  JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
@@ -154,18 +139,20 @@
     </select>
 
     <insert id="insertTenant" parameterType="neatlogic.framework.dto.TenantVo">
-        INSERT INTO `tenant` (`id`,
+        INSERT INTO `tenant` (
                               `uuid`,
                               `name`,
                               `is_active`,
+                              `is_need_demo`,
                               `expire_date`,
                               `status`,
                               `fcd`,
                               `description`)
-        VALUES (#{id},
+        VALUES (
                 #{uuid},
                 #{name},
                 #{isActive},
+                #{isNeedDemo},
                 #{expireDate},
                 #{status},
                 now(),
@@ -173,8 +160,8 @@
     </insert>
 
     <insert id="insertTenantModuleGroup">
-        INSERT INTO `tenant_modulegroup` (`tenant_id`, `tenant_uuid`, `module_group`)
-        VALUES (#{tenantId}, #{tenantUuid}, #{moduleGroup})
+        INSERT INTO `tenant_modulegroup` (`tenant_uuid`, `module_group`)
+        VALUES ( #{tenantUuid}, #{moduleGroup})
     </insert>
 
     <insert id="insertTenantAudit" parameterType="neatlogic.framework.dto.TenantAuditVo">
@@ -228,7 +215,7 @@
         WHERE `id` = #{id}
     </update>
 
-    <update id="updateTenant" parameterType="neatlogic.framework.dto.TenantVo">
+    <update id="updateTenantByUuid" parameterType="neatlogic.framework.dto.TenantVo">
         UPDATE
             `tenant`
         SET `name`        = #{name},
@@ -237,21 +224,21 @@
             `description` = #{description},
             `status`      = #{status},
             `error_msg`   = #{errorMsg}
-        WHERE `id` = #{id}
+        WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="updateTenantIsActive" parameterType="neatlogic.framework.dto.TenantVo">
+    <update id="updateTenantIsActiveByUuid" parameterType="java.lang.String">
         UPDATE
             `tenant`
         SET `is_active` = #{isActive}
-        WHERE `id` = #{id}
+        WHERE `uuid` = #{value}
     </update>
 
-    <update id="updateTenantStatus" parameterType="neatlogic.framework.dto.TenantVo">
+    <update id="updateTenantStatusByUuid" parameterType="java.lang.String">
         UPDATE
             `tenant`
         SET `status` = #{status}
-        WHERE `id` = #{id}
+        WHERE `uuid` = #{uuid}
     </update>
 
     <update id="updateTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
@@ -271,16 +258,16 @@
         update `tenant` set `visit_time` = now() where `uuid` = #{value}
     </update>
 
-    <delete id="deleteTenantModuleGroupByTenantId" parameterType="java.lang.Long">
+    <delete id="deleteTenantModuleGroupByTenantUuid" parameterType="java.lang.String">
         DELETE
         FROM `tenant_modulegroup`
-        WHERE `tenant_id` = #{value}
+        WHERE `tenant_uuid` = #{value}
     </delete>
 
-    <delete id="deleteTenantModuleByTenantId" parameterType="java.lang.Long">
+    <delete id="deleteTenantModuleByTenantUuid" parameterType="java.lang.String">
         DELETE
         FROM `tenant_module`
-        WHERE `tenant_id` = #{value}
+        WHERE `tenant_uuid` = #{value}
     </delete>
 </mapper>
 

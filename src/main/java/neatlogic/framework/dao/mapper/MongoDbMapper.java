@@ -17,7 +17,6 @@
 package neatlogic.framework.dao.mapper;
 
 import neatlogic.framework.dto.MongoDbVo;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,8 +26,6 @@ public interface MongoDbMapper {
     List<MongoDbVo> getAllTenantMongoDb();
 
     MongoDbVo getTenantMongoDbByTenantUuid(String uuid);
-
-    int updateTenantMongoDbPasswordByTenantId(@Param("tenantId") Long tenantId, @Param("password") String password);
 
     int insertTenantMongodb(MongoDbVo mongoDbVo);
 

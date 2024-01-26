@@ -26,8 +26,6 @@ public interface TenantMapper {
 
     TenantVo getTenantByUuid(String tenantUuid);
 
-    TenantVo getTenantById(Long tenantId);
-
     List<TenantVo> getAllActiveTenant();
 
     Long getTenantAuditMaxGroupIdByTenantUuid(String tenantUuid);
@@ -36,7 +34,7 @@ public interface TenantMapper {
 
     int insertTenant(TenantVo tenantVo);
 
-    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup, @Param("isInitDml") Boolean isInitDml);
+    int insertTenantModuleGroup( @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup, @Param("isInitDml") Boolean isInitDml);
 
     int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
@@ -46,22 +44,22 @@ public interface TenantMapper {
 
     int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
-    int updateTenant(TenantVo tenantVo);
+    int updateTenantByUuid(TenantVo tenantVo);
 
-    int updateTenantIsActive(TenantVo tenantVo);
+    int updateTenantIsActiveByUuid(String uuid);
 
     int updateTenantAudit(TenantAuditVo tenantAuditVo);
 
-    int updateTenantStatus(TenantVo tenantVo);
+    int updateTenantStatusByUuid(@Param("uuid") String uuid,@Param("status") String status);
 
     int updateTenantModule(TenantModuleVo tenantModuleVo);
 
     int updateTenantVisitTime(String tenant);
 
-    int checkTenantUuidIsExists(TenantVo tenantVo);
+    int checkTenantUuidIsExists(@Param("uuid") String uuid);
 
-    int deleteTenantModuleGroupByTenantId(Long tenantId);
+    int deleteTenantModuleGroupByTenantUuid(String tenantUuid);
 
-    void deleteTenantModuleByTenantId(Long id);
+    void deleteTenantModuleByTenantUuid(String tenantUuid);
 
 }

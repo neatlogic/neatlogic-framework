@@ -19,20 +19,27 @@ limitations under the License.
 <mapper namespace="neatlogic.framework.mq.dao.mapper.MqTopicMapper">
 
     <select id="getTopicByName" parameterType="java.lang.String" resultType="neatlogic.framework.mq.dto.TopicVo">
-        SELECT name, is_active
+        SELECT name, is_active as isActive, config as configStr
         FROM mq_topic
         WHERE name = #{value}
     </select>
 
 
     <select id="getTopicList" resultType="neatlogic.framework.mq.dto.TopicVo">
-        SELECT name, is_active AS isActive
+        SELECT name, is_active AS isActive, config AS configStr
         FROM mq_topic
     </select>
 
-    <insert id="insertInActiveTopic" parameterType="neatlogic.framework.mq.dto.TopicVo">
+    <update id="saveTopicConfig" parameterType="neatlogic.framework.mq.dto.TopicVo">
+        INSERT INTO mq_topic (name, config, is_active)
+        VALUES (#{name}, #{configStr}, 1)
+        ON DUPLICATE KEY UPDATE config = #{configStr}
+    </update>
+
+    <insert id="saveTopicIsActive" parameterType="neatlogic.framework.mq.dto.TopicVo">
         INSERT INTO mq_topic (name, is_active)
         VALUES (#{name}, #{isActive})
+        ON DUPLICATE KEY UPDATE is_active = #{isActive}
     </insert>
 
     <delete id="deleteInActiveTopic" parameterType="java.lang.String">

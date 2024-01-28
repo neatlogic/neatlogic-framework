@@ -16,11 +16,11 @@
 
 package neatlogic.framework.mq.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.mq.dao.mapper.MqTopicMapper;
 import neatlogic.framework.mq.dto.TopicVo;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public abstract class TopicBase<T> implements ITopic<T> {
                 String topicName = this.getName().toLowerCase(Locale.ROOT);
                 TopicVo topicVo = mqTopicMapper.getTopicByName(topicName);
                 if (topicVo == null || Objects.equals(topicVo.getIsActive(), 1)) {
-                    JSONObject contentObj = generateTopicContent(content);
+                    JSONObject contentObj = generateTopicContent(topicVo, content);
                     if (MapUtils.isNotEmpty(contentObj)) {
                         String msg = contentObj.toString();
                         try {
@@ -69,5 +69,5 @@ public abstract class TopicBase<T> implements ITopic<T> {
         }
     }
 
-    protected abstract JSONObject generateTopicContent(T content);
+    protected abstract JSONObject generateTopicContent(TopicVo topicVo, T content);
 }

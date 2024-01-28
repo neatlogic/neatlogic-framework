@@ -25,7 +25,9 @@ public interface MqTopicMapper {
 
     TopicVo getTopicByName(String name);
 
-    void insertInActiveTopic(TopicVo topicVo);
+    void saveTopicConfig(TopicVo topicVo);
+
+    void saveTopicIsActive(TopicVo topicVo);
 
     void deleteInActiveTopic(String name);
 }

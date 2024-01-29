@@ -119,9 +119,10 @@
 
     <select id="getAllActiveTenant" resultType="neatlogic.framework.dto.TenantVo">
         SELECT
-               t.`uuid`,
-               t.`name`,
-               t.visit_time as visitTime
+                t.`uuid`,
+                t.`name`,
+                t.visit_time as visitTime,
+                t.`fcd`
         FROM `tenant` t
                  JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
         WHERE t.`is_active` = 1

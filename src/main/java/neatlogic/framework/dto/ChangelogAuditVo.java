@@ -20,7 +20,7 @@ public class ChangelogAuditVo {
     private Integer sqlStatus;
 
     @EntityField(name = "是否已忽略", type = ApiParamType.INTEGER)
-    private Integer ignored;
+    private Integer ignored = 0;
 
     @EntityField(name = "异常信息", type = ApiParamType.STRING)
     private String errorMsg;
@@ -29,13 +29,14 @@ public class ChangelogAuditVo {
     public ChangelogAuditVo() {
     }
 
-    public ChangelogAuditVo(String tenantUuid, String moduleId, String sqlHash, String version,String errorMsg,Integer sqlStatus) {
+    public ChangelogAuditVo(String tenantUuid, String moduleId, String sqlHash, String version,String errorMsg,Integer sqlStatus,Integer ignored) {
         this.tenantUuid = tenantUuid;
         this.moduleId = moduleId;
         this.version = version;
         this.sqlHash = sqlHash;
         this.errorMsg = errorMsg;
         this.sqlStatus = sqlStatus;
+        this.ignored = ignored;
     }
 
     public ChangelogAuditVo(String tenantUuid, String moduleId, String sqlHash, String version,Integer sqlStatus) {

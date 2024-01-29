@@ -496,7 +496,7 @@ public class Config {
             MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
             MONGO_DATABASE = prop.getProperty("mongo.database", "neatlogic");
 
-            JMS_URL = prop.getProperty("jms.url", "tcp://localhost:8161");
+            JMS_URL = prop.getProperty("jms.url", "tcp://localhost:61616");
             FILE_HANDLER = prop.getProperty("file.handler", "FILE");
 
             MOBILE_TEST_USER = prop.getProperty("mobile.test.user");

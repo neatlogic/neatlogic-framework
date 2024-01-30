@@ -41,6 +41,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -245,7 +246,7 @@ public class ScriptRunnerManager {
                 if (runner != null) {
                     runner.closeConnection();
                 }
-                if(scriptBufferedReader != null){
+                if (scriptBufferedReader != null) {
                     scriptBufferedReader.close();
                 }
             } catch (Exception e) {
@@ -264,7 +265,12 @@ public class ScriptRunnerManager {
     }
 
     /**
-     * 执行sql
+     * changelog 记录自动忽略不存在，已存在之类的sql异常
+     */
+    private static final List<String> ignoreKeyList = Arrays.asList("exist", "duplicate");
+
+    /**
+     * 执行sql，并记录changelog
      *
      * @param tenant       租户
      * @param moduleId     模块id
@@ -328,12 +334,17 @@ public class ScriptRunnerManager {
                             error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
                         }
                         //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
-                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, error, 0);
+                        int ignored = 0;
+                        if (ignoreKeyList.stream().anyMatch(o -> errStrWriter.toString().toLowerCase(Locale.ROOT).contains(o))) {
+                            ignored = 1;
+                        } else {
+                            System.out.println(error);
+                            isError = true;
+                        }
+                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, error, 0, ignored);
                         insertChangelogAudit(changelogAuditVo);
                         insertChangelogAuditDetail(sqlHash, sql);
-                        System.out.println(error);
                         errStrWriter.getBuffer().setLength(0);
-                        isError = true;
                     } else {
                         changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, 1);
                         hasRunSqlMd5List.add(sqlHash);
@@ -356,7 +367,7 @@ public class ScriptRunnerManager {
                 if (runner != null) {
                     runner.closeConnection();
                 }
-                if(scriptBufferedReader != null){
+                if (scriptBufferedReader != null) {
                     scriptBufferedReader.close();
                 }
             } catch (Exception e) {
@@ -373,15 +384,17 @@ public class ScriptRunnerManager {
      * @param changelogAuditVo changelog记录
      */
     private static void insertChangelogAudit(ChangelogAuditVo changelogAuditVo) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`error_msg`,`sql_status`,`lcd`) VALUES (?,?,?,?,?,?,now()) ON DUPLICATE KEY UPDATE `error_msg` = ?,`sql_status` = ?, `lcd` = now() ")){
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`error_msg`,`sql_status`,`lcd`,`ignored`) VALUES (?,?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `error_msg` = ?,`sql_status` = ?, `lcd` = now(),`ignored` = ? ")) {
             statement.setString(1, changelogAuditVo.getTenantUuid());
             statement.setString(2, changelogAuditVo.getModuleId());
             statement.setString(3, changelogAuditVo.getSqlHash());
             statement.setString(4, changelogAuditVo.getVersion());
             statement.setString(5, changelogAuditVo.getErrorMsg());
             statement.setInt(6, changelogAuditVo.getSqlStatus());
-            statement.setString(7, changelogAuditVo.getErrorMsg());
-            statement.setInt(8, changelogAuditVo.getSqlStatus());
+            statement.setInt(7, changelogAuditVo.getIgnored());
+            statement.setString(8, changelogAuditVo.getErrorMsg());
+            statement.setInt(9, changelogAuditVo.getSqlStatus());
+            statement.setInt(10, changelogAuditVo.getIgnored());
             statement.execute();
         } catch (Exception ex) {
             throw new Exception(ex);
@@ -392,11 +405,11 @@ public class ScriptRunnerManager {
     /**
      * 记录changelog sql语句
      *
-     * @param hash          sql的哈希唯一值
-     * @param sql           sql语句
+     * @param hash sql的哈希唯一值
+     * @param sql  sql语句
      */
     private static void insertChangelogAuditDetail(String hash, String sql) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `changelog_audit_detail` (`hash`,`sql`) VALUES (?,?) ");){
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `changelog_audit_detail` (`hash`,`sql`) VALUES (?,?) ");) {
             statement.setString(1, hash);
             statement.setString(2, sql);
             statement.execute();
@@ -411,7 +424,7 @@ public class ScriptRunnerManager {
      * @param tenantModuleDmlSqlVo dml sql对象
      */
     private static void insertTenantModuleDmlSql(TenantModuleDmlSqlVo tenantModuleDmlSqlVo) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`) VALUES (?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?")){
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`) VALUES (?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?")) {
             statement.setString(1, tenantModuleDmlSqlVo.getTenantUuid());
             statement.setString(2, tenantModuleDmlSqlVo.getModuleId());
             statement.setString(3, tenantModuleDmlSqlVo.getSqlMd5());
@@ -429,11 +442,11 @@ public class ScriptRunnerManager {
     /**
      * 记录租户dml sql语句
      *
-     * @param md5           sql的哈希唯一值
-     * @param dmlSql        sql语句
+     * @param md5    sql的哈希唯一值
+     * @param dmlSql sql语句
      */
     private static void insertTenantModuleDmlSqlDetail(String md5, String dmlSql) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement =neatlogicConn.prepareStatement("insert ignore into `tenant_module_dmlsql_detail` (`hash`,`sql`) VALUES (?,?) ")){
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `tenant_module_dmlsql_detail` (`hash`,`sql`) VALUES (?,?) ")) {
             statement.setString(1, md5);
             statement.setString(2, dmlSql);
             statement.execute();

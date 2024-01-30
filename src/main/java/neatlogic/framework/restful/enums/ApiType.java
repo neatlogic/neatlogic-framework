@@ -17,18 +17,18 @@
 package neatlogic.framework.restful.enums;
 
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 public enum ApiType {
-    OBJECT("object", new I18n("对象模式"), "rest/"),
-    STREAM("stream", new I18n("json流模式"), "stream/"),
-    BINARY("binary", new I18n("字节流模式"), "binary/");
+    RAW("raw", "原始模式", "raw/"),
+    OBJECT("object", "对象模式", "rest/"),
+    STREAM("stream", "json流模式", "stream/"),
+    BINARY("binary", "字节流模式", "binary/");
 
     private final String name;
-    private final I18n text;
+    private final String text;
     private final String urlPre;
 
-    ApiType(String _name, I18n _text, String _urlPre) {
+    ApiType(String _name, String _text, String _urlPre) {
         this.name = _name;
         this.text = _text;
         this.urlPre = _urlPre;
@@ -39,7 +39,7 @@ public enum ApiType {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public String getUrlPre() {

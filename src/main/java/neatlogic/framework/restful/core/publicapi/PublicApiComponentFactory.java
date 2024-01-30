@@ -16,6 +16,8 @@
 
 package neatlogic.framework.restful.core.publicapi;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -34,8 +36,6 @@ import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiKind;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.enums.PublicApiAuthType;
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -175,10 +175,10 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
 
         for (Map.Entry<String, IPublicJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
             IPublicJsonStreamApiComponent component = entry.getValue();
-            if (component.getId() != null) {
-                streamComponentMap.put(component.getId(), component);
+            if (component.getClassName() != null) {
+                streamComponentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getId());
+                restComponentVo.setHandler(component.getClassName());
                 restComponentVo.setToken(component.getToken());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
@@ -186,17 +186,17 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiType.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getId(), restComponentVo);
+                apiHandlerMap.put(component.getClassName(), restComponentVo);
                 initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
             }
         }
 
         for (Map.Entry<String, IPublicBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
             IPublicBinaryStreamApiComponent component = entry.getValue();
-            if (component.getId() != null) {
-                binaryComponentMap.put(component.getId(), component);
+            if (component.getClassName() != null) {
+                binaryComponentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getId());
+                restComponentVo.setHandler(component.getClassName());
                 restComponentVo.setToken(component.getToken());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
@@ -204,7 +204,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiType.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getId(), restComponentVo);
+                apiHandlerMap.put(component.getClassName(), restComponentVo);
                 initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
             }
         }

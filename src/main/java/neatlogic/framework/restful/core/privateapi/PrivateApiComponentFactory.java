@@ -29,6 +29,7 @@ import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiKind;
@@ -54,10 +55,10 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
     private static final List<ApiVo> apiList = new ArrayList<>();
     private static final Map<String, ApiVo> apiMap = new HashMap<>();
-    // public static Map<String, RateLimiter> interfaceRateMap = new
-    // ConcurrentHashMap<>();
     private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
     private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
+
+    public static final Map<String, IRawApiComponent> rawComponentMap = new HashMap<>();
     // 按照token表达式长度排序，最长匹配原则
     private static final Map<String, ApiVo> regexApiMap = new TreeMap<>((o1, o2) -> {
         // 先按照长度排序，如果长度一样按照内容排序
@@ -79,6 +80,10 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
     public static IBinaryStreamApiComponent getBinaryInstance(String componentId) {
         return binaryComponentMap.get(componentId);
+    }
+
+    public static IRawApiComponent getRawInstance(String componentId) {
+        return rawComponentMap.get(componentId);
     }
 
     public static ApiVo getApiByToken(String token) throws CloneNotSupportedException {
@@ -130,13 +135,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         return componentMap;
     }
 
-    public static Map<String, IBinaryStreamApiComponent> getBinaryStreamComponentMap() {
-        return binaryComponentMap;
-    }
-
-    public static Map<String, IJsonStreamApiComponent> getJsonStreamComponentMap() {
-        return streamComponentMap;
-    }
 
     public static Map<String, ApiHandlerVo> getApiHandlerMap() {
         return apiHandlerMap;
@@ -151,6 +149,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         Map<String, IPrivateApiComponent> myMap = context.getBeansOfType(IPrivateApiComponent.class);
         Map<String, IPrivateJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IPrivateJsonStreamApiComponent.class);
         Map<String, IPrivateBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IPrivateBinaryStreamApiComponent.class);
+        Map<String, IPrivateRawApiComponent> myRawMap = context.getBeansOfType(IPrivateRawApiComponent.class);
         for (Map.Entry<String, IPrivateApiComponent> entry : myMap.entrySet()) {
             IPrivateApiComponent component = entry.getValue();
             if (component.getClassName() != null) {
@@ -179,12 +178,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
-                    // Class<?> targetClass = AopUtils.getTargetClass(component);
-                    // if (targetClass.getAnnotation(IsActived.class) != null) {
-                    // apiVo.setIsActive(1);
-                    // } else {
-                    // apiVo.setIsActive(0);
-                    // }
                     apiVo.setIsActive(1);
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
@@ -199,7 +192,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         StringBuffer temp = new StringBuffer();
                         while (m.find()) {
                             apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^\\/]+)");
+                            m.appendReplacement(temp, "([^/]+)");
                         }
                         m.appendTail(temp);
                         String regexToken = "^" + temp + "$";
@@ -225,18 +218,18 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
         for (Map.Entry<String, IPrivateJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
             IPrivateJsonStreamApiComponent component = entry.getValue();
-            if (component.getId() != null) {
+            if (component.getClassName() != null) {
                 checkAnnotation(component, context);
-                streamComponentMap.put(component.getId(), component);
+                streamComponentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getId());
+                restComponentVo.setHandler(component.getClassName());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(true);
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiType.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getId(), restComponentVo);
+                apiHandlerMap.put(component.getClassName(), restComponentVo);
                 String token = component.getToken();
                 if (StringUtils.isNotBlank(token)) {
                     if (token.startsWith("/")) {
@@ -248,15 +241,9 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     ApiVo apiVo = new ApiVo();
                     apiVo.setAuthtype("token");
                     apiVo.setToken(token);
-                    apiVo.setHandler(component.getId());
+                    apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
-                    // Class<?> targetClass = AopUtils.getTargetClass(component);
-                    // if (targetClass.getAnnotation(IsActived.class) != null) {
-                    // apiVo.setIsActive(1);
-                    // } else {
-                    // apiVo.setIsActive(0);
-                    // }
                     apiVo.setIsActive(1);
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
@@ -272,7 +259,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         StringBuffer temp = new StringBuffer();
                         while (m.find()) {
                             apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^\\/]+)");
+                            m.appendReplacement(temp, "([^/]+)");
                         }
                         m.appendTail(temp);
                         String regexToken = "^" + temp + "$";
@@ -297,18 +284,18 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
         for (Map.Entry<String, IPrivateBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
             IPrivateBinaryStreamApiComponent component = entry.getValue();
-            if (component.getId() != null) {
+            if (component.getClassName() != null) {
                 checkAnnotation(component, context);
-                binaryComponentMap.put(component.getId(), component);
+                binaryComponentMap.put(component.getClassName(), component);
                 ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getId());
+                restComponentVo.setHandler(component.getClassName());
                 restComponentVo.setName(component.getName());
                 restComponentVo.setConfig(component.getConfig());
                 restComponentVo.setPrivate(true);
                 restComponentVo.setModuleId(context.getId());
                 restComponentVo.setType(ApiType.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getId(), restComponentVo);
+                apiHandlerMap.put(component.getClassName(), restComponentVo);
                 String token = component.getToken();
                 if (StringUtils.isNotBlank(token)) {
                     if (token.startsWith("/")) {
@@ -320,15 +307,9 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     ApiVo apiVo = new ApiVo();
                     apiVo.setAuthtype("token");
                     apiVo.setToken(token);
-                    apiVo.setHandler(component.getId());
+                    apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
-                    // Class<?> targetClass = AopUtils.getTargetClass(component);
-                    // if (targetClass.getAnnotation(IsActived.class) != null) {
-                    // apiVo.setIsActive(1);
-                    // } else {
-                    // apiVo.setIsActive(0);
-                    // }
                     apiVo.setIsActive(1);
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
@@ -344,7 +325,73 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         StringBuffer temp = new StringBuffer();
                         while (m.find()) {
                             apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^\\/]+)");
+                            m.appendReplacement(temp, "([^/]+)");
+                        }
+                        m.appendTail(temp);
+                        String regexToken = "^" + temp + "$";
+                        if (!regexApiMap.containsKey(regexToken)) {
+                            regexApiMap.put(regexToken, apiVo);
+                        } else {
+                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
+                            System.exit(1);
+                        }
+                    }
+
+                    if (!apiMap.containsKey(token)) {
+                        apiList.add(apiVo);
+                        apiMap.put(token, apiVo);
+                    } else {
+                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
+                        System.exit(1);
+                    }
+                }
+            }
+        }
+
+        for (Map.Entry<String, IPrivateRawApiComponent> entry : myRawMap.entrySet()) {
+            IPrivateRawApiComponent component = entry.getValue();
+            if (component.getClassName() != null) {
+                checkAnnotation(component, context);
+                rawComponentMap.put(component.getClassName(), component);
+                ApiHandlerVo restComponentVo = new ApiHandlerVo();
+                restComponentVo.setHandler(component.getClassName());
+                restComponentVo.setName(component.getName());
+                restComponentVo.setConfig(component.getConfig());
+                restComponentVo.setPrivate(true);
+                restComponentVo.setModuleId(context.getId());
+                restComponentVo.setType(ApiType.RAW.getValue());
+                apiHandlerList.add(restComponentVo);
+                apiHandlerMap.put(component.getClassName(), restComponentVo);
+                String token = component.getToken();
+                if (StringUtils.isNotBlank(token)) {
+                    if (token.startsWith("/")) {
+                        token = token.substring(1);
+                    }
+                    if (token.endsWith("/")) {
+                        token = token.substring(0, token.length() - 1);
+                    }
+                    ApiVo apiVo = new ApiVo();
+                    apiVo.setAuthtype("token");
+                    apiVo.setToken(token);
+                    apiVo.setHandler(component.getClassName());
+                    apiVo.setHandlerName(component.getName());
+                    apiVo.setName(component.getName());
+                    apiVo.setIsActive(1);
+                    apiVo.setNeedAudit(component.needAudit());
+                    apiVo.setTimeout(0);// 0是default
+                    apiVo.setType(ApiType.RAW.getValue());
+                    apiVo.setModuleId(context.getId());
+                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
+                    apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
+                    apiVo.setIsDeletable(0);// 不能删除
+                    apiVo.setIsPrivate(true);
+
+                    if (token.contains("{")) {
+                        Matcher m = p.matcher(token);
+                        StringBuffer temp = new StringBuffer();
+                        while (m.find()) {
+                            apiVo.addPathVariable(m.group(1));
+                            m.appendReplacement(temp, "([^/]+)");
                         }
                         m.appendTail(temp);
                         String regexToken = "^" + temp + "$";
@@ -385,8 +432,8 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
             //System.out.println(clazz.getSimpleName());
             //跳过匿名接口
-            if(component instanceof  IApiComponent && ((IApiComponent) component).supportAnonymousAccess().isSupportAnonymousAccess()) {
-               return;
+            if (component instanceof IApiComponent && ((IApiComponent) component).supportAnonymousAccess().isSupportAnonymousAccess()) {
+                return;
             }
             if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
                 AuthAction authAction = clazz.getAnnotation(AuthAction.class);

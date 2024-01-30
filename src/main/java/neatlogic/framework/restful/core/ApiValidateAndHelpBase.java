@@ -62,7 +62,6 @@ public class ApiValidateAndHelpBase {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
 
     protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
-
         UserContext userContext = UserContext.get();
         HttpServletRequest request = userContext.getRequest();
         String requestIp = IpUtil.getIpAddr(request);
@@ -87,6 +86,30 @@ public class ApiValidateAndHelpBase {
         AppenderManager.execute(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor, AuditType.API_AUDIT));
     }
 
+    protected void saveAudit(ApiVo apiVo, String param, Object result, String error, Long startTime, Long endTime) {
+        UserContext userContext = UserContext.get();
+        HttpServletRequest request = userContext.getRequest();
+        String requestIp = IpUtil.getIpAddr(request);
+        JSONObject data = new JSONObject();
+        data.put("token", apiVo.getToken());
+        data.put("authtype", apiVo.getAuthtype());
+        data.put("userUuid", userContext.getUserUuid());
+        data.put("ip", requestIp);
+        if (StringUtils.isNotEmpty(param)) {
+            data.put("param", param);
+        }
+        if (result != null) {
+            data.put("result", JSONObject.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+        }
+        if (StringUtils.isNotBlank(error)) {
+            data.put("error", error);
+        }
+        data.put("startTime", startTime);
+        data.put("endTime", endTime);
+        ApiAuditAppendPostProcessor appendPostProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPostProcessor.class);
+        ApiAuditAppendPreProcessor appendPreProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPreProcessor.class);
+        AppenderManager.execute(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor, AuditType.API_AUDIT));
+    }
 
 
     protected void validOutput(Class<?> apiClass, Object result, Class<?>... classes) throws NoSuchMethodException {
@@ -167,8 +190,27 @@ public class ApiValidateAndHelpBase {
         }
     }
 
-    protected void validIsReSubmit(Class<?> targetClass, String token, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException {
+    protected void validIsReSubmitForRaw(Class<?> targetClass, String token, String param, Class<?>... classes) throws NoSuchMethodException {
+        Method m = targetClass.getDeclaredMethod("myDoService", classes);
+        if (m.isAnnotationPresent(ResubmitInterval.class)) {
+            for (Annotation anno : m.getDeclaredAnnotations()) {
+                if (anno.annotationType().equals(ResubmitInterval.class)) {
+                    ResubmitInterval resubmitInterval = (ResubmitInterval) anno;
+                    if (resubmitInterval.value() > 0) {
+                        String key = token + "_" + Md5Util.encryptMD5(param);
+                        if (SubmitKeyManager.contain(key)) {
+                            throw new ResubmitException(token);
+                        } else {
+                            SubmitKeyManager.add(key, resubmitInterval.value());
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
+    protected void validIsReSubmit(Class<?> targetClass, String token, JSONObject paramObj, Class<?>... classes) throws NoSuchMethodException {
         Method m = targetClass.getDeclaredMethod("myDoService", classes);
         if (m.isAnnotationPresent(ResubmitInterval.class)) {
             for (Annotation anno : m.getDeclaredAnnotations()) {
@@ -187,6 +229,36 @@ public class ApiValidateAndHelpBase {
             }
         }
     }
+
+    protected void validApiFowRaw(Class<?> apiClass) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
+        // 获取目标类
+        boolean isAuth = false;
+        List<String> authNameList = new ArrayList<>();
+        if (apiClass != null) {
+            //AuthAction action = apiClass.getAnnotation(AuthAction.class);
+            AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
+            if (!Objects.equals(TenantContext.get().getTenantUuid(), "master") && actions.length > 0) {
+                for (AuthAction action : actions) {
+                    if (StringUtils.isNotBlank(action.action().getSimpleName())) {
+                        String actionName = action.action().getSimpleName();
+                        // 判断用户角色是否拥有接口权限
+                        if (AuthActionChecker.check(actionName)) {
+                            isAuth = true;
+                            break;
+                        }
+                    }
+                    authNameList.add($.t(AuthFactory.getAuthInstance(action.action().getSimpleName()).getAuthDisplayName()));
+                }
+            } else {
+                isAuth = true;
+            }
+
+            if (!isAuth) {
+                throw new PermissionDeniedException(authNameList);
+            }
+        }
+    }
+
 
     protected void validApi(Class<?> apiClass, JSONObject paramObj, ApiVo apiVo, Class<?>... classes) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
         // 获取目标类
@@ -440,7 +512,7 @@ public class ApiValidateAndHelpBase {
                                     for (Field field : p.explode().getComponentType().getDeclaredFields()) {
                                         drawFieldMessageRecursive(field, elementObjList, true);
                                     }
-                                    if (elementObjList.size() > 0) {
+                                    if (!elementObjList.isEmpty()) {
                                         paramObj.put("children", elementObjList);
                                     }
 

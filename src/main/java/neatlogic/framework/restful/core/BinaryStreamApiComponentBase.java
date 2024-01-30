@@ -1,16 +1,15 @@
 package neatlogic.framework.restful.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.CacheControlType;
 import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,9 +80,9 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
         return result;
     }
 
-    public final String getId() {
+    /*public final String getId() {
         return ClassUtils.getUserClass(this.getClass()).getName();
-    }
+    }*/
 
     @Override
     public final JSONObject help() {

@@ -16,11 +16,12 @@
 
 package neatlogic.framework.restful.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.restful.constvalue.ApiAnonymousAccessSupportEnum;
 import neatlogic.framework.restful.dto.ApiVo;
-import com.alibaba.fastjson.JSONObject;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,7 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 public interface IBinaryStreamApiComponent {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getId();
+    default String getClassName() {
+        return ClassUtils.getUserClass(this.getClass()).getName();
+    }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getName();

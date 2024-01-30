@@ -790,6 +790,11 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     }
 
     @Override
+    public FormAttributeVo getFormAttribute(String formConfig, String attributeUuid) {
+        return getFormAttribute(JSONObject.parseObject(formConfig), attributeUuid, null);
+    }
+
+    @Override
     public String getFormAttributeHandler(String attributeUuid, JSONObject formConfig) {
         List<FormAttributeVo> formAttributeList = getAllFormAttributeList(formConfig);
         for (FormAttributeVo formAttributeVo : formAttributeList) {

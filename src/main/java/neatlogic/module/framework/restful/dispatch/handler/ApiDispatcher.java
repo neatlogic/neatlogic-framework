@@ -34,6 +34,7 @@ import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.counter.ApiAccessCountUpdateThread;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
@@ -233,6 +234,36 @@ public class ApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
+            } else if (apiType.equals(ApiType.RAW)) {
+                IRawApiComponent restComponent = PrivateApiComponentFactory.getRawInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj.getString("payload"), response);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.put("_disableDetect", true);
+                            }
+                        } else {
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV, SerializerFeature.DisableCircularReferenceDetect)));
+                            } else {
+                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            }
+                        }
+                    } else {
+                        returnObj.putAll(restComponent.help());
+                    }
+                } else {
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                }
             }
         }
     }
@@ -294,6 +325,73 @@ public class ApiDispatcher {
                 response.getWriter().print(returnObj);
             }
         }
+    }
+
+    @RequestMapping(value = "/raw/**", method = RequestMethod.POST)
+    public void dispatcherForRawPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        try {
+            //由于统一接受json参数，先封装后拆解
+            JSONObject jsonObj = new JSONObject();
+            if (jsonStr.startsWith("\"") && jsonStr.endsWith("\"")) {
+                jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+            }
+            jsonObj.put("payload", jsonStr);
+            doIt(request, response, token, ApiType.RAW, jsonObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (NotFoundEditTargetException ex) {
+            response.setStatus(ResponseCode.EDIT_TARGET_NOTFOUND.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", $.t(ex.getMessage(), ex.getValues()));
+        } catch (Exception ex) {
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
+            logger.error(ex.getMessage(), ex);
+        }
+        if (!response.isCommitted()) {
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
+        }
+
     }
 
     @RequestMapping(value = "/rest/**", method = RequestMethod.POST)
@@ -681,6 +779,41 @@ public class ApiDispatcher {
         response.setContentType(Config.RESPONSE_TYPE_JSON);
         response.getWriter().print(returnObj.toJSONString());
     }
+
+    @RequestMapping(value = "/help/raw/**", method = RequestMethod.GET)
+    public void rawhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        try {
+            doIt(request, response, token, ApiType.RAW, null, returnObj, "help");
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        }
+        response.setContentType(Config.RESPONSE_TYPE_JSON);
+        response.getWriter().print(returnObj.toJSONString());
+    }
+
 
     @RequestMapping(value = "/help/stream/**", method = RequestMethod.GET)
     public void streamhelp(HttpServletRequest request, HttpServletResponse response) throws IOException {

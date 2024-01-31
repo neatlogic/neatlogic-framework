@@ -29,12 +29,14 @@ import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dto.FieldValidResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.core.NotFoundEditTargetException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.counter.ApiAccessCountUpdateThread;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
@@ -42,6 +44,7 @@ import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.AnonymousApiTokenUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -205,6 +208,40 @@ public class AnonymousApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
+            } else if (apiType.equals(ApiType.RAW)) {
+                IRawApiComponent restComponent = PrivateApiComponentFactory.getRawInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+                        throw new AnonymousExceptionMessage();
+                    }
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        ApiAccessCountUpdateThread.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj.getString("payload"), response);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
+                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.put("_disableDetect", true);
+                            }
+                        } else {
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV, SerializerFeature.DisableCircularReferenceDetect)));
+                            } else {
+                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            }
+                        }
+                    } else {
+                        returnObj.putAll(restComponent.help());
+                    }
+                } else {
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                }
             }
         }
     }
@@ -313,6 +350,80 @@ public class AnonymousApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
+            logger.error(ex.getMessage(), ex);
+        }
+        if (!response.isCommitted()) {
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
+        }
+    }
+
+    @RequestMapping(value = "/t/{tenant}/raw/**", method = RequestMethod.POST)
+    public void dispatcherForRawPost(@PathVariable("tenant") String tenant, @RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        try {
+            if (TenantUtil.hasTenant(tenant)) {
+                TenantContext.init();
+                TenantContext.get().switchTenant(tenant);
+                UserContext.init(SystemUser.ANONYMOUS, request, response);
+            } else {
+                throw new TenantNotFoundException(tenant);
+            }
+            //由于统一接受json参数，先封装后拆解
+            boolean tokenHasEncrypted = false;
+            JSONObject jsonObj = new JSONObject();
+            if (jsonStr.startsWith("\"") && jsonStr.endsWith("\"")) {
+                jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+            }
+            jsonObj.put("payload", jsonStr);
+            doIt(request, response, token, tokenHasEncrypted, ApiType.RAW, jsonObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (NotFoundEditTargetException ex) {
+            response.setStatus(ResponseCode.EDIT_TARGET_NOTFOUND.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", $.t(ex.getMessage(), ex.getValues()));
         } catch (Exception ex) {
             response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");

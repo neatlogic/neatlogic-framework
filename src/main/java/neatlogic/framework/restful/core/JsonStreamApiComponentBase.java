@@ -1,15 +1,14 @@
 package neatlogic.framework.restful.core;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONReader;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Method;
 
@@ -67,9 +66,9 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
         return result;
     }
 
-    public final String getId() {
+    /*public final String getId() {
         return ClassUtils.getUserClass(this.getClass()).getName();
-    }
+    }*/
 
     @Override
     public final JSONObject help() {

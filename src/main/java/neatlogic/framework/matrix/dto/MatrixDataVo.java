@@ -1,11 +1,10 @@
 package neatlogic.framework.matrix.dto;
 
+import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.common.dto.BasePageVo;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.alibaba.fastjson.JSONArray;
 
 /**
  * @program: neatlogic
@@ -143,6 +142,9 @@ public class MatrixDataVo extends BasePageVo {
 
 
     public List<MatrixFilterVo> getFilterList() {
+        if (filterList == null) {
+            filterList = new ArrayList<>();
+        }
         return filterList;
     }
 

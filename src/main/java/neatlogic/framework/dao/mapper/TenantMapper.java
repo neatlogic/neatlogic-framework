@@ -32,6 +32,8 @@ public interface TenantMapper {
 
     List<String> getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId);
 
+    List<TenantAuditVo> getTenantAuditListWithDmlDemo(String tenantUuid);
+
     int insertTenant(TenantVo tenantVo);
 
     int insertTenantModuleGroup( @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup, @Param("isInitDml") Boolean isInitDml);

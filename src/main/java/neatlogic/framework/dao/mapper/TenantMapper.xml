@@ -138,6 +138,23 @@
         where tenant_uuid = #{tenantUuid}
           and `module_id` = #{moduleId}
     </select>
+    <select id="getTenantAuditListWithDmlDemo" resultType="neatlogic.framework.dto.TenantAuditVo">
+        SELECT
+            `id`,
+            `group_id` AS groupId,
+            `tenant_uuid` as tenantUuid,
+            `module_id` as moduleId,
+            `module_group` as moduleGroup,
+            `sql_type` as sqlType,
+            `start_time` as startTime,
+            `end_time` as endTime,
+            (UNIX_TIMESTAMP(IFNULL(end_time, NOW(3)))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost,
+            `result_hash` as resultHash,
+            `error_hash` as errorHash,
+            `status`
+        FROM
+            `tenant_audit` where `tenant_uuid` = #{value} and `module_group`= 'webroot' and `module_id` = 'webroot'
+    </select>
 
     <insert id="insertTenant" parameterType="neatlogic.framework.dto.TenantVo">
         INSERT INTO `tenant` (

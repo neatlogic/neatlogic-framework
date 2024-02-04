@@ -17,9 +17,7 @@
 package neatlogic.framework.tenantinit;
 
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
-import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dto.TenantVo;
@@ -62,25 +60,21 @@ public class TenantInitManager extends ModuleInitializedListenerBase {
      * @param tenantVo 租户信息
      */
     public static void execute(TenantVo tenantVo) {
-        CachedThreadPool.execute(new NeatLogicThread("TENANT-INIT-DATA") {
-            @Override
-            protected void execute() {
-                TenantContext.get().switchTenant(tenantVo.getUuid());
-                List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
-                List<ITenantInit> iTenantInits = getTenantInitList();
-                iTenantInits.sort(Comparator.comparing(ITenantInit::sort));
-                for (ITenantInit tenantInit : iTenantInits) {
-                    try {
-                        if (groupList.contains(tenantInit.getGroup())) {
-                            tenantInit.execute();
-                        }
-                    } catch (Exception ex) {
-                        logger.error("租户“" + tenantVo.getName() + "”初始化数据“" + tenantInit.getName() + "”失败：" + ex.getMessage(), ex);
-                    }
+        TenantContext.get().switchTenant(tenantVo.getUuid());
+        List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+        List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
+        List<ITenantInit> iTenantInits = getTenantInitList();
+        iTenantInits.sort(Comparator.comparing(ITenantInit::sort));
+        for (ITenantInit tenantInit : iTenantInits) {
+            try {
+                if (groupList.contains(tenantInit.getGroup())) {
+                    tenantInit.execute();
                 }
+            } catch (Exception ex) {
+                logger.error("租户“" + tenantVo.getName() + "”初始化数据“" + tenantInit.getName() + "”失败：" + ex.getMessage(), ex);
             }
-        });
+        }
+        TenantContext.get().setUseDefaultDatasource(true);
     }
 
 

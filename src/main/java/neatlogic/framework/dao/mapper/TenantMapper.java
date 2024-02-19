@@ -6,6 +6,7 @@ import neatlogic.framework.dto.TenantModuleVo;
 import neatlogic.framework.dto.TenantVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TenantMapper {
@@ -40,7 +41,7 @@ public interface TenantMapper {
 
     int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
-    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo, @Param("updateTag") Long updateTag);
+    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo, @Param("updateTag") Date updateTag);
 
     int insertTenantModuleDmlSql(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId, @Param("currentRunSqlMd5List") List<String> currentRunSqlMd5List,@Param("sqlStatus")int sqlStatus);
 

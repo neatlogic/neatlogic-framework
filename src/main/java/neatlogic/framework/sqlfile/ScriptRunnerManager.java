@@ -16,7 +16,6 @@
 
 package neatlogic.framework.sqlfile;
 
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.ChangelogAuditVo;
 import neatlogic.framework.dto.TenantModuleDmlSqlVo;
@@ -27,7 +26,6 @@ import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import neatlogic.framework.util.Md5Util;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.slf4j.Logger;
@@ -57,16 +55,16 @@ public class ScriptRunnerManager {
     }
 
     /**
-     * 执行sql
+     * 执行sql文件
      *
      * @param tenant       租户
-     * @param moduleId     模块id
      * @param scriptReader 脚本读取
      * @param logWriter    日志
      * @param errWriter    错误日志
      */
-    public static void runScript(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, boolean isDataDb) throws Exception {
+    public static void runScript(TenantVo tenant, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, boolean isDataDb) throws Exception {
         Connection conn = null;
+        ScriptRunner runner = null;
         String tenantUuid = tenant.getUuid();
         if (isDataDb) {
             tenantUuid = tenantUuid + "_data";
@@ -74,7 +72,7 @@ public class ScriptRunnerManager {
         NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenantUuid);
         try {
             conn = tenantDatasource.getConnection();
-            ScriptRunner runner = new ScriptRunner(conn);
+            runner = new ScriptRunner(conn);
             runner.setSendFullScript(false);
             runner.setAutoCommit(true);
             // 有错误会继续执行
@@ -84,7 +82,6 @@ public class ScriptRunnerManager {
             runner.setErrorLogWriter(errWriter);
             runner.setDelimiter(";");
             runner.runScript(scriptReader);
-            runner.closeConnection();
         } catch (Exception ex) {
             logger.error("执行ddl sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
@@ -93,82 +90,14 @@ public class ScriptRunnerManager {
                 if (conn != null) {
                     conn.close();
                 }
-            } catch (SQLException e) {
-                logger.error(e.getMessage());
-            }
-        }
-    }
-
-    /**
-     * 仅执行一次sql，执行过的sql跳过不执行
-     *
-     * @param tenant       租户
-     * @param moduleId     模块id
-     * @param scriptReader 脚本读取
-     * @param logWriter    日志
-     * @param errWriter    错误日志
-     * @param isDataDb     是否data库
-     */
-    public static void runScriptOnce(TenantVo tenant, String moduleId, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, Boolean isDataDb) throws Exception {
-        TenantContext.get().setUseDefaultDatasource(true);
-        List<String> hasRunSqlMd5List = tenantMapper.getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId(tenant.getUuid(), moduleId);
-        List<String> currentRunSqlMd5List = new ArrayList<>();
-        Connection conn = null;
-        String tenantUuid = tenant.getUuid();
-        if (isDataDb) {
-            tenantUuid = tenantUuid + "_data";
-        }
-        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenantUuid);
-        try {
-            BufferedReader scriptBufferedReader = new BufferedReader(scriptReader);
-            conn = tenantDatasource.getConnection();
-            ScriptRunner runner = new ScriptRunner(conn);
-            runner.setLogWriter(logWriter);
-            runner.setErrorLogWriter(errWriter);
-            runner.setSendFullScript(false);
-            runner.setAutoCommit(true);
-            String line;
-            while ((line = scriptBufferedReader.readLine()) != null) {
-                if (StringUtils.isBlank(line.trim())) {
-                    continue;
-                }
-                // 如果没有执行过改sql，则执行该 SQL 语句
-                String sqlMd5 = Md5Util.encryptMD5(line);
-                if (!hasRunSqlMd5List.contains(sqlMd5)) {
-                    runner.runScript(new StringReader(line));
-                    currentRunSqlMd5List.add(sqlMd5);
-                    hasRunSqlMd5List.add(sqlMd5);
-                }
-            }
-            runner.closeConnection();
-            if (CollectionUtils.isNotEmpty(currentRunSqlMd5List)) {
-                List<String> hasRunSqlMd5ListTmp = new ArrayList<>();
-                for (int i = 0; i < currentRunSqlMd5List.size(); i++) {
-                    if (i != 0 && i % 200 == 0) {
-                        tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, 1);
-                        hasRunSqlMd5ListTmp.clear();
-                    } else {
-                        hasRunSqlMd5ListTmp.add(currentRunSqlMd5List.get(i));
-                    }
-                }
-                if (CollectionUtils.isNotEmpty(hasRunSqlMd5ListTmp)) {
-                    tenantMapper.insertTenantModuleDmlSql(tenant.getUuid(), moduleId, hasRunSqlMd5ListTmp, 1);
-                }
-            }
-        } catch (Exception ex) {
-            logger.error("执行dml sql异常: " + ex.getMessage(), ex);
-            throw new Exception(ex);
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
+                if(runner != null){
+                    runner.closeConnection();
                 }
             } catch (SQLException e) {
                 logger.error(e.getMessage());
             }
         }
     }
-
 
     /**
      * 仅执行一次sql，执行过的sql跳过不执行
@@ -256,7 +185,7 @@ public class ScriptRunnerManager {
     }
 
     /**
-     * 执行sql
+     * 执行neatlogic Changelog sql
      *
      * @param scriptReader 脚本读取
      */

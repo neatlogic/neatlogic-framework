@@ -9,45 +9,36 @@ import javax.servlet.http.HttpServletResponse;
 public interface ILoginAuthHandler {
 
     /**
-     * @return
-     * @Author 89770
-     * @Time 2020年11月19日
-     * @Description: 认证类型
-     * @Param
+     * 认证类型
      */
     String getType();
 
     /**
-     * 资源权限拦截
+     * 使用场景：接口访问时拦截自定义认证
      *
-     * @return
-     * @Author 89770
-     * @Time 2020年11月19日
-     * @Description: 认证逻辑
-     * @Param
+     * @return 返回的用户对象，必须包含uuid,否则返回的用户无效
      */
     UserVo auth(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 
     /**
-     * 登录认证
+     * 使用场景：使用前端登录页面登录
      *
-     * @param userVo
-     * @param resultJson
-     * @return
+     * @return 返回登录后的用户
      */
     UserVo login(UserVo userVo, JSONObject resultJson);
 
     /**
-     * @Author 89770
-     * @Time 2020年11月19日
-     * @Description: 跳转url ，如果为null，则跳自带的登录页
-     * @Param
+     * 使用场景：接口访问时拦截验证失败后，跳转的url
+     *
+     * @return 系统登出后跳转的url，null则跳转回系统默认登录页面
      */
     String directUrl();
 
     /**
-     * 登出
+     * 使用场景：使用登出接口
+     *
+     * @return 系统登出后跳转的url，null则跳转回系统默认登录页面
      */
     String logout();
 

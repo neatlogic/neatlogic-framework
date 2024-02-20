@@ -9,7 +9,7 @@
 		FROM
 		`tenant_modulegroup` tm
 		JOIN `tenant` t
-		ON tm.`tenant_id` = t.`id`
+		ON tm.`tenant_uuid` = t.`uuid`
 		WHERE t.`uuid` = #{value}
 	</select>
 

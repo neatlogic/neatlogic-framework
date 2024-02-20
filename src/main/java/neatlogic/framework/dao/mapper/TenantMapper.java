@@ -6,6 +6,7 @@ import neatlogic.framework.dto.TenantModuleVo;
 import neatlogic.framework.dto.TenantVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TenantMapper {
@@ -26,42 +27,42 @@ public interface TenantMapper {
 
     TenantVo getTenantByUuid(String tenantUuid);
 
-    TenantVo getTenantById(Long tenantId);
-
     List<TenantVo> getAllActiveTenant();
 
     Long getTenantAuditMaxGroupIdByTenantUuid(String tenantUuid);
 
     List<String> getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId);
 
+    List<TenantAuditVo> getTenantAuditListWithDmlDemo(String tenantUuid);
+
     int insertTenant(TenantVo tenantVo);
 
-    int insertTenantModuleGroup(@Param("tenantId") Long tenantId, @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup, @Param("isInitDml") Boolean isInitDml);
+    int insertTenantModuleGroup( @Param("tenantUuid") String tenantUuid, @Param("moduleGroup") String moduleGroup, @Param("isInitDml") Boolean isInitDml);
 
     int insertTenantAudit(TenantAuditVo tenantAuditVo);
 
-    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo, @Param("updateTag") Long updateTag);
+    int insertTenantModule(@Param("tenantModule") TenantModuleVo tenantModuleVo, @Param("updateTag") Date updateTag);
 
     int insertTenantModuleDmlSql(@Param("tenantUuid") String tenantUuid, @Param("moduleId") String moduleId, @Param("currentRunSqlMd5List") List<String> currentRunSqlMd5List,@Param("sqlStatus")int sqlStatus);
 
     int replaceTenantAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
-    int updateTenant(TenantVo tenantVo);
+    int updateTenantByUuid(TenantVo tenantVo);
 
-    int updateTenantIsActive(TenantVo tenantVo);
+    int updateTenantIsActiveByUuid(String uuid);
 
     int updateTenantAudit(TenantAuditVo tenantAuditVo);
 
-    int updateTenantStatus(TenantVo tenantVo);
+    int updateTenantStatusByUuid(@Param("uuid") String uuid,@Param("status") String status);
 
     int updateTenantModule(TenantModuleVo tenantModuleVo);
 
     int updateTenantVisitTime(String tenant);
 
-    int checkTenantUuidIsExists(TenantVo tenantVo);
+    int checkTenantUuidIsExists(@Param("uuid") String uuid);
 
-    int deleteTenantModuleGroupByTenantId(Long tenantId);
+    int deleteTenantModuleGroupByTenantUuid(String tenantUuid);
 
-    void deleteTenantModuleByTenantId(Long id);
+    void deleteTenantModuleByTenantUuid(String tenantUuid);
 
 }

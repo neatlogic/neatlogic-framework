@@ -26,7 +26,6 @@ import java.util.Objects;
 
 public class DatasourceVo implements Serializable {
     private static final long serialVersionUID = 2803421287862902646L;
-    private Long tenantId;
     private String tenantUuid;
     private String host;
     private Integer port;
@@ -108,14 +107,6 @@ public class DatasourceVo implements Serializable {
 
     public void setDriver(String driver) {
         this.driver = driver;
-    }
-
-    public Long getTenantId() {
-        return tenantId;
-    }
-
-    public void setTenantId(Long tenantId) {
-        this.tenantId = tenantId;
     }
 
     public String getHost() {

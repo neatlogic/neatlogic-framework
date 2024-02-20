@@ -18,9 +18,9 @@ limitations under the License.
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.MongoDbMapper">
     <insert id="insertTenantMongodb">
-        insert into mongodb (`tenant_id`, `tenant_uuid`, `database`, `username`, `password`, `host`, `option`,
+        insert into mongodb (`tenant_uuid`, `database`, `username`, `password`, `host`, `option`,
                              `auth_config`)
-        values (#{tenantId},
+        values (
                 #{tenantUuid},
                 #{database},
                 #{username},
@@ -37,7 +37,7 @@ limitations under the License.
                    `auth_config` = #{authConfig}
     </insert>
     <select id="getAllActiveTenantMongoDb" resultType="neatlogic.framework.dto.MongoDbVo">
-        SELECT tenant_id   AS tenantId,
+        SELECT
                tenant_uuid AS tenantUuid,
                `database`,
                username,
@@ -52,7 +52,7 @@ limitations under the License.
     </select>
 
     <select id="getAllTenantMongoDb" resultType="neatlogic.framework.dto.MongoDbVo">
-        SELECT tenant_id   AS tenantId,
+        SELECT
                tenant_uuid AS tenantUuid,
                `database`,
                username,
@@ -64,7 +64,7 @@ limitations under the License.
     </select>
 
     <select id="getTenantMongoDbByTenantUuid" resultType="neatlogic.framework.dto.MongoDbVo">
-        SELECT tenant_id   AS tenantId,
+        SELECT
                tenant_uuid AS tenantUuid,
                `database`,
                username,
@@ -76,9 +76,4 @@ limitations under the License.
         where tenant_uuid = #{value}
     </select>
 
-    <update id="updateTenantMongoDbPasswordByTenantId">
-        update mongodb
-        set `password` = #{password}
-        where `tenant_id` = #{tenantId}
-    </update>
 </mapper>

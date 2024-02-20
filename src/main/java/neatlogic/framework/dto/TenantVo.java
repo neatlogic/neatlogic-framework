@@ -24,7 +24,6 @@ import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -78,9 +77,6 @@ public class TenantVo extends BaseEditorVo {
             this.text = text;
         }
     }
-
-    @EntityField(name = "id", type = ApiParamType.LONG)
-    private Long id;
     @EntityField(name = "uuid", type = ApiParamType.STRING)
     private String uuid;
     @EntityField(name = "common.name", type = ApiParamType.STRING)
@@ -119,6 +115,11 @@ public class TenantVo extends BaseEditorVo {
 
     @EntityField(name = "nfd.tenantvo.visittime", type = ApiParamType.LONG)
     private Date visitTime;
+
+    @EntityField(name = "创建租户时是否需要demo数据", type = ApiParamType.INTEGER)
+    private Integer isNeedDemo;
+
+    private Boolean isEdit = false;
 
 
     public TenantVo() {
@@ -175,17 +176,6 @@ public class TenantVo extends BaseEditorVo {
 
     public void setModuleList(List<ModuleVo> moduleList) {
         this.moduleList = moduleList;
-    }
-
-    public Long getId() {
-        if (id == null) {
-            id = SnowflakeUtil.uniqueLong();
-        }
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public List<ModuleGroupVo> getModuleGroupList() {
@@ -286,4 +276,19 @@ public class TenantVo extends BaseEditorVo {
         this.visitTime = visitTime;
     }
 
+    public Integer getIsNeedDemo() {
+        return isNeedDemo;
+    }
+
+    public void setIsNeedDemo(Integer isNeedDemo) {
+        this.isNeedDemo = isNeedDemo;
+    }
+
+    public Boolean getIsEdit() {
+        return isEdit;
+    }
+
+    public void setIsEdit(Boolean isEdit) {
+        this.isEdit = isEdit;
+    }
 }

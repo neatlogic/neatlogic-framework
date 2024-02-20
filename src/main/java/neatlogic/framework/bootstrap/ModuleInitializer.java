@@ -182,7 +182,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
         ResultSet tenantResultSet = null;
         try {
             neatlogicConn = JdbcUtil.getNeatlogicConnection();
-            String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid";
+            String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid where a.is_active =1 ";
             tenantStatement = neatlogicConn.prepareStatement(tenantSql);
             tenantResultSet = tenantStatement.executeQuery();
             while (tenantResultSet.next()) {

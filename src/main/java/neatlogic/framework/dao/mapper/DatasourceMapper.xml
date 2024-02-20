@@ -29,12 +29,12 @@ limitations under the License.
                `port`
         FROM `datasource` a
                  JOIN `tenant` b
-                      ON a.tenant_id = b.id
+                      ON a.tenant_uuid = b.uuid
                           AND b.is_active = 1
     </select>
 
     <select id="getAllTenantDatasource" resultType="neatlogic.framework.dto.DatasourceVo">
-        SELECT tenant_id     as tenantId,
+        SELECT
                `tenant_uuid` AS `tenantUuid`,
                `url`,
                `username`,
@@ -45,7 +45,7 @@ limitations under the License.
         FROM `datasource`
     </select>
     <select id="getDatasourceByTenantUuid" resultType="neatlogic.framework.dto.DatasourceVo">
-        SELECT tenant_id     as tenantId,
+        SELECT
                `tenant_uuid` AS `tenantUuid`,
                `url`,
                `username`,
@@ -61,18 +61,12 @@ limitations under the License.
         SELECT USER FROM mysql.user WHERE USER = '${value}';
     </select>
 
-    <update id="updateDatasourcePasswordByTenantId">
-        update `datasource`
-        set `password` = #{password}
-        where `tenant_id` = #{tenantId}
-    </update>
-
     <update id="updateDatabaseUserPwd">
         ALTER USER '${tenantUuid}'@'%' IDENTIFIED BY '${password}';
     </update>
 
     <insert id="insertDatasource" parameterType="neatlogic.framework.dto.DatasourceVo">
-        INSERT INTO `datasource` (`tenant_id`,
+        INSERT INTO `datasource` (
                                   `tenant_uuid`,
                                   `url`,
                                   `username`,
@@ -80,7 +74,7 @@ limitations under the License.
                                   `driver`,
                                   `host`,
                                   `port`)
-        VALUES (#{tenantId},
+        VALUES (
                 #{tenantUuid},
                 #{url},
                 #{username},

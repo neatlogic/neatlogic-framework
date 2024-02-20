@@ -16,6 +16,7 @@
 
 package neatlogic.module.framework.filter.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.hmac.HeaderIrregularException;
@@ -25,6 +26,9 @@ import neatlogic.framework.exception.user.UserTokenNotFoundException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.service.UserService;
 import neatlogic.framework.util.SHA256Util;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @Service
 public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
@@ -90,9 +95,27 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
         InputStream input = request.getInputStream();
         //System.out.println(request.getContentType());
-        StringBuilder sb = new StringBuilder();
-        if (StringUtils.isBlank(request.getContentType()) || (request.getContentType() != null && !request.getContentType().toLowerCase().startsWith("multipart/form-data"))) {
-            //如果是multipart，则跳过对body内容的抽取，避免文件内容过大时导致内存溢出
+        String bodyJsonString = StringUtils.EMPTY;
+        JSONObject bodyJson = new JSONObject();
+        if (ServletFileUpload.isMultipartContent(request)) {
+            DiskFileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            try {
+                List<FileItem> items = upload.parseRequest(request);
+                for (FileItem item : items) {
+                    if (item.isFormField()) {
+                        // 处理普通表单字段
+                        String fieldName = item.getFieldName();
+                        String value = item.getString();
+                        bodyJson.put(fieldName, value);
+                    }
+                }
+                bodyJsonString = bodyJson.toString();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            StringBuilder sb = new StringBuilder();
             BufferedReader reader;
             if (input != null) {
                 reader = new BufferedReader(new InputStreamReader(input));
@@ -102,10 +125,11 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
                     sb.append(charBuffer, 0, bytesRead);
                 }
             }
+            bodyJsonString = sb.toString();
         }
 
         String queryString = StringUtils.isNotBlank(request.getQueryString()) ? "?" + request.getQueryString() : StringUtils.EMPTY;
-        String sign = user + "#" + request.getRequestURI() + queryString + "#" + Base64.encodeBase64StringUnChunked(sb.toString().getBytes(StandardCharsets.UTF_8));
+        String sign = user + "#" + request.getRequestURI() + queryString + "#" + Base64.encodeBase64StringUnChunked(bodyJsonString.getBytes(StandardCharsets.UTF_8));
         String result = SHA256Util.encrypt(token, sign);
         if (result.equalsIgnoreCase(authorization)) {
             return userVo;
@@ -115,7 +139,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
 
     @Override
-    public boolean isValidTokenCreateTime(){
+    public boolean isValidTokenCreateTime() {
         //hmac认证用于其他系统直接调用后台认证，无需更新tokenCreateTime，否则可能会导致同个用户浏览器登录失效。
         return false;
     }

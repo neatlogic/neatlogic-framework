@@ -29,8 +29,10 @@ import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.service.TenantService;
 import org.apache.commons.lang3.StringUtils;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +40,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/tenant/")
@@ -45,9 +51,29 @@ public class TenantController {
     private final Logger logger = LoggerFactory.getLogger(TenantController.class);
     @Resource
     private TenantService tenantService;
-
+    private final static Set<String> moduleSet = new HashSet<>();
+    private boolean isLoad = false;
     @Resource
     private ThemeMapper themeMapper;
+
+    private void getCommercialModule() {
+        Reflections reflections = new Reflections("neatlogic");
+        Set<Class<? extends InstantiationAwareBeanPostProcessor>> authClass = reflections.getSubTypesOf(InstantiationAwareBeanPostProcessor.class);
+        for (Class<? extends InstantiationAwareBeanPostProcessor> c : authClass) {
+            try {
+                if (!c.getSimpleName().endsWith("AuthBean")) {
+                    continue;
+                }
+                Field field = c.getDeclaredField("moduleSet");
+                field.setAccessible(true);
+                Object value = field.get(null);
+                moduleSet.addAll((Collection<? extends String>) value);
+            } catch (Exception ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        }
+        isLoad = true;
+    }
 
     @RequestMapping(value = "/check/{tenant}")
     public void checkTenant(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -72,20 +98,23 @@ public class TenantController {
                 themeConfig = theme.getConfig();
             }
             data.put("themeConfig", themeConfig);
-
             //登录插件
             data.put("authType", Config.LOGIN_AUTH_TYPE());
             data.put("encrypt", Config.LOGIN_AUTH_PASSWORD_ENCRYPT());
+            if (!isLoad) {
+                getCommercialModule();
+            }
+            data.put("commercialModuleSet", moduleSet);
 
-            if(Config.LOGIN_AUTH_TYPE() != null) {
+            if (Config.LOGIN_AUTH_TYPE() != null) {
                 ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
-                if(loginAuth != null) {
+                if (loginAuth != null) {
                     data.put("isNeedAuth", loginAuth.isNeedAuth());
                 }
             }
 
             //单点登录
-            if(StringUtils.isNotEmpty(Config.SSO_TICKET_KEY())) {
+            if (StringUtils.isNotEmpty(Config.SSO_TICKET_KEY())) {
                 data.put("ssoTicketKey", Config.SSO_TICKET_KEY());
             }
             ReturnJson.success(data, response);

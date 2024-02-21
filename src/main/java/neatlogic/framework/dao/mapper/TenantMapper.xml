@@ -80,14 +80,14 @@
         `uuid`,
         `name`,
         `is_active` AS isActive,
-        `expire_date` AS expireDate,
         `status`,
         `error_msg` as errorMsg,
+        `visit_time` as visitTime,
         `description`
         FROM
         `tenant`
         <include refid="searchTenantCondition"/>
-        ORDER BY `fcd`,`uuid` DESC
+        ORDER BY `is_active`,`visit_time` DESC
     </select>
 
     <select id="searchTenantCount" parameterType="neatlogic.framework.dto.TenantVo" resultType="int">
@@ -245,11 +245,11 @@
         WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="updateTenantIsActiveByUuid" parameterType="java.lang.String">
+    <update id="updateTenantIsActiveByUuid" >
         UPDATE
             `tenant`
         SET `is_active` = #{isActive}
-        WHERE `uuid` = #{value}
+        WHERE `uuid` = #{tenantUuid}
     </update>
 
     <update id="updateTenantStatusByUuid" parameterType="java.lang.String">

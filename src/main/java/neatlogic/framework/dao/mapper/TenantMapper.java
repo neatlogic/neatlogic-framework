@@ -49,7 +49,7 @@ public interface TenantMapper {
 
     int updateTenantByUuid(TenantVo tenantVo);
 
-    int updateTenantIsActiveByUuid(String uuid);
+    int updateTenantIsActiveByUuid(@Param("tenantUuid") String uuid,  @Param("isActive") Integer isActive);
 
     int updateTenantAudit(TenantAuditVo tenantAuditVo);
 

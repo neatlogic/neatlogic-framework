@@ -181,12 +181,43 @@ public class TimeUtil {
         }
     }
 
-    public static String addDateByDay(Date date, int day, String format) {
+    /**
+     * 获取n天后的时间 Date
+     *
+     * @param date 时间
+     * @param day  天数
+     * @return n天后的时间
+     */
+    public static Date getAddDateByDay(Date date, int day) {
+        Calendar calendar = getAddCalendarByDay(date, day);
+        return calendar.getTime();
+    }
+
+    /**
+     * 获取n天后的时间 Calendar
+     *
+     * @param date 时间
+     * @param day  天数
+     * @return n天后的时间
+     */
+    private static Calendar getAddCalendarByDay(Date date, int day) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         for (int i = 0; i < day; i++) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
+        return calendar;
+    }
+
+    /**
+     * 获取n天后的时间 String
+     *
+     * @param date 时间
+     * @param day  天数
+     * @return n天后的时间
+     */
+    public static String addDateStrByDay(Date date, int day, String format) {
+        Calendar calendar = getAddCalendarByDay(date, day);
         return TimeUtil.convertDateToString(calendar.getTime(), format);
     }
 
@@ -198,11 +229,7 @@ public class TimeUtil {
      * @return n天后的时间
      */
     public static Long getAddDateLongByDay(Date date, int day) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        for (int i = 0; i < day; i++) {
-            calendar.add(Calendar.DAY_OF_MONTH, 1);
-        }
+        Calendar calendar = getAddCalendarByDay(date, day);
         return calendar.getTime().getTime();
     }
 
@@ -416,14 +443,14 @@ public class TimeUtil {
     /**
      * 比较时间
      */
-    public static Boolean compareDate(Date date, Date compare) {
+    public static boolean compareDate(Date date, Date compare) {
         if (date == null && compare == null) {
             return true;
         }
         if (date != null && compare == null) {
             return true;
         }
-        if (date == null && compare != null) {
+        if (date == null) {
             return false;
         }
         return date.getTime() >= compare.getTime();

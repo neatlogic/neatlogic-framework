@@ -26,14 +26,33 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public class AttributeDataVo {
+public class AttributeDataVo implements Comparable<AttributeDataVo> {
+    private Long id;
+    private String formUuid;
     private String attributeUuid;
     private String attributeLabel;
     private String type;
     @JSONField(serialize = false)
     private String data;
     private Object dataObj;
-    private Integer isMultiple;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFormUuid() {
+        return formUuid;
+    }
+
+    public void setFormUuid(String formUuid) {
+        this.formUuid = formUuid;
+    }
+
+    //    private Integer isMultiple;
     public String getAttributeUuid() {
         return attributeUuid;
     }
@@ -95,13 +114,13 @@ public class AttributeDataVo {
         this.dataObj = dataObj;
     }
 
-    public Integer getIsMultiple() {
-        return isMultiple;
-    }
-
-    public void setIsMultiple(Integer isMultiple) {
-        this.isMultiple = isMultiple;
-    }
+//    public Integer getIsMultiple() {
+//        return isMultiple;
+//    }
+//
+//    public void setIsMultiple(Integer isMultiple) {
+//        this.isMultiple = isMultiple;
+//    }
 
     public boolean dataIsEmpty() {
         Object dataObj = getDataObj();
@@ -159,5 +178,10 @@ public class AttributeDataVo {
         } else {
             return dataObj.equals(otherDataObj);
         }
+    }
+
+    @Override
+    public int compareTo(AttributeDataVo attributeData) {
+        return this.id.compareTo(attributeData.getId());
     }
 }

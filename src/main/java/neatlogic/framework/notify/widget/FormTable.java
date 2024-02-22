@@ -368,7 +368,7 @@ public class FormTable implements TemplateMethodModelEx {
                 continue;
             }
             String attributeLabel = attributeDataVo.getAttributeLabel();
-            String type = attributeDataVo.getType();
+            String type = attributeDataVo.getHandler();
             Object dataObj = attributeDataVo.getExtendedData();
             String result = StringUtils.EMPTY;
             if (dataObj != null) {

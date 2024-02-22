@@ -19,6 +19,7 @@ package neatlogic.framework.form.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
+import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,12 +32,15 @@ public class AttributeDataVo implements Comparable<AttributeDataVo> {
     private String formUuid;
     private String attributeUuid;
     private String attributeLabel;
-    private String type;
+    private String handler;
     @JSONField(serialize = false)
     private String data;
     private Object dataObj;
 
     public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
         return id;
     }
 
@@ -69,12 +73,12 @@ public class AttributeDataVo implements Comparable<AttributeDataVo> {
         this.attributeLabel = attributeLabel;
     }
 
-    public String getType() {
-        return type;
+    public String getHandler() {
+        return handler;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public String getData() {
@@ -87,26 +91,26 @@ public class AttributeDataVo implements Comparable<AttributeDataVo> {
 
     public Object getDataObj() {
         if (dataObj != null) {
-            if (StringUtils.isBlank(type)) {
+            if (StringUtils.isBlank(handler)) {
                 return dataObj;
             }
-            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
+            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(handler);
             if (handler == null) {
                 return dataObj;
             }
-            return handler.conversionDataType(dataObj, attributeLabel);
+            return formAttributeHandler.conversionDataType(dataObj, attributeLabel);
         } else {
             if (data == null) {
                 return null;
             }
-            if (StringUtils.isBlank(type)) {
+            if (StringUtils.isBlank(handler)) {
                 return data;
             }
-            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
-            if (handler == null) {
+            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(handler);
+            if (formAttributeHandler == null) {
                 return data;
             }
-            return handler.conversionDataType(data, attributeLabel);
+            return formAttributeHandler.conversionDataType(data, attributeLabel);
         }
     }
 

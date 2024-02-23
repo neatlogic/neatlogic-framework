@@ -236,14 +236,22 @@ public class ScriptRunnerManager {
             // Resources.setCharset(Charset.forName("UTF-8"));
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errWriter);
-            runner.setDelimiter(";");
+//            runner.setDelimiter(";");
+            // 语句结束符号
+            String delimiter = ";";
+            runner.setDelimiter(delimiter);
             String line;
             StringBuilder sqlSb = new StringBuilder();
             while ((line = scriptBufferedReader.readLine()) != null) {
                 if (StringUtils.isBlank(line.trim())) {
                     continue;
                 }
-                if (!line.trim().toLowerCase(Locale.ROOT).endsWith(";")) {
+                if (line.trim().toLowerCase(Locale.ROOT).startsWith("delimiter")) {
+                    delimiter = line.substring(9).trim();
+                    runner.setDelimiter(delimiter);
+                    continue;
+                } else if (!line.trim().toLowerCase(Locale.ROOT).endsWith(delimiter)) {
+                    sqlSb.append("\n");
                     sqlSb.append(line);
                     continue;
                 }

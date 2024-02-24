@@ -62,7 +62,7 @@ CREATE PROCEDURE handleProcessTaskFormAttributeData()
 BEGIN
     DECLARE rowNum LONG;
     DECLARE currentPage INT DEFAULT 1;
-    DECLARE pageSize INT DEFAULT 1000;
+    DECLARE pageSize INT DEFAULT 100;
     DECLARE pageCount INT DEFAULT 0;
     DECLARE yu INT DEFAULT 0;
 
@@ -92,22 +92,48 @@ BEGIN
                                        LIMIT startNum, pageSize;
 
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+                SET @batchInsertSql_form_attribute_data = NULL;
+                SET @batchInsertSql_processtask_formattribute = NULL;
+
                 OPEN cur;
                 read_loop: LOOP
                     FETCH cur INTO v_processTaskId, v_type, v_attributeLabel, v_attributeUuid, v_data, v_formUuid;
                     IF done THEN
                         LEAVE read_loop;
                     END IF;
+                    IF v_type IS NULL THEN
+			            SET v_type = '';
+                    END IF;
                     IF v_attributeLabel IS NULL THEN
                         SET v_attributeLabel = '';
                     END IF;
+                    IF v_data IS NULL THEN
+                        SET v_data = '';
+                    END IF;
                     SET v_id = generateSnowflakeId();
-                    INSERT INTO `form_attribute_data` (`id`, `form_uuid`, `handler`, `attribute_label`, `attribute_uuid`, `data`)
-                    VALUES (v_id, v_formUuid, v_type, v_attributeLabel, v_attributeUuid, v_data);
-                    INSERT INTO `processtask_formattribute` (`processtask_id`, `form_attribute_data_id`)
-                    VALUES (v_processTaskId, v_id);
+                    IF @batchInsertSql_form_attribute_data IS NULL THEN
+                        SET @batchInsertSql_form_attribute_data = CONCAT('INSERT INTO `form_attribute_data` (`id`, `form_uuid`, `handler`, `attribute_label`, `attribute_uuid`, `data`) VALUES', ' (', v_id, ', \'', v_formUuid, '\', \'', v_type, '\', \'', v_attributeLabel, '\', \'', v_attributeUuid, '\', \'', v_data, '\')');
+                    ELSE
+                        SET @batchInsertSql_form_attribute_data = CONCAT(@batchInsertSql_form_attribute_data, ', (', v_id, ', \'', v_formUuid, '\', \'', v_type, '\', \'', v_attributeLabel, '\', \'', v_attributeUuid, '\', \'', v_data, '\')');
+                    END IF;
+                    IF @batchInsertSql_processtask_formattribute IS NULL THEN
+                        SET @batchInsertSql_processtask_formattribute = CONCAT('INSERT INTO `processtask_formattribute` (`processtask_id`, `form_attribute_data_id`) VALUES', ' (', v_processTaskId, ',', v_id, ')');
+                    ELSE
+                        SET @batchInsertSql_processtask_formattribute = CONCAT(@batchInsertSql_processtask_formattribute, ', (', v_processTaskId, ',', v_id, ')');
+                    END IF;
                 END LOOP;
                 CLOSE cur;
+
+                PREPARE stmt_1 FROM @batchInsertSql_form_attribute_data;
+                EXECUTE stmt_1;
+                DEALLOCATE PREPARE stmt_1;
+                PREPARE stmt_2 FROM @batchInsertSql_processtask_formattribute;
+                EXECUTE stmt_2;
+                DEALLOCATE PREPARE stmt_2;
+
+                SET @batchInsertSql_form_attribute_data = NULL;
+                SET @batchInsertSql_processtask_formattribute = NULL;
             END;
             SET currentPage = currentPage + 1;
         END WHILE;
@@ -115,3 +141,8 @@ BEGIN
 END $$
 DELIMITER ;
 
+CALL handleProcessTaskFormAttributeData();
+
+DROP PROCEDURE `handleProcessTaskFormAttributeData`;
+
+DROP FUNCTION `generateSnowflakeId`;

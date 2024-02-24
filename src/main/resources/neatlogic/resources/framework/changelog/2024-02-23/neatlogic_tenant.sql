@@ -60,11 +60,10 @@ DROP PROCEDURE IF EXISTS `handleProcessTaskFormAttributeData`;
 DELIMITER $$
 CREATE PROCEDURE handleProcessTaskFormAttributeData()
 BEGIN
-    DECLARE rowNum LONG;
+    DECLARE rowNum BIGINT DEFAULT 0;
     DECLARE currentPage INT DEFAULT 1;
     DECLARE pageSize INT DEFAULT 100;
     DECLARE pageCount INT DEFAULT 0;
-    DECLARE yu INT DEFAULT 0;
 
     SELECT COUNT(1) INTO rowNum FROM `processtask_formattribute_data`;
     IF rowNum > 0 THEN
@@ -85,6 +84,7 @@ BEGIN
                 DECLARE v_data MEDIUMTEXT;
 
                 DECLARE startNum INT DEFAULT (currentPage - 1) * pageSize;
+
                 DECLARE cur CURSOR FOR SELECT a.`processtask_id`, a.`type`, a.`attribute_label`, a.`attribute_uuid`, a.`data`, b.`form_uuid`
                                        FROM `processtask_formattribute_data` a
                                        JOIN `processtask_form` b ON b.`processtask_id` = a.`processtask_id`

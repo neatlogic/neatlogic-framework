@@ -19,6 +19,7 @@ package neatlogic.framework.form.dto;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
+import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,14 +27,36 @@ import org.apache.commons.lang3.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-public class AttributeDataVo {
+public class AttributeDataVo implements Comparable<AttributeDataVo> {
+    private Long id;
+    private String formUuid;
     private String attributeUuid;
     private String attributeLabel;
-    private String type;
+    private String handler;
     @JSONField(serialize = false)
     private String data;
     private Object dataObj;
-    private Integer isMultiple;
+
+    public Long getId() {
+        if (id == null) {
+            id = SnowflakeUtil.uniqueLong();
+        }
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getFormUuid() {
+        return formUuid;
+    }
+
+    public void setFormUuid(String formUuid) {
+        this.formUuid = formUuid;
+    }
+
+    //    private Integer isMultiple;
     public String getAttributeUuid() {
         return attributeUuid;
     }
@@ -50,12 +73,12 @@ public class AttributeDataVo {
         this.attributeLabel = attributeLabel;
     }
 
-    public String getType() {
-        return type;
+    public String getHandler() {
+        return handler;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setHandler(String handler) {
+        this.handler = handler;
     }
 
     public String getData() {
@@ -68,26 +91,26 @@ public class AttributeDataVo {
 
     public Object getDataObj() {
         if (dataObj != null) {
-            if (StringUtils.isBlank(type)) {
+            if (StringUtils.isBlank(handler)) {
                 return dataObj;
             }
-            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
+            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(handler);
             if (handler == null) {
                 return dataObj;
             }
-            return handler.conversionDataType(dataObj, attributeLabel);
+            return formAttributeHandler.conversionDataType(dataObj, attributeLabel);
         } else {
             if (data == null) {
                 return null;
             }
-            if (StringUtils.isBlank(type)) {
+            if (StringUtils.isBlank(handler)) {
                 return data;
             }
-            IFormAttributeHandler handler = FormAttributeHandlerFactory.getHandler(type);
-            if (handler == null) {
+            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(handler);
+            if (formAttributeHandler == null) {
                 return data;
             }
-            return handler.conversionDataType(data, attributeLabel);
+            return formAttributeHandler.conversionDataType(data, attributeLabel);
         }
     }
 
@@ -95,13 +118,13 @@ public class AttributeDataVo {
         this.dataObj = dataObj;
     }
 
-    public Integer getIsMultiple() {
-        return isMultiple;
-    }
-
-    public void setIsMultiple(Integer isMultiple) {
-        this.isMultiple = isMultiple;
-    }
+//    public Integer getIsMultiple() {
+//        return isMultiple;
+//    }
+//
+//    public void setIsMultiple(Integer isMultiple) {
+//        this.isMultiple = isMultiple;
+//    }
 
     public boolean dataIsEmpty() {
         Object dataObj = getDataObj();
@@ -159,5 +182,10 @@ public class AttributeDataVo {
         } else {
             return dataObj.equals(otherDataObj);
         }
+    }
+
+    @Override
+    public int compareTo(AttributeDataVo attributeData) {
+        return this.id.compareTo(attributeData.getId());
     }
 }

@@ -351,6 +351,21 @@ limitations under the License.
         ORDER BY a.`form_uuid`
     </select>
 
+    <select id="getFormAttributeDataListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.form.dto.AttributeDataVo">
+        SELECT
+            `id`,
+            `form_uuid` AS formUuid,
+            `handler`,
+            `attribute_label` AS attributeLabel,
+            `attribute_uuid` AS attributeUuid,
+            `data`
+        FROM `form_attribute_data`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <update id="updateFormVersion" parameterType="neatlogic.framework.form.dto.FormVersionVo">
         UPDATE
         `form_version`
@@ -478,6 +493,28 @@ limitations under the License.
                 #{data})
     </insert>
 
+    <insert id="insertFormAttributeData" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
+        INSERT INTO `form_attribute_data` (
+            `id`,
+            `form_uuid`,
+            `handler`,
+            `attribute_label`,
+            `attribute_uuid`,
+            `data`
+        )
+        VALUES
+            (
+                #{id},
+                #{formUuid},
+                #{handler},
+                #{attributeLabel},
+                #{attributeUuid},
+                #{data}
+            )
+        ON DUPLICATE KEY
+        UPDATE `data` = #{data,typeHandler=CompressHandler}
+    </insert>
+
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">
         DELETE
         FROM `form_attribute`
@@ -506,5 +543,13 @@ limitations under the License.
         DELETE
         FROM `form_customitem`
         WHERE id = #{value}
+    </delete>
+
+    <delete id="deleteFormAttributeDataByIdList" parameterType="java.lang.Long">
+        DELETE FROM `form_attribute_data`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
     </delete>
 </mapper>

@@ -467,8 +467,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         }
         List<String> valueList = new ArrayList<>();
         List<String> textList = new ArrayList<>();
-        boolean isMultiple = configObj.getBooleanValue("isMultiple");
-        attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
+//        boolean isMultiple = configObj.getBooleanValue("isMultiple");
+//        attributeDataVo.setIsMultiple(isMultiple ? 1 : 0);
         String dataSource = configObj.getString("dataSource");
         if ("static".equals(dataSource)) {
             JSONArray dataArray = configObj.getJSONArray("dataList");

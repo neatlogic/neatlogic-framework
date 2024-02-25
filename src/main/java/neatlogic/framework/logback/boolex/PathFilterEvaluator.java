@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * 优先使用白名单。及：如果白名单和黑名单同时配置，则使用白名单
  */
-public class CustomFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
+public class PathFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
 
     private String whitelist;
 

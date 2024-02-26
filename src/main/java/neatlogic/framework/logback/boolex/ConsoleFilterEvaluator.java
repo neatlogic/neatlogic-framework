@@ -23,114 +23,229 @@ import org.apache.commons.lang3.StringUtils;
 
 public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
 
-    private String errorPathList;
+    private String errorWhitelist;
 
-    private String warnPathList;
+    private String errorBlacklist;
 
-    private String infoPathList;
+    private String warnWhitelist;
 
-    private String debugPathList;
+    private String warnBlacklist;
 
-    private String tracePathList;
+    private String infoWhitelist;
+
+    private String infoBlacklist;
+
+    private String debugWhitelist;
+
+    private String debugBlacklist;
+
+    private String traceWhitelist;
+
+    private String traceBlacklist;
 
     @Override
     public boolean evaluate(ILoggingEvent event) throws NullPointerException {
         if (event.getLevel() == Level.ERROR) {
-            if(StringUtils.isNotBlank(errorPathList)) {
-                String[] split = errorPathList.split("\\|");
+            if(StringUtils.isNotBlank(errorWhitelist)) {
+                boolean flag = false;
+                String[] split = errorWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
                 for (String path : split) {
                     if (loggerName.startsWith(path)) {
-                        return true;
+                        flag = true;
+                        break;
                     }
                 }
-                return false;
+                if (!flag) {
+                    return false;
+                }
+            }
+            if(StringUtils.isNotBlank(errorBlacklist)) {
+                String[] blackList = errorBlacklist.split("\\|");
+                String loggerName = event.getLoggerName();
+                for (String path : blackList) {
+                    if (loggerName.startsWith(path)) {
+                        return false;
+                    }
+                }
             }
         } else if (event.getLevel() == Level.WARN) {
-            if(StringUtils.isNotBlank(warnPathList)) {
-                String[] split = warnPathList.split("\\|");
+            if(StringUtils.isNotBlank(warnWhitelist)) {
+                boolean flag = false;
+                String[] split = warnWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
                 for (String path : split) {
                     if (loggerName.startsWith(path)) {
-                        return true;
+                        flag = true;
+                        break;
                     }
                 }
-                return false;
+                if (!flag) {
+                    return false;
+                }
+            }
+            if(StringUtils.isNotBlank(warnBlacklist)) {
+                String[] blackList = warnBlacklist.split("\\|");
+                String loggerName = event.getLoggerName();
+                for (String path : blackList) {
+                    if (loggerName.startsWith(path)) {
+                        return false;
+                    }
+                }
             }
         } else if (event.getLevel() == Level.INFO) {
-            if(StringUtils.isNotBlank(infoPathList)) {
-                String[] split = infoPathList.split("\\|");
+            if(StringUtils.isNotBlank(infoWhitelist)) {
+                boolean flag = false;
+                String[] split = infoWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
                 for (String path : split) {
                     if (loggerName.startsWith(path)) {
-                        return true;
+                        flag = true;
+                        break;
                     }
                 }
-                return false;
+                if (!flag) {
+                    return false;
+                }
+            }
+            if(StringUtils.isNotBlank(infoBlacklist)) {
+                String[] blackList = infoBlacklist.split("\\|");
+                String loggerName = event.getLoggerName();
+                for (String path : blackList) {
+                    if (loggerName.startsWith(path)) {
+                        return false;
+                    }
+                }
             }
         } else if (event.getLevel() == Level.DEBUG) {
-            if(StringUtils.isNotBlank(debugPathList)) {
-                String[] split = debugPathList.split("\\|");
+            if(StringUtils.isNotBlank(debugWhitelist)) {
+                boolean flag = false;
+                String[] split = debugWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
                 for (String path : split) {
                     if (loggerName.startsWith(path)) {
-                        return true;
+                        flag = true;
+                        break;
                     }
                 }
-                return false;
+                if (!flag) {
+                    return false;
+                }
+            }
+            if(StringUtils.isNotBlank(debugBlacklist)) {
+                String[] blackList = debugBlacklist.split("\\|");
+                String loggerName = event.getLoggerName();
+                for (String path : blackList) {
+                    if (loggerName.startsWith(path)) {
+                        return false;
+                    }
+                }
             }
         } else if (event.getLevel() == Level.TRACE) {
-            if(StringUtils.isNotBlank(tracePathList)) {
-                String[] split = tracePathList.split("\\|");
+            if(StringUtils.isNotBlank(traceWhitelist)) {
+                boolean flag = false;
+                String[] split = traceWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
                 for (String path : split) {
                     if (loggerName.startsWith(path)) {
-                        return true;
+                        flag = true;
+                        break;
                     }
                 }
-                return false;
+                if (!flag) {
+                    return false;
+                }
+            }
+            if(StringUtils.isNotBlank(traceBlacklist)) {
+                String[] blackList = traceBlacklist.split("\\|");
+                String loggerName = event.getLoggerName();
+                for (String path : blackList) {
+                    if (loggerName.startsWith(path)) {
+                        return false;
+                    }
+                }
             }
         }
         return true;
     }
 
-    public String getErrorPathList() {
-        return errorPathList;
+    public String getErrorWhitelist() {
+        return errorWhitelist;
     }
 
-    public void setErrorPathList(String errorPathList) {
-        this.errorPathList = errorPathList;
+    public void setErrorWhitelist(String errorWhitelist) {
+        this.errorWhitelist = errorWhitelist;
     }
 
-    public String getWarnPathList() {
-        return warnPathList;
+    public String getErrorBlacklist() {
+        return errorBlacklist;
     }
 
-    public void setWarnPathList(String warnPathList) {
-        this.warnPathList = warnPathList;
+    public void setErrorBlacklist(String errorBlacklist) {
+        this.errorBlacklist = errorBlacklist;
     }
 
-    public String getInfoPathList() {
-        return infoPathList;
+    public String getWarnWhitelist() {
+        return warnWhitelist;
     }
 
-    public void setInfoPathList(String infoPathList) {
-        this.infoPathList = infoPathList;
+    public void setWarnWhitelist(String warnWhitelist) {
+        this.warnWhitelist = warnWhitelist;
     }
 
-    public String getDebugPathList() {
-        return debugPathList;
+    public String getWarnBlacklist() {
+        return warnBlacklist;
     }
 
-    public void setDebugPathList(String debugPathList) {
-        this.debugPathList = debugPathList;
+    public void setWarnBlacklist(String warnBlacklist) {
+        this.warnBlacklist = warnBlacklist;
     }
 
-    public String getTracePathList() {
-        return tracePathList;
+    public String getInfoWhitelist() {
+        return infoWhitelist;
     }
 
-    public void setTracePathList(String tracePathList) {
-        this.tracePathList = tracePathList;
+    public void setInfoWhitelist(String infoWhitelist) {
+        this.infoWhitelist = infoWhitelist;
+    }
+
+    public String getInfoBlacklist() {
+        return infoBlacklist;
+    }
+
+    public void setInfoBlacklist(String infoBlacklist) {
+        this.infoBlacklist = infoBlacklist;
+    }
+
+    public String getDebugWhitelist() {
+        return debugWhitelist;
+    }
+
+    public void setDebugWhitelist(String debugWhitelist) {
+        this.debugWhitelist = debugWhitelist;
+    }
+
+    public String getDebugBlacklist() {
+        return debugBlacklist;
+    }
+
+    public void setDebugBlacklist(String debugBlacklist) {
+        this.debugBlacklist = debugBlacklist;
+    }
+
+    public String getTraceWhitelist() {
+        return traceWhitelist;
+    }
+
+    public void setTraceWhitelist(String traceWhitelist) {
+        this.traceWhitelist = traceWhitelist;
+    }
+
+    public String getTraceBlacklist() {
+        return traceBlacklist;
+    }
+
+    public void setTraceBlacklist(String traceBlacklist) {
+        this.traceBlacklist = traceBlacklist;
     }
 }

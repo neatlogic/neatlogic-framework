@@ -20,11 +20,14 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.boolex.EvaluationException;
 import ch.qos.logback.core.boolex.EventEvaluatorBase;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.AntPathMatcher;
 
 /**
  * 优先使用白名单。及：如果白名单和黑名单同时配置，则使用白名单
  */
 public class PathFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
+
+    private static AntPathMatcher antPathMatcher = new AntPathMatcher(".");
 
     private String whitelist;
 
@@ -32,29 +35,29 @@ public class PathFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
 
     @Override
     public boolean evaluate(ILoggingEvent event) throws NullPointerException, EvaluationException {
-        if (StringUtils.isBlank(whitelist) && StringUtils.isBlank(blacklist)) {
-            return true;
-        }
         if(StringUtils.isNotBlank(whitelist)) {
+            boolean flag = false;
             String[] whiteList = whitelist.split("\\|");
             String loggerName = event.getLoggerName();
-            for (String white : whiteList) {
-                if (loggerName.startsWith(white)) {
-                    return true;
+            for (String pattern : whiteList) {
+                if (antPathMatcher.match(pattern, loggerName)) {
+                    flag = true;
+                    break;
                 }
             }
-            return false;
+            if (!flag) {
+                return false;
+            }
         }
 
         if(StringUtils.isNotBlank(blacklist)) {
             String[] blackList = blacklist.split("\\|");
             String loggerName = event.getLoggerName();
-            for (String black : blackList) {
-                if (loggerName.startsWith(black)) {
+            for (String pattern : blackList) {
+                if (antPathMatcher.match(pattern, loggerName)) {
                     return false;
                 }
             }
-            return true;
         }
         return true;
     }

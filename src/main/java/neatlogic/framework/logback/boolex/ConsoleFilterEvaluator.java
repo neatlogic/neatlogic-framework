@@ -20,8 +20,11 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.boolex.EventEvaluatorBase;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.AntPathMatcher;
 
 public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
+
+    private static AntPathMatcher antPathMatcher = new AntPathMatcher(".");
 
     private String errorWhitelist;
 
@@ -50,8 +53,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 boolean flag = false;
                 String[] split = errorWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : split) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : split) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         flag = true;
                         break;
                     }
@@ -63,8 +66,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
             if(StringUtils.isNotBlank(errorBlacklist)) {
                 String[] blackList = errorBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : blackList) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : blackList) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
                 }
@@ -74,8 +77,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 boolean flag = false;
                 String[] split = warnWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : split) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : split) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         flag = true;
                         break;
                     }
@@ -87,8 +90,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
             if(StringUtils.isNotBlank(warnBlacklist)) {
                 String[] blackList = warnBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : blackList) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : blackList) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
                 }
@@ -98,8 +101,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 boolean flag = false;
                 String[] split = infoWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : split) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : split) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         flag = true;
                         break;
                     }
@@ -111,8 +114,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
             if(StringUtils.isNotBlank(infoBlacklist)) {
                 String[] blackList = infoBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : blackList) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : blackList) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
                 }
@@ -122,8 +125,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 boolean flag = false;
                 String[] split = debugWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : split) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : split) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         flag = true;
                         break;
                     }
@@ -135,8 +138,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
             if(StringUtils.isNotBlank(debugBlacklist)) {
                 String[] blackList = debugBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : blackList) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : blackList) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
                 }
@@ -146,8 +149,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 boolean flag = false;
                 String[] split = traceWhitelist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : split) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : split) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         flag = true;
                         break;
                     }
@@ -159,8 +162,8 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
             if(StringUtils.isNotBlank(traceBlacklist)) {
                 String[] blackList = traceBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String path : blackList) {
-                    if (loggerName.startsWith(path)) {
+                for (String pattern : blackList) {
+                    if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
                 }

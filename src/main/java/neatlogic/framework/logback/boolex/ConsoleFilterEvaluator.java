@@ -64,9 +64,9 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 }
             }
             if(StringUtils.isNotBlank(errorBlacklist)) {
-                String[] blackList = errorBlacklist.split("\\|");
+                String[] split = errorBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String pattern : blackList) {
+                for (String pattern : split) {
                     if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
@@ -88,9 +88,9 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 }
             }
             if(StringUtils.isNotBlank(warnBlacklist)) {
-                String[] blackList = warnBlacklist.split("\\|");
+                String[] split = warnBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String pattern : blackList) {
+                for (String pattern : split) {
                     if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
@@ -112,9 +112,9 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 }
             }
             if(StringUtils.isNotBlank(infoBlacklist)) {
-                String[] blackList = infoBlacklist.split("\\|");
+                String[] split = infoBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String pattern : blackList) {
+                for (String pattern : split) {
                     if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
@@ -136,9 +136,9 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 }
             }
             if(StringUtils.isNotBlank(debugBlacklist)) {
-                String[] blackList = debugBlacklist.split("\\|");
+                String[] split = debugBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String pattern : blackList) {
+                for (String pattern : split) {
                     if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }
@@ -160,9 +160,9 @@ public class ConsoleFilterEvaluator extends EventEvaluatorBase<ILoggingEvent> {
                 }
             }
             if(StringUtils.isNotBlank(traceBlacklist)) {
-                String[] blackList = traceBlacklist.split("\\|");
+                String[] split = traceBlacklist.split("\\|");
                 String loggerName = event.getLoggerName();
-                for (String pattern : blackList) {
+                for (String pattern : split) {
                     if (antPathMatcher.match(pattern, loggerName)) {
                         return false;
                     }

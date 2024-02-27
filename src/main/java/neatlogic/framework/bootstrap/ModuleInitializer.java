@@ -45,10 +45,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ModuleInitializer implements WebApplicationInitializer {
@@ -146,10 +149,40 @@ public class ModuleInitializer implements WebApplicationInitializer {
             groupName = neatlogicE.attributeValue("groupName");
             groupSort = neatlogicE.attributeValue("groupSort");
             groupDescription = neatlogicE.attributeValue("groupDescription");
-            version = Config.getProperty("META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties", "version");
+            String pomPropertiesPath = getPomPropertiesPath(path);
+            if (StringUtils.isBlank(pomPropertiesPath)) {
+                pomPropertiesPath = "META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties";
+            }
+            version = Config.getProperty(pomPropertiesPath, "version");
             moduleVoList.add(new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription, path, parent, isCommercial));
         }
         return moduleVoList;
+    }
+
+    /**
+     * 根据context.xml path 获取 pom.properties path
+     */
+    private String getPomPropertiesPath(String resourceContextPath) {
+        // 获取资源的URL
+        URL resourceUrl = Config.class.getClassLoader().getResource(resourceContextPath);
+        if (resourceUrl != null) {
+            try {
+                // 如果资源在JAR文件中，获取JAR文件的URL
+                String jarUrl = resourceUrl.toString().replaceFirst("jar:file:", "").replaceFirst("!.*", "");
+                try (JarFile jarFile = new JarFile(jarUrl)) {
+                    Enumeration<JarEntry> entries = jarFile.entries();
+                    while (entries.hasMoreElements()) {
+                        JarEntry entry = entries.nextElement();
+                        String entryName = entry.getName();
+                        if (entryName.endsWith("pom.properties")) {
+                            return entryName;
+                        }
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
     }
 
     /**

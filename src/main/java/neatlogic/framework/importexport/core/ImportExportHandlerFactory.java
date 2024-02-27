@@ -27,6 +27,7 @@ import neatlogic.framework.file.dao.mapper.FileMapper;
 import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
 import neatlogic.framework.importexport.dto.*;
+import neatlogic.framework.importexport.exception.DependencyNotFoundException;
 import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import neatlogic.framework.importexport.exception.ImportExportTypeInconsistencyException;
 import neatlogic.framework.importexport.exception.ImportNoAuthException;
@@ -174,6 +175,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
         }
         List<ImportExportPrimaryChangeVo> primaryChangeList = new ArrayList<>();
         Map<Long, FileVo> fileMap = new HashMap<>();
+        List<String> messageList = new ArrayList<>();
         // 第二次遍历压缩包，导入dependency-folder/{primaryKey}.json和{primaryKey}.json文件
         try (ZipInputStream zipIs = new ZipInputStream(multipartFile.getInputStream());
              ByteArrayOutputStream out = new ByteArrayOutputStream()
@@ -205,10 +207,14 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         if (logger.isWarnEnabled()) {
                             logger.warn("import data: " + dependencyVo.getType() + "-" + dependencyVo.getName() + "-" + oldPrimaryKey);
                         }
-                        newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
-                        if (Objects.equals(dependencyVo.getType(), FrameworkImportExportHandlerType.FILE.getValue())) {
-                            FileVo fileVo = dependencyVo.getData().toJavaObject(FileVo.class);
-                            fileMap.put(fileVo.getId(), fileVo);
+                        try {
+                            newPrimaryKey = importExportHandler.importData(dependencyVo, primaryChangeList);
+                            if (Objects.equals(dependencyVo.getType(), FrameworkImportExportHandlerType.FILE.getValue())) {
+                                FileVo fileVo = dependencyVo.getData().toJavaObject(FileVo.class);
+                                fileMap.put(fileVo.getId(), fileVo);
+                            }
+                        } catch (DependencyNotFoundException e) {
+                            messageList.addAll(e.getMessageList());
                         }
                     } else {
                         newPrimaryKey = importExportHandler.getPrimaryByName(dependencyVo);
@@ -231,11 +237,18 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                     if (importExportHandler == null) {
                         throw new ImportExportHandlerNotFoundException(importExportVo.getType());
                     }
-                    importExportHandler.importData(importExportVo, primaryChangeList);
+                    try {
+                        importExportHandler.importData(importExportVo, primaryChangeList);
+                    } catch (DependencyNotFoundException e) {
+                        messageList.addAll(e.getMessageList());
+                    }
                 }
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
+        }
+        if (CollectionUtils.isNotEmpty(messageList)) {
+            throw new DependencyNotFoundException(messageList);
         }
         // 第三次遍历压缩包，导入attachment-folder/{primaryKey}/xxx文件
         try (ZipInputStream zipIs = new ZipInputStream(multipartFile.getInputStream());

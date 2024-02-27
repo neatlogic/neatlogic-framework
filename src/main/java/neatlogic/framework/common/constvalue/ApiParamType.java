@@ -18,7 +18,7 @@ package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.util.$;
 
-public enum ApiParamType {
+public enum ApiParamType  {
     INTEGER("int", "common.int"),
     ENUM("enum", "common.enum"),
     BOOLEAN("boolean", "common.boolean"),

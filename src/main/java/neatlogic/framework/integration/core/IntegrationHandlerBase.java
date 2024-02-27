@@ -16,6 +16,7 @@
 
 package neatlogic.framework.integration.core;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -41,6 +42,7 @@ import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import neatlogic.module.framework.integration.audit.IntegrationAuditAppendPostProcessor;
 import neatlogic.module.framework.integration.audit.IntegrationAuditAppendPreProcessor;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -112,15 +114,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             } else {// 自定义参数
                 patternList = new ArrayList<>();
                 JSONArray paramList = paramObj.getJSONArray("paramList");
-                if (paramList != null && paramList.size() > 0) {
+                if (CollectionUtils.isNotEmpty(paramList)) {
                     for (int i = 0; i < paramList.size(); i++) {
                         JSONObject pObj = paramList.getJSONObject(i);
-                        PatternVo patternVo = JSONObject.toJavaObject(pObj, PatternVo.class);
+                        PatternVo patternVo = JSON.toJavaObject(pObj, PatternVo.class);
                         patternList.add(patternVo);
                     }
                 }
             }
-            if (patternList != null && patternList.size() > 0) {
+            if (CollectionUtils.isNotEmpty(patternList)) {
                 for (PatternVo patternVo : patternList) {
                     if (patternVo.getIsRequired() != null && patternVo.getIsRequired().equals(1)) {
                         if (!requestParamObj.containsKey(patternVo.getName())) {

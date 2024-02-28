@@ -1,5 +1,6 @@
 package neatlogic.module.framework.importexport.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
 import neatlogic.framework.importexport.core.ImportExportHandler;
@@ -17,6 +18,8 @@ import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -95,6 +98,19 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
             }
             ImportExportBaseInfoVo importExportBaseInfoVo = new ImportExportBaseInfoVo();
             importExportBaseInfoVo.setPrimaryKey(matrix.getCiId());
+            JSONObject config = matrix.getConfig();
+            if (MapUtils.isNotEmpty(config)) {
+                String name = "";
+                String ciLabel = config.getString("ciLabel");
+                if (StringUtils.isNotBlank(ciLabel)) {
+                    name = name + ciLabel;
+                }
+                String ciName = config.getString("ciName");
+                if (StringUtils.isNotBlank(ciName)) {
+                    name = name + "(" + ciName + ")";
+                }
+                importExportBaseInfoVo.setName(name);
+            }
             importExportBaseInfoVo.setType(FrameworkImportExportHandlerType.CMDB_CI.getValue());
             try {
                 importExportHandler.checkIsExists(importExportBaseInfoVo);
@@ -129,6 +145,19 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
             }
             ImportExportBaseInfoVo importExportBaseInfoVo = new ImportExportBaseInfoVo();
             importExportBaseInfoVo.setPrimaryKey(matrixVo.getCiId());
+            JSONObject config = matrixVo.getConfig();
+            if (MapUtils.isNotEmpty(config)) {
+                String name = "";
+                String ciLabel = config.getString("ciLabel");
+                if (StringUtils.isNotBlank(ciLabel)) {
+                    name = name + ciLabel;
+                }
+                String ciName = config.getString("ciName");
+                if (StringUtils.isNotBlank(ciName)) {
+                    name = name + "(" + ciName + ")";
+                }
+                importExportBaseInfoVo.setName(name);
+            }
             importExportBaseInfoVo.setType(FrameworkImportExportHandlerType.CMDB_CI.getValue());
             try {
                 importExportHandler.checkIsExists(importExportBaseInfoVo);

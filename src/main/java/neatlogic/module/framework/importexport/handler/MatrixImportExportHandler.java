@@ -1,11 +1,16 @@
 package neatlogic.module.framework.importexport.handler;
 
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
+import neatlogic.framework.importexport.core.ImportExportHandler;
 import neatlogic.framework.importexport.core.ImportExportHandlerBase;
+import neatlogic.framework.importexport.core.ImportExportHandlerFactory;
 import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.importexport.dto.ImportExportBaseInfoVo;
 import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
+import neatlogic.framework.importexport.exception.DependencyNotFoundException;
+import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
@@ -79,9 +84,22 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
                 matrix.setIntegrationUuid((String) newPrimaryKey);
             }
         } else if (Objects.equals(matrix.getType(), "cmdbci")) {
-            Object newPrimaryKey = getNewPrimaryKey(FrameworkImportExportHandlerType.CMDB_CI, matrix.getId(), primaryChangeList);
-            if (newPrimaryKey != null) {
-                matrix.setCiId((Long) newPrimaryKey);
+//            Object newPrimaryKey = getNewPrimaryKey(FrameworkImportExportHandlerType.CMDB_CI, matrix.getId(), primaryChangeList);
+//            if (newPrimaryKey != null) {
+//                matrix.setCiId((Long) newPrimaryKey);
+//            }
+            // 配置项模型不做一起导入，只检查其是否存在
+            ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(FrameworkImportExportHandlerType.CMDB_CI.getValue());
+            if (importExportHandler == null) {
+                throw new ImportExportHandlerNotFoundException(FrameworkImportExportHandlerType.CMDB_CI.getText());
+            }
+            ImportExportBaseInfoVo importExportBaseInfoVo = new ImportExportBaseInfoVo();
+            importExportBaseInfoVo.setPrimaryKey(matrix.getCiId());
+            importExportBaseInfoVo.setType(FrameworkImportExportHandlerType.CMDB_CI.getValue());
+            try {
+                importExportHandler.checkIsExists(importExportBaseInfoVo);
+            } catch (ApiRuntimeException e) {
+                throw new DependencyNotFoundException(e.getMessage());
             }
         }
         matrixDataSourceHandler.importMatrix(matrix);
@@ -103,7 +121,20 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
         if (Objects.equals(matrix.getType(), "external")) {
             doExportData(FrameworkImportExportHandlerType.INTEGRATION, matrixVo.getIntegrationUuid(), dependencyList, zipOutputStream);
         } else if (Objects.equals(matrix.getType(), "cmdbci")) {
-            doExportData(FrameworkImportExportHandlerType.CMDB_CI, matrixVo.getCiId(), dependencyList, zipOutputStream);
+//            doExportData(FrameworkImportExportHandlerType.CMDB_CI, matrixVo.getCiId(), dependencyList, zipOutputStream);
+            // 配置项模型不做一起导出，只检查其是否存在
+            ImportExportHandler importExportHandler = ImportExportHandlerFactory.getHandler(FrameworkImportExportHandlerType.CMDB_CI.getValue());
+            if (importExportHandler == null) {
+                throw new ImportExportHandlerNotFoundException(FrameworkImportExportHandlerType.CMDB_CI.getText());
+            }
+            ImportExportBaseInfoVo importExportBaseInfoVo = new ImportExportBaseInfoVo();
+            importExportBaseInfoVo.setPrimaryKey(matrixVo.getCiId());
+            importExportBaseInfoVo.setType(FrameworkImportExportHandlerType.CMDB_CI.getValue());
+            try {
+                importExportHandler.checkIsExists(importExportBaseInfoVo);
+            } catch (ApiRuntimeException e) {
+                throw new DependencyNotFoundException(e.getMessage());
+            }
         }
         ImportExportVo importExportVo = new ImportExportVo(this.getType().getValue(), primaryKey, matrixVo.getLabel());
         importExportVo.setDataWithObject(matrixVo);

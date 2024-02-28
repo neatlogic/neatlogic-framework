@@ -1,18 +1,27 @@
-CREATE TABLE  IF NOT EXISTS `form_attribute_data` (
-  `id` bigint NOT NULL COMMENT 'id',
-  `form_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单uuid',
-  `handler` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
-  `attribute_label` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性名',
-  `attribute_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性uuid',
-  `data` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '属性值,json格式',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单实例属性当前值';
+ALTER TABLE `processtask_formattribute_data`
+  ADD COLUMN `id` BIGINT NOT NULL AUTO_INCREMENT FIRST,
+  ADD KEY(`id`),
+AUTO_INCREMENT=0;
 
-CREATE TABLE  IF NOT EXISTS `processtask_formattribute` (
-  `processtask_id` bigint NOT NULL COMMENT '工单id',
-  `form_attribute_data_id` bigint NOT NULL COMMENT '表单属性值id',
+DROP TABLE IF EXISTS `form_attribute_data`;
+
+CREATE TABLE `form_attribute_data` (
+  `id` BIGINT NOT NULL COMMENT 'id',
+  `form_uuid` CHAR(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单uuid',
+  `handler` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
+  `attribute_label` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性名',
+  `attribute_uuid` CHAR(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性uuid',
+  `data` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '属性值,json格式',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单实例属性当前值';
+
+DROP TABLE IF EXISTS `processtask_formattribute`;
+
+CREATE TABLE `processtask_formattribute` (
+  `processtask_id` BIGINT NOT NULL COMMENT '工单id',
+  `form_attribute_data_id` BIGINT NOT NULL COMMENT '表单属性值id',
   PRIMARY KEY (`processtask_id`,`form_attribute_data_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='工单与表单属性值关系表';
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='工单与表单属性值关系表';
 
 DROP FUNCTION IF EXISTS `generateSnowflakeId`;
 
@@ -60,84 +69,29 @@ DROP PROCEDURE IF EXISTS `handleProcessTaskFormAttributeData`;
 DELIMITER $$
 CREATE PROCEDURE handleProcessTaskFormAttributeData()
 BEGIN
-    DECLARE rowNum BIGINT DEFAULT 0;
-    DECLARE currentPage INT DEFAULT 1;
-    DECLARE pageSize INT DEFAULT 100;
-    DECLARE pageCount INT DEFAULT 0;
+    DECLARE v_id BIGINT DEFAULT generateSnowflakeId();
 
-    SELECT COUNT(1) INTO rowNum FROM `processtask_formattribute_data`;
-    IF rowNum > 0 THEN
-        SET @lastStamp = -1;
-        SET @sequence = 0;
+    UPDATE `processtask_formattribute_data` SET `id` = `id` + v_id;
 
-        SET pageCount = CEIL(rowNum / pageSize);
-        WHILE currentPage <= pageCount DO
-            BEGIN
-                DECLARE done INT DEFAULT FALSE;
+    INSERT INTO `form_attribute_data` (`id`, `form_uuid`, `handler`, `attribute_label`, `attribute_uuid`, `data`)
+        SELECT
+        a.`id`,
+        b.`form_uuid`,
+        IFNULL(a.`type`, ''),
+        IFNULL(a.`attribute_label`, ''),
+        a.`attribute_uuid`,
+        IFNULL(a.`data`, '')
+    FROM `processtask_formattribute_data` a
+    JOIN `processtask_form` b ON b.`processtask_id` = a.`processtask_id`
+    ORDER BY a.`processtask_id`, a.`sort`;
 
-                DECLARE v_id BIGINT;
-                DECLARE v_processTaskId BIGINT;
-                DECLARE v_type VARCHAR(50);
-                DECLARE v_attributeLabel VARCHAR(50);
-                DECLARE v_attributeUuid CHAR(32);
-                DECLARE v_formUuid CHAR(32);
-                DECLARE v_data MEDIUMTEXT;
+    INSERT INTO `processtask_formattribute` (`processtask_id`, `form_attribute_data_id`)
+    SELECT
+        a.`processtask_id`,
+        a.`id`
+    FROM `processtask_formattribute_data` a
+    ORDER BY a.`processtask_id`, a.`sort`;
 
-                DECLARE startNum INT DEFAULT (currentPage - 1) * pageSize;
-
-                DECLARE cur CURSOR FOR SELECT a.`processtask_id`, a.`type`, a.`attribute_label`, a.`attribute_uuid`, a.`data`, b.`form_uuid`
-                                       FROM `processtask_formattribute_data` a
-                                       JOIN `processtask_form` b ON b.`processtask_id` = a.`processtask_id`
-                                       ORDER BY a.`processtask_id`, a.`sort`
-                                       LIMIT startNum, pageSize;
-
-                DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-                SET @batchInsertSql_form_attribute_data = NULL;
-                SET @batchInsertSql_processtask_formattribute = NULL;
-
-                OPEN cur;
-                read_loop: LOOP
-                    FETCH cur INTO v_processTaskId, v_type, v_attributeLabel, v_attributeUuid, v_data, v_formUuid;
-                    IF done THEN
-                        LEAVE read_loop;
-                    END IF;
-                    IF v_type IS NULL THEN
-			            SET v_type = '';
-                    END IF;
-                    IF v_attributeLabel IS NULL THEN
-                        SET v_attributeLabel = '';
-                    END IF;
-                    IF v_data IS NULL THEN
-                        SET v_data = '';
-                    END IF;
-                    SET v_id = generateSnowflakeId();
-                    IF @batchInsertSql_form_attribute_data IS NULL THEN
-                        SET @batchInsertSql_form_attribute_data = CONCAT('INSERT INTO `form_attribute_data` (`id`, `form_uuid`, `handler`, `attribute_label`, `attribute_uuid`, `data`) VALUES', ' (', v_id, ', \'', v_formUuid, '\', \'', v_type, '\', \'', v_attributeLabel, '\', \'', v_attributeUuid, '\', \'', v_data, '\')');
-                    ELSE
-                        SET @batchInsertSql_form_attribute_data = CONCAT(@batchInsertSql_form_attribute_data, ', (', v_id, ', \'', v_formUuid, '\', \'', v_type, '\', \'', v_attributeLabel, '\', \'', v_attributeUuid, '\', \'', v_data, '\')');
-                    END IF;
-                    IF @batchInsertSql_processtask_formattribute IS NULL THEN
-                        SET @batchInsertSql_processtask_formattribute = CONCAT('INSERT INTO `processtask_formattribute` (`processtask_id`, `form_attribute_data_id`) VALUES', ' (', v_processTaskId, ',', v_id, ')');
-                    ELSE
-                        SET @batchInsertSql_processtask_formattribute = CONCAT(@batchInsertSql_processtask_formattribute, ', (', v_processTaskId, ',', v_id, ')');
-                    END IF;
-                END LOOP;
-                CLOSE cur;
-
-                PREPARE stmt_1 FROM @batchInsertSql_form_attribute_data;
-                EXECUTE stmt_1;
-                DEALLOCATE PREPARE stmt_1;
-                PREPARE stmt_2 FROM @batchInsertSql_processtask_formattribute;
-                EXECUTE stmt_2;
-                DEALLOCATE PREPARE stmt_2;
-
-                SET @batchInsertSql_form_attribute_data = NULL;
-                SET @batchInsertSql_processtask_formattribute = NULL;
-            END;
-            SET currentPage = currentPage + 1;
-        END WHILE;
-    END IF;
 END $$
 DELIMITER ;
 
@@ -146,3 +100,7 @@ CALL handleProcessTaskFormAttributeData();
 DROP PROCEDURE `handleProcessTaskFormAttributeData`;
 
 DROP FUNCTION `generateSnowflakeId`;
+
+ALTER TABLE `processtask_formattribute_data`
+DROP COLUMN `id`,
+DROP INDEX `id`;

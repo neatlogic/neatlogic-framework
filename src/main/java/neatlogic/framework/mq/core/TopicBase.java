@@ -53,7 +53,7 @@ public abstract class TopicBase<T> implements ITopic<T> {
             job.execute(content, t -> {
                 String topicName = this.getName().toLowerCase(Locale.ROOT);
                 TopicVo topicVo = mqTopicMapper.getTopicByName(topicName);
-                if (topicVo == null || Objects.equals(topicVo.getIsActive(), 1)) {
+                if (topicVo != null && Objects.equals(topicVo.getIsActive(), 1)) {
                     JSONObject contentObj = generateTopicContent(topicVo, content);
                     if (MapUtils.isNotEmpty(contentObj)) {
                         String msg = contentObj.toString();

@@ -101,7 +101,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         }
         //如果认证cookie为null,说明不是通过登录页登录，而是通过第三方认证接口认证。第一次认证通过后需构建并设置response 认证 cookie
         if (userVo != null && StringUtils.isBlank(userVo.getCookieAuthorization())) {
-            logger.warn("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
+            logger.debug("======= myAuth: " + getType() + " ===== " + userVo.getUserId());
             AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
             JwtVo jwtVo = buildJwt(userVo, authenticationInfoVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);

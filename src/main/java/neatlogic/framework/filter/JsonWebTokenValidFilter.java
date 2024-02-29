@@ -94,7 +94,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            logger.warn("======= defaultLoginAuth: ");
+            logger.debug("======= defaultLoginAuth: ");
             //先按 default 认证，不存在才根据具体 AuthType 认证用户
             userVo = defaultLoginAuth.auth(cachedRequest, response);
             if (userVo == null) {
@@ -111,7 +111,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     if (loginAuth != null) {
                         userVo = loginAuth.auth(cachedRequest, response);
                         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
-                            logger.warn("======= getUser succeed: " + userVo.getUuid());
+                            logger.debug("======= getUser succeed: " + userVo.getUuid());
                             isUnExpired = userExpirationValid(userVo, timezone, request, response);
                             if (isUnExpired) {
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
@@ -131,7 +131,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     return;
                 }
             } else {
-                logger.warn("======= getUser succeed: " + userVo.getUuid());
+                logger.debug("======= getUser succeed: " + userVo.getUuid());
                 isUnExpired = userExpirationValid(userVo, timezone, request, response);
             }
 
@@ -140,7 +140,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, loginAuth.directUrl());
                 return;
             } else {
-                logger.warn("======= is Expired");
+                logger.debug("======= is Expired");
             }
 
             try {
@@ -175,7 +175,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         String message = responseCode.getMessage(args);
         redirectObj.put("Status", "FAILED");
         redirectObj.put("Message", message);
-        logger.warn("======login error:" + message);
+        logger.debug("======login error:" + message);
         response.setStatus(responseCode.getCode());
         redirectObj.put("DirectUrl", directUrl);
         if (isRemoveCookie) {

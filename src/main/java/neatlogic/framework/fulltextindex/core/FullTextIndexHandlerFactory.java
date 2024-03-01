@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
     private static final Map<String, IFullTextIndexHandler> componentMap = new HashMap<>();
     private static final List<FullTextIndexTypeVo> fullTextIndexTypeList = new ArrayList<>();
+    private static final Map<String, IFullTextIndexType> fullTextIndexTypeMap = new HashMap<>();
 
 
     public static IFullTextIndexHandler getHandler(String type) {
@@ -70,6 +71,12 @@ public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
         for (ModuleVo moduleVo : moduleList) {
             returnTypeList.addAll(fullTextIndexTypeList.stream().filter(type -> type.getModuleId().equals(moduleVo.getId())).collect(Collectors.toList()));
         }
+        for (FullTextIndexTypeVo typeVo : returnTypeList) {
+            IFullTextIndexType fullTextIndexType = fullTextIndexTypeMap.get(typeVo.getType());
+            if (fullTextIndexType != null) {
+                typeVo.setTypeName(fullTextIndexType.getTypeName());
+            }
+        }
         return returnTypeList;
     }
 
@@ -104,6 +111,7 @@ public class FullTextIndexHandlerFactory extends ModuleInitializedListenerBase {
             if (component.getType() != null) {
                 componentMap.put(component.getType().getType(), component);
                 fullTextIndexTypeList.add(new FullTextIndexTypeVo(context.getModuleId(), component.getType().getType(), component.getType().getTypeName(), component.getType().isActiveGlobalSearch()));
+                fullTextIndexTypeMap.put(component.getType().getType(), component.getType());
             }
         }
     }

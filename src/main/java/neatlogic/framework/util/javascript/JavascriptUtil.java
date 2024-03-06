@@ -242,7 +242,6 @@ public class JavascriptUtil {
                 return "{}";
             }
         }
-        //ScriptEngine se = sem.getEngineByName("nashorn");
         ScriptEngine se = getEngine();
         if (sw != null) {
             se.getContext().setWriter(sw);
@@ -255,7 +254,7 @@ public class JavascriptUtil {
         String resultStr = "";
         if (result != null) {
             try {
-                resultStr = result.toString();// JSON.toJSONString(result);
+                resultStr = result.toString();
             } catch (Exception ex) {
                 resultStr = result.toString();
             }

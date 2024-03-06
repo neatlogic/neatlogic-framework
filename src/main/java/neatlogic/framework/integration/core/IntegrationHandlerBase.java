@@ -173,7 +173,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             // 设置http method
             connection.setRequestMethod(integrationVo.getMethod().toUpperCase());
             connection.setUseCaches(false);
-            connection.setDoOutput(true);
+            if (StringUtils.isNotBlank(integrationVo.getMethod()) && integrationVo.getMethod().equalsIgnoreCase("post")) {
+                connection.setDoOutput(true);
+            }
+
 
             // 设置验证
             if (authConfig != null) {

@@ -58,6 +58,7 @@ public class Config {
     private static Integer DB_PORT;
     private static String DB_URL;
     private static String DB_TRANSACTION_TIMEOUT;// 事务超时时间
+    private static int DATASOURCE_CONNECT_TIMEOUT;//连接池连接超时时间
     private static String DATA_HOME;// 存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
@@ -195,6 +196,8 @@ public class Config {
     public static String DB_TRANSACTION_TIMEOUT() {
         return DB_TRANSACTION_TIMEOUT;
     }
+
+    public static int DATASOURCE_CONNECT_TIMEOUT() { return DATASOURCE_CONNECT_TIMEOUT;}
 
     public static String MONGO_HOST() {
         return MONGO_HOST;
@@ -488,6 +491,7 @@ public class Config {
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
             DB_TRANSACTION_TIMEOUT = prop.getProperty("db.transaction.timeout");
+            DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout","5000"));
             DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));

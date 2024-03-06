@@ -18,6 +18,7 @@ package neatlogic.framework.store.mysql;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.DatasourceMapper;
 import neatlogic.framework.dto.DatasourceVo;
@@ -139,6 +140,6 @@ public class DatasourceManager {
         dataSource.addDataSourceProperty("cacheServerConfiguration", true);
         dataSource.addDataSourceProperty("elideSetAutoCommits", true);
         dataSource.addDataSourceProperty("maintainTimeStats", false);
-        dataSource.setConnectionTimeout(5000);
+        dataSource.setConnectionTimeout(Config.DATASOURCE_CONNECT_TIMEOUT());
     }
 }

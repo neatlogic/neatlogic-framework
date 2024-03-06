@@ -628,6 +628,11 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
 
     @Override
     public Object getFormSelectAttributeValueByOriginalValue(Object originalValue) {
+        return getFormSelectAttributeValueByOriginalValue(originalValue, "value");
+    }
+
+    @Override
+    public Object getFormSelectAttributeValueByOriginalValue(Object originalValue, String hiddenField) {
         if (originalValue == null) {
             return null;
         }
@@ -638,7 +643,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 Object originalValueObject = originalValueArray.get(i);
                 if (originalValueObject instanceof JSONObject) {
                     JSONObject originalValueObj = (JSONObject) originalValueObject;
-                    Object value = originalValueObj.get("value");
+                    Object value = originalValueObj.get(hiddenField);
                     if (value != null) {
                         valueList.add(value);
                     }
@@ -649,7 +654,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             return valueList;
         } else if (originalValue instanceof JSONObject) {
             JSONObject originalValueObj = (JSONObject) originalValue;
-            return originalValueObj.get("value");
+            return originalValueObj.get(hiddenField);
         }
         return originalValue;
     }

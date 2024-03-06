@@ -68,6 +68,8 @@ public interface IFormCrossoverService extends ICrossoverService {
 
     Object getFormSelectAttributeValueByOriginalValue(Object originalValue);
 
+    Object getFormSelectAttributeValueByOriginalValue(Object originalValue, String hiddenField);
+
     /**
      * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
      * @param formConfig

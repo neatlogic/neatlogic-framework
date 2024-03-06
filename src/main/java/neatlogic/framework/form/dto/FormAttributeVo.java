@@ -30,10 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
@@ -270,7 +267,7 @@ public class FormAttributeVo implements Serializable {
             return configObj.getBoolean("isMultiple");
         }
 
-        if (conditionModel.equals(FormConditionModel.CUSTOM.getValue())) {
+        if (conditionModel!= null && Objects.equals(conditionModel.getValue(), FormConditionModel.CUSTOM.getValue())) {
             if ("formcheckbox".equals(handler)) {
                 return true;
             } else {
@@ -280,11 +277,11 @@ public class FormAttributeVo implements Serializable {
         return null;
     }
 
-    public boolean getIsUseFormConfig() {
+    public Boolean getIsUseFormConfig() {
         return this.isUseFormConfig;
     }
 
-    public void setIsUseFormConfig(boolean isUseFormConfig) {
+    public void setIsUseFormConfig(Boolean isUseFormConfig) {
         this.isUseFormConfig = isUseFormConfig;
     }
 

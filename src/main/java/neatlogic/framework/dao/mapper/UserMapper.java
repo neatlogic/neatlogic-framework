@@ -17,6 +17,7 @@
 package neatlogic.framework.dao.mapper;
 
 import neatlogic.framework.dto.*;
+import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -185,6 +186,10 @@ public interface UserMapper {
     List<String> getActiveUserEmailListByTeamUuid(String teamUuid);
 
     List<String> getUserIdByUserIdList(List<String> userIdList);
+
+    int searchUserCountForMatrix(MatrixDataVo searchVo);
+
+    List<UserVo> searchUserListForMatrix(MatrixDataVo searchVo);
 
     int insertUserAuth(UserAuthVo userAuthVo);
 

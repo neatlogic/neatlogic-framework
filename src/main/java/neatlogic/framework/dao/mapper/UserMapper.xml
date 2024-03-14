@@ -1180,6 +1180,143 @@ limitations under the License.
         where is_super_admin = 1
     </select>
 
+    <sql id="searchUserForMatrixSql">
+        <if test="keyword != null">
+            AND (a.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="filterList != null and filterList.size() > 0">
+            AND
+            <foreach collection="filterList" item="filter" separator="AND">
+                <choose>
+                    <when test="filter.expression == 'equal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notequal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (${filter.uuid} NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR ${filter.uuid} IS NULL)
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} != #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'like'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notlike'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (${filter.uuid} NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR ${filter.uuid} IS NULL)
+                            </when>
+                            <otherwise>
+                                (${filter.uuid} NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR ${filter.uuid} IS NULL)
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'is-null'">
+                        (${filter.uuid} IS NULL OR ${filter.uuid} = '')
+                    </when>
+                    <when test="filter.expression == 'is-not-null'">
+                        (${filter.uuid} IS NOT NULL AND ${filter.uuid} != '')
+                    </when>
+                    <otherwise>
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </sql>
+
+    <sql id="searchUserForMatrixChildSql">
+        SELECT
+            a.`id`,
+            a.`uuid`,
+            a.`user_id`,
+            a.`user_name`,
+            a.`email`,
+            a.`phone`,
+            a.`vip_level`,
+            a.`is_active`,
+            a.`is_delete`,
+            GROUP_CONCAT(`c`.`name` SEPARATOR ',') AS `team_name`
+        FROM `user` a
+                 left join `user_team` b on b.`user_uuid` = a.`uuid`
+                 left join `team` c on c.`uuid` = b.`team_uuid`
+        WHERE a.`is_delete` = 0
+          AND a.`is_active` = 1
+        group by a.`uuid`
+    </sql>
+
+    <select id="searchUserCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM (
+            <include refid="searchUserForMatrixChildSql"/>
+        ) a
+        <where>
+            <include refid="searchUserForMatrixSql"/>
+        </where>
+    </select>
+
+    <select id="searchUserListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="neatlogic.framework.dto.UserVo">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`user_id` AS userId,
+        a.`user_name` AS userName,
+        a.`email`,
+        a.`phone`,
+        a.`vip_level` AS vipLevel,
+        a.`is_active` AS isActive,
+        a.`is_delete` AS isDelete
+        FROM (
+            <include refid="searchUserForMatrixChildSql"/>
+        ) a
+        <where>
+            <include refid="searchUserForMatrixSql"/>
+        </where>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
     <insert id="insertUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,
                                       `auth_group`,

@@ -178,15 +178,15 @@
                                 OR `${filter.uuid}` IS NULL)
                             </when>
                             <otherwise>
-                                (`${filter.uuid}` NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR a.`${filter.uuid}` IS NULL)
+                                (`${filter.uuid}` NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR `${filter.uuid}` IS NULL)
                             </otherwise>
                         </choose>
                     </when>
                     <when test="filter.expression == 'is-null'">
-                        `${filter.uuid}` IS NULL
+                        (`${filter.uuid}` IS NULL OR `${filter.uuid}` = '')
                     </when>
                     <when test="filter.expression == 'is-not-null'">
-                        `${filter.uuid}` IS NOT NULL
+                        (`${filter.uuid}` IS NOT NULL AND `${filter.uuid}` != '')
                     </when>
                     <otherwise>
                         <choose>

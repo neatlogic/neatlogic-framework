@@ -178,6 +178,21 @@ limitations under the License.
         </foreach>
     </select>
 
+    <select id="getRoleListContainsDeletedByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
+            useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `description`,
+        `rule`
+        FROM `role`
+        WHERE `is_delete` = 0 AND `uuid` IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <select id="getRoleByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.RoleVo"
             useCache="false">
         SELECT
@@ -396,6 +411,114 @@ limitations under the License.
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>
+    </select>
+
+    <sql id="searchRoleForMatrixSql">
+        <if test="keyword != null">
+            AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `description` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="filterList != null and filterList.size() > 0">
+            AND
+            <foreach collection="filterList" item="filter" separator="AND">
+                <choose>
+                    <when test="filter.expression == 'equal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                `${filter.uuid}` IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                `${filter.uuid}` = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notequal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (`${filter.uuid}` NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR `${filter.uuid}` IS NULL)
+                            </when>
+                            <otherwise>
+                                `${filter.uuid}` != #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'like'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                `${filter.uuid}` IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                `${filter.uuid}` LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notlike'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (`${filter.uuid}` NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR `${filter.uuid}` IS NULL)
+                            </when>
+                            <otherwise>
+                                (`${filter.uuid}` NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR `${filter.uuid}` IS NULL)
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'is-null'">
+                        (`${filter.uuid}` IS NULL OR `${filter.uuid}` = '')
+                    </when>
+                    <when test="filter.expression == 'is-not-null'">
+                        (`${filter.uuid}` IS NOT NULL AND `${filter.uuid}` != '')
+                    </when>
+                    <otherwise>
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                `${filter.uuid}` IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                `${filter.uuid}` = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="searchRoleCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer">
+        SELECT
+            COUNT(1)
+        FROM `role`
+        WHERE `is_delete` = 0
+        <include refid="searchRoleForMatrixSql"/>
+    </select>
+
+    <select id="searchRoleListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="neatlogic.framework.dto.RoleVo">
+        SELECT
+            `id`,
+            `uuid`,
+            `name`,
+            `description`,
+            `rule`,
+            `is_delete` AS isDelete
+        FROM `role`
+        WHERE `is_delete` = 0
+        <include refid="searchRoleForMatrixSql"/>
+        LIMIT #{startNum}, #{pageSize}
     </select>
 
     <insert id="insertRole" parameterType="neatlogic.framework.dto.RoleVo">

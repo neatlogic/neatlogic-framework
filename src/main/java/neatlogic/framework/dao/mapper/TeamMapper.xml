@@ -562,6 +562,116 @@ limitations under the License.
         SELECT `uuid` FROM `team` WHERE `upward_name_path` = #{value}
     </select>
 
+    <sql id="searchTeamForMatrixSql">
+        <if test="keyword != null">
+            AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="filterList != null and filterList.size() > 0">
+            AND
+            <foreach collection="filterList" item="filter" separator="AND">
+                <choose>
+                    <when test="filter.expression == 'equal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notequal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (${filter.uuid} NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR ${filter.uuid} IS NULL)
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} != #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'like'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notlike'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (${filter.uuid} NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR ${filter.uuid} IS NULL)
+                            </when>
+                            <otherwise>
+                                (${filter.uuid} NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR ${filter.uuid} IS NULL)
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'is-null'">
+                        (${filter.uuid} IS NULL OR ${filter.uuid} = '')
+                    </when>
+                    <when test="filter.expression == 'is-not-null'">
+                        (${filter.uuid} IS NOT NULL AND ${filter.uuid} != '')
+                    </when>
+                    <otherwise>
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="searchTeamCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer">
+        SELECT
+        COUNT(1)
+        FROM `team` a
+        left join `team` b on b.`uuid` = a.`parent_uuid`
+        WHERE a.`is_delete` = 0
+        <include refid="searchTeamForMatrixSql"/>
+    </select>
+
+    <select id="searchTeamListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="neatlogic.framework.dto.TeamVo">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`description`,
+        a.`parent_uuid` AS parentUuid,
+        a.`is_delete` AS isDelete
+        FROM `team` a
+        left join `team` b on b.`uuid` = a.`parent_uuid`
+        WHERE a.`is_delete` = 0
+        <include refid="searchTeamForMatrixSql"/>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
     <insert id="insertTeam" parameterType="neatlogic.framework.dto.TeamVo">
         INSERT INTO `team` (`id`,
                             `uuid`,

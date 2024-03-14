@@ -3,6 +3,7 @@ package neatlogic.framework.dao.mapper;
 import neatlogic.framework.dto.TeamUserTitleVo;
 import neatlogic.framework.dto.TeamUserVo;
 import neatlogic.framework.dto.TeamVo;
+import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -74,6 +75,10 @@ public interface TeamMapper {
     String getTeamUuidByUpwardNamePath(String upwardNamePath);
 
     int checkTitleIsReferenceByTitleId(Long id);
+
+    int searchTeamCountForMatrix(MatrixDataVo searchVo);
+
+    List<TeamVo> searchTeamListForMatrix(MatrixDataVo searchVo);
 
     int insertTeam(TeamVo teamVo);
 

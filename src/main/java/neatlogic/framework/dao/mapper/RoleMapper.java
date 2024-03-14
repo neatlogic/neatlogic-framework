@@ -18,6 +18,7 @@ package neatlogic.framework.dao.mapper;
 
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.dto.*;
+import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -56,6 +57,8 @@ public interface RoleMapper {
     RoleVo getRoleSimpleInfoByUuid(String uuid);
 
     List<RoleVo> getRoleByUuidList(List<String> uuidList);
+
+    List<RoleVo> getRoleListContainsDeletedByUuidList(List<String> uuidList);
 
     List<RoleVo> getRoleByIdList(List<Long> idList);
 
@@ -99,6 +102,10 @@ public interface RoleMapper {
      */
     List<RoleVo> getParentTeamRoleListWithCheckedChildrenByTeam(TeamVo teamVo);
 
+    int searchRoleCountForMatrix(MatrixDataVo searchVo);
+
+    List<RoleVo> searchRoleListForMatrix(MatrixDataVo searchVo);
+
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 
     int insertRole(RoleVo roleVo);
@@ -132,5 +139,4 @@ public interface RoleMapper {
     int deleteTeamRoleByRoleUuidAndTeamUuidList(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
 
     int deleteTeamRole(RoleTeamVo roleTeamVo);
-
 }

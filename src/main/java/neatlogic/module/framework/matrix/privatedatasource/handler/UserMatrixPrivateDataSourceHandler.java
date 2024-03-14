@@ -131,7 +131,7 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
         JSONArray defaultValue = dataVo.getDefaultValue();
         if (CollectionUtils.isNotEmpty(defaultValue)) {
             List<String> uuidList = defaultValue.toJavaList(String.class);
-            userList = userMapper.getUserListByUuidList(uuidList);
+            userList = userMapper.getUserByUserUuidList(uuidList);
         } else {
             MatrixDataVo searchVo = matrixDataVoConvertSearchCondition(dataVo);
             int rowNum = userMapper.searchUserCountForMatrix(searchVo);

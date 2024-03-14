@@ -1277,7 +1277,7 @@ limitations under the License.
             a.`vip_level`,
             a.`is_active`,
             a.`is_delete`,
-            GROUP_CONCAT(`c`.`name` SEPARATOR ',') AS `teamName`
+            GROUP_CONCAT(`c`.`name` SEPARATOR ',') AS `team_name`
         FROM `user` a
                  left join `user_team` b on b.`user_uuid` = a.`uuid`
                  left join `team` c on c.`uuid` = b.`team_uuid`

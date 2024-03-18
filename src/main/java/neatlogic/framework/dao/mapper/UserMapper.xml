@@ -1180,8 +1180,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <sql id="searchUserForMatrixSql">
-        <if test="keyword != null">
-            AND (a.`user_id` LIKE CONCAT('%', #{keyword}, '%') OR a.`user_name` LIKE CONCAT('%', #{keyword}, '%'))
+        <if test="notNullColumnList != null and notNullColumnList.size() > 0">
+            <foreach collection="notNullColumnList" item="notColumn" separator="AND">
+                ${notColumn} IS NOT NULL
+            </foreach>
         </if>
         <if test="filterList != null and filterList.size() > 0">
             AND
@@ -1269,14 +1271,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT
             a.`id`,
             a.`uuid`,
-            a.`user_id`,
-            a.`user_name`,
+            a.`user_id` AS userId,
+            a.`user_name` AS userName,
             a.`email`,
             a.`phone`,
-            a.`vip_level`,
-            a.`is_active`,
-            a.`is_delete`,
-            GROUP_CONCAT(`c`.`name` SEPARATOR ',') AS `team_name`
+            a.`vip_level` AS vipLevel,
+            a.`is_active` AS isActive,
+            a.`is_delete` AS isDelete,
+            GROUP_CONCAT(`c`.`name` SEPARATOR ',') AS `teamName`
         FROM `user` a
                  left join `user_team` b on b.`user_uuid` = a.`uuid`
                  left join `team` c on c.`uuid` = b.`team_uuid`
@@ -1289,24 +1291,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT
         COUNT(1)
         FROM (
+            SELECT DISTINCT
+            <foreach collection="columnList" item="column" separator=",">
+                `${column}`
+            </foreach>
+            FROM (
             <include refid="searchUserForMatrixChildSql"/>
-        ) a
-        <where>
-            <include refid="searchUserForMatrixSql"/>
-        </where>
+            ) a
+            <where>
+                <include refid="searchUserForMatrixSql"/>
+            </where>
+        ) b
     </select>
 
-    <select id="searchUserListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="neatlogic.framework.dto.UserVo">
-        SELECT
-        a.`id`,
-        a.`uuid`,
-        a.`user_id` AS userId,
-        a.`user_name` AS userName,
-        a.`email`,
-        a.`phone`,
-        a.`vip_level` AS vipLevel,
-        a.`is_active` AS isActive,
-        a.`is_delete` AS isDelete
+    <select id="searchUserListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.util.HashMap">
+        SELECT DISTINCT
+        <foreach collection="columnList" item="column" separator=",">
+            `${column}`
+        </foreach>
         FROM (
             <include refid="searchUserForMatrixChildSql"/>
         ) a

@@ -562,8 +562,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <sql id="searchTeamForMatrixSql">
-        <if test="keyword != null">
-            AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
+        <if test="notNullColumnList != null and notNullColumnList.size() > 0">
+            <foreach collection="notNullColumnList" item="notColumn" separator="AND">
+                ${notColumn} IS NOT NULL
+            </foreach>
         </if>
         <if test="filterList != null and filterList.size() > 0">
             AND
@@ -647,27 +649,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </if>
     </sql>
 
+    <sql id="searchTeamForMatrixChildSql">
+        SELECT
+            a.`id`,
+            a.`uuid`,
+            a.`name`,
+            a.`description`,
+            a.`parent_uuid` AS parentUuid,
+            a.`is_delete` AS isDelete,
+            b.`name` AS parentName
+        FROM `team` a
+                 LEFT JOIN `team` b ON b.`uuid` = a.`parent_uuid`
+        WHERE a.`is_delete` = 0
+    </sql>
+
     <select id="searchTeamCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer">
         SELECT
-        COUNT(1)
-        FROM `team` a
-        left join `team` b on b.`uuid` = a.`parent_uuid`
-        WHERE a.`is_delete` = 0
-        <include refid="searchTeamForMatrixSql"/>
+            COUNT(1)
+        FROM (
+            SELECT DISTINCT
+                <foreach collection="columnList" item="column" separator=",">
+                    `${column}`
+                </foreach>
+            FROM (
+                <include refid="searchTeamForMatrixChildSql"/>
+            ) a
+            <where>
+                <include refid="searchTeamForMatrixSql"/>
+            </where>
+        ) b
     </select>
 
-    <select id="searchTeamListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="neatlogic.framework.dto.TeamVo">
-        SELECT
-        a.`id`,
-        a.`uuid`,
-        a.`name`,
-        a.`description`,
-        a.`parent_uuid` AS parentUuid,
-        a.`is_delete` AS isDelete
-        FROM `team` a
-        left join `team` b on b.`uuid` = a.`parent_uuid`
-        WHERE a.`is_delete` = 0
-        <include refid="searchTeamForMatrixSql"/>
+    <select id="searchTeamListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.util.HashMap">
+        SELECT DISTINCT
+            <foreach collection="columnList" item="column" separator=",">
+                `${column}`
+            </foreach>
+        FROM (
+            <include refid="searchTeamForMatrixChildSql"/>
+        ) a
+        <where>
+            <include refid="searchTeamForMatrixSql"/>
+        </where>
         LIMIT #{startNum}, #{pageSize}
     </select>
 

@@ -46,7 +46,7 @@ public class MatrixDataVo extends BasePageVo {
     /**
      * 查询数据时不能为空的column列表
      */
-    private List<String> NotNullColumnList;
+    private List<String> notNullColumnList;
     public String getMatrixUuid() {
         return matrixUuid;
     }
@@ -201,10 +201,10 @@ public class MatrixDataVo extends BasePageVo {
     }
 
     public List<String> getNotNullColumnList() {
-        return NotNullColumnList;
+        return notNullColumnList;
     }
 
     public void setNotNullColumnList(List<String> notNullColumnList) {
-        NotNullColumnList = notNullColumnList;
+        this.notNullColumnList = notNullColumnList;
     }
 }

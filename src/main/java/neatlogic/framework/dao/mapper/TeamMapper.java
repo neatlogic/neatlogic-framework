@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface TeamMapper {
     TeamVo getTeam(TeamVo teamVo);
@@ -78,7 +79,7 @@ public interface TeamMapper {
 
     int searchTeamCountForMatrix(MatrixDataVo searchVo);
 
-    List<TeamVo> searchTeamListForMatrix(MatrixDataVo searchVo);
+    List<Map<String, Object>> searchTeamListForMatrix(MatrixDataVo searchVo);
 
     int insertTeam(TeamVo teamVo);
 

@@ -98,6 +98,7 @@ public class RoleMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             MatrixDataVo searchVo = matrixDataVoConvertSearchCondition(dataVo);
             int rowNum = roleMapper.searchRoleCountForMatrix(searchVo);
             if (rowNum > 0) {
+                dataVo.setRowNum(rowNum);
                 searchVo.setRowNum(rowNum);
                 roleList = roleMapper.searchRoleListForMatrix(searchVo);
             }
@@ -106,9 +107,13 @@ public class RoleMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
     }
 
     private MatrixDataVo matrixDataVoConvertSearchCondition(MatrixDataVo dataVo) {
+        MatrixDataVo newDataVo = new MatrixDataVo();
+        newDataVo.setCurrentPage(dataVo.getCurrentPage());
+        newDataVo.setPageSize(dataVo.getPageSize());
+        newDataVo.setNeedPage(dataVo.getNeedPage());
         List<MatrixFilterVo> filterList = dataVo.getFilterList();
         if (CollectionUtils.isEmpty(filterList)) {
-            return dataVo;
+            return newDataVo;
         }
         List<MatrixFilterVo> newFilterList = new ArrayList<>();
         for (MatrixFilterVo filter : filterList) {
@@ -136,8 +141,8 @@ public class RoleMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
                 newFilterList.add(new MatrixFilterVo("description", filter.getExpression(), filter.getValueList()));
             }
         }
-        dataVo.setFilterList(newFilterList);
-        return dataVo;
+        newDataVo.setFilterList(newFilterList);
+        return newDataVo;
     }
 
     private List<Map<String, String>> roleListConvertDataList(List<RoleVo> roleList) {

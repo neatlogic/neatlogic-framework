@@ -115,19 +115,19 @@ public class EmailUtil {
 
             MimeMultipart multipart = new MimeMultipart();
             /** 设置邮件正文 */
-            if (StringUtils.isNotBlank(content)) {
-                content = "<html>" +
-                        "<head>" +
-                        "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">" +
-                        "<style type=\"text/css\">" +
-                        "</style>" +
-                        "</head><body>" +
-                        content +
-                        "</body></html>";
-                MimeBodyPart text = new MimeBodyPart();
-                text.setContent(content, "text/html;charset=UTF-8");
-                multipart.addBodyPart(text);
-            }
+            //if (StringUtils.isNotBlank(content)) { //注释掉，否则content 为空时发邮件会异常
+            content = "<html>" +
+                    "<head>" +
+                    "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">" +
+                    "<style type=\"text/css\">" +
+                    "</style>" +
+                    "</head><body>" +
+                    content +
+                    "</body></html>";
+            MimeBodyPart text = new MimeBodyPart();
+            text.setContent(content, "text/html;charset=UTF-8");
+            multipart.addBodyPart(text);
+            //}
             /** 设置附件 */
             if (MapUtils.isNotEmpty(attachmentMap)) {
                 for (Map.Entry<String, InputStream> entry : attachmentMap.entrySet()) {

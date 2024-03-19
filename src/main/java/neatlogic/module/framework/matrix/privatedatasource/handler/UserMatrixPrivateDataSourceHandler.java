@@ -13,6 +13,7 @@ import neatlogic.framework.matrix.dto.MatrixDataVo;
 import neatlogic.framework.matrix.dto.MatrixFilterVo;
 import neatlogic.framework.util.UuidUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -88,7 +89,7 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
         {
             JSONObject jsonObj = new JSONObject();
             jsonObj.put("name", "所属组");
-            jsonObj.put("label", "teamNameList");
+            jsonObj.put("label", "teamName");
             jsonObj.put("isPrimaryKey", 0);
             jsonObj.put("isSearchable", 1);
             attributeDefinedList.add(jsonObj);
@@ -127,33 +128,83 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
 
     @Override
     public List<Map<String, String>> searchTableData(MatrixDataVo dataVo) {
-        List<UserVo> userList = new ArrayList<>();
         JSONArray defaultValue = dataVo.getDefaultValue();
         if (CollectionUtils.isNotEmpty(defaultValue)) {
             List<String> uuidList = defaultValue.toJavaList(String.class);
+            List<UserVo> userList = new ArrayList<>();
             userList = userMapper.getUserByUserUuidList(uuidList);
+            if (CollectionUtils.isNotEmpty(userList)) {
+                for (UserVo userVo : userList) {
+                    List<TeamVo> teamList = teamMapper.getTeamListByUserUuid(userVo.getUuid());
+                    List<String> teamNameList = teamList.stream().map(TeamVo::getName).collect(Collectors.toList());
+                    userVo.setTeamNameList(teamNameList);
+                }
+            }
+            return userListConvertDataList(userList);
         } else {
+            List<Map<String, String>> resultList = new ArrayList<>();
             MatrixDataVo searchVo = matrixDataVoConvertSearchCondition(dataVo);
             int rowNum = userMapper.searchUserCountForMatrix(searchVo);
             if (rowNum > 0) {
+                dataVo.setRowNum(rowNum);
                 searchVo.setRowNum(rowNum);
-                userList = userMapper.searchUserListForMatrix(searchVo);
+                List<Map<String, Object>> list = userMapper.searchUserListForMatrix(searchVo);
+                for (Map<String, Object> map : list) {
+                    if (MapUtils.isEmpty(map)) {
+                        continue;
+                    }
+                    Map<String, String> newMap = new HashMap<>();
+                    for (String column : searchVo.getColumnList()) {
+                        Object value = map.get(column);
+                        if (value != null) {
+                            String valueStr = value.toString();
+                            if (Objects.equals(column, "vipLevel")) {
+                                if (Objects.equals(valueStr, "1")) {
+                                    valueStr = "是";
+                                } else {
+                                    valueStr = "否";
+                                }
+                            }
+                            newMap.put(columnsMap.get(column), valueStr);
+                        } else {
+                            newMap.put(columnsMap.get(column), "");
+                        }
+                    }
+                    resultList.add(newMap);
+                }
             }
+            return resultList;
         }
-        if (CollectionUtils.isNotEmpty(userList)) {
-            for (UserVo userVo : userList) {
-                List<TeamVo> teamList = teamMapper.getTeamListByUserUuid(userVo.getUuid());
-                List<String> teamNameList = teamList.stream().map(TeamVo::getName).collect(Collectors.toList());
-                userVo.setTeamNameList(teamNameList);
-            }
-        }
-        return userListConvertDataList(userList);
     }
 
     private MatrixDataVo matrixDataVoConvertSearchCondition(MatrixDataVo dataVo) {
+        MatrixDataVo newDataVo = new MatrixDataVo();
+        newDataVo.setCurrentPage(dataVo.getCurrentPage());
+        newDataVo.setPageSize(dataVo.getPageSize());
+        newDataVo.setNeedPage(dataVo.getNeedPage());
+        List<String> columnList = new ArrayList<>();
+        for (String column : dataVo.getColumnList()) {
+            for(MatrixAttributeVo matrixAttributeVo : matrixAttributeList){
+                if (Objects.equals(matrixAttributeVo.getUuid(), column)) {
+                    columnList.add(matrixAttributeVo.getLabel());
+                }
+            }
+        }
+        newDataVo.setColumnList(columnList);
+        if (CollectionUtils.isNotEmpty(dataVo.getNotNullColumnList())) {
+            List<String> notNullColumnList = new ArrayList<>();
+            for (String notNullColumn : dataVo.getNotNullColumnList()) {
+                for(MatrixAttributeVo matrixAttributeVo : matrixAttributeList){
+                    if (Objects.equals(matrixAttributeVo.getUuid(), notNullColumn)) {
+                        notNullColumnList.add(matrixAttributeVo.getLabel());
+                    }
+                }
+            }
+            newDataVo.setNotNullColumnList(notNullColumnList);
+        }
         List<MatrixFilterVo> filterList = dataVo.getFilterList();
         if (CollectionUtils.isEmpty(filterList)) {
-            return dataVo;
+            return newDataVo;
         }
         List<MatrixFilterVo> newFilterList = new ArrayList<>();
         for (MatrixFilterVo filter : filterList) {
@@ -176,9 +227,9 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             } else if (columnsMap.get("id").equals(uuid)) {
                 newFilterList.add(new MatrixFilterVo("a.`id`", filter.getExpression(), filter.getValueList()));
             } else if (columnsMap.get("userId").equals(uuid)) {
-                newFilterList.add(new MatrixFilterVo("a.`user_id`", filter.getExpression(), filter.getValueList()));
+                newFilterList.add(new MatrixFilterVo("a.`userId`", filter.getExpression(), filter.getValueList()));
             } else if (columnsMap.get("userName").equals(uuid)) {
-                newFilterList.add(new MatrixFilterVo("a.`user_name`", filter.getExpression(), filter.getValueList()));
+                newFilterList.add(new MatrixFilterVo("a.`userName`", filter.getExpression(), filter.getValueList()));
             } else if (columnsMap.get("vipLevel").equals(uuid)) {
                 List<String> valueList = new ArrayList<>();
                 if (CollectionUtils.isNotEmpty(filter.getValueList())) {
@@ -187,19 +238,21 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
                         valueList.add("1");
                     } else if (Objects.equals(value, "否")) {
                         valueList.add("0");
+                    } else {
+                        valueList.add("2");
                     }
                 }
-                newFilterList.add(new MatrixFilterVo("a.`vip_level`", filter.getExpression(), valueList));
+                newFilterList.add(new MatrixFilterVo("a.`vipLevel`", filter.getExpression(), valueList));
             } else if (columnsMap.get("email").equals(uuid)) {
                 newFilterList.add(new MatrixFilterVo("a.`email`", filter.getExpression(), filter.getValueList()));
             } else if (columnsMap.get("phone").equals(uuid)) {
                 newFilterList.add(new MatrixFilterVo("a.`phone`", filter.getExpression(), filter.getValueList()));
-            } else if (columnsMap.get("teamNameList").equals(uuid)) {
-                newFilterList.add(new MatrixFilterVo("a.`team_name`", filter.getExpression(), filter.getValueList()));
+            } else if (columnsMap.get("teamName").equals(uuid)) {
+                newFilterList.add(new MatrixFilterVo("a.`teamName`", filter.getExpression(), filter.getValueList()));
             }
         }
-        dataVo.setFilterList(newFilterList);
-        return dataVo;
+        newDataVo.setFilterList(newFilterList);
+        return newDataVo;
     }
 
     private List<Map<String, String>> userListConvertDataList(List<UserVo> userList) {
@@ -211,7 +264,7 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             data.put(columnsMap.get("id"), userVo.getId().toString());
             data.put(columnsMap.get("userId"), userVo.getUserId());
             data.put(columnsMap.get("userName"), userVo.getUserName());
-            data.put(columnsMap.get("teamNameList"), String.join(",", userVo.getTeamNameList()));
+            data.put(columnsMap.get("teamName"), String.join(",", userVo.getTeamNameList()));
             data.put(columnsMap.get("vipLevel"), Objects.equals(userVo.getVipLevel(), 1) ? "是" : "否");
             data.put(columnsMap.get("email"), userVo.getEmail() == null ? "" : userVo.getEmail());
             data.put(columnsMap.get("phone"), userVo.getPhone() == null ? "" : userVo.getPhone());

@@ -21,6 +21,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface UserMapper {
     String getUserTokenByUserId(String userId);
@@ -188,7 +189,7 @@ public interface UserMapper {
 
     int searchUserCountForMatrix(MatrixDataVo searchVo);
 
-    List<UserVo> searchUserListForMatrix(MatrixDataVo searchVo);
+    List<Map<String, Object>> searchUserListForMatrix(MatrixDataVo searchVo);
 
     int insertUserAuth(UserAuthVo userAuthVo);
 

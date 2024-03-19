@@ -413,9 +413,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <sql id="searchRoleForMatrixSql">
-        <if test="keyword != null">
-            AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `description` LIKE CONCAT('%', #{keyword}, '%'))
-        </if>
         <if test="filterList != null and filterList.size() > 0">
             AND
             <foreach collection="filterList" item="filter" separator="AND">

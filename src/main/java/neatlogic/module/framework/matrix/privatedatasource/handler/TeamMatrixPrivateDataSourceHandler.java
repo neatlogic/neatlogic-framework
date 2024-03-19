@@ -11,6 +11,7 @@ import neatlogic.framework.matrix.dto.MatrixDataVo;
 import neatlogic.framework.matrix.dto.MatrixFilterVo;
 import neatlogic.framework.util.UuidUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -95,29 +96,71 @@ public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
         if (CollectionUtils.isNotEmpty(defaultValue)) {
             List<String> uuidList = defaultValue.toJavaList(String.class);
             teamList = teamMapper.getTeamListContainsDeletedByUuidList(uuidList);
+            if (CollectionUtils.isNotEmpty(teamList)) {
+                List<String> parentUuidList = teamList.stream().map(TeamVo::getParentUuid).collect(Collectors.toList());
+                List<TeamVo> parentList = teamMapper.getTeamListContainsDeletedByUuidList(parentUuidList);
+                Map<String, String> map = parentList.stream().collect(Collectors.toMap(TeamVo::getUuid, TeamVo::getName));
+                for (TeamVo teamVo : teamList) {
+                    teamVo.setParentName(map.get(teamVo.getParentUuid()));
+                }
+            }
+            return teamListConvertDataList(teamList);
         } else {
+            List<Map<String, String>> resultList = new ArrayList<>();
             MatrixDataVo searchVo = matrixDataVoConvertSearchCondition(dataVo);
             int rowNum = teamMapper.searchTeamCountForMatrix(searchVo);
             if (rowNum > 0) {
+                dataVo.setRowNum(rowNum);
                 searchVo.setRowNum(rowNum);
-                teamList = teamMapper.searchTeamListForMatrix(searchVo);
+                List<Map<String, Object>> list = teamMapper.searchTeamListForMatrix(searchVo);
+                for (Map<String, Object> map : list) {
+                    if (MapUtils.isEmpty(map)) {
+                        continue;
+                    }
+                    Map<String, String> newMap = new HashMap<>();
+                    for (String column : searchVo.getColumnList()) {
+                        Object value = map.get(column);
+                        if (value != null) {
+                            newMap.put(columnsMap.get(column), value.toString());
+                        } else {
+                            newMap.put(columnsMap.get(column), "");
+                        }
+                    }
+                    resultList.add(newMap);
+                }
             }
+            return resultList;
         }
-        if (CollectionUtils.isNotEmpty(teamList)) {
-            List<String> parentUuidList = teamList.stream().map(TeamVo::getParentUuid).collect(Collectors.toList());
-            List<TeamVo> parentList = teamMapper.getTeamListContainsDeletedByUuidList(parentUuidList);
-            Map<String, String> map = parentList.stream().collect(Collectors.toMap(TeamVo::getUuid, TeamVo::getName));
-            for (TeamVo teamVo : teamList) {
-                teamVo.setParentName(map.get(teamVo.getParentUuid()));
-            }
-        }
-        return teamListConvertDataList(teamList);
     }
 
     private MatrixDataVo matrixDataVoConvertSearchCondition(MatrixDataVo dataVo) {
+        MatrixDataVo newDataVo = new MatrixDataVo();
+        newDataVo.setCurrentPage(dataVo.getCurrentPage());
+        newDataVo.setPageSize(dataVo.getPageSize());
+        newDataVo.setNeedPage(dataVo.getNeedPage());
+        List<String> columnList = new ArrayList<>();
+        for (String column : dataVo.getColumnList()) {
+            for(MatrixAttributeVo matrixAttributeVo : matrixAttributeList){
+                if (Objects.equals(matrixAttributeVo.getUuid(), column)) {
+                    columnList.add(matrixAttributeVo.getLabel());
+                }
+            }
+        }
+        newDataVo.setColumnList(columnList);
+        if (CollectionUtils.isNotEmpty(dataVo.getNotNullColumnList())) {
+            List<String> notNullColumnList = new ArrayList<>();
+            for (String notNullColumn : dataVo.getNotNullColumnList()) {
+                for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
+                    if (Objects.equals(matrixAttributeVo.getUuid(), notNullColumn)) {
+                        notNullColumnList.add(matrixAttributeVo.getLabel());
+                    }
+                }
+            }
+            newDataVo.setNotNullColumnList(notNullColumnList);
+        }
         List<MatrixFilterVo> filterList = dataVo.getFilterList();
         if (CollectionUtils.isEmpty(filterList)) {
-            return dataVo;
+            return newDataVo;
         }
         List<MatrixFilterVo> newFilterList = new ArrayList<>();
         for (MatrixFilterVo filter : filterList) {
@@ -142,10 +185,10 @@ public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             } else if (columnsMap.get("name").equals(uuid)) {
                 newFilterList.add(new MatrixFilterVo("a.`name`", filter.getExpression(), filter.getValueList()));
             } else if (columnsMap.get("parentName").equals(uuid)) {
-                newFilterList.add(new MatrixFilterVo("b.`name`", filter.getExpression(), filter.getValueList()));
+                newFilterList.add(new MatrixFilterVo("a.`parentName`", filter.getExpression(), filter.getValueList()));
             }
         }
-        dataVo.setFilterList(newFilterList);
+        newDataVo.setFilterList(newFilterList);
         return dataVo;
     }
 

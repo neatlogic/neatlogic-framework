@@ -211,38 +211,38 @@ public class UserSelectHandler extends FormHandlerBase {
             if (CollectionUtils.isEmpty(textList)) {
                 return textList;
             }
-            List<String> valueList = new ArrayList<>();
+            JSONArray valueList = new JSONArray();
             for (String textStr : textList) {
                 if (groupList.contains(GroupSearch.COMMON.getValue())) {
                     if (Objects.equals(textStr, UserType.ALL.getText())) {
                         valueList.add(GroupSearch.COMMON.getValuePlugin() + UserType.ALL.getValue());
-                        break;
+                        continue;
                     }
                 }
                 if (groupList.contains(GroupSearch.USER.getValue())) {
                     UserVo userVo = userMapper.getUserByUserId(textStr);
                     if (userVo != null) {
                         valueList.add(GroupSearch.USER.getValuePlugin() + userVo.getUuid());
-                        break;
+                        continue;
                     }
                     List<String> list = userMapper.getUserUuidListByUserName(textStr);
                     if (CollectionUtils.isNotEmpty(list)) {
                         valueList.add(GroupSearch.USER.getValuePlugin() + list.get(0));
-                        break;
+                        continue;
                     }
                 }
                 if (groupList.contains(GroupSearch.TEAM.getValue())) {
                     List<String> list = teamMapper.getTeamUuidByName(textStr);
                     if (CollectionUtils.isNotEmpty(list)) {
                         valueList.add(GroupSearch.TEAM.getValuePlugin() + list.get(0));
-                        break;
+                        continue;
                     }
                 }
                 if (groupList.contains(GroupSearch.ROLE.getValue())) {
                     List<String> list = roleMapper.getRoleUuidByName(textStr);
                     if (CollectionUtils.isNotEmpty(list)) {
                         valueList.add(GroupSearch.ROLE.getValuePlugin() + list.get(0));
-                        break;
+                        continue;
                     }
                 }
             }

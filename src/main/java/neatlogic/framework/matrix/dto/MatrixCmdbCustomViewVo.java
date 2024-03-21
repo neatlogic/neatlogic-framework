@@ -17,5 +17,60 @@
 
 package neatlogic.framework.matrix.dto;
 
+import com.alibaba.fastjson.JSONObject;
+
 public class MatrixCmdbCustomViewVo {
+
+    private String matrixUuid;
+
+    private Long customViewId;
+    private JSONObject config;
+    private String configStr;
+
+    public MatrixCmdbCustomViewVo() {
+    }
+
+    public MatrixCmdbCustomViewVo(String matrixUuid, Long customViewId, JSONObject config) {
+        this.matrixUuid = matrixUuid;
+        this.customViewId = customViewId;
+        this.config = config;
+    }
+
+    public String getMatrixUuid() {
+        return matrixUuid;
+    }
+
+    public void setMatrixUuid(String matrixUuid) {
+        this.matrixUuid = matrixUuid;
+    }
+
+    public Long getCustomViewId() {
+        return customViewId;
+    }
+
+    public void setCustomViewId(Long customViewId) {
+        this.customViewId = customViewId;
+    }
+
+    public JSONObject getConfig() {
+        if (config == null && configStr != null) {
+            config = JSONObject.parseObject(configStr);
+        }
+        return config;
+    }
+
+    public void setConfig(JSONObject config) {
+        this.config = config;
+    }
+
+    public String getConfigStr() {
+        if (configStr == null && config != null) {
+            configStr = config.toJSONString();
+        }
+        return configStr;
+    }
+
+    public void setConfigStr(String configStr) {
+        this.configStr = configStr;
+    }
 }

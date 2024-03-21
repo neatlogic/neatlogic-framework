@@ -154,6 +154,15 @@
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
 
+	<select id="getMatrixCmdbCustomViewByMatrixUuid" parameterType="string" resultType="neatlogic.framework.matrix.dto.MatrixCmdbCustomViewVo">
+		SELECT
+			`matrix_uuid` AS matrixUuid,
+			`custom_view_id` AS customViewId,
+			`config` AS configStr
+		FROM `matrix_cmdb_custom_view`
+		WHERE `matrix_uuid` = #{matrixUuid}
+	</select>
+
 	<insert id="insertMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixVo" >
 		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
 			select LAST_INSERT_ID() as id
@@ -219,6 +228,18 @@
 		)
 	</insert>
 
+	<insert id="replaceMatrixCmdbCustomView" parameterType="neatlogic.framework.matrix.dto.MatrixCiVo">
+		REPLACE INTO `matrix_cmdb_custom_view`(
+			`matrix_uuid`,
+			`custom_view_id`,
+			`config`
+		) VALUES (
+		#{matrixUuid},
+		#{customViewId},
+		#{configStr}
+		)
+	</insert>
+
 	<update id="updateMatrixNameAndLcu" parameterType="neatlogic.framework.matrix.dto.MatrixVo">
 		UPDATE `matrix` SET
 		 `name` = #{name},
@@ -241,5 +262,9 @@
 
 	<delete id="deleteMatrixCiByMatrixUuid" parameterType="String">
 		DELETE FROM `matrix_ci` WHERE `matrix_uuid` = #{value}
+	</delete>
+
+	<delete id="deleteMatrixCmdbCustomViewByMatrixUuid" parameterType="String">
+		DELETE FROM `matrix_cmdb_custom_view` WHERE `matrix_uuid` = #{value}
 	</delete>
 </mapper>

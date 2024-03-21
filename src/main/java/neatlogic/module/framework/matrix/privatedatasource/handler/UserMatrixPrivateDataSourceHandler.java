@@ -187,6 +187,7 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             for(MatrixAttributeVo matrixAttributeVo : matrixAttributeList){
                 if (Objects.equals(matrixAttributeVo.getUuid(), column)) {
                     columnList.add(matrixAttributeVo.getLabel());
+                    break;
                 }
             }
         }
@@ -197,6 +198,7 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
                 for(MatrixAttributeVo matrixAttributeVo : matrixAttributeList){
                     if (Objects.equals(matrixAttributeVo.getUuid(), notNullColumn)) {
                         notNullColumnList.add(matrixAttributeVo.getLabel());
+                        break;
                     }
                 }
             }

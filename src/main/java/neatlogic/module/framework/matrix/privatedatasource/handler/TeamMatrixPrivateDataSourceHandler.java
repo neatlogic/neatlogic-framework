@@ -143,6 +143,7 @@ public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             for(MatrixAttributeVo matrixAttributeVo : matrixAttributeList){
                 if (Objects.equals(matrixAttributeVo.getUuid(), column)) {
                     columnList.add(matrixAttributeVo.getLabel());
+                    break;
                 }
             }
         }
@@ -153,6 +154,7 @@ public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
                 for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
                     if (Objects.equals(matrixAttributeVo.getUuid(), notNullColumn)) {
                         notNullColumnList.add(matrixAttributeVo.getLabel());
+                        break;
                     }
                 }
             }
@@ -189,7 +191,7 @@ public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
             }
         }
         newDataVo.setFilterList(newFilterList);
-        return dataVo;
+        return newDataVo;
     }
 
     private List<Map<String, String>> teamListConvertDataList(List<TeamVo> teamList) {

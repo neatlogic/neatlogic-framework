@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.module.framework.dao.mapper.doumentonline.DocumentOnlineMapper">
 
-    <select id="getDocumentOnlineConfigListByFilePathList" parameterType="java.util.List" resultType="neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo">
+    <!--<select id="getDocumentOnlineConfigListByFilePathList" parameterType="java.util.List" resultType="neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo">
         SELECT
             `file_path` AS filePath,
             `module_group` AS moduleGroup,
@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <foreach collection="list" item="filePath" open="(" separator="," close=")">
             #{filePath}
         </foreach>
-    </select>
+    </select>-->
 
     <select id="getAllDocumentOnlineConfigList" resultType="neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo">
         SELECT

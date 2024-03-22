@@ -22,6 +22,7 @@ import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;
 
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -39,6 +40,7 @@ public class I18nUtils {
         Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
         String value = key;
         try {
+            args = Arrays.stream(args).map(String::valueOf).toArray(); //解决Long类型参数被格式化问题
             value = messageSource.getMessage(key, args, locale);
         } catch (NoSuchMessageException ignored) {
         }
@@ -112,6 +114,7 @@ public class I18nUtils {
         String value;
         try {
             value = bundle.getString(key);
+            args = Arrays.stream(args).map(String::valueOf).toArray(); //解决Long类型参数被格式化问题
         } catch (Exception ignored) {
             value = key;
         }

@@ -22,7 +22,7 @@ import java.util.List;
 
 public interface DocumentOnlineMapper extends IDocumentOnlineCrossoverMapper {
 
-    List<DocumentOnlineConfigVo> getDocumentOnlineConfigListByFilePathList(List<String> filePathList);
+//    List<DocumentOnlineConfigVo> getDocumentOnlineConfigListByFilePathList(List<String> filePathList);
 
     List<DocumentOnlineConfigVo> getAllDocumentOnlineConfigList();
 

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.documentonline.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,9 @@ public class DocumentOnlineConfigVo implements Serializable {
     private String anchorPoint;
     @EntityField(name = "common.source", type = ApiParamType.STRING)
     private String source;
+
+    @JSONField(serialize = false)
+    private boolean isUsed;
 
     public DocumentOnlineConfigVo() {}
 
@@ -100,5 +104,13 @@ public class DocumentOnlineConfigVo implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(filePath, moduleGroup, menu);
+    }
+
+    public boolean isUsed() {
+        return isUsed;
+    }
+
+    public void setUsed(boolean used) {
+        isUsed = used;
     }
 }

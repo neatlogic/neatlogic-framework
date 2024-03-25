@@ -209,6 +209,12 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
             // 禁止添加子节点
             DOCUMENT_ONLINE_DIRECTORY_ROOT.noAllowedAddChild();
         }
+
+        for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigList) {
+            if (!documentOnlineConfigVo.isUsed()) {
+                logger.warn("nmfs.documentonlineinitializeindexhandler.executeforalltenant.warn_c" + JSONObject.toJSONString(documentOnlineConfigVo));
+            }
+        }
         return 1;
     }
 
@@ -225,26 +231,27 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      */
     private List<DocumentOnlineConfigVo> getMappingConfigByFilePath(String filePath) {
         List<DocumentOnlineConfigVo> resultList = new ArrayList<>();
-        List<String> filePathList = new ArrayList<>();
-        List<String> directoryList = new ArrayList<>();
-        String[] split = filePath.split("/");
-        for (String directory : split) {
-            directoryList.add(directory);
-            if (directoryList.size() > 2) {
-                filePathList.add(String.join("/", directoryList));
-            }
-        }
-        if (CollectionUtils.isNotEmpty(filePathList)) {
-            List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineMapper.getDocumentOnlineConfigListByFilePathList(filePathList);
-            for (DocumentOnlineConfigVo documentOnlineConfigVo : documentOnlineConfigList) {
-                documentOnlineConfigVo.setSource("database");
-                resultList.add(documentOnlineConfigVo);
-            }
-        }
+//        List<String> filePathList = new ArrayList<>();
+//        List<String> directoryList = new ArrayList<>();
+//        String[] split = filePath.split("/");
+//        for (String directory : split) {
+//            directoryList.add(directory);
+//            if (directoryList.size() > 2) {
+//                filePathList.add(String.join("/", directoryList));
+//            }
+//        }
+//        if (CollectionUtils.isNotEmpty(filePathList)) {
+//            List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineMapper.getDocumentOnlineConfigListByFilePathList(filePathList);
+//            for (DocumentOnlineConfigVo documentOnlineConfigVo : documentOnlineConfigList) {
+//                documentOnlineConfigVo.setSource("database");
+//                resultList.add(documentOnlineConfigVo);
+//            }
+//        }
         for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigList) {
             if (filePath.startsWith(documentOnlineConfigVo.getFilePath())) {
                 if (!resultList.contains(documentOnlineConfigVo)) {
                     resultList.add(documentOnlineConfigVo);
+                    documentOnlineConfigVo.setUsed(true);
                 }
             }
         }

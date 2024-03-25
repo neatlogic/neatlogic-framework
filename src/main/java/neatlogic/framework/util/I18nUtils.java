@@ -18,6 +18,7 @@ package neatlogic.framework.util;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.i18n.JsonResourceBundleControl;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;
 
@@ -31,16 +32,19 @@ public class I18nUtils {
     /**
      * 获取翻译
      * 使用场景：系统启动后执行的翻译
-     * @param key 键
+     *
+     * @param key  键
      * @param args 值参数
      * @return 翻译值
      */
     public static String getMessage(String key, Object... args) {
-        MessageSourceAccessor messageSource = SpringContextUtil.getBean("messageSourceAccessor",MessageSourceAccessor.class);
+        MessageSourceAccessor messageSource = SpringContextUtil.getBean("messageSourceAccessor", MessageSourceAccessor.class);
         Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
         String value = key;
         try {
-            args = Arrays.stream(args).map(String::valueOf).toArray(); //解决Long类型参数被格式化问题
+            if (args != null) {
+                args = Arrays.stream(args).map(arg -> arg == null ? StringUtils.EMPTY : arg.toString()).toArray(); //解决Long类型参数被格式化问题
+            }
             value = messageSource.getMessage(key, args, locale);
         } catch (NoSuchMessageException ignored) {
         }
@@ -50,11 +54,12 @@ public class I18nUtils {
     /**
      * 获取翻译
      * 使用场景：系统启动后执行的翻译
+     *
      * @param key 键
      * @return 翻译值
      */
     public static String getMessage(String key) {
-        MessageSourceAccessor messageSource = SpringContextUtil.getBean("messageSourceAccessor",MessageSourceAccessor.class);
+        MessageSourceAccessor messageSource = SpringContextUtil.getBean("messageSourceAccessor", MessageSourceAccessor.class);
         Locale locale = RequestContext.get() != null ? RequestContext.get().getLocale() : Locale.getDefault();
         String value = key;
         try {
@@ -67,6 +72,7 @@ public class I18nUtils {
     /**
      * 获取翻译
      * 只有spring 还没有加载MessageSourceAccessor bean 才使用方法
+     *
      * @param key 键
      * @return 翻译值
      */
@@ -77,8 +83,9 @@ public class I18nUtils {
     /**
      * 获取翻译
      * 只有spring 还没有加载MessageSourceAccessor bean 才使用方法
+     *
      * @param locale 目标翻译语言 如 Locale.CHINESE
-     * @param key 键
+     * @param key    键
      * @return 翻译值
      */
     public static String getStaticMessage(Locale locale, String key) {
@@ -88,7 +95,8 @@ public class I18nUtils {
     /**
      * 获取翻译
      * 只有spring 还没有加载MessageSourceAccessor bean 才使用方法
-     * @param key 键
+     *
+     * @param key  键
      * @param args 值参数
      * @return 翻译值
      */
@@ -99,9 +107,10 @@ public class I18nUtils {
     /**
      * 获取翻译
      * 只有spring 还没有加载MessageSourceAccessor bean 才使用方法
+     *
      * @param locale 目标翻译语言 如 Locale.CHINESE
-     * @param key 键
-     * @param args 值参数
+     * @param key    键
+     * @param args   值参数
      * @return 翻译值
      */
     public static <E> String getStaticMessage(Locale locale, String key, Object... args) {
@@ -114,7 +123,9 @@ public class I18nUtils {
         String value;
         try {
             value = bundle.getString(key);
-            args = Arrays.stream(args).map(String::valueOf).toArray(); //解决Long类型参数被格式化问题
+            if (args != null) {
+                args = Arrays.stream(args).map(arg -> arg == null ? StringUtils.EMPTY : arg.toString()).toArray(); //解决Long类型参数被格式化问题
+            }
         } catch (Exception ignored) {
             value = key;
         }

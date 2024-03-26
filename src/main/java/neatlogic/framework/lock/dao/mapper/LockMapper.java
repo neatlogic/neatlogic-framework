@@ -11,7 +11,7 @@ public interface LockMapper {
 
     void deleteLock(String id);
 
-    int getMysqlLock(@Param("key") String key,@Param("waitSecond")Integer waitSecond);
+    Integer getMysqlLock(@Param("key") String key,@Param("waitSecond")Integer waitSecond);
 
-    int releaseMysqlLock(String key);
+    Integer releaseMysqlLock(String key);
 }

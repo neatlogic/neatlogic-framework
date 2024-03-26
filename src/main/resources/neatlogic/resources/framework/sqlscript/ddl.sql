@@ -847,6 +847,7 @@ CREATE TABLE IF NOT EXISTS `mq_subscribe` (
 CREATE TABLE IF NOT EXISTS `mq_topic` (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `is_active` tinyint(1) DEFAULT NULL COMMENT '是否激活',
+  `config` longtext COLLATE utf8mb4_general_ci COMMENT '配置',
   PRIMARY KEY (`name`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='mq主题表';
 

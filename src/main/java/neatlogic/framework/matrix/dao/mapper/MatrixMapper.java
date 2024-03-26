@@ -1,10 +1,7 @@
 package neatlogic.framework.matrix.dao.mapper;
 
 import neatlogic.framework.common.dto.BasePageVo;
-import neatlogic.framework.matrix.dto.MatrixCiVo;
-import neatlogic.framework.matrix.dto.MatrixExternalVo;
-import neatlogic.framework.matrix.dto.MatrixViewVo;
-import neatlogic.framework.matrix.dto.MatrixVo;
+import neatlogic.framework.matrix.dto.*;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -42,6 +39,8 @@ public interface MatrixMapper {
 
     MatrixCiVo getMatrixCiByMatrixUuid(String matrixUuid);
 
+    MatrixCmdbCustomViewVo getMatrixCmdbCustomViewByMatrixUuid(String matrixUuid);
+
     int insertMatrix(MatrixVo matrixVo);
 
     int replaceMatrixExternal(MatrixExternalVo matrixExternalVo);
@@ -49,6 +48,8 @@ public interface MatrixMapper {
     int insertMatrixView(MatrixViewVo matrixViewVo);
 
     int replaceMatrixCi(MatrixCiVo matrixCiVo);
+
+    int replaceMatrixCmdbCustomView(MatrixCmdbCustomViewVo matrixCmdbCustomViewVo);
 
     int updateMatrixNameAndLcu(MatrixVo matrixVo);
 
@@ -59,4 +60,6 @@ public interface MatrixMapper {
     int deleteMatrixViewByMatrixUuid(String matrixUuid);
 
     int deleteMatrixCiByMatrixUuid(String matrixUuid);
+
+    int deleteMatrixCmdbCustomViewByMatrixUuid(String matrixUuid);
 }

@@ -93,7 +93,7 @@ public class AttributeDataVo implements Comparable<AttributeDataVo> {
                 return dataObj;
             }
             IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(handler);
-            if (handler == null) {
+            if (formAttributeHandler == null) {
                 return dataObj;
             }
             return formAttributeHandler.conversionDataType(dataObj, attributeLabel);

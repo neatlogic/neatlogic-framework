@@ -18,7 +18,6 @@ package neatlogic.framework.notify.core;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.dto.ConditionParamVo;
-import neatlogic.framework.notify.dto.NotifyTriggerTemplateVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
 import org.springframework.util.ClassUtils;
 
@@ -29,11 +28,6 @@ public interface INotifyPolicyHandler {
     String getName();
 
     List<NotifyTriggerVo> getNotifyTriggerList();
-
-    /**
-     * 获取通知触发点模版列表
-     */
-    List<NotifyTriggerTemplateVo> getNotifyTriggerTemplateList(NotifyHandlerType type);
 
     List<ValueTextVo> getParamTypeList();
 

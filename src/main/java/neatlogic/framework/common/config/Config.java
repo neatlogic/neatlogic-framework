@@ -58,6 +58,11 @@ public class Config {
     private static String DB_URL;
     private static String DB_TRANSACTION_TIMEOUT;// 事务超时时间
     private static int DATASOURCE_CONNECT_TIMEOUT;//连接池连接超时时间
+    private static Integer DATASOURCE_MAXIMUM_POOL_SIZE;//连接数
+    private static Integer DATASOURCE_MAX_LIFETIME;//控制池中连接的最大生存期
+    private static Integer DATASOURCE_MINIMUM_IDLE;//此属性控制 HikariCP尝试在池中维护的最小空闲连接数
+    private static Integer DATASOURCE_VALIDATION_TIMEOUT;//此属性控制测试连接是否活跃的最长时间。此值必须小于 connectionTimeout
+    private static Integer DATASOURCE_IDLE_TIMEOUT;//此属性控制允许连接在池中处于空闲状态的最长时间
     private static String DATA_HOME;// 存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
@@ -197,6 +202,16 @@ public class Config {
     }
 
     public static int DATASOURCE_CONNECT_TIMEOUT() { return DATASOURCE_CONNECT_TIMEOUT;}
+
+    public static Integer DATASOURCE_MAXIMUN_POOL_SIZE() { return DATASOURCE_MAXIMUM_POOL_SIZE;}
+
+    public static Integer DATASOURCE_MAX_LIFETIME() { return DATASOURCE_MAX_LIFETIME;}
+
+    public static Integer DATASOURCE_MINIMUM_IDLE() { return DATASOURCE_MINIMUM_IDLE;}
+
+    public static Integer DATASOURCE_VALIDATION_TIMEOUT() { return DATASOURCE_VALIDATION_TIMEOUT;}
+
+    public static Integer DATASOURCE_IDLE_TIMEOUT() { return DATASOURCE_IDLE_TIMEOUT;}
 
     public static String MONGO_HOST() {
         return MONGO_HOST;
@@ -491,6 +506,11 @@ public class Config {
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
             DB_TRANSACTION_TIMEOUT = prop.getProperty("db.transaction.timeout");
             DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout","5000"));
+            DATASOURCE_MAXIMUM_POOL_SIZE = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size","20"));
+            DATASOURCE_MAX_LIFETIME = Integer.parseInt(prop.getProperty("datasource.max.lifetime","-1"));
+            DATASOURCE_MINIMUM_IDLE = Integer.parseInt(prop.getProperty("datasource.minimum.idle","-1"));
+            DATASOURCE_VALIDATION_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.validation.timeout","-1"));
+            DATASOURCE_IDLE_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.idle.timeout","-1"));
             DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));

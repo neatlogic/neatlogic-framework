@@ -77,7 +77,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </update>
 
     <insert id="replaceIntoField">
-        REPLACE INTO `fulltextindex_field_${moduleId}` (`id`,
+        INSERT INTO `fulltextindex_field_${moduleId}` (`id`,
                                                        `word_id`,
                                                        `target_field`,
                                                        `target_id`,
@@ -87,6 +87,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{fieldVo.targetField},
                 #{fieldVo.targetId},
                 #{fieldVo.counter})
+        ON DUPLICATE KEY UPDATE `word_id`      = #{fieldVo.wordId},
+                                `target_field` = #{fieldVo.targetField},
+                                `target_id`    = #{fieldVo.targetId},
+                                `counter`      = #{fieldVo.counter}
     </insert>
 
     <insert id="insertFieldOffset">

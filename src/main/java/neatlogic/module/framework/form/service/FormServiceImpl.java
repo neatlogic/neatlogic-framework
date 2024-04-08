@@ -879,7 +879,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                     resultList.addAll(getAllFormAttributeList(tableList2, parent2));
                 }
             }
-        } else if (Objects.equals(FormHandler.FORMTAB.getHandler(), handler) || Objects.equals(FormHandler.FORMCOLLAPSE.getHandler(), handler)) {
+        } else {
             JSONArray componentArray = componentObj.getJSONArray("component");
             if (CollectionUtils.isNotEmpty(componentArray)) {
                 FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);

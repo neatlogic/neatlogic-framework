@@ -210,6 +210,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     </select>
 
+    <select id="getRunnerGroupById" resultType="neatlogic.framework.dto.runner.RunnerGroupVo" useCache="false">
+        SELECT
+            rg.`id`,
+            rg.`name`,
+            rg.`description`
+        FROM
+            runnergroup rg
+        where rg.id = #{value}
+    </select>
+
     <select id="checkRunnerGroupIdIsExist" resultType="int" useCache="false">
         select count(`id`)
         from runnergroup
@@ -337,6 +347,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 OR c.`network_ip` LIKE CONCAT('%', #{keyword}, '%')
                 OR r.`url` LIKE CONCAT('%', #{keyword}, '%')
                 )
+            </if>
+            <if test="defaultValue != null and defaultValue.size() > 0">
+                AND rg.`id` IN
+                <foreach collection="defaultValue" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
             <if test="authType != null and authType != ''">
                 AND r.`auth_type` = #{authType}
@@ -537,6 +553,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <foreach collection="runnerIdSet" open="(" separator="," close=")" item="id">
             #{id}
         </foreach>
+    </select>
+    <select id="getRunnerGroupByName" resultType="neatlogic.framework.dto.runner.RunnerGroupVo" useCache="false">
+        SELECT
+            rg.`id`,
+            rg.`name`,
+            rg.`description`
+        FROM
+            runnergroup rg
+        where rg.name = #{value}
+    </select>
+    <select id="getRunnerMapListByRunnerGroupId" resultType="neatlogic.framework.dto.runner.RunnerMapVo" useCache="false">
+        SELECT ar.`id`,
+               ar.`name`,
+               ar.`url`,
+               ar.`host`,
+               ar.`port`,
+               ar.`access_key`                         AS accessKey,
+               ar.`access_secret`                      AS accessSecret,
+               ar.`auth_type`                          AS authType,
+               ar.`public_key`                         AS publicKey,
+               ar.`private_key`                        AS privateKey,
+               rgr.`runnergroup_id`                    AS groupId,
+               IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
+        FROM `runner` ar
+                 JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+                 JOIN  `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
+                 JOIN  `runnergroup` rg ON rg.`id` = rgr.`runnergroup_id`
+        where ar.is_delete = 0 and rg.id = #{value}
     </select>
 
     <insert id="replaceRunner" parameterType="neatlogic.framework.dto.runner.RunnerVo">

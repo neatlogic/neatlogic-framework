@@ -55,6 +55,12 @@ public interface RunnerMapper {
 
     List<RunnerGroupVo> searchRunnerGroup(RunnerGroupVo groupVo);
 
+    RunnerGroupVo getRunnerGroupById(Long id);
+
+    RunnerGroupVo getRunnerGroupByName(String string);
+
+    List<RunnerMapVo> getRunnerMapListByRunnerGroupId(Long runnerGroupId);
+
     int searchRunnerCountByGroupId(Long id);
 
     int searchRunnerCount(RunnerVo runnerVo);

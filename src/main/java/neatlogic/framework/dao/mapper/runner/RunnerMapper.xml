@@ -21,6 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="getAllNetworkMask" resultType="neatlogic.framework.dto.runner.GroupNetworkVo" useCache="false">
         SELECT rn.`id`,
                rn.`group_id`   as groupId,
+               r.name,
                rn.`network_ip` as networkIp,
                rn.`mask`
         FROM `runnergroup_network` rn
@@ -220,6 +221,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where rg.id = #{value}
     </select>
 
+    <select id="getRunnerGroupByIdList" resultType="neatlogic.framework.dto.runner.RunnerGroupVo" useCache="false">
+        SELECT
+            rg.`id`,
+            rg.`name`,
+            rg.`description`
+        FROM
+            runnergroup rg
+        where rg.id in
+        <foreach collection="lsist" separator="," open="(" close=")" item="id">
+            #{id}
+        </foreach>
+    </select>
+
     <select id="checkRunnerGroupIdIsExist" resultType="int" useCache="false">
         select count(`id`)
         from runnergroup
@@ -384,6 +398,115 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                  LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         where rgr.`runnergroup_id` = #{id}
     </select>
+
+    <select id="searchRunnerGroupCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer" useCache="false">
+        SELECT
+        COUNT(1)
+        FROM
+        `runnergroup` a
+        <where>
+            <include refid="searchForMatrixSql"/>
+        </where>
+    </select>
+
+    <select id="searchRunnerGroupForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.util.HashMap" useCache="false">
+        SELECT
+        a.id,a.`name`
+        FROM
+        `runnergroup` a
+        <where>
+            <include refid="searchForMatrixSql"/>
+        </where>
+    </select>
+
+
+    <sql id="searchForMatrixSql">
+        <if test="notNullColumnList != null and notNullColumnList.size() > 0">
+            <foreach collection="notNullColumnList" item="notColumn" separator="AND">
+                ${notColumn} IS NOT NULL
+            </foreach>
+        </if>
+        <if test="filterList != null and filterList.size() > 0">
+            AND
+            <foreach collection="filterList" item="filter" separator="AND">
+                <choose>
+                    <when test="filter.expression == 'equal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notequal'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (${filter.uuid} NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR ${filter.uuid} IS NULL)
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} != #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'like'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'notlike'">
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                (${filter.uuid} NOT IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                                OR ${filter.uuid} IS NULL)
+                            </when>
+                            <otherwise>
+                                (${filter.uuid} NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR ${filter.uuid} IS NULL)
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <when test="filter.expression == 'is-null'">
+                        (${filter.uuid} IS NULL OR ${filter.uuid} = '')
+                    </when>
+                    <when test="filter.expression == 'is-not-null'">
+                        (${filter.uuid} IS NOT NULL AND ${filter.uuid} != '')
+                    </when>
+                    <otherwise>
+                        <choose>
+                            <when test="filter.valueList.size() > 1">
+                                ${filter.uuid} IN
+                                <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+                                    #{item}
+                                </foreach>
+                            </when>
+                            <otherwise>
+                                ${filter.uuid} = #{filter.valueList[0]}
+                            </otherwise>
+                        </choose>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+    </sql>
 
     <select id="searchRunnerCount" resultType="java.lang.Integer">
         select count(distinct `id`)

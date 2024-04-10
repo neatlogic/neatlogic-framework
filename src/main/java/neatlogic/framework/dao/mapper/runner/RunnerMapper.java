@@ -20,9 +20,11 @@ import neatlogic.framework.dto.runner.GroupNetworkVo;
 import neatlogic.framework.dto.runner.RunnerGroupVo;
 import neatlogic.framework.dto.runner.RunnerMapVo;
 import neatlogic.framework.dto.runner.RunnerVo;
+import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface RunnerMapper {
@@ -57,11 +59,17 @@ public interface RunnerMapper {
 
     RunnerGroupVo getRunnerGroupById(Long id);
 
+    List<RunnerGroupVo> getRunnerGroupByIdList(List<Long> idlist);
+
     RunnerGroupVo getRunnerGroupByName(String string);
 
     List<RunnerMapVo> getRunnerMapListByRunnerGroupId(Long runnerGroupId);
 
+    List<Map<String, Object>> searchRunnerGroupForMatrix(MatrixDataVo matrixDataVo);
+
     int searchRunnerCountByGroupId(Long id);
+
+    int searchRunnerGroupCountForMatrix(MatrixDataVo matrixDataVo);
 
     int searchRunnerCount(RunnerVo runnerVo);
 

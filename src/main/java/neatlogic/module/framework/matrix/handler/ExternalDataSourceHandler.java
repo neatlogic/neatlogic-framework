@@ -357,8 +357,8 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
         } else {
             List<MatrixFilterVo> filterList = dataVo.getFilterList();
             String keywordColumn = dataVo.getKeywordColumn();
+            paramObj.put("keyword", dataVo.getKeyword()); //keyword给到用户自行处理即可
             if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
-                paramObj.put("keyword", dataVo.getKeyword()); //keyword给到用户自行处理即可
                 filterList.add(new MatrixFilterVo(keywordColumn, SearchExpression.LI.getExpression(), Arrays.asList(dataVo.getKeyword())));
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理

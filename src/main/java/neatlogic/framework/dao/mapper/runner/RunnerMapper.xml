@@ -700,9 +700,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                rgr.`runnergroup_id`                    AS groupId,
                IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
         FROM `runner` ar
-                 JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
-                 JOIN  `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
-                 JOIN  `runnergroup` rg ON rg.`id` = rgr.`runnergroup_id`
+                left JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+                left JOIN  `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
+                left JOIN  `runnergroup` rg ON rg.`id` = rgr.`runnergroup_id`
         where ar.is_delete = 0 and rg.id = #{value}
     </select>
 

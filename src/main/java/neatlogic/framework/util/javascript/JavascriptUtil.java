@@ -15,13 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.util.javascript;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.script.*;
 import java.io.StringWriter;
@@ -54,7 +51,7 @@ public class JavascriptUtil {
 
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
+    // private static final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
     private static final ThreadLocal<List<CacheItem>> engineCache = new ThreadLocal<>();
 
     //private static final ScriptEngineManager sem = new ScriptEngineManager();
@@ -81,26 +78,31 @@ public class JavascriptUtil {
         return factory.getScriptEngine(classFilter);
     }
 
-    private static CompiledScript getCompiledScript(String script) throws ScriptException {
-        List<CacheItem> engineList = engineCache.get();
-        if (engineList == null) {
-            engineList = new ArrayList<>();
-            engineCache.set(engineList);
-        }
+    private static CompiledScript getCompiledScript(String script, boolean needCache) throws ScriptException {
         CacheItem item = null;
-        for (int i = 0; i < engineList.size(); i++) {
-            if (engineList.get(i).getScript().equals(script)) {
-                item = engineList.get(i);
-                engineList.remove(i);
-                break;
+        if (needCache) {
+            List<CacheItem> engineList = engineCache.get();
+            if (engineList == null) {
+                engineList = new ArrayList<>();
+                engineCache.set(engineList);
             }
-        }
-        if (item == null) {
+
+            for (int i = 0; i < engineList.size(); i++) {
+                if (engineList.get(i).getScript().equals(script)) {
+                    item = engineList.get(i);
+                    engineList.remove(i);
+                    break;
+                }
+            }
+            if (item == null) {
+                item = new CacheItem(script);
+            }
+            engineList.add(item);
+            if (engineList.size() > 10) {
+                engineList.remove(10);
+            }
+        } else {
             item = new CacheItem(script);
-        }
-        engineList.add(item);
-        if (engineList.size() > 10) {
-            engineList.remove(10);
         }
         //System.out.println("size:" + engineList.size());
         return item.getCompiledScript();
@@ -108,6 +110,16 @@ public class JavascriptUtil {
 
     public static String transform(Object paramObj, String script) throws ScriptException, NoSuchMethodException {
         return transform(paramObj, script, null);
+    }
+
+    public static Object runScript(JSONObject paramObj, String script) throws ScriptException {
+        CompiledScript compiledScript;
+        compiledScript = getCompiledScript("function run(){" + script + ";}run();", true);
+        Bindings params = new SimpleBindings();
+        if (MapUtils.isNotEmpty(paramObj)) {
+            params.putAll(paramObj);
+        }
+        return compiledScript.eval(params);
     }
 
     /**
@@ -145,32 +157,6 @@ public class JavascriptUtil {
         return false;
     }
 
-    public static void main2(String[] v) throws ScriptException, NoSuchMethodException {
-        JSONObject paramObj = new JSONObject();
-        JSONArray attr1 = new JSONArray();
-        attr1.add("1");
-        JSONArray attr2 = new JSONArray();
-        attr2.add("a");
-        attr2.add("b");
-        JSONObject valueObj = new JSONObject();
-        valueObj.put("attr_1", attr1);
-        valueObj.put("attr_2", attr2);
-        paramObj.put("data", valueObj);
-
-        JSONArray attr3 = new JSONArray();
-        attr3.add("1");
-        JSONArray attr4 = new JSONArray();
-        attr4.add("b");
-        attr4.add("a");
-        JSONObject conditionObj = new JSONObject();
-        conditionObj.put("attr_1", attr3);
-        conditionObj.put("attr_2", attr4);
-        paramObj.put("condition", conditionObj);
-
-        String expression = "calculate('equal', data['attr_1'],condition['attr_1']) && calculate('equal', data['attr_2'], condition['attr_2'])";
-        System.out.println(runExpression(paramObj, expression));
-    }
-
 
     public static void main(String[] v) throws ScriptException, InterruptedException {
         /*ScriptEngine se = getEngine("--global-per-engine");
@@ -192,7 +178,7 @@ public class JavascriptUtil {
                     script = getCompiledScript("function run(a,m,n){  var x = param.a + 1;\n" +
                             "var y = x * 2 + param.m;\n" +
                             "var z = y * 3 - param.n;\n" +
-                            "return z;} run(param.a,param.m,param.n);\n");
+                            "return z;} run(param.a,param.m,param.n);\n", false);
                 } catch (ScriptException e) {
                     throw new RuntimeException(e);
                 }

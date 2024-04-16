@@ -88,7 +88,7 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
 
     public Map<String, ConditionGroupVo> getConditionGroupMap() {
         if (MapUtils.isEmpty(conditionGroupMap) && CollectionUtils.isNotEmpty(conditionGroupList)) {
-            conditionGroupMap = conditionGroupList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+            conditionGroupMap = conditionGroupList.stream().collect(Collectors.toMap(ConditionGroupVo::getUuid, e -> e));
         }
         return conditionGroupMap;
     }

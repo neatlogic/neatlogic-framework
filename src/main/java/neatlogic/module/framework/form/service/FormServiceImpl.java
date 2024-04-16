@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.form.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
@@ -44,6 +45,8 @@ import neatlogic.module.framework.dependency.handler.MatrixAttr2FormAttrDependen
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -55,6 +58,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FormServiceImpl implements FormService, IFormCrossoverService {
+    private static final Logger logger = LoggerFactory.getLogger(FormServiceImpl.class);
 
     @Resource
     private MatrixMapper matrixMapper;
@@ -344,7 +348,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 return null;
             }
             List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
-            Map<String, Object> valueTextMap = dataList.stream().collect(Collectors.toMap(e -> e.getText(), e -> e.getValue()));
+            Map<String, Object> valueTextMap = dataList.stream().collect(Collectors.toMap(ValueTextVo::getText, ValueTextVo::getValue));
             if (text instanceof String) {
                 String textStr = (String) text;
                 Object value = valueTextMap.get(textStr);
@@ -355,7 +359,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                     valueList.add(jsonObj);
                 }
                 return valueList;
-            }  else if (text instanceof List) {
+            } else if (text instanceof List) {
                 List<String> textList = (List) text;
                 if (CollectionUtils.isEmpty(textList)) {
                     return valueList;
@@ -398,7 +402,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                     valueList.add(jsonObj);
                 }
                 return valueList;
-            }  else if (text instanceof List) {
+            } else if (text instanceof List) {
                 List<String> textList = (List) text;
                 if (CollectionUtils.isEmpty(textList)) {
                     return valueList;
@@ -434,7 +438,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         if (CollectionUtils.isEmpty(formAttributeList)) {
             return;
         }
-        Map<String, FormAttributeVo> formAttributeMap = formAttributeList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        Map<String, FormAttributeVo> formAttributeMap = formAttributeList.stream().collect(Collectors.toMap(FormAttributeVo::getUuid, e -> e));
         for (int i = 0; i < formAttributeDataList.size(); i++) {
             JSONObject formAttributeDataObj = formAttributeDataList.getJSONObject(i);
             String attributeUuid = formAttributeDataObj.getString("attributeUuid");
@@ -475,7 +479,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 return resultObj;
             }
             List<ValueTextVo> dataList = dataArray.toJavaList(ValueTextVo.class);
-            Map<Object, String> valueTextMap = dataList.stream().collect(Collectors.toMap(e -> e.getValue(), e -> e.getText()));
+            Map<Object, String> valueTextMap = dataList.stream().collect(Collectors.toMap(ValueTextVo::getValue, ValueTextVo::getText));
             if (dataObj instanceof JSONArray) {
                 JSONArray valueArray = (JSONArray) dataObj;
                 if (CollectionUtils.isNotEmpty(valueArray)) {
@@ -601,8 +605,8 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                                       List<? extends AttributeDataVo> newFormAttributeDataList,
                                       List<? extends AttributeDataVo> oldFormAttributeDataList) {
         boolean isModified = false;
-        Map<String, ? extends AttributeDataVo> newFormAttributeDataMap = newFormAttributeDataList.stream().collect(Collectors.toMap(e -> e.getAttributeUuid(), e -> e));
-        Map<String, ? extends AttributeDataVo> oldFormAttributeDataMap = oldFormAttributeDataList.stream().collect(Collectors.toMap(e -> e.getAttributeUuid(), e -> e));
+        Map<String, ? extends AttributeDataVo> newFormAttributeDataMap = newFormAttributeDataList.stream().collect(Collectors.toMap(AttributeDataVo::getAttributeUuid, e -> e));
+        Map<String, ? extends AttributeDataVo> oldFormAttributeDataMap = oldFormAttributeDataList.stream().collect(Collectors.toMap(AttributeDataVo::getAttributeUuid, e -> e));
         for (FormAttributeVo formAttributeVo : formAttributeList) {
             String attributeUuid = formAttributeVo.getUuid();
             AttributeDataVo newProcessTaskFormAttributeDataVo = newFormAttributeDataMap.get(attributeUuid);
@@ -699,7 +703,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 dataVo.setCurrentPage(dataVo.getCurrentPage() + 1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -750,7 +754,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 dataVo.setCurrentPage(dataVo.getCurrentPage() + 1);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         return null;
     }
@@ -763,7 +767,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
 
     @Override
     public List<FormAttributeVo> getAllFormAttributeList(String formConfig) {
-        return getAllFormAttributeList(JSONObject.parseObject(formConfig));
+        return getAllFormAttributeList(JSON.parseObject(formConfig));
     }
 
     @Override
@@ -795,7 +799,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
 
     @Override
     public FormAttributeVo getFormAttribute(String formConfig, String attributeUuid) {
-        return getFormAttribute(JSONObject.parseObject(formConfig), attributeUuid, null);
+        return getFormAttribute(JSON.parseObject(formConfig), attributeUuid, null);
     }
 
     @Override
@@ -811,7 +815,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
 
     @Override
     public String getFormAttributeHandler(String attributeUuid, String formConfig) {
-        return getFormAttributeHandler(attributeUuid, JSONObject.parseObject(formConfig));
+        return getFormAttributeHandler(attributeUuid, JSON.parseObject(formConfig));
     }
 
     private List<FormAttributeVo> getAllFormAttributeList(JSONArray tableList, FormAttributeParentVo parent) {

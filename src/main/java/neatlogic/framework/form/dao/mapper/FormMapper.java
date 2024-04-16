@@ -75,6 +75,8 @@ public interface FormMapper {
 
     List<FormVersionVo> getFormVersionList();
 
+    List<AttributeDataVo> getFormAttributeDataListByProcessTaskId(Long processTaskId);
+
     List<AttributeDataVo> getFormAttributeDataListByIdList(List<Long> idList);
 
     int insertForm(FormVo formVo);

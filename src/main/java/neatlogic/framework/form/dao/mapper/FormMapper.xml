@@ -350,6 +350,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         ORDER BY a.`form_uuid`
     </select>
 
+    <select id="getFormAttributeDataListByProcessTaskId" parameterType="java.lang.Long" resultType="neatlogic.framework.form.dto.AttributeDataVo">
+        SELECT a.`id`,
+               a.`form_uuid`       AS formUuid,
+               a.`handler`,
+               a.`attribute_label` AS attributeLabel,
+               a.`attribute_uuid`  AS attributeUuid,
+               a.`data`
+        FROM `form_attribute_data` a
+                 join processtask_formattribute b on a.id = b.form_attribute_data_id
+        where b.processtask_id = #{value}
+    </select>
+
     <select id="getFormAttributeDataListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.form.dto.AttributeDataVo">
         SELECT
             `id`,

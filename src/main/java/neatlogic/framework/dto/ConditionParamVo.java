@@ -1,16 +1,14 @@
 package neatlogic.framework.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-
 import neatlogic.framework.common.constvalue.ParamType;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConditionParamVo {
     private String uuid;
@@ -26,6 +24,9 @@ public class ConditionParamVo {
     private int isEditable = 1;
     private String freemarkerTemplate;
     private String handler;
+
+    private boolean isConditionable;
+
     /** 不作为数据库与显示字段，仅为排序使用 */
     @JSONField(serialize = false)
     private Long lcd = 0L;
@@ -177,6 +178,14 @@ public class ConditionParamVo {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public boolean isConditionable() {
+        return isConditionable;
+    }
+
+    public void setConditionable(boolean conditionable) {
+        isConditionable = conditionable;
     }
 
     public Long getLcd() {

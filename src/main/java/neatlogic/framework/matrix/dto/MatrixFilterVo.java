@@ -4,9 +4,13 @@ import java.util.List;
 
 public class MatrixFilterVo {
     private String uuid;
+    private String name;
     private String type;
     private List<String> valueList;
     private String expression;
+
+    public MatrixFilterVo() {
+    }
 
     public MatrixFilterVo(String uuid, String expression, List<String> valueList) {
         this.uuid = uuid;
@@ -27,6 +31,14 @@ public class MatrixFilterVo {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getType() {

@@ -13,7 +13,13 @@ import java.util.List;
  **/
 public class MatrixDataVo extends BasePageVo {
     private String matrixUuid;
+
+    private String matrixLabel;
+
     private List<String> columnList;
+
+    private List<String> columnNameList;
+
     @Deprecated
     private List<MatrixColumnVo> sourceColumnList;
     /**
@@ -22,6 +28,7 @@ public class MatrixDataVo extends BasePageVo {
     private List<String> uuidList;
     private String uuidColumn;
     private String keywordColumn;
+    private String keywordColumnName;
     private String keywordExpression;
     private String uuid;
     private String attrType;
@@ -206,5 +213,29 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setNotNullColumnList(List<String> notNullColumnList) {
         this.notNullColumnList = notNullColumnList;
+    }
+
+    public String getMatrixLabel() {
+        return matrixLabel;
+    }
+
+    public void setMatrixLabel(String matrixLabel) {
+        this.matrixLabel = matrixLabel;
+    }
+
+    public List<String> getColumnNameList() {
+        return columnNameList;
+    }
+
+    public void setColumnNameList(List<String> columnNameList) {
+        this.columnNameList = columnNameList;
+    }
+
+    public String getKeywordColumnName() {
+        return keywordColumnName;
+    }
+
+    public void setKeywordColumnName(String keywordColumnName) {
+        this.keywordColumnName = keywordColumnName;
     }
 }

@@ -71,7 +71,7 @@
 				AND `type` = #{type}
 			</if>
 			<if test="keyword != null and keyword != ''">
-				AND `name` LIKE CONCAT('%', #{keyword}, '%')
+				AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `uuid` LIKE CONCAT('%', #{keyword}, '%') OR `label` LIKE CONCAT('%', #{keyword}, '%'))
 			</if>
 		</where>
 	</select>
@@ -90,25 +90,25 @@
 
 	<select id="searchMatrix" resultMap="matrixMap">
 			SELECT 
-			a.`id`,
-			a.`uuid`,
-			a.`name`,
-			a.`label`,
-			a.`type`,
-			a.`fcu`,
-			a.`fcd`,
-			a.`lcu`,
-			a.`lcd`
-			FROM `matrix` a
+			`id`,
+			`uuid`,
+			`name`,
+			`label`,
+			`type`,
+			`fcu`,
+			`fcd`,
+			`lcu`,
+			`lcd`
+			FROM `matrix`
 			<where>
 				<if test="type != null and type != ''">
-					AND a.`type` = #{type}
+					AND `type` = #{type}
 				</if>
 				<if test="keyword != null and keyword != ''">
-					AND a.`name` LIKE CONCAT('%', #{keyword}, '%')
+					AND (`name` LIKE CONCAT('%', #{keyword}, '%') OR `uuid` LIKE CONCAT('%', #{keyword}, '%') OR `label` LIKE CONCAT('%', #{keyword}, '%'))
 				</if>
 			</where>
-			ORDER BY a.`id` desc
+			ORDER BY `id` desc
 			LIMIT #{startNum}, #{pageSize}
 	</select>
 

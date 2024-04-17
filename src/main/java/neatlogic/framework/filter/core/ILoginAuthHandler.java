@@ -43,6 +43,20 @@ public interface ILoginAuthHandler {
     String logout();
 
     /**
+     * 使用场景：移动端接口访问时拦截验证失败后，跳转的url
+     *
+     * @return 系统登出后跳转的url，null则跳转回系统默认登录页面
+     */
+    String mobileDirectUrl();
+
+    /**
+     * 使用场景：移动端使用登出接口
+     *
+     * @return 系统登出后跳转的url，null则跳转回系统默认登录页面
+     */
+    String mobileLogout();
+
+    /**
      * 是否需要更新校验token createTime
      */
     boolean isValidTokenCreateTime();

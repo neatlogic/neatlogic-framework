@@ -18,6 +18,8 @@ package neatlogic.framework.filter.core;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.DeviceType;
+import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.LoginMapper;
 import neatlogic.framework.dao.mapper.RoleMapper;
@@ -93,7 +95,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         UserVo userVo = myAuth(request);
         //如果userVo没有uuid则这个user不合法，直接置null
         if (userVo != null && StringUtils.isBlank(userVo.getUuid())) {
-            if(!Objects.equals(getType(),"default")) {
+            if (!Objects.equals(getType(), "default")) {
                 logger.error(getType() + " return userVo invalid!! userVo must include uuid");
             }
             userVo = null;
@@ -125,7 +127,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     /**
-     *  自定义认证，返回的用户对象，必须包含uuid,否则返回的用户无效
+     * 自定义认证，返回的用户对象，必须包含uuid,否则返回的用户无效
      */
     public abstract UserVo myAuth(HttpServletRequest request) throws Exception;
 
@@ -205,12 +207,22 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
         String url;
         try {
-            url = myLogout();
+            String device = CommonUtil.getDevice();
+            if (StringUtils.isNotBlank(device) && Objects.equals(DeviceType.MOBILE.getValue(), device)) {
+                url = mobileLogout();
+            } else {
+                url = myLogout();
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
             throw new RuntimeException();
         }
         return url;
+    }
+
+    @Override
+    public String mobileLogout(){
+        return null;
     }
 
     protected String myLogout() throws IOException {
@@ -219,11 +231,22 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public String directUrl() {
-        String directUrl = myDirectUrl();
+        String directUrl;
+        String device = CommonUtil.getDevice();
+        if (StringUtils.isNotBlank(device) && Objects.equals(DeviceType.MOBILE.getValue(), device)) {
+            directUrl = mobileDirectUrl();
+        } else {
+            directUrl = myDirectUrl();
+        }
         if (StringUtils.isBlank(directUrl)) {
             directUrl = Config.DIRECT_URL();
         }
         return directUrl;
+    }
+
+    @Override
+    public String mobileDirectUrl(){
+        return null;
     }
 
     protected String myDirectUrl() {

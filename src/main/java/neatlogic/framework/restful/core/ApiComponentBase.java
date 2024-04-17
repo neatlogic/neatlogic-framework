@@ -119,7 +119,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (response != null) {
                         CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
                         if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
-                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() + cacheControlVo.getMaxAge());
+                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() +"="+ cacheControlVo.getMaxAge());
                         }
                     }
                 }

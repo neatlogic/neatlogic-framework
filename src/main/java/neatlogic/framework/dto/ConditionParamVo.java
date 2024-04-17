@@ -1,10 +1,13 @@
 package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ParamType;
+import neatlogic.framework.form.constvalue.FormHandler;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -24,14 +27,19 @@ public class ConditionParamVo {
     private int isEditable = 1;
     private String freemarkerTemplate;
     private String handler;
+    private String handlerName;
 
     private boolean isConditionable;
+    List<ConditionParamVo> subParamList = new ArrayList<>();
 
-    /** 不作为数据库与显示字段，仅为排序使用 */
+    /**
+     * 不作为数据库与显示字段，仅为排序使用
+     */
     @JSONField(serialize = false)
     private Long lcd = 0L;
 
-    public ConditionParamVo() {}
+    public ConditionParamVo() {
+    }
 
     public ConditionParamVo(ConditionParamVo conditionParamVo) {
         this.name = conditionParamVo.name;
@@ -45,12 +53,29 @@ public class ConditionParamVo {
         this.isEditable = conditionParamVo.isEditable;
         this.freemarkerTemplate = conditionParamVo.freemarkerTemplate;
         this.handler = conditionParamVo.handler;
+        this.subParamList = conditionParamVo.subParamList;
 
         if (CollectionUtils.isNotEmpty(conditionParamVo.expressionList)) {
             for (ExpressionVo expressionVo : conditionParamVo.expressionList) {
                 this.expressionList.add(new ExpressionVo(expressionVo));
             }
         }
+    }
+
+    public String getHandlerName() {
+        if (StringUtils.isNotBlank(handler)) {
+            handlerName = FormHandler.getName(handler);
+        }
+        return handlerName;
+    }
+
+
+    public List<ConditionParamVo> getSubParamList() {
+        return subParamList;
+    }
+
+    public void setSubParamList(List<ConditionParamVo> subParamList) {
+        this.subParamList = subParamList;
     }
 
     public JSONObject getConfig() {
@@ -60,7 +85,35 @@ public class ConditionParamVo {
     public void setConfig(String config) {
         try {
             this.config = JSON.parseObject(config);
-        } catch (Exception e) {
+            if ("formdate".equals(this.handler)) {
+                if (MapUtils.isNotEmpty(this.config)) {
+                    this.config.put("type", "datetimerange");
+                }
+            } else if ("formtime".equals(this.handler)) {
+                if (MapUtils.isNotEmpty(this.config)) {
+                    this.config.put("type", "timerange");
+                }
+            }
+            //分析config数据，如果有dataConfig配置，则直接获取下层数据
+            JSONArray dataConfig = this.config.getJSONArray("dataConfig");
+            if (CollectionUtils.isNotEmpty(dataConfig)) {
+                for (int i = 0; i < dataConfig.size(); i++) {
+                    JSONObject dataObj = dataConfig.getJSONObject(i);
+                    ConditionParamVo conditionParamVo = new ConditionParamVo();
+                    conditionParamVo.setName(dataObj.getString("uuid"));
+                    conditionParamVo.setLabel(dataObj.getString("label"));
+                    //conditionParamVo.setController(formAttributeVo.getHandlerType());
+                    //conditionParamVo.setType(formAttributeVo.getType());
+                    conditionParamVo.setHandler(dataObj.getString("handler"));
+                    conditionParamVo.setConfig(dataObj.getJSONObject("config"));
+                    if (this.subParamList == null) {
+                        this.subParamList = new ArrayList<>();
+                    }
+                    this.subParamList.add(conditionParamVo);
+                }
+            }
+
+        } catch (Exception ignored) {
 
         }
     }
@@ -159,7 +212,7 @@ public class ConditionParamVo {
 
     public String getFreemarkerTemplate() {
         if (StringUtils.isBlank(freemarkerTemplate) && StringUtils.isNotBlank(paramType)
-            && StringUtils.isNotBlank(name)) {
+                && StringUtils.isNotBlank(name)) {
             ParamType paramTypeEnum = ParamType.getParamType(paramType);
             if (paramTypeEnum != null) {
                 freemarkerTemplate = paramTypeEnum.getFreemarkerTemplate(name);

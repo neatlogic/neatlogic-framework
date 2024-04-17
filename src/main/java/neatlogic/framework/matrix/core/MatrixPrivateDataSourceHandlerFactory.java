@@ -57,6 +57,21 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
     }
 
     /**
+     * 根据label获取单个矩阵对象信息
+     *
+     * @param label 唯一标识
+     * @return 单个矩阵对象信息
+     */
+    public static MatrixVo getMatrixVoByLabel(String label) {
+        for (MatrixVo matrixVo : list) {
+            if (matrixVo.getLabel().equals(label)) {
+                return matrixVo;
+            }
+        }
+        return null;
+    }
+
+    /**
      * 根据搜索条件统计符合条件矩阵总数
      *
      * @param searchVo 搜索条件

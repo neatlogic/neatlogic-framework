@@ -40,8 +40,7 @@ public enum FormHandler implements IFormHandler {
     FORMRATE("formrate", "评分"),
     FORMTAB("formtab", "选项卡"),
     FORMCOLLAPSE("formcollapse", "折叠面板"),
-    FORMSUBASSEMBLY("formsubassembly", "子表单"),
-    ;
+    FORMSUBASSEMBLY("formsubassembly", "子表单");
 
     private final String handler;
     private final String handlerName;
@@ -49,6 +48,15 @@ public enum FormHandler implements IFormHandler {
     FormHandler(String handler, String handlerName) {
         this.handler = handler;
         this.handlerName = handlerName;
+    }
+
+    public static String getName(String handler) {
+        for (FormHandler formHandler : FormHandler.values()) {
+            if (formHandler.handler.equals(handler)) {
+                return formHandler.handlerName;
+            }
+        }
+        return null;
     }
 
     @Override

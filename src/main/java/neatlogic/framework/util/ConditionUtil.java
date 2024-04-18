@@ -5,15 +5,13 @@ import neatlogic.framework.asynchronization.threadlocal.ConditionParamContext;
 import neatlogic.framework.common.constvalue.Expression;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.script.ScriptException;
 import java.util.List;
 
 public class ConditionUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ConditionUtil.class);
 
-    public static boolean predicate(List<String> curentValueList, String expression, List<String> targetValueList) {
+    public static boolean predicate(List<String> curentValueList, String expression, List<String> targetValueList) throws ScriptException {
         Expression processExpression = Expression.getProcessExpression(expression);
         if (processExpression == null) {
             //尝试用js脚本引擎进行比对
@@ -22,13 +20,8 @@ public class ConditionUtil {
                 JSONObject paramData = context.getParamData();
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("data", paramData);
-                try {
-                    Object returnValue = JavascriptUtil.runScript(paramObj, expression);
-                    return Boolean.parseBoolean(returnValue.toString());
-                } catch (Exception e) {
-                    logger.warn(e.getMessage(), e);
-                    return false;
-                }
+                Object returnValue = JavascriptUtil.runScript(paramObj, expression);
+                return Boolean.parseBoolean(returnValue.toString());
                 //JavascriptUtil.runExpression(paramData,)
             }
             return false;

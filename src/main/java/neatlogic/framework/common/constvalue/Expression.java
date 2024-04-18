@@ -76,7 +76,7 @@ public enum Expression implements IEnum {
                 return s.getExpressionName();
             }
         }
-        return null;
+        return _expression;
     }
 
     public static String getExpressionEs(String _expression) {

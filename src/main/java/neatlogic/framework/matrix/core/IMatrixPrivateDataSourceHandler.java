@@ -73,6 +73,7 @@ public interface IMatrixPrivateDataSourceHandler {
             String key = getLabel() + "-" + label;
             matrixAttributeVo.setUuid(UuidUtil.getCustomUUID(key));
             matrixAttributeVo.setName(name);
+            matrixAttributeVo.setUniqueIdentifier(label);
             matrixAttributeVo.setLabel(label);
             matrixAttributeVo.setType(MatrixAttributeType.INPUT.getValue());
             matrixAttributeVo.setIsRequired(1);

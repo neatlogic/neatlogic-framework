@@ -389,6 +389,7 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     if ("uuid".equals(name)) {
                         matrixAttributeVo.setPrimaryKey(1);
                     }
+                    matrixAttributeVo.setUniqueIdentifier(name);
                     matrixAttributeVo.setName(attrVo.getLabel());
                     matrixAttributeVo.setType(MatrixAttributeType.INPUT.getValue());
                     matrixAttributeVo.setIsDeletable(0);

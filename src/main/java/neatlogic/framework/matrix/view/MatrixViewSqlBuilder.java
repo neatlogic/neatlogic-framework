@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.matrix.view;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.matrix.dto.MatrixViewAttributeVo;
 import neatlogic.framework.matrix.exception.MatrixViewHasNoAttrException;
@@ -77,7 +78,8 @@ public class MatrixViewSqlBuilder {
 
     public boolean valid() {
         try {
-            Statement stmt = CCJSqlParserUtil.parse(sql);
+            String parseSql = sql.replace("@{DATA_SCHEMA}", TenantContext.get().getDataDbName());
+            Statement stmt = CCJSqlParserUtil.parse(parseSql);
             Select selectStatement = (Select) stmt;
             PlainSelect select = (PlainSelect) selectStatement.getSelectBody();
             final boolean[] hasId = new boolean[1];
@@ -141,7 +143,8 @@ public class MatrixViewSqlBuilder {
     public String getTestSql() {
         try {
             this.valid();
-            Statement stmt = CCJSqlParserUtil.parse(sql);
+            String parseSql = sql.replace("@{DATA_SCHEMA}", TenantContext.get().getDataDbName());
+            Statement stmt = CCJSqlParserUtil.parse(parseSql);
             Select selectStatement = (Select) stmt;
             PlainSelect select = (PlainSelect) selectStatement.getSelectBody();
             Limit limit = new Limit();

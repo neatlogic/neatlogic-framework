@@ -423,6 +423,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                                     MatrixAttributeVo matrixAttributeVo = new MatrixAttributeVo();
                                     matrixAttributeVo.setMatrixUuid(matrixUuid);
                                     matrixAttributeVo.setUuid(theadObj.getString("key"));
+                                    matrixAttributeVo.setUniqueIdentifier(theadObj.getString("key"));
                                     matrixAttributeVo.setName(theadObj.getString("title"));
                                     matrixAttributeVo.setType(MatrixAttributeType.INPUT.getValue());
                                     matrixAttributeVo.setIsDeletable(0);

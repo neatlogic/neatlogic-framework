@@ -4,7 +4,7 @@ import java.util.List;
 
 public class MatrixFilterVo {
     private String uuid;
-    private String name;
+    private String uniqueIdentifier;
     private String type;
     private List<String> valueList;
     private String expression;
@@ -33,12 +33,12 @@ public class MatrixFilterVo {
         this.uuid = uuid;
     }
 
-    public String getName() {
-        return name;
+    public String getUniqueIdentifier() {
+        return uniqueIdentifier;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUniqueIdentifier(String uniqueIdentifier) {
+        this.uniqueIdentifier = uniqueIdentifier;
     }
 
     public String getType() {

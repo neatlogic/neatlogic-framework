@@ -18,7 +18,7 @@ public class MatrixDataVo extends BasePageVo {
 
     private List<String> columnList;
 
-    private List<String> columnNameList;
+    private List<String> columnUniqueIdentifierList;
 
     @Deprecated
     private List<MatrixColumnVo> sourceColumnList;
@@ -28,7 +28,7 @@ public class MatrixDataVo extends BasePageVo {
     private List<String> uuidList;
     private String uuidColumn;
     private String keywordColumn;
-    private String keywordColumnName;
+    private String keywordColumnUniqueIdentifier;
     private String keywordExpression;
     private String uuid;
     private String attrType;
@@ -223,19 +223,19 @@ public class MatrixDataVo extends BasePageVo {
         this.matrixLabel = matrixLabel;
     }
 
-    public List<String> getColumnNameList() {
-        return columnNameList;
+    public List<String> getColumnUniqueIdentifierList() {
+        return columnUniqueIdentifierList;
     }
 
-    public void setColumnNameList(List<String> columnNameList) {
-        this.columnNameList = columnNameList;
+    public void setColumnUniqueIdentifierList(List<String> columnUniqueIdentifierList) {
+        this.columnUniqueIdentifierList = columnUniqueIdentifierList;
     }
 
-    public String getKeywordColumnName() {
-        return keywordColumnName;
+    public String getKeywordColumnUniqueIdentifier() {
+        return keywordColumnUniqueIdentifier;
     }
 
-    public void setKeywordColumnName(String keywordColumnName) {
-        this.keywordColumnName = keywordColumnName;
+    public void setKeywordColumnUniqueIdentifier(String keywordColumnUniqueIdentifier) {
+        this.keywordColumnUniqueIdentifier = keywordColumnUniqueIdentifier;
     }
 }

@@ -1,19 +1,18 @@
 package neatlogic.framework.matrix.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.Expression;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.dto.ExpressionVo;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
 import neatlogic.framework.restful.annotation.EntityField;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: neatlogic
@@ -25,6 +24,9 @@ public class MatrixAttributeVo extends BasePageVo {
     private String matrixUuid;
     @EntityField( name = "属性uuid", type = ApiParamType.STRING)
     private String uuid;
+
+	@EntityField( name = "属性唯一标识", type = ApiParamType.STRING)
+	private String uniqueIdentifier;
     @EntityField( name = "属性名", type = ApiParamType.STRING)
     private String name;
     @EntityField( name = "属性label", type = ApiParamType.STRING)
@@ -67,7 +69,15 @@ public class MatrixAttributeVo extends BasePageVo {
         this.uuid = uuid;
     }
 
-    public String getName() {
+	public String getUniqueIdentifier() {
+		return uniqueIdentifier;
+	}
+
+	public void setUniqueIdentifier(String uniqueIdentifier) {
+		this.uniqueIdentifier = uniqueIdentifier;
+	}
+
+	public String getName() {
         return name;
     }
 

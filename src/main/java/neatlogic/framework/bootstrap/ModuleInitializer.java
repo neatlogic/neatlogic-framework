@@ -129,7 +129,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
         Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
         for (Resource resource : resources) {
             String path = resource.getURL().getPath();
-            path = path.substring(path.indexOf("!") + 1);
+//            path = path.substring(path.indexOf("!") + 1);
+            path = path.substring(path.lastIndexOf("/neatlogic/") + 1);
             SAXReader reader = new SAXReader();
             Document document = reader.read(resource.getURL());
             Element rootE = document.getRootElement();
@@ -291,18 +292,22 @@ public class ModuleInitializer implements WebApplicationInitializer {
         List<String> errorList = new ArrayList<>();
         Map<String, List<String>> moduleVersionListMap = new HashMap<>();
         //检查changelog下合法版本
-        Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/*/changelog/*/");
+        Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/*/changelog/*/*");
         for (Resource resource : resources) {
             //目前
             String fileName = resource.getURL().getPath().substring(0, resource.getURL().getPath().lastIndexOf("/"));
             String version = fileName.substring(fileName.lastIndexOf("/") + 1);
             if (!Objects.equals("changelog", version) && StringUtils.isNotBlank(version)) {
                 String path = resource.getURL().getPath();
-                path = path.substring(path.indexOf("!") + 1);
+//                path = path.substring(path.indexOf("!") + 1);
+                path = path.substring(path.lastIndexOf("/neatlogic/resources/"));
                 if (StringUtils.isNotBlank(path)) {
                     String moduleId = path.split("/")[3];
                     if (version.matches("\\d{4}-\\d{2}-\\d{2}(-\\d{2})?")) {
-                        moduleVersionListMap.computeIfAbsent(moduleId, k -> new ArrayList<>()).add(version);
+                        List<String> list = moduleVersionListMap.computeIfAbsent(moduleId, k -> new ArrayList<>());
+                        if (!list.contains(version)) {
+                            list.add(version);
+                        }
                     } else {
                         errorList.add(path);
                     }

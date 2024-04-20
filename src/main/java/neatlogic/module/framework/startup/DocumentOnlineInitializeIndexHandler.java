@@ -158,8 +158,10 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     }
                 }
                 String path = resource.getURL().getPath();
-                int separatorIndex = path.indexOf("!/");
-                String filePath = path.substring(separatorIndex + 2);
+//                int separatorIndex = path.indexOf("!/");
+//                String filePath = path.substring(separatorIndex + 2);
+                int separatorIndex = path.lastIndexOf("/neatlogic/resources/");
+                String filePath = path.substring(separatorIndex + 1);
                 if (existingFilePathList.contains(filePath)) {
                     logger.error($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.error", filePath));
                     System.exit(1);

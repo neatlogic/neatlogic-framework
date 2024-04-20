@@ -28,8 +28,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.PropertiesPersister;
 import org.springframework.util.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -481,11 +483,26 @@ public class ReloadableJsonBundleMessageSource extends AbstractResourceBasedMess
     }
 
     private Map<String, String> readJsonFile(Resource resource) throws IOException {
-        try (InputStream inputStream = resource.getInputStream()) {
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-            String json = new String(bytes);
-            JSONObject rawJsonObject = JSON.parseObject(json);
+//        try (InputStream inputStream = resource.getInputStream()) {
+//            byte[] bytes = new byte[inputStream.available()];
+//            inputStream.read(bytes);
+//            String json = new String(bytes);
+//            JSONObject rawJsonObject = JSON.parseObject(json);
+//            Map<String, String> flattenedMap = new HashMap<>();
+//            flattenMap("", rawJsonObject, flattenedMap);
+//            return flattenedMap;
+//        }
+        try (
+                InputStream inputStream = resource.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+        ) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String line = null;
+            while((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+            JSONObject rawJsonObject = JSON.parseObject(stringBuilder.toString());
             Map<String, String> flattenedMap = new HashMap<>();
             flattenMap("", rawJsonObject, flattenedMap);
             return flattenedMap;

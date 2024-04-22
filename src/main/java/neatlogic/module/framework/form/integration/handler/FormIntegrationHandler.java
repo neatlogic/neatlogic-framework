@@ -30,7 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ import java.util.stream.Collectors;
  * @author linbq
  * @since 2021/11/23 11:44
  **/
-@Component
+@Deprecated
 public class FormIntegrationHandler extends IntegrationHandlerBase {
     @Override
     public String getName() {

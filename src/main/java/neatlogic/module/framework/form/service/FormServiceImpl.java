@@ -858,10 +858,14 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 if (Objects.equals("formtable", dataObj.getString("handler"))) {
                     FormAttributeParentVo parent3 = new FormAttributeParentVo(dataObj.getString("uuid"), dataObj.getString("label"), parent2);
                     JSONObject config2 = dataObj.getJSONObject("config");
-                    JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
-                    for (int j = 0; j < dataConfigList2.size(); j++) {
-                        JSONObject dataObj2 = dataConfigList2.getJSONObject(j);
-                        resultList.addAll(getFormAttributeList(dataObj2, parent3));
+                    if (MapUtils.isNotEmpty(config2)) {
+                        JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
+                        if (CollectionUtils.isNotEmpty(dataConfigList2)) {
+                            for (int j = 0; j < dataConfigList2.size(); j++) {
+                                JSONObject dataObj2 = dataConfigList2.getJSONObject(j);
+                                resultList.addAll(getFormAttributeList(dataObj2, parent3));
+                            }
+                        }
                     }
                 }
             }

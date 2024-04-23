@@ -169,6 +169,9 @@ public class FileVo extends BaseEditorVo {
     }
 
     public String getType() {
+        if(StringUtils.isNotBlank(type)){
+            return type.toLowerCase();
+        }
         return type;
     }
 

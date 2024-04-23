@@ -218,7 +218,7 @@ public class FormVersionVo extends BaseEditorVo {
                             JSONObject controllerObj = controllerList.getJSONObject(i);
                             JSONObject config = controllerObj.getJSONObject("config");
                             if (MapUtils.isNotEmpty(config)) {
-                                formAttributeList.add(new FormAttributeVo(this.getFormUuid(), this.getUuid(), controllerObj.getString("uuid"), controllerObj.getString("label"), controllerObj.getString("type"), controllerObj.getString("handler"), config.getBooleanValue("isRequired"), controllerObj.getString("config"), config.getString("defaultValueList")));
+                                formAttributeList.add(new FormAttributeVo(this.getFormUuid(), this.getUuid(), controllerObj.getString("uuid"), controllerObj.getString("label"), controllerObj.getString("type"), controllerObj.getString("handler"), config.getBooleanValue("isRequired"), config, config.getString("defaultValueList")));
                             }
                         }
                     }
@@ -237,7 +237,7 @@ public class FormVersionVo extends BaseEditorVo {
             String handler = componentObj.getString("handler");
             boolean isRequired = config.getBooleanValue("isRequired");
             String defaultValue = config.getString("defaultValue");
-            return new FormAttributeVo(this.getFormUuid(), this.getUuid(), uuid, label, type, handler, isRequired, componentObj.getString("config"), defaultValue);
+            return new FormAttributeVo(this.getFormUuid(), this.getUuid(), uuid, label, type, handler, isRequired, config, defaultValue);
         }
         return null;
     }

@@ -91,4 +91,13 @@ public interface IFormCrossoverService extends ICrossoverService {
      * @return
      */
     String getFormAttributeHandler(String attributeUuid, String formConfig);
+
+    /**
+     * 获取表单组件列表
+     * @param formUuid 表单UUID
+     * @param formName 表单名
+     * @param tag 标签
+     * @return 组件列表
+     */
+    List<FormAttributeVo> getFormAttributeList(String formUuid, String formName, String tag);
 }

@@ -690,7 +690,7 @@ public class TableInputerHandler extends FormHandlerBase {
     public void makeupFormAttribute(FormAttributeVo formAttributeVo) {
         Set<String> matrixUuidSet = new HashSet<>();
         Map<String, Set<String>> matrixUuidAttributeUuidSetMap = new HashMap<>();
-        JSONObject config = formAttributeVo.getConfigObj();
+        JSONObject config = formAttributeVo.getConfig();
         /** 扩展属性 **/
         JSONArray attributeArray = config.getJSONArray("attributeList");
         if (CollectionUtils.isNotEmpty(attributeArray)) {

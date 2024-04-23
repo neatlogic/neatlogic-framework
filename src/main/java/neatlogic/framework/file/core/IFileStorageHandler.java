@@ -15,13 +15,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.file.core;
 
+import neatlogic.framework.file.dto.FileVo;
+
 import java.io.InputStream;
 
 public interface IFileStorageHandler {
 
     String getName();
 
-    String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception;
+    String saveData(String tenantUuid, InputStream inputStream, FileVo file) throws Exception;
 
     InputStream getData(String path) throws Exception;
 

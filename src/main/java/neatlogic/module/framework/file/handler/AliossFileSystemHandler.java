@@ -9,6 +9,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import neatlogic.framework.file.core.IFileStorageHandler;
+import neatlogic.framework.file.dto.FileVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -54,11 +55,11 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
     /**
      * @param tenantUuid  租户uuid
      * @param inputStream 输入流
-     * @param contentType contentType
+     * @param file 文件
      * @return 附件路径
      */
     @Override
-    public String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
+    public String saveData(String tenantUuid, InputStream inputStream, FileVo file) throws Exception {
         String bucket = Config.getConfigProperty("alioss.bucket", "neatlogic");
         if (ossClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("alioss");
@@ -70,10 +71,10 @@ public class AliossFileSystemHandler implements InitializingBean, IFileStorageHa
             ossClient.createBucket(Config.getConfigProperty("alioss.bucket", "neatlogic"));
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
-        String finalPath = "/" + tenantUuid + "/upload/" + fileType + "/" + format.format(new Date()) + "/" + fileId;
+        String finalPath = "/" + tenantUuid + "/upload/" + file.getType() + "/" + format.format(new Date()) + "/" + file.getPathName();
         // 使用putObject上传一个文件到存储桶中
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentType(contentType);
+        metadata.setContentType(file.getContentType());
         ossClient.putObject(bucket, finalPath, inputStream, metadata);
 //		fileVo.setPath("minio:" + finalPath);
         return AliossFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;

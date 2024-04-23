@@ -20,6 +20,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import neatlogic.framework.file.core.IFileStorageHandler;
+import neatlogic.framework.file.dto.FileVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
@@ -53,11 +54,11 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
     /**
      * @param tenantUuid  租户uuid
      * @param inputStream 输入流
-     * @param contentType contentType
+     * @param fileParam 文件
      * @return 附件路径
      */
     @Override
-    public String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
+    public String saveData(String tenantUuid, InputStream inputStream, FileVo fileParam) throws Exception {
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
@@ -68,9 +69,9 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
             minioClient.makeBucket(Config.getConfigProperty("minio.bucket", "neatlogic"));
         }
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
-        String finalPath = "/" + tenantUuid + "/upload/" + fileType + "/" + format.format(new Date()) + "/" + fileId;
+        String finalPath = "/" + tenantUuid + "/upload/" + fileParam.getType() + "/" + format.format(new Date()) + "/" + fileParam.getPathName();
         // 使用putObject上传一个文件到存储桶中
-        minioClient.putObject(Config.getConfigProperty("minio.bucket", "neatlogic"), finalPath, inputStream, contentType);
+        minioClient.putObject(Config.getConfigProperty("minio.bucket", "neatlogic"), finalPath, inputStream, fileParam.getContentType());
 //		fileVo.setPath("minio:" + finalPath);
         return MinioFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
     }

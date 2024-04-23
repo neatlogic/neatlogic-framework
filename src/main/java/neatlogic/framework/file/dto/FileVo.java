@@ -38,6 +38,8 @@ public class FileVo extends BaseEditorVo {
     private String path;
     @EntityField(name = "附件名称", type = ApiParamType.STRING)
     private String name;
+    @EntityField(name = "路径附件名称", type = ApiParamType.STRING)
+    private String pathName;
     @EntityField(name = "附件大小（字节）", type = ApiParamType.INTEGER)
     private Long size;
     @EntityField(name = "附件大小", type = ApiParamType.STRING)
@@ -201,4 +203,14 @@ public class FileVo extends BaseEditorVo {
         this.url = url;
     }
 
+    public String getPathName() {
+        if(StringUtils.isBlank(pathName)){
+            pathName = getId().toString();
+        }
+        return pathName;
+    }
+
+    public void setPathName(String pathName) {
+        this.pathName = pathName;
+    }
 }

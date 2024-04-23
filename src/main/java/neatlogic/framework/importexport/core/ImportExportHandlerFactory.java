@@ -281,7 +281,7 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                             out.write(buf, 0, len);
                         }
                         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-                        String filePath = FileUtil.saveData(tenantUuid, in, fileVo.getId().toString(), fileVo.getContentType(), fileVo.getType());
+                        String filePath = FileUtil.saveData(tenantUuid, in, fileVo);
                         in.close();
                         fileVo.setPath(filePath);
                         fileMapper.updateFile(fileVo);

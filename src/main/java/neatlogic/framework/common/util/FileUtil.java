@@ -20,6 +20,7 @@ import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import neatlogic.framework.file.core.FileStorageMediumFactory;
 import neatlogic.framework.file.core.IFileStorageHandler;
+import neatlogic.framework.file.dto.FileVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +37,11 @@ public class FileUtil {
      *
      * @param tenantUuid  租户uuid
      * @param inputStream 文件流
-     * @param fileId      文件id
-     * @param contentType 附件类型
-     * @param fileType    附件类型
+     * @param file      文件
      * @return 附件路径
      * @throws Exception 异常
      */
-    public static String saveData(String tenantUuid, InputStream inputStream, String fileId, String contentType, String fileType) throws Exception {
+    public static String saveData(String tenantUuid, InputStream inputStream, FileVo file) throws Exception {
         IFileStorageHandler handler = null;
         String filePath = null;
         try {
@@ -50,12 +49,12 @@ public class FileUtil {
             if (handler == null) {
                 throw new FileStorageMediumHandlerNotFoundException(Config.FILE_HANDLER());
             }
-            filePath = handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
+            filePath = handler.saveData(tenantUuid, inputStream, file);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             if (!Objects.equals(Config.FILE_HANDLER(), "FILE")) {
                 handler = FileStorageMediumFactory.getHandler("FILE");
-                filePath = handler.saveData(tenantUuid, inputStream, fileId, contentType, fileType);
+                filePath = handler.saveData(tenantUuid, inputStream, file);
             }
         }
         return filePath;

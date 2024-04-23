@@ -20,6 +20,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.audit.AuditVoHandler;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.exception.file.FilePathIllegalException;
+import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.restful.dao.mapper.ApiAuditMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +64,7 @@ public class AuditUtil {
           例如参数的开始坐标为"param>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"的字节数
           偏移量为apiAuditVo.getParam()的字节数(注意一定要用UTF-8格式，否则计算出来的偏移量不对)
          */
-        String paramFilePath = null;
+            String paramFilePath = null;
         String resultFilePath = null;
         String errorFilePath = null;
         StringBuilder sb = new StringBuilder();
@@ -105,7 +106,11 @@ public class AuditUtil {
         if (StringUtils.isBlank(filePath)) {
             InputStream inputStream = IOUtils.toInputStream(sb.toString(), StandardCharsets.UTF_8);
             try {
-                filePath = FileUtil.saveData(TenantContext.get().getTenantUuid(), inputStream, fileHash, "text/plain", fileType);
+                FileVo file = new FileVo();
+                file.setPathName(fileHash);
+                file.setContentType("text/plain");
+                file.setType(fileType);
+                filePath = FileUtil.saveData(TenantContext.get().getTenantUuid(), inputStream, file);
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
             } finally {

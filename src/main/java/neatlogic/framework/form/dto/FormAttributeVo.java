@@ -31,39 +31,39 @@ import java.util.*;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
-    @EntityField(name = "属性uuid", type = ApiParamType.STRING)
+    @EntityField(name = "common.uuid", type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "表单uuid", type = ApiParamType.STRING)
+    @EntityField(name = "common.framework.formuuid", type = ApiParamType.STRING)
     private String formUuid;
-    @EntityField(name = "表单版本uuid", type = ApiParamType.STRING)
+    @EntityField(name = "common.framework.formversionuuid", type = ApiParamType.STRING)
     private String formVersionUuid;
-    @EntityField(name = "父级uuid", type = ApiParamType.STRING)
+    @EntityField(name = "common.parentuuid", type = ApiParamType.STRING)
     private String parentUuid;
-    @EntityField(name = "标签", type = ApiParamType.STRING)
+    @EntityField(name = "common.tag", type = ApiParamType.STRING)
     private String tag;
-    @EntityField(name = "属性key", type = ApiParamType.STRING)
+    @EntityField(name = "common.key", type = ApiParamType.STRING)
     private String key;
-    @EntityField(name = "属性标签名", type = ApiParamType.STRING)
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String label;
-    @EntityField(name = "类型", type = ApiParamType.STRING)
+    @EntityField(name = "common.type", type = ApiParamType.STRING)
     private String type;
-    @EntityField(name = "处理器", type = ApiParamType.STRING)
+    @EntityField(name = "common.handler", type = ApiParamType.STRING)
     private String handler;
-    @EntityField(name = "属性配置", type = ApiParamType.STRING)
+    @EntityField(name = "common.config", type = ApiParamType.STRING)
     private JSONObject config;
-    @EntityField(name = "属性数据", type = ApiParamType.STRING)
+    @EntityField(name = "common.data", type = ApiParamType.STRING)
     private String data;
-    @EntityField(name = "是否必填", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "common.isrequired", type = ApiParamType.BOOLEAN)
     private boolean isRequired;
-    @EntityField(name = "表达式列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.expressionlist", type = ApiParamType.JSONARRAY)
     List<ExpressionVo> expressionList;
-    @EntityField(name = "默认表达式", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "common.defaultexpression", type = ApiParamType.JSONOBJECT)
     ExpressionVo defaultExpression;
-    @EntityField(name = "供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "common.framework.isuseformconfig", type = ApiParamType.BOOLEAN)
     private boolean isUseFormConfig;
-    @EntityField(name = "服务uuid，当表单属性作为工单中心搜索条件时需要使用此属性进行对应", type = ApiParamType.STRING)
+    @EntityField(name = "term.itsm.channeluuid", type = ApiParamType.STRING, help = "当表单属性作为工单中心搜索条件时需要使用此属性进行对应")
     private String channelUuid;
-    @EntityField(name = "条件模型")
+    @EntityField(name = "common.framework.formconditionmodel")
     private FormConditionModel conditionModel = FormConditionModel.CUSTOM;
 
     @JSONField(serialize = false)

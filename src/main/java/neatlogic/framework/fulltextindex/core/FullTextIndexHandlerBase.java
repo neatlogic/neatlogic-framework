@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.fulltextindex.core;
 
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.exception.core.ApiRuntimeException;
@@ -25,6 +26,7 @@ import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexWordMapper;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.*;
 import neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo;
 import neatlogic.framework.fulltextindex.enums.Status;
+import neatlogic.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +46,7 @@ import java.util.Locale;
 import java.util.Set;
 
 public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler {
-    private final static Logger logger = LoggerFactory.getLogger(FullTextIndexHandlerBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(FullTextIndexHandlerBase.class);
     static Tidy tidy = new Tidy();
 
     static {
@@ -66,6 +68,9 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     @Resource
     private FullTextIndexRebuildAuditMapper fullTextIndexRebuildAuditMapper;
+
+    @Resource
+    private DatabaseFragmentMapper databaseFragmentMapper;
 
     /*
      * @Description: 返回模块名，mybatis拦截器需要根据模块名自动选择合适表，要注意编写的正确性
@@ -261,6 +266,11 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         if (isRebuildAll) {
             //删除所有已经创建的索引
             fullTextIndexMapper.deleteFullTextIndexByType(fullTextIndexTypeVo);
+            databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_target_" + fullTextIndexTypeVo.getModuleId());
+            databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_field_" + fullTextIndexTypeVo.getModuleId());
+            databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_offset_" + fullTextIndexTypeVo.getModuleId());
+            databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_content_" + fullTextIndexTypeVo.getModuleId());
+
         }
         CachedThreadPool.execute(new RebuildRunner(fullTextIndexTypeVo, auditVo));
     }

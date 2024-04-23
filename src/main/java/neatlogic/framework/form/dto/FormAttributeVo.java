@@ -15,7 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.form.dto;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
@@ -26,44 +25,46 @@ import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
-    @EntityField(name = "属性uuid", type = ApiParamType.STRING)
+    @EntityField(name = "common.uuid", type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "表单uuid", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.formuuid", type = ApiParamType.STRING)
     private String formUuid;
-    @EntityField(name = "表单版本uuid", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.formversionuuid", type = ApiParamType.STRING)
     private String formVersionUuid;
-    @EntityField(name = "属性标签名", type = ApiParamType.STRING)
+    @EntityField(name = "common.parentuuid", type = ApiParamType.STRING)
+    private String parentUuid;
+    @EntityField(name = "common.tag", type = ApiParamType.STRING)
+    private String tag;
+    @EntityField(name = "common.key", type = ApiParamType.STRING)
+    private String key;
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String label;
-    @EntityField(name = "类型", type = ApiParamType.STRING)
+    @EntityField(name = "common.type", type = ApiParamType.STRING)
     private String type;
-    @EntityField(name = "处理器", type = ApiParamType.STRING)
+    @EntityField(name = "common.handler", type = ApiParamType.STRING)
     private String handler;
-    @EntityField(name = "属性配置", type = ApiParamType.STRING)
-    private String config;
-    @EntityField(name = "属性数据", type = ApiParamType.STRING)
+    @EntityField(name = "common.config", type = ApiParamType.STRING)
+    private JSONObject config;
+    @EntityField(name = "common.data", type = ApiParamType.STRING)
     private String data;
-    @EntityField(name = "是否必填", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "common.isrequired", type = ApiParamType.BOOLEAN)
     private boolean isRequired;
-    @EntityField(name = "表达式列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "common.expressionlist", type = ApiParamType.JSONARRAY)
     List<ExpressionVo> expressionList;
-    @EntityField(name = "默认表达式", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "common.defaultexpression", type = ApiParamType.JSONOBJECT)
     ExpressionVo defaultExpression;
-    @EntityField(name = "供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "nffd.formattributevo.entityfield.name", type = ApiParamType.BOOLEAN)
     private boolean isUseFormConfig;
-    @EntityField(name = "服务uuid，当表单属性作为工单中心搜索条件时需要使用此属性进行对应", type = ApiParamType.STRING)
+    @EntityField(name = "term.itsm.channeluuid", type = ApiParamType.STRING, help = "当表单属性作为工单中心搜索条件时需要使用此属性进行对应")
     private String channelUuid;
-    @EntityField(name = "条件模型")
+    @EntityField(name = "term.framework.conditionmodel")
     private FormConditionModel conditionModel = FormConditionModel.CUSTOM;
-
-    @JSONField(serialize = false)
-    private JSONObject configObj;
 
     @JSONField(serialize = false)
     private Set<String> integrationUuidSet;
@@ -75,6 +76,9 @@ public class FormAttributeVo implements Serializable {
     private Map<String, Set<String>> matrixUuidAttributeUuidSetMap;
 
     private FormAttributeParentVo parent;
+
+    @JSONField(serialize = false)
+    private String configStr;
 
     public FormAttributeVo() {
 
@@ -90,7 +94,7 @@ public class FormAttributeVo implements Serializable {
     }
 
     public FormAttributeVo(String formUuid, String formVersionUuid, String uuid, String label, String type,
-                           String handler, boolean isRequired, String config, String data) {
+                           String handler, boolean isRequired, JSONObject config, String data) {
         this.uuid = uuid;
         this.formUuid = formUuid;
         this.formVersionUuid = formVersionUuid;
@@ -158,11 +162,14 @@ public class FormAttributeVo implements Serializable {
         this.handler = handler;
     }
 
-    public String getConfig() {
+    public JSONObject getConfig() {
+        if (config == null && configStr != null) {
+            config = JSONObject.parseObject(configStr);
+        }
         return config;
     }
 
-    public void setConfig(String config) {
+    public void setConfig(JSONObject config) {
         this.config = config;
     }
 
@@ -254,6 +261,9 @@ public class FormAttributeVo implements Serializable {
             return null;
         }
         IFormAttributeHandler formHandler = FormAttributeHandlerFactory.getHandler(handler);
+        if (formHandler == null) {
+            return null;
+        }
         return formHandler.getHandlerType(conditionModel);
     }
 
@@ -262,8 +272,7 @@ public class FormAttributeVo implements Serializable {
             return null;
         }
         if ("formselect".equals(handler)) {
-            JSONObject configObj = JSON.parseObject(config);
-            return configObj.getBoolean("isMultiple");
+            return config.getBoolean("isMultiple");
         }
 
         if (conditionModel!= null && Objects.equals(conditionModel.getValue(), FormConditionModel.CUSTOM.getValue())) {
@@ -282,13 +291,6 @@ public class FormAttributeVo implements Serializable {
 
     public void setIsUseFormConfig(Boolean isUseFormConfig) {
         this.isUseFormConfig = isUseFormConfig;
-    }
-
-    public JSONObject getConfigObj() {
-        if (configObj == null && StringUtils.isNotBlank(config)) {
-            configObj = JSONObject.parseObject(config);
-        }
-        return configObj;
     }
 
     public Set<String> getIntegrationUuidSet() {
@@ -321,5 +323,40 @@ public class FormAttributeVo implements Serializable {
 
     public void setParent(FormAttributeParentVo parent) {
         this.parent = parent;
+    }
+
+    public String getParentUuid() {
+        return parentUuid;
+    }
+
+    public void setParentUuid(String parentUuid) {
+        this.parentUuid = parentUuid;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getConfigStr() {
+        if (configStr == null && config != null) {
+            configStr = config.toJSONString();
+        }
+        return configStr;
+    }
+
+    public void setConfigStr(String configStr) {
+        this.configStr = configStr;
     }
 }

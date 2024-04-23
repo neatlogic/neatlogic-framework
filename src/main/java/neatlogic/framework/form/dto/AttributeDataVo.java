@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 public class AttributeDataVo implements Comparable<AttributeDataVo> {
     private Long id;
     private String formUuid;
+    private String tag;
     private String attributeUuid;
     private String attributeLabel;
     private String handler;
@@ -77,6 +78,14 @@ public class AttributeDataVo implements Comparable<AttributeDataVo> {
 
     public void setHandler(String handler) {
         this.handler = handler;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 
     public String getData() {

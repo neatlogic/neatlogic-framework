@@ -18,6 +18,7 @@ package neatlogic.framework.form.dao.mapper;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.form.dto.*;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -67,6 +68,8 @@ public interface FormMapper {
 
     List<FormAttributeVo> getFormAttributeListByFormUuidList(List<String> formUuidList);
 
+    List<FormAttributeVo> getFormExtendAttributeListByFormUuidAndFormVersionUuid(@Param("formUuid") String formUuid, @Param("formVersionUuid") String formVersionUuid);
+
     int getFormAttributeMatrixCount();
 
     List<Map<String, Object>> getFormAttributeMatrixList(BasePageVo searchVo);
@@ -97,7 +100,11 @@ public interface FormMapper {
 
     int insertFormAttribute(FormAttributeVo formAttributeVo);
 
+    int insertFormExtendAttribute(FormAttributeVo formAttributeVo);
+
     int insertFormAttributeData(AttributeDataVo attributeDataVo);
+
+    int insertFormExtendAttributeData(AttributeDataVo attributeDataVo);
 
     int deleteFormAttributeByFormUuid(String formUuid);
 
@@ -110,4 +117,8 @@ public interface FormMapper {
     void deleteFormCustomItem(Long id);
 
     int deleteFormAttributeDataByIdList(List<Long> idList);
+
+    int deleteFormExtendAttributeDataByIdList(List<Long> idList);
+
+    int deleteFormExtendAttributeByFormUuidAndFormVersionUuid(@Param("formUuid") String formUuid, @Param("formVersionUuid") String currentVersionUuid);
 }

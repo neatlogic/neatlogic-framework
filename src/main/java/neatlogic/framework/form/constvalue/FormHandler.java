@@ -40,7 +40,8 @@ public enum FormHandler implements IFormHandler {
     FORMRATE("formrate", "评分"),
     FORMTAB("formtab", "选项卡"),
     FORMCOLLAPSE("formcollapse", "折叠面板"),
-    FORMSUBASSEMBLY("formsubassembly", "子表单");
+    FORMSUBASSEMBLY("formsubassembly", "子表单"),
+    FORMCUSTOM("formcustom", "自定义组件");
 
     private final String handler;
     private final String handlerName;

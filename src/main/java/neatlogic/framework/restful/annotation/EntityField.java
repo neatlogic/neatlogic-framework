@@ -1,12 +1,8 @@
 package neatlogic.framework.restful.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import neatlogic.framework.common.constvalue.ApiParamType;
+
+import java.lang.annotation.*;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -18,5 +14,7 @@ public @interface EntityField {
     ApiParamType type() default ApiParamType.STRING;
 
     Class<?> member() default NotDefined.class;// 值成员
+
+    String help() default "";
 
 }

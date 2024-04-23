@@ -23,11 +23,13 @@ import neatlogic.framework.dependency.core.DependencyManager;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormHandler;
+import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeParentVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormActiveVersionNotFoundExcepiton;
 import neatlogic.framework.form.service.IFormCrossoverService;
 import neatlogic.framework.matrix.constvalue.SearchExpression;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
@@ -59,6 +61,9 @@ import java.util.stream.Collectors;
 @Service
 public class FormServiceImpl implements FormService, IFormCrossoverService {
     private static final Logger logger = LoggerFactory.getLogger(FormServiceImpl.class);
+
+    @Resource
+    private FormMapper formMapper;
 
     @Resource
     private MatrixMapper matrixMapper;
@@ -924,9 +929,42 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             formAttributeVo.setRequired(isRequired);
             String defaultValue = config.getString("defaultValue");
             formAttributeVo.setData(defaultValue);
-            formAttributeVo.setConfig(config.toJSONString());
+            formAttributeVo.setConfig(config);
         }
         formAttributeVo.setParent(parent);
         return formAttributeVo;
+    }
+
+    @Override
+    public List<FormAttributeVo> getFormAttributeList(String formUuid, String formName, String tag) {
+        FormVersionVo formVersion = formMapper.getActionFormVersionByFormUuid(formUuid);
+        if (formVersion == null) {
+            throw new FormActiveVersionNotFoundExcepiton(formName);
+        }
+        FormAttributeVo searchVo = new FormAttributeVo();
+        searchVo.setFormUuid(formUuid);
+        searchVo.setFormVersionUuid(formVersion.getUuid());
+        List<FormAttributeVo> formAttributeList = formMapper.getFormAttributeList(searchVo);
+        if (StringUtils.isBlank(tag)) {
+            return formAttributeList;
+        }
+        List<FormAttributeVo> resultList = new ArrayList<>();
+        List<String> parentUuidList = new ArrayList<>();
+        List<FormAttributeVo> formExtendAttributeList = new ArrayList<>();
+        List<FormAttributeVo> list = formMapper.getFormExtendAttributeListByFormUuidAndFormVersionUuid(formUuid, formVersion.getUuid());
+        for (FormAttributeVo formAttributeVo : list) {
+            if (Objects.equals(formAttributeVo.getTag(), tag)) {
+                formExtendAttributeList.add(formAttributeVo);
+                parentUuidList.add(formAttributeVo.getParentUuid());
+            }
+        }
+        for (FormAttributeVo formAttributeVo : formAttributeList) {
+            if (parentUuidList.contains(formAttributeVo.getUuid())) {
+                continue;
+            }
+            resultList.add(formAttributeVo);
+        }
+        resultList.addAll(formExtendAttributeList);
+        return resultList;
     }
 }

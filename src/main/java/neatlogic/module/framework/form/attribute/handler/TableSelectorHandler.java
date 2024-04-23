@@ -539,7 +539,7 @@ public class TableSelectorHandler extends FormHandlerBase {
         Set<String> integrationUuidSet = new HashSet<>();
         Set<String> matrixUuidSet = new HashSet<>();
         Map<String, Set<String>> matrixUuidAttributeUuidSetMap = new HashMap<>();
-        JSONObject config = formAttributeVo.getConfigObj();
+        JSONObject config = formAttributeVo.getConfig();
         String dataSource = config.getString("dataSource");
         if ("matrix".equals(dataSource)) {
             String matrixUuid = config.getString("matrixUuid");

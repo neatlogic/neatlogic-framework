@@ -33,9 +33,9 @@ public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
     @EntityField(name = "common.uuid", type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "common.framework.formuuid", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.formuuid", type = ApiParamType.STRING)
     private String formUuid;
-    @EntityField(name = "common.framework.formversionuuid", type = ApiParamType.STRING)
+    @EntityField(name = "term.framework.formversionuuid", type = ApiParamType.STRING)
     private String formVersionUuid;
     @EntityField(name = "common.parentuuid", type = ApiParamType.STRING)
     private String parentUuid;
@@ -59,11 +59,11 @@ public class FormAttributeVo implements Serializable {
     List<ExpressionVo> expressionList;
     @EntityField(name = "common.defaultexpression", type = ApiParamType.JSONOBJECT)
     ExpressionVo defaultExpression;
-    @EntityField(name = "common.framework.isuseformconfig", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "nffd.formattributevo.entityfield.name", type = ApiParamType.BOOLEAN)
     private boolean isUseFormConfig;
     @EntityField(name = "term.itsm.channeluuid", type = ApiParamType.STRING, help = "当表单属性作为工单中心搜索条件时需要使用此属性进行对应")
     private String channelUuid;
-    @EntityField(name = "common.framework.formconditionmodel")
+    @EntityField(name = "term.framework.conditionmodel")
     private FormConditionModel conditionModel = FormConditionModel.CUSTOM;
 
     @JSONField(serialize = false)

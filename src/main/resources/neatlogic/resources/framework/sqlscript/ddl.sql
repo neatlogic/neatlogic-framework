@@ -1472,7 +1472,7 @@ CREATE TABLE IF NOT EXISTS `extramenu_authority`
     PRIMARY KEY (`form_version_uuid`,`matrix_uuid`,`form_attribute_uuid`) USING BTREE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单属性引用矩阵关系表';
 
-CREATE TABLE `form_extend_attribute` (
+CREATE TABLE IF NOT EXISTS `form_extend_attribute` (
     `form_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单uuid',
     `formversion_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单版本uuid',
     `parent_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '属性父级uuid',
@@ -1486,7 +1486,7 @@ CREATE TABLE `form_extend_attribute` (
     PRIMARY KEY (`form_uuid`,`tag`,`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='表单版本扩展属性';
 
-CREATE TABLE `form_extend_attribute_data` (
+CREATE TABLE IF NOT EXISTS `form_extend_attribute_data` (
     `id` bigint NOT NULL COMMENT 'id',
     `form_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '表单uuid',
     `handler` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',

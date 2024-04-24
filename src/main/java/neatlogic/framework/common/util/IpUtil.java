@@ -1,6 +1,8 @@
 package neatlogic.framework.common.util;
 
+import neatlogic.framework.exception.runner.IPIsIncorrectException;
 import neatlogic.framework.exception.util.IpSubnetMaskException;
+import neatlogic.framework.util.RegexUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +49,9 @@ public class IpUtil {
         if (StringUtils.isEmpty(ip)) {
             return false;
         }
+        if(!RegexUtils.isMatch(ip,RegexUtils.IP)){
+            throw new IPIsIncorrectException(ip);
+        }
         if(subnetMask == 0){ //掩码为0则表示匹配所有ip -by波哥
             return true;
         }
@@ -61,7 +66,7 @@ public class IpUtil {
             int cidrIpAddr = (Integer.parseInt(cidrIps[0]) << 24) | (Integer.parseInt(cidrIps[1]) << 16) | (Integer.parseInt(cidrIps[2]) << 8) | Integer.parseInt(cidrIps[3]);
             return (ipAddr & mask) == (cidrIpAddr & mask);
         } catch (Exception ex) {
-            throw new IpSubnetMaskException(ip + " " + networkIp + " " + subnetMask);
+            throw new IpSubnetMaskException(ip,networkIp + "/" + subnetMask);
         }
     }
 

@@ -12,7 +12,7 @@ import neatlogic.framework.form.dto.FormAttributeParentVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.dto.FormVo;
-import neatlogic.module.framework.form.service.FormService;
+import neatlogic.framework.util.FormUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -26,9 +26,6 @@ public class Matrix2FormAttributeDependencyHandler extends FixedTableDependencyH
 
     @Resource
     private FormMapper formMapper;
-
-    @Resource
-    private FormService formService;
 
     @Override
     protected DependencyInfoVo parse(DependencyVo dependencyVo) {
@@ -56,7 +53,7 @@ public class Matrix2FormAttributeDependencyHandler extends FixedTableDependencyH
         pathList.add(formVo.getName());
         pathList.add(formVersionVo.getVersion().toString());
         String sceneUuid = config.getString("sceneUuid");
-        FormAttributeVo formAttribute = formService.getFormAttribute(formVersionVo.getFormConfig(), dependencyVo.getTo(), sceneUuid);
+        FormAttributeVo formAttribute = FormUtil.getFormAttribute(formVersionVo.getFormConfig(), dependencyVo.getTo(), sceneUuid);
         if (formAttribute == null) {
             return null;
         }

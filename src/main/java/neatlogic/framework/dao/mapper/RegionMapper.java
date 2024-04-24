@@ -17,6 +17,9 @@
 
 package neatlogic.framework.dao.mapper;
 
+import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.dto.TeamVo;
+import neatlogic.framework.dto.region.RegionTeamVo;
 import neatlogic.framework.dto.region.RegionVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -36,5 +39,19 @@ public interface RegionMapper {
 
     List<RegionVo> searchRegion(RegionVo region);
 
+    int searchRegionTeamCount(RegionTeamVo region);
+
+    List<TeamVo> searchRegionTeam(RegionTeamVo region);
+
     void insertRegion(RegionVo region);
+
+    void deleteRegionById(Long id);
+
+    void insertRegionTeam(RegionTeamVo regionTeamVo);
+
+    void deleteRegionExpired(@Param("regionId") Long regionId,@Param("type") String type,@Param("updateTime") Long updateTime);
+
+    void deleteRegionTeamByRegionId(Long id);
+
+    void deleteRegionTeamByRegionIdAndTypeAndTeamUuidList(@Param("regionId") Long regionId,@Param("type") String type,@Param("teamUuidArray") JSONArray teamUuidArray);
 }

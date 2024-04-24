@@ -24,12 +24,11 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RegionVo extends BasePageVo implements Serializable {
+public class RegionVo extends BasePageVo{
     public final static Long ROOT_ID = 0L;
     public final static Long ROOT_PARENTID = -1L;
     @EntityField(name = "id", type = ApiParamType.LONG)
@@ -56,7 +55,7 @@ public class RegionVo extends BasePageVo implements Serializable {
 
     public Long getId() {
         if(id == null){
-            return SnowflakeUtil.uniqueLong();
+           id = SnowflakeUtil.uniqueLong();
         }
         return id;
     }

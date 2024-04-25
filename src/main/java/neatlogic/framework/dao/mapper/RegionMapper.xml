@@ -115,6 +115,12 @@
         where rt.`region_id` = #{regionId}
           and rt.`type` = #{type}
     </select>
+    <select id="checkRegionNameIsRepeat" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM `region` where `parent_id`=#{parentId} AND `name`=#{name} AND `id`!=#{id}
+    </select>
+    <select id="getParentIdById" resultType="java.lang.Long">
+        SELECT `parent_id` FROM `region` where `id`=#{value}
+    </select>
 
     <insert id="insertRegion">
         insert into `region` (`id`, `name`, `parent_id`, `worktime_uuid`, `is_active`)

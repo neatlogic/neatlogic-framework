@@ -43,6 +43,10 @@ public interface RegionMapper {
 
     List<TeamVo> searchRegionTeam(RegionTeamVo region);
 
+    int checkRegionNameIsRepeat(RegionVo regionVo);
+
+    Long getParentIdById(Long id);
+
     void insertRegion(RegionVo region);
 
     void deleteRegionById(Long id);

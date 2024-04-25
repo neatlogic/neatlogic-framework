@@ -45,6 +45,11 @@ public class RegionTeamVo extends BasePageVo {
         this.updateTime = updateTime;
     }
 
+    public RegionTeamVo(Long regionId, String type) {
+        this.regionId = regionId;
+        this.type = type;
+    }
+
 
     public Long getRegionId() {
         return regionId;

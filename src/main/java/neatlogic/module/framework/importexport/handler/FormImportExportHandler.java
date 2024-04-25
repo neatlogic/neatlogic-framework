@@ -3,7 +3,6 @@ package neatlogic.module.framework.importexport.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
-import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.FormAttributeVo;
@@ -11,13 +10,13 @@ import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.dto.FormVo;
 import neatlogic.framework.form.exception.FormActiveVersionNotFoundExcepiton;
 import neatlogic.framework.form.exception.FormNotFoundException;
-import neatlogic.framework.form.service.IFormCrossoverService;
 import neatlogic.framework.importexport.constvalue.FrameworkImportExportHandlerType;
 import neatlogic.framework.importexport.core.ImportExportHandlerBase;
 import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.importexport.dto.ImportExportBaseInfoVo;
 import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
+import neatlogic.framework.util.FormUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -104,14 +103,13 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
 
         importHandle(formVersion, primaryChangeList);
 
-        IFormCrossoverService formCrossoverService = CrossoverServiceFactory.getApi(IFormCrossoverService.class);
         // 处理表单版本
         formVersion.setFormUuid(form.getUuid());
         formVersion.setIsActive(0);
         FormVersionVo oldFormVersion = formMapper.getFormVersionByUuid(formVersion.getUuid());
         if (oldFormVersion != null) {
             // 删除依赖
-            formCrossoverService.deleteDependency(oldFormVersion);
+            FormUtil.deleteDependency(oldFormVersion);
             formVersion.setLcu(UserContext.get().getUserUuid());
             formMapper.updateFormVersion(formVersion);
         } else {
@@ -126,7 +124,7 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
             formMapper.insertFormVersion(formVersion);
         }
         // 插入依赖
-        formCrossoverService.saveDependency(formVersion);
+        FormUtil.saveDependency(formVersion);
         List<FormAttributeVo> formAttributeList = formVersion.getFormAttributeList();
         // 激活版本
         FormVersionVo oldActiveFormVersion = formMapper.getActionFormVersionByFormUuid(form.getUuid());

@@ -536,8 +536,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </delete>
 
     <insert id="insertRunnerMap">
-        INSERT IGNORE INTO `runner_map` (`id`, `runner_id`)
-        VALUES (#{runnerMapId}, #{id});
+        INSERT INTO `runner_map` (`id`, `runner_id`)
+        VALUES (#{runnerMapId}, #{id})
+        ON DUPLICATE KEY UPDATE `runner_id` = #{id} ;
     </insert>
 
     <insert id="insertNetwork" parameterType="neatlogic.framework.dto.runner.GroupNetworkVo">

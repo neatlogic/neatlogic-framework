@@ -18,17 +18,20 @@ package neatlogic.framework.util.javascript.expressionHandler;
 import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ValueIsNotContainException;
+import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class like {
-    private final static Logger logger = LoggerFactory.getLogger(like.class);
+    private static final Logger logger = LoggerFactory.getLogger(like.class);
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-
+        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             if (dataValueList.size() == conditionValueList.size()) {
                 //单值判断
@@ -38,14 +41,22 @@ public class like {
                     if (dataValue.contains(conditionValue)) {
                         return true;
                     } else {
-                        logger.error(new ValueIsNotContainException(prefix, dataValue, conditionValue).getMessage());
+                        ApiRuntimeException error = new ValueIsNotContainException(prefix, dataValue, conditionValue);
+                        if (errorList != null) {
+                            errorList.add(error);
+                        }
+                        logger.error(error.getMessage());
                         return false;
                     }
                 } else {
                     for (int i = 0; i < conditionValueList.size(); i++) {
                         String cValue = conditionValueList.getString(i);
                         if (dataValueList.stream().noneMatch(d -> d.toString().equals(cValue))) {
-                            logger.error(new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                            ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                            if (errorList != null) {
+                                errorList.add(error);
+                            }
+                            logger.error(error.getMessage());
                             return false;
                         }
                     }
@@ -55,18 +66,30 @@ public class like {
                 for (int i = 0; i < conditionValueList.size(); i++) {
                     String cValue = conditionValueList.getString(i);
                     if (dataValueList.stream().noneMatch(d -> d.toString().equals(cValue))) {
-                        logger.error(new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                        ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                        if (errorList != null) {
+                            errorList.add(error);
+                        }
+                        logger.error(error.getMessage());
                         return false;
                     }
                 }
                 return true;
             } else {
-                logger.error(new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                if (errorList != null) {
+                    errorList.add(error);
+                }
+                logger.error(error.getMessage());
                 return false;
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-                logger.error(new ApiRuntimeException(prefix).getMessage());
+                ApiRuntimeException error = new ApiRuntimeException(prefix);
+                if (errorList != null) {
+                    errorList.add(error);
+                }
+                logger.error(error.getMessage());
                 return false;
             } else {
                 return true;

@@ -16,40 +16,60 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.util.javascript.expressionHandler;
 
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ValueConNotNullException;
 import neatlogic.framework.exception.util.javascript.ValueIsNotEqualException;
 import neatlogic.framework.exception.util.javascript.ValueNeedNullException;
+import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class equal {
-    private final static Logger logger = LoggerFactory.getLogger(equal.class);
+    private static final Logger logger = LoggerFactory.getLogger(equal.class);
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
+        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             if (dataValueList.size() == conditionValueList.size()) {
                 dataValueList.sort(Comparator.comparing(Object::toString));
                 conditionValueList.sort(Comparator.comparing(Object::toString));
                 if (!dataValueList.toString().equals(conditionValueList.toString())) {
-                    logger.error(new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                    ApiRuntimeException error = new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                    if (errorList != null) {
+                        errorList.add(error);
+                    }
+                    logger.error(error.getMessage());
                     return false;
                 }
                 return true;
             } else {
-                logger.error(new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList)).getMessage());
+                ApiRuntimeException error = new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
+                if (errorList != null) {
+                    errorList.add(error);
+                }
+                logger.error(error.getMessage());
                 return false;
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-                logger.error(new ValueConNotNullException(prefix, getValue(conditionValueList)).getMessage());
+                ApiRuntimeException error = new ValueConNotNullException(prefix, getValue(conditionValueList));
+                if (errorList != null) {
+                    errorList.add(error);
+                }
+                logger.error(error.getMessage());
                 return false;
             } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
-                logger.error(new ValueNeedNullException(prefix).getMessage());
+                ApiRuntimeException error = new ValueNeedNullException(prefix);
+                if (errorList != null) {
+                    errorList.add(error);
+                }
+                logger.error(error.getMessage());
                 return false;
             }
             return true;

@@ -15,8 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.util.javascript;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -24,10 +26,11 @@ import javax.script.*;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class JavascriptUtil {
+    private static final ThreadLocal<List<ApiRuntimeException>> instance = new ThreadLocal<>();
+
+
     static class CacheItem {
 
         private final String script;
@@ -129,7 +132,7 @@ public class JavascriptUtil {
      * @param expression 表达式
      * @return 执行结果
      */
-    public static boolean runExpression(JSONObject paramObj, String expression) throws ScriptException, NoSuchMethodException {
+    public static boolean runExpression(JSONObject paramObj, String expression, List<ApiRuntimeException> errorList) throws ScriptException, NoSuchMethodException {
         //处理is-null和is-not-null两种表达式
         expression = expression.replace("-", "");
         //ScriptEngine se = getEngine("-strict");
@@ -148,25 +151,47 @@ public class JavascriptUtil {
         script += "return result;\n";
         script += "}\n";
         se.eval(script);
-        //System.out.println(script);
-        Invocable invocableEngine = (Invocable) se;
-        Object rv = invocableEngine.invokeFunction("run");
-        if (rv != null) {
-            return Boolean.parseBoolean(rv.toString());
+        //由于表达式不能直接抛异常，创建threadlocal传递errorList
+        if (errorList != null) {
+            instance.set(errorList);
+        }
+        try {
+            //System.out.println(script);
+            Invocable invocableEngine = (Invocable) se;
+            Object rv = invocableEngine.invokeFunction("run");
+            if (rv != null) {
+                return Boolean.parseBoolean(rv.toString());
+            }
+        } finally {
+            if (instance.get() != null) {
+                instance.remove();
+            }
         }
         return false;
     }
 
+    /**
+     * 执行一个表达式，返回true或false
+     *
+     * @param paramObj   参数，包含data,condition和define三个属性
+     * @param expression 表达式
+     * @return 执行结果
+     */
+    public static boolean runExpression(JSONObject paramObj, String expression) throws
+            ScriptException, NoSuchMethodException {
+        return runExpression(paramObj, expression, null);
+    }
 
-    public static void main(String[] v) throws ScriptException, InterruptedException {
-        /*ScriptEngine se = getEngine("--global-per-engine");
-        Compilable compilable = ((Compilable) se);
-        CompiledScript script = compilable.compile(
-                "function run(a,m,n){  var x = param.a + 1; \n" +
-                        "  var y = x * 2 + param.m;\n" +
-                        "  var z = y * 3 - param.n;\n" +
-                        "  z;\n" +
-                        "return z;} run(param.a,param.m,param.n);\n");*/
+
+   /* public static void main(String[] v) throws ScriptException, InterruptedException {
+        //ScriptEngine se = getEngine("--global-per-engine");
+        //Compilable compilable = ((Compilable) se);
+        //CompiledScript script = compilable.compile(
+         //       "function run(a,m,n){  var x = param.a + 1; \n" +
+           //             "  var y = x * 2 + param.m;\n" +
+             //           "  var z = y * 3 - param.n;\n" +
+               //         "  z;\n" +
+                 //       "return z;} run(param.a,param.m,param.n);\n");
         long s = System.currentTimeMillis();
         AtomicInteger counter = new AtomicInteger();
         CountDownLatch latch = new CountDownLatch(1000);
@@ -216,13 +241,17 @@ public class JavascriptUtil {
         int x = a + 1;
         int y = x * 2 + m;
         return y * 3 - n;
+    }*/
+
+    public static List<ApiRuntimeException> getErrorList() {
+        return instance.get();
     }
 
-
-    public static String transform(Object paramObj, String script, StringWriter sw) throws ScriptException, NoSuchMethodException {
+    public static String transform(Object paramObj, String script, StringWriter sw) throws
+            ScriptException, NoSuchMethodException {
         if (StringUtils.isBlank(script)) {
             if (paramObj != null) {
-                return JSONObject.toJSONString(paramObj);
+                return JSON.toJSONString(paramObj);
             } else {
                 return "{}";
             }

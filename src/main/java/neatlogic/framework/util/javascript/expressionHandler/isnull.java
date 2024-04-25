@@ -16,20 +16,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.util.javascript.expressionHandler;
 
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ValueNeedNullException;
+import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 public class isnull {
-    private final static Logger logger = LoggerFactory.getLogger(isnull.class);
+    private static final Logger logger = LoggerFactory.getLogger(isnull.class);
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
 
         if (CollectionUtils.isNotEmpty(dataValueList)) {
-            logger.error(new ValueNeedNullException(prefix).getMessage());
+            List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
+            ApiRuntimeException error = new ValueNeedNullException(prefix);
+            if (errorList != null) {
+                errorList.add(error);
+            }
+            logger.error(error.getMessage());
             return false;
         }
         return true;

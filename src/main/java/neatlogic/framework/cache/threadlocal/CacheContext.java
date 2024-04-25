@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CacheContext {
-    private final transient static ThreadLocal<Map<String, Object>> instance = new ThreadLocal<>();
+    private static final transient ThreadLocal<Map<String, Object>> instance = new ThreadLocal<>();
 
 
     public static Map<String, Object> get() {
@@ -35,7 +35,7 @@ public class CacheContext {
     public static void putData(String key, Object value) {
         if (value != null) {
             if (instance.get() == null) {
-                instance.set(new HashMap<String, Object>());
+                instance.set(new HashMap<>());
             }
             Map<String, Object> cacheObj = instance.get();
             cacheObj.put(key, value);

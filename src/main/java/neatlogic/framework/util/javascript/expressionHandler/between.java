@@ -16,7 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.util.javascript.expressionHandler;
 
 import com.alibaba.fastjson.JSONArray;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.*;
+import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -27,23 +29,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
  * 区间运算支持数字型、日期型、时间型和日期时间型
  */
 public class between {
-    private final static Logger logger = LoggerFactory.getLogger(between.class);
+    private static final Logger logger = LoggerFactory.getLogger(between.class);
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
+        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             if (dataValueList.size() == conditionValueList.size()) {
                 String dataValue = dataValueList.getString(0);
                 String conditionValue = conditionValueList.getString(0);
                 if (StringUtils.isNotBlank(dataValue) && StringUtils.isNotBlank(conditionValue)) {
                     String[] range = conditionValue.split("~");
-                    String valueBefore = "", valueAfter = "";
+                    String valueBefore;
+                    String valueAfter;
                     if (range.length == 2) {
                         valueBefore = range[0];
                         valueAfter = range[1];
@@ -51,16 +56,25 @@ public class between {
                     }
                 }
             } else {
-                logger.error(new ValueNumberIsNotEqualException(prefix).getMessage());
+                ApiRuntimeException error = new ValueNumberIsNotEqualException(prefix);
+                if (errorList != null) {
+                    errorList.add(error);
+                }
+                logger.error(error.getMessage());
                 return false;
             }
         }
-        logger.error(new ValueIsNullException(prefix).getMessage());
+        ApiRuntimeException error = new ValueIsNullException(prefix);
+        if (errorList != null) {
+            errorList.add(error);
+        }
+        logger.error(error.getMessage());
         return false;
     }
 
     private static boolean compare(String dataValue, String valueBefore, String valueAfter, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
+        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (isNumber(dataValue)) {
             double transferValue = Double.parseDouble(dataValue);
             double transferValueBefore = Double.MIN_VALUE;
@@ -111,19 +125,31 @@ public class between {
                 }
                 if (transferValueBefore != null && transferValueAfter != null) {
                     if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
-                        logger.error(new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter).getMessage());
+                        ApiRuntimeException error = new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter);
+                        if (errorList != null) {
+                            errorList.add(error);
+                        }
+                        logger.error(error.getMessage());
                         return false;
                     }
                     return true;
                 } else if (transferValueBefore != null) {
                     if (!transferValue.after(transferValueBefore)) {
-                        logger.error(new ValueNotAfterException(prefix, dataValue, valueBefore).getMessage());
+                        ApiRuntimeException error = new ValueNotAfterException(prefix, dataValue, valueBefore);
+                        if (errorList != null) {
+                            errorList.add(error);
+                        }
+                        logger.error(error.getMessage());
                         return false;
                     }
                     return true;
                 } else if (transferValueAfter != null) {
                     if (!transferValue.before(transferValueAfter)) {
-                        logger.error(new ValueNotBeforeException(prefix, dataValue, valueAfter).getMessage());
+                        ApiRuntimeException error = new ValueNotBeforeException(prefix, dataValue, valueAfter);
+                        if (errorList != null) {
+                            errorList.add(error);
+                        }
+                        logger.error(error.getMessage());
                         return false;
                     }
                     return true;
@@ -135,7 +161,7 @@ public class between {
         return false;
     }
 
-    private final static Set<Character> numberCharSet = new HashSet<>();
+    private static final Set<Character> numberCharSet = new HashSet<>();
 
     static {
         numberCharSet.add('0');
@@ -203,8 +229,4 @@ public class between {
         return false;
     }
 
-    public static void main(String[] arg) {
-        String a = "~2";
-        System.out.println(a.split("~")[0]);
-    }
 }

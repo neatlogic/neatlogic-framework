@@ -34,6 +34,7 @@ public class FormVersionVo extends BaseEditorVo {
     private Integer isActive;
     private JSONObject formConfig;
     private String sceneUuid;
+    private List<FormAttributeVo> formExtendAttributeList;
     @JSONField(serialize = false)
     private List<FormAttributeVo> formAttributeList;
     @JSONField(serialize = false)
@@ -271,5 +272,13 @@ public class FormVersionVo extends BaseEditorVo {
 
     public void setFormConfigStr(String formConfigStr) {
         this.formConfigStr = formConfigStr;
+    }
+
+    public List<FormAttributeVo> getFormExtendAttributeList() {
+        return formExtendAttributeList;
+    }
+
+    public void setFormExtendAttributeList(List<FormAttributeVo> formExtendAttributeList) {
+        this.formExtendAttributeList = formExtendAttributeList;
     }
 }

@@ -267,23 +267,23 @@ public class FormAttributeVo implements Serializable {
         return formHandler.getHandlerType(conditionModel);
     }
 
-    public Boolean getIsMultiple() {
-        if (handler == null) {
-            return null;
-        }
-        if ("formselect".equals(handler)) {
-            return config.getBoolean("isMultiple");
-        }
-
-        if (conditionModel!= null && Objects.equals(conditionModel.getValue(), FormConditionModel.CUSTOM.getValue())) {
-            if ("formcheckbox".equals(handler)) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return null;
-    }
+//    public Boolean getIsMultiple() {
+//        if (handler == null) {
+//            return null;
+//        }
+//        if ("formselect".equals(handler) && config != null) {
+//            return config.getBoolean("isMultiple");
+//        }
+//
+//        if (conditionModel!= null && Objects.equals(conditionModel.getValue(), FormConditionModel.CUSTOM.getValue())) {
+//            if ("formcheckbox".equals(handler)) {
+//                return true;
+//            } else {
+//                return false;
+//            }
+//        }
+//        return null;
+//    }
 
     public Boolean getIsUseFormConfig() {
         return this.isUseFormConfig;

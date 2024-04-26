@@ -25,10 +25,12 @@ import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
@@ -356,9 +358,6 @@ public class FormAttributeVo implements Serializable {
     public String getConfigStr() {
         if (configStr == null && config != null) {
             configStr = config.toJSONString();
-        }
-        if (StringUtils.isBlank(configStr)) {
-            configStr = "{}";
         }
         return configStr;
     }

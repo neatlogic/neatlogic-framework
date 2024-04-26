@@ -25,6 +25,7 @@ import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.*;
@@ -165,6 +166,9 @@ public class FormAttributeVo implements Serializable {
     public JSONObject getConfig() {
         if (config == null && configStr != null) {
             config = JSONObject.parseObject(configStr);
+        }
+        if (config == null) {
+            config = new JSONObject();
         }
         return config;
     }
@@ -352,6 +356,9 @@ public class FormAttributeVo implements Serializable {
     public String getConfigStr() {
         if (configStr == null && config != null) {
             configStr = config.toJSONString();
+        }
+        if (StringUtils.isBlank(configStr)) {
+            configStr = "{}";
         }
         return configStr;
     }

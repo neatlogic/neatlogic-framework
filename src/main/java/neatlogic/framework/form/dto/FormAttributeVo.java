@@ -27,7 +27,10 @@ import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class FormAttributeVo implements Serializable {
     private static final long serialVersionUID = 8282018124626035430L;
@@ -165,6 +168,9 @@ public class FormAttributeVo implements Serializable {
     public JSONObject getConfig() {
         if (config == null && configStr != null) {
             config = JSONObject.parseObject(configStr);
+        }
+        if (config == null) {
+            config = new JSONObject();
         }
         return config;
     }

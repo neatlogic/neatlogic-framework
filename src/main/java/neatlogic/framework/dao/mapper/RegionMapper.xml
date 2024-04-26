@@ -60,6 +60,12 @@
             <if test="keyword != null and keyword != ''">
                 `name` LIKE CONCAT('%',#{keyword},'%')
             </if>
+            <if test="idList != null and idList.size() > 0">
+                `id` in
+                <foreach collection="idList" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
         </where>
     </select>
     <select id="searchRegion" resultType="neatlogic.framework.dto.region.RegionVo">
@@ -75,6 +81,12 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 `name` LIKE CONCAT('%',#{keyword},'%')
+            </if>
+            <if test="idList != null and idList.size() > 0">
+                `id` in
+                <foreach collection="idList" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
             </if>
         </where>
         ORDER BY `id`
@@ -120,6 +132,30 @@
     </select>
     <select id="getParentIdById" resultType="java.lang.Long">
         SELECT `parent_id` FROM `region` where `id`=#{value}
+    </select>
+    <select id="getRegionIdListByTeamUuidListAndType" resultType="java.lang.Long">
+        SELECT r.`id`
+        FROM `region_team` rt
+                 join `region` r on rt.region_id = r.id
+                 join `team` t on rt.`team_uuid` = t.`uuid`
+        where rt.`team_uuid` in
+          <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+              #{teamUuid}
+          </foreach>
+          and rt.`type` = #{type}
+    </select>
+    <select id="getRegionIdListByTeamUuidListAndCheckedChildren" resultType="java.lang.Long">
+        SELECT r.`id`
+        FROM `region_team` rt
+            join `region` r on rt.region_id = r.id
+            join `team` t on rt.`team_uuid` = t.`uuid`
+        where
+            rt.team_uuid in
+                <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                    #{teamUuid}
+                </foreach>
+          and rt.checked_children = #{checkedChildren}
+          and rt.`type` = #{type}
     </select>
 
     <insert id="insertRegion">

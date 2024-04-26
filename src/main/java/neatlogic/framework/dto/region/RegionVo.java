@@ -53,6 +53,9 @@ public class RegionVo extends BasePageVo{
     @JSONField(serialize=false)
     private RegionVo parent;
 
+    @JSONField(serialize=false)
+    private List<Long> idList;
+
     public Long getId() {
         if(id == null){
            id = SnowflakeUtil.uniqueLong();
@@ -155,4 +158,11 @@ public class RegionVo extends BasePageVo{
         return children;
     }
 
+    public List<Long> getIdList() {
+        return idList;
+    }
+
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
+    }
 }

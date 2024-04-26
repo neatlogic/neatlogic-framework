@@ -18,6 +18,7 @@ package neatlogic.framework.service;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author linbq
@@ -46,4 +47,10 @@ public interface AuthenticationInfoService {
      * @param isRuleRole 是否过滤不符合规则的角色
      */
     AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole);
+
+    /**
+     * 补充父级组
+     * @param teamUuidList 组
+     */
+    Set<String> getTeamSetWithParents(List<String> teamUuidList);
 }

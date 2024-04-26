@@ -45,6 +45,10 @@ public interface RegionMapper {
 
     int checkRegionNameIsRepeat(RegionVo regionVo);
 
+    List<Long> getRegionIdListByTeamUuidListAndType(@Param("teamUuidList") List<String> teamUuidList, @Param("type") String type);
+
+    List<Long> getRegionIdListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("type") String type, @Param("checkedChildren") int checkedChildren);
+
     Long getParentIdById(Long id);
 
     void insertRegion(RegionVo region);
@@ -53,9 +57,10 @@ public interface RegionMapper {
 
     void insertRegionTeam(RegionTeamVo regionTeamVo);
 
-    void deleteRegionExpired(@Param("regionId") Long regionId,@Param("type") String type,@Param("updateTime") Long updateTime);
+    void deleteRegionExpired(@Param("regionId") Long regionId, @Param("type") String type, @Param("updateTime") Long updateTime);
 
     void deleteRegionTeamByRegionId(Long id);
 
-    void deleteRegionTeamByRegionIdAndTypeAndTeamUuidList(@Param("regionId") Long regionId,@Param("type") String type,@Param("teamUuidArray") JSONArray teamUuidArray);
+    void deleteRegionTeamByRegionIdAndTypeAndTeamUuidList(@Param("regionId") Long regionId, @Param("type") String type, @Param("teamUuidArray") JSONArray teamUuidArray);
+
 }

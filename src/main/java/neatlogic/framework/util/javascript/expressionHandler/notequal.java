@@ -43,8 +43,9 @@ public class notequal {
                     ApiRuntimeException error = new ValueIsEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                     if (errorList != null) {
                         errorList.add(error);
+                    } else {
+                        logger.error(error.getMessage());
                     }
-                    logger.error(error.getMessage());
                     return false;
                 }
             } else {
@@ -58,8 +59,9 @@ public class notequal {
             ApiRuntimeException error = new ApiRuntimeException(prefix);
             if (errorList != null) {
                 errorList.add(error);
+            } else {
+                logger.error(error.getMessage());
             }
-            logger.error(error.getMessage());
             return false;
         }
     }

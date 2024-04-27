@@ -44,8 +44,9 @@ public class like {
                         ApiRuntimeException error = new ValueIsNotContainException(prefix, dataValue, conditionValue);
                         if (errorList != null) {
                             errorList.add(error);
+                        } else {
+                            logger.error(error.getMessage());
                         }
-                        logger.error(error.getMessage());
                         return false;
                     }
                 } else {
@@ -55,8 +56,9 @@ public class like {
                             ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                             if (errorList != null) {
                                 errorList.add(error);
+                            } else {
+                                logger.error(error.getMessage());
                             }
-                            logger.error(error.getMessage());
                             return false;
                         }
                     }
@@ -69,8 +71,9 @@ public class like {
                         ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                         if (errorList != null) {
                             errorList.add(error);
+                        } else {
+                            logger.error(error.getMessage());
                         }
-                        logger.error(error.getMessage());
                         return false;
                     }
                 }
@@ -79,8 +82,9 @@ public class like {
                 ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             }
         } else {
@@ -88,8 +92,9 @@ public class like {
                 ApiRuntimeException error = new ApiRuntimeException(prefix);
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             } else {
                 return true;

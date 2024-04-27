@@ -37,8 +37,9 @@ public class isnotnull {
             ApiRuntimeException error = new ValueConNotNullException(prefix);
             if (errorList != null) {
                 errorList.add(error);
+            } else {
+                logger.error(error.getMessage());
             }
-            logger.error(error.getMessage());
             return false;
         }
         return true;

@@ -59,8 +59,9 @@ public class between {
                 ApiRuntimeException error = new ValueNumberIsNotEqualException(prefix);
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             }
         }

@@ -43,8 +43,9 @@ public class equal {
                     ApiRuntimeException error = new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                     if (errorList != null) {
                         errorList.add(error);
+                    } else {
+                        logger.error(error.getMessage());
                     }
-                    logger.error(error.getMessage());
                     return false;
                 }
                 return true;
@@ -52,8 +53,9 @@ public class equal {
                 ApiRuntimeException error = new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             }
         } else {
@@ -61,15 +63,17 @@ public class equal {
                 ApiRuntimeException error = new ValueConNotNullException(prefix, getValue(conditionValueList));
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
                 ApiRuntimeException error = new ValueNeedNullException(prefix);
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             }
             return true;

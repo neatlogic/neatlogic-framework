@@ -46,8 +46,9 @@ public class notlike {
                         ApiRuntimeException error = new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                         if (errorList != null) {
                             errorList.add(error);
+                        } else {
+                            logger.error(error.getMessage());
                         }
-                        logger.error(error.getMessage());
                         return false;
                     }
                 } else {
@@ -60,8 +61,9 @@ public class notlike {
                     ApiRuntimeException error = new ApiRuntimeException(prefix, getValue(dataValueList), getValue(conditionValueList));
                     if (errorList != null) {
                         errorList.add(error);
+                    } else {
+                        logger.error(error.getMessage());
                     }
-                    logger.error(error.getMessage());
                     return false;
                 }
             } else if (dataValueList.size() > conditionValueList.size()) {
@@ -74,8 +76,9 @@ public class notlike {
                 ApiRuntimeException error = new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             } else {
                 return true;
@@ -85,8 +88,9 @@ public class notlike {
                 ApiRuntimeException error = new ValueIsNullException(prefix);
                 if (errorList != null) {
                     errorList.add(error);
+                } else {
+                    logger.error(error.getMessage());
                 }
-                logger.error(error.getMessage());
                 return false;
             } else {
                 return true;

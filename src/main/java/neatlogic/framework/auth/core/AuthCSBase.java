@@ -13,15 +13,8 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package neatlogic.framework.exception.type;
+package neatlogic.framework.auth.core;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
-
-public class LicenseInvalidException extends ApiRuntimeException {
-
-
-    public LicenseInvalidException(String moduleId) {
-        super("nfet.licenseinvalidexception.licenseinvalidexception", moduleId);
-    }
+public abstract class AuthCSBase extends AuthBase{
 
 }

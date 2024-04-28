@@ -76,6 +76,9 @@ public class RegionVo extends BasePageVo{
     }
 
     public Long getParentId() {
+        if(parentId == null){ //兼容前端tree组件无法给parentId赋值为0的问题
+            parentId = 0L;
+        }
         return parentId;
     }
 

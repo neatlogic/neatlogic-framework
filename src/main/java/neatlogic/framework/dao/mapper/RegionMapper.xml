@@ -143,6 +143,7 @@
               #{teamUuid}
           </foreach>
           and rt.`type` = #{type}
+          and r.`is_active` = 1
     </select>
     <select id="getRegionIdListByTeamUuidListAndCheckedChildren" resultType="java.lang.Long">
         SELECT r.`id`
@@ -156,6 +157,7 @@
                 </foreach>
           and rt.checked_children = #{checkedChildren}
           and rt.`type` = #{type}
+          and r.`is_active` = 1
     </select>
 
     <insert id="insertRegion">

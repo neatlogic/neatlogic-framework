@@ -16,10 +16,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.auth.core;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 public abstract class AuthBase {
+
+    private String authModule;
+
     public final String getAuthName() {
         return this.getClass().getSimpleName();
     }
@@ -30,13 +35,27 @@ public abstract class AuthBase {
 
     public abstract String getAuthGroup();
 
+    public String getAuthModule() {
+        if(StringUtils.isBlank(authModule)) {
+            String moduleName = null;
+            String packageName = this.getClass().getName();
+            String[] packages = packageName.split("\\.");
+            for (String p : packages) {
+                if (Objects.equals(p, "auth")) {
+                    authModule = moduleName;
+                    break;
+                }
+                moduleName = p;
+            }
+        }
+        return authModule;
+    }
+
     public abstract Integer getSort();
 
     public boolean checkInvalid() {
         return true;
     }
-
-    ;
 
     /**
      * 是否在前端页面展示，目前用于跨模块调接口权限授权，即A include B,B无需授权
@@ -57,5 +76,4 @@ public abstract class AuthBase {
     public List<Class<? extends AuthBase>> getIncludeAuths() {
         return (List<Class<? extends AuthBase>>) CollectionUtils.EMPTY_COLLECTION;
     }
-
 }

@@ -39,7 +39,7 @@ public class AuthFactory {
                 //排除抽象类
                 if (!Modifier.isAbstract(c.getModifiers())) {
                     AuthBase authIns = c.newInstance();
-                    if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || (authIns instanceof AuthCSBase && ModuleUtil.isModuleInvalidated(authIns.getAuthGroup()))) {
+                    if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || (authIns instanceof AuthCSBase && ModuleUtil.isModuleInvalidated(authIns.getAuthModule()))) {
                         continue;
                     }
                     authMap.put(authIns.getAuthName(), authIns);

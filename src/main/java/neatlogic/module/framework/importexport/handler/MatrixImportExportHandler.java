@@ -14,6 +14,7 @@ import neatlogic.framework.importexport.exception.DependencyNotFoundException;
 import neatlogic.framework.importexport.exception.ImportExportHandlerNotFoundException;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
+import neatlogic.framework.matrix.core.MatrixPrivateDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.matrix.dto.MatrixVo;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
@@ -125,7 +126,11 @@ public class MatrixImportExportHandler extends ImportExportHandlerBase {
     @Override
     protected ImportExportVo myExportData(Object primaryKey, List<ImportExportBaseInfoVo> dependencyList, ZipOutputStream zipOutputStream) {
         String uuid = (String) primaryKey;
-        MatrixVo matrix = matrixMapper.getMatrixByUuid(uuid);
+        MatrixVo matrix = MatrixPrivateDataSourceHandlerFactory.getMatrixVo(uuid);
+        if (matrix != null) {
+            return null;
+        }
+        matrix = matrixMapper.getMatrixByUuid(uuid);
         if (matrix == null) {
             throw new MatrixNotFoundException(uuid);
         }

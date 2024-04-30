@@ -13,7 +13,7 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
     @Override
     public List<GroupSearchGroupVo> searchUserRoleTeam(GroupSearchVo groupSearchVo) {
         List<String> groupList = groupSearchVo.getGroupList();
-        List<String> excludeList = groupSearchVo.getGroupList();
+        List<String> excludeList = groupSearchVo.getExcludeList();
         int groupCount = 0;
         List<GroupSearchGroupVo> resultArray = new ArrayList<>();
         Map<String, IGroupSearchHandler> handlerMap = GroupSearchHandlerFactory.getComponentMap();

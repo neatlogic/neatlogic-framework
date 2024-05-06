@@ -14,6 +14,7 @@ public class AuthVo {
     private String description;
     private String authGroupName;
     private String authGroup;
+    private boolean isCommercial = false;
     private int userCount;
     private int roleCount;
     private int sort;
@@ -44,6 +45,14 @@ public class AuthVo {
         this.description = tmpAuth.getAuthName();
         this.authGroupName = tmpAuth.getAuthGroup();
         this.sort = tmpAuth.getSort();
+    }
+
+    public boolean isCommercial() {
+        return isCommercial;
+    }
+
+    public void setCommercial(boolean commercial) {
+        isCommercial = commercial;
     }
 
     public String getDescription() {

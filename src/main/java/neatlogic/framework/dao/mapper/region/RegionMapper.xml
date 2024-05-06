@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.region.RegionMapper">
+    <select id="getMaxRhtCode" resultType="java.lang.Integer">
+        SELECT max(`rht`)
+        FROM `region`
+    </select>
+
+    <select id="getRegionListForTree" parameterType="java.lang.Integer"
+            resultType="neatlogic.framework.dto.region.RegionVo">
+        SELECT `id`,
+               `name`,
+               `parent_id`     as parentId,
+               `worktime_uuid` as worktimeUuid,
+               `is_active`     as isActive,
+               `lft`,
+               `rht`
+        FROM `region`
+        WHERE `lft` &gt;= #{lft}
+          AND `rht` &lt;= #{rht}
+        ORDER BY `lft`
+    </select>
+    <select id="getRegionListByIdList" resultType="neatlogic.framework.dto.region.RegionVo">
+        SELECT
+        `id`,
+        `name`,
+        `parent_id` as parentId,
+        `worktime_uuid` as worktimeUuid,
+        `is_active` as isActive,
+        `lft`,
+        `rht`
+        FROM `region`
+        WHERE `id` in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="searchRegionCount" resultType="java.lang.Integer">
+        SELECT
+        count(`id`)
+        FROM `region`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `name` LIKE CONCAT('%',#{keyword},'%')
+            </if>
+            <if test="idList != null and idList.size() > 0">
+                `id` in
+                <foreach collection="idList" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="searchRegion" resultType="neatlogic.framework.dto.region.RegionVo">
+        SELECT
+        `id`,
+        `name`,
+        `parent_id` as parentId,
+        `worktime_uuid` as worktimeUuid,
+        `is_active` as isActive,
+        `lft`,
+        `rht`
+        FROM `region`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `name` LIKE CONCAT('%',#{keyword},'%')
+            </if>
+            <if test="idList != null and idList.size() > 0">
+                `id` in
+                <foreach collection="idList" item="id" open="(" close=")" separator=",">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY `id`
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+    <select id="getRegionById" resultType="neatlogic.framework.dto.region.RegionVo">
+        SELECT `id`,
+               `name`,
+               `parent_id`     as parentId,
+               `worktime_uuid` as worktimeUuid,
+               `is_active`     as isActive,
+               `lft`,
+               `rht`
+        FROM `region`
+        where `id` = #{id}
+    </select>
+    <select id="searchRegionTeamCount" resultType="java.lang.Integer">
+        SELECT count(1)
+        FROM `region_team` rt
+                 join `team` t on rt.`team_uuid` = t.`uuid`
+        where rt.`region_id` = #{regionId}
+          and rt.`type` = #{type}
+    </select>
+
+    <select id="searchRegionTeam" resultType="neatlogic.framework.dto.TeamVo">
+        SELECT t.`id`,
+               t.`uuid`,
+               t.`name`,
+               t.`parent_uuid`      AS parentUuid,
+               t.`level`,
+               t.`lft`,
+               t.`rht`,
+               t.`upward_uuid_path` AS upwardUuidPath,
+               t.`upward_name_path` AS upwardNamePath,
+               rt.checked_children  as checkedChildren
+        FROM `region_team` rt
+                 join `team` t on rt.`team_uuid` = t.`uuid`
+        where rt.`region_id` = #{regionId}
+          and rt.`type` = #{type}
+    </select>
+    <select id="checkRegionNameIsRepeat" resultType="java.lang.Integer">
+        SELECT COUNT(1) FROM `region` where `parent_id`=#{parentId} AND `name`=#{name} AND `id`!=#{id}
+    </select>
+    <select id="getParentIdById" resultType="java.lang.Long">
+        SELECT `parent_id` FROM `region` where `id`=#{value}
+    </select>
+    <select id="getRegionIdListByTeamUuidListAndType" resultType="java.lang.Long">
+        SELECT r.`id`
+        FROM `region_team` rt
+                 join `region` r on rt.region_id = r.id
+                 join `team` t on rt.`team_uuid` = t.`uuid`
+        where rt.`team_uuid` in
+          <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+              #{teamUuid}
+          </foreach>
+          and rt.`type` = #{type}
+          and r.`is_active` = 1
+    </select>
+    <select id="getRegionIdListByTeamUuidListAndCheckedChildren" resultType="java.lang.Long">
+        SELECT r.`id`
+        FROM `region_team` rt
+            join `region` r on rt.region_id = r.id
+            join `team` t on rt.`team_uuid` = t.`uuid`
+        where
+            rt.team_uuid in
+                <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                    #{teamUuid}
+                </foreach>
+          and rt.checked_children = #{checkedChildren}
+          and rt.`type` = #{type}
+          and r.`is_active` = 1
+    </select>
+
+    <insert id="insertRegion">
+        insert into `region` (`id`, `name`, `parent_id`, `worktime_uuid`, `is_active`)
+        values (#{id}, #{name}, #{parentId}, #{workTimeUuid}, #{isActive})
+        ON DUPLICATE KEY
+            UPDATE `name`          = #{name},
+                   `parent_id`     = #{parentId},
+                   `worktime_uuid` = #{workTimeUuid},
+                   `is_active`     = #{isActive}
+    </insert>
+    <insert id="insertRegionTeam">
+        insert into `region_team` (`region_id`, `type`, `team_uuid`, `checked_children`, `update_time`)
+        values (#{regionId}, #{type}, #{teamUuid}, #{checkedChildren}, #{updateTime})
+        ON DUPLICATE KEY
+            UPDATE
+                   `checked_children` = #{checkedChildren},
+                   `update_time`     = #{updateTime}
+    </insert>
+
+    <delete id="deleteRegionById">
+        delete
+        from `region`
+        where `id` = #{value}
+    </delete>
+    <delete id="deleteRegionExpired">
+        delete
+        from `region_team`
+        where `region_id` = #{regionId} and `type` = #{type} and `update_time` != #{updateTime}
+    </delete>
+    <delete id="deleteRegionTeamByRegionId">
+        delete
+        from `region_team`
+        where `region_id` = #{value}
+    </delete>
+    <delete id="deleteRegionTeamByRegionIdAndTypeAndTeamUuidList">
+        delete
+        from `region_team`
+        where `region_id` = #{regionId} and `type` = #{type} and `team_uuid` in
+        <foreach collection="teamUuidArray" item="teamUuid" open="(" close=")" separator=",">
+            #{teamUuid}
+        </foreach>
+    </delete>
+</mapper>
+

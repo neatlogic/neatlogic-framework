@@ -17,9 +17,9 @@
 
 package neatlogic.framework.auth.label;
 
-import neatlogic.framework.auth.core.AuthCSBase;
+import neatlogic.framework.auth.core.AuthBase;
 
-public class REGION_MODIFY extends AuthCSBase {
+public class REGION_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {

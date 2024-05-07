@@ -108,7 +108,6 @@
         FROM `region_team` rt
                  join `team` t on rt.`team_uuid` = t.`uuid`
         where rt.`region_id` = #{regionId}
-          and rt.`type` = #{type}
     </select>
 
     <select id="searchRegionTeam" resultType="neatlogic.framework.dto.TeamVo">
@@ -125,7 +124,6 @@
         FROM `region_team` rt
                  join `team` t on rt.`team_uuid` = t.`uuid`
         where rt.`region_id` = #{regionId}
-          and rt.`type` = #{type}
     </select>
     <select id="checkRegionNameIsRepeat" resultType="java.lang.Integer">
         SELECT COUNT(1) FROM `region` where `parent_id`=#{parentId} AND `name`=#{name} AND `id`!=#{id}
@@ -142,7 +140,6 @@
           <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
               #{teamUuid}
           </foreach>
-          and rt.`type` = #{type}
           and r.`is_active` = 1
     </select>
     <select id="getRegionIdListByTeamUuidListAndCheckedChildren" resultType="java.lang.Long">
@@ -156,7 +153,6 @@
                     #{teamUuid}
                 </foreach>
           and rt.checked_children = #{checkedChildren}
-          and rt.`type` = #{type}
           and r.`is_active` = 1
     </select>
 
@@ -170,8 +166,8 @@
                    `is_active`     = #{isActive}
     </insert>
     <insert id="insertRegionTeam">
-        insert into `region_team` (`region_id`, `type`, `team_uuid`, `checked_children`, `update_time`)
-        values (#{regionId}, #{type}, #{teamUuid}, #{checkedChildren}, #{updateTime})
+        insert into `region_team` (`region_id`, `team_uuid`, `checked_children`, `update_time`)
+        values (#{regionId}, #{teamUuid}, #{checkedChildren}, #{updateTime})
         ON DUPLICATE KEY
             UPDATE
                    `checked_children` = #{checkedChildren},
@@ -186,17 +182,17 @@
     <delete id="deleteRegionExpired">
         delete
         from `region_team`
-        where `region_id` = #{regionId} and `type` = #{type} and `update_time` != #{updateTime}
+        where `region_id` = #{regionId} and `update_time` != #{updateTime}
     </delete>
     <delete id="deleteRegionTeamByRegionId">
         delete
         from `region_team`
         where `region_id` = #{value}
     </delete>
-    <delete id="deleteRegionTeamByRegionIdAndTypeAndTeamUuidList">
+    <delete id="deleteRegionTeamByRegionIdAndTeamUuidList">
         delete
         from `region_team`
-        where `region_id` = #{regionId} and `type` = #{type} and `team_uuid` in
+        where `region_id` = #{regionId} and `team_uuid` in
         <foreach collection="teamUuidArray" item="teamUuid" open="(" close=")" separator=",">
             #{teamUuid}
         </foreach>

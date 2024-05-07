@@ -56,7 +56,7 @@ public class UserSessionCleanerJob extends JobBase {
     public void initJob(String tenantUuid) {
         //每半个小时运行
         JobObject jobObject = new JobObject.Builder("USER-SESSION-CLEANER-JOB", this.getGroupName(), this.getClassName(), tenantUuid)
-                .withCron("0,30 * * * *")
+                .withCron("0 0,30 * * * ?")
                 //.withIntervalInSeconds(3)//test
                 .build();
         this.reloadJob(jobObject);

@@ -73,5 +73,54 @@
             </if>
         </where>
     </select>
+
+    <select id="searchTeamTagTeamCount" resultType="java.lang.Integer">
+        SELECT count(1) from (
+            select t.uuid
+            FROM `team_tag_team` ttt
+            join `team` t on ttt.`team_uuid` = t.`uuid`
+            where
+            <if test="tagIdList != null and tagIdList.size() > 0">
+                ttt.`tag_id` in
+                <foreach collection="tagIdList" item="tagId" open="(" close=")" separator=",">
+                    #{tagId}
+                </foreach>
+            </if>
+            GROUP BY t.uuid
+            HAVING count(t.uuid) = #{tagIdListSize}
+        ) a
+    </select>
+
+    <select id="getTeamTagTeamUuidList" resultType="neatlogic.framework.dto.teamtag.TeamTagTeamVo">
+        SELECT
+        t.`uuid` as teamUuid,
+        min(ttt.checked_children) as checkedChildren
+        FROM `team_tag_team` ttt
+        join `team` t on ttt.`team_uuid` = t.`uuid`
+        where
+        <if test="tagIdList != null and tagIdList.size() > 0">
+            ttt.`tag_id` in
+            <foreach collection="tagIdList" item="tagId" open="(" close=")" separator=",">
+                #{tagId}
+            </foreach>
+        </if>
+        GROUP BY t.uuid
+        HAVING count(t.uuid) = #{tagIdListSize}
+    </select>
+
+    <insert id="insertTeamTagTeam">
+        insert into `team_tag_team` (`tag_id`, `team_uuid`, `checked_children`, `update_time`)
+        values (#{tagId}, #{teamUuid}, #{checkedChildren}, #{updateTime})
+        ON DUPLICATE KEY
+            UPDATE
+                `checked_children` = #{checkedChildren},
+                `update_time`     = #{updateTime}
+    </insert>
+
+    <delete id="deleteTeamTagTeamExpired">
+        delete
+        from `team_tag_team`
+        where `tag_id` = #{tagId} and `update_time` != #{updateTime}
+    </delete>
 </mapper>
 

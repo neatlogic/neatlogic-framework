@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.restful.core;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -347,9 +348,9 @@ public class ApiValidateAndHelpBase {
                         } else if (p.type().equals(ApiParamType.LONG)) {
                             paramObj.put(p.name(), Long.parseLong(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.JSONARRAY)) {
-                            paramObj.put(p.name(), JSONArray.parse(p.defaultValue()));
+                            paramObj.put(p.name(), JSON.parse(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.JSONOBJECT)) {
-                            paramObj.put(p.name(), JSONObject.parse(p.defaultValue()));
+                            paramObj.put(p.name(), JSON.parse(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.ENUM)) {
                             paramObj.put(p.name(), p.defaultValue());
                         }
@@ -366,15 +367,15 @@ public class ApiValidateAndHelpBase {
                 }
                 if (p.maxSize() > 0) {
                     if (paramValue instanceof JSONArray) {
-                        JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
+                        JSONArray paramArray = JSON.parseArray(paramValue.toString());
                         if (paramArray.size() > p.maxSize()) {
-                            throw new ParamValueTooLongException(p.name(), paramArray.size(), p.maxSize());
+                            throw new ParamSizeTooLargeException(p.name(), paramArray.size(), p.maxSize());
                         }
                     }
                     if (paramValue instanceof JSONObject) {
-                        JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
+                        JSONObject paramJson = JSON.parseObject(paramValue.toString());
                         if (paramJson.size() > p.maxSize()) {
-                            throw new ParamValueTooLongException(p.name(), paramJson.size(), p.maxSize());
+                            throw new ParamSizeTooLargeException(p.name(), paramJson.size(), p.maxSize());
                         }
                     }
                 }
@@ -387,15 +388,15 @@ public class ApiValidateAndHelpBase {
                 }
                 if (p.minSize() > 0) {
                     if (paramValue instanceof JSONArray) {
-                        JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
+                        JSONArray paramArray = JSON.parseArray(paramValue.toString());
                         if (paramArray.size() < p.minSize()) {
-                            throw new ParamValueTooShortException(p.name(), paramArray.size(), p.minSize());
+                            throw new ParamSizeTooSmallException(p.name(), paramArray.size(), p.minSize());
                         }
                     }
                     if (paramValue instanceof JSONObject) {
-                        JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
+                        JSONObject paramJson = JSON.parseObject(paramValue.toString());
                         if (paramJson.size() < p.minSize()) {
-                            throw new ParamValueTooShortException(p.name(), paramJson.size(), p.minSize());
+                            throw new ParamSizeTooSmallException(p.name(), paramJson.size(), p.minSize());
                         }
                     }
                 }

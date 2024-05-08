@@ -17,7 +17,9 @@
 
 package neatlogic.framework.dao.mapper.teamtag;
 
+import neatlogic.framework.dto.teamtag.TeamTagTeamVo;
 import neatlogic.framework.dto.teamtag.TeamTagVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -28,4 +30,12 @@ public interface TeamTagMapper {
     int searchTeamTagCount(TeamTagVo teamTag);
 
     List<TeamTagVo> searchTeamTag(TeamTagVo teamTag);
+
+    int searchTeamTagTeamCount(TeamTagTeamVo teamTagTeam);
+
+    List<TeamTagTeamVo> getTeamTagTeamUuidList(TeamTagTeamVo teamTagTeam);
+
+    int insertTeamTagTeam(TeamTagTeamVo teamTagTeamVo);
+
+    void deleteTeamTagTeamExpired(@Param("tagId") Long tagId,@Param("updateTime") Long updateTime);
 }

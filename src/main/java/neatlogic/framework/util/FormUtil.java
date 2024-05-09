@@ -420,7 +420,7 @@ public class FormUtil {
         return resultList;
     }
 
-    private static List<FormAttributeVo> getFormAttributeList(JSONObject componentObj, FormAttributeParentVo parent) {
+    public static List<FormAttributeVo> getFormAttributeList(JSONObject componentObj, FormAttributeParentVo parent) {
         List<FormAttributeVo> resultList = new ArrayList<>();
         // 标签组件不能改变值，不放入组件列表里
         String handler = componentObj.getString("handler");

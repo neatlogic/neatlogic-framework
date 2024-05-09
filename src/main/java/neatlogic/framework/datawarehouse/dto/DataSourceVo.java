@@ -36,6 +36,8 @@ import java.util.Optional;
 public class DataSourceVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
+    @JSONField(serialize = false)
+    private List<Long> idList;
     @EntityField(name = "common.uniquename", type = ApiParamType.STRING)
     private String name;
     @EntityField(name = "common.name", type = ApiParamType.STRING)
@@ -87,6 +89,14 @@ public class DataSourceVo extends BasePageVo {
 
     public DataSourceVo(Long id) {
         this.id = id;
+    }
+
+    public List<Long> getIdList() {
+        return idList;
+    }
+
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
     }
 
     public void addField(List<DataSourceFieldVo> fieldList) {

@@ -173,6 +173,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         is_active as isActive
         from datawarehouse_datasource
         <include refid="searchReportDataSourceSql"></include>
+        order by id desc
         limit #{startNum}, #{pageSize}
     </select>
 

@@ -110,11 +110,14 @@
 
     <insert id="insertTeamTagTeam">
         insert into `team_tag_team` (`tag_id`, `team_uuid`, `checked_children`, `update_time`)
-        values (#{tagId}, #{teamUuid}, #{checkedChildren}, #{updateTime})
+        values
+        <foreach collection="tagIdList" item="tagId" separator="),(" open="(" close=")">
+            #{tagId}, #{teamUuid}, #{checkedChildren}, #{updateTime}
+        </foreach>
         ON DUPLICATE KEY
             UPDATE
-                `checked_children` = #{checkedChildren},
-                `update_time`     = #{updateTime}
+                `checked_children` = VALUES(`checked_children`),
+                `update_time`     = VALUES(`update_time`)
     </insert>
 
     <delete id="deleteTeamTagTeamExpired">

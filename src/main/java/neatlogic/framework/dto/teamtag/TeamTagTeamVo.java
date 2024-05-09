@@ -41,8 +41,8 @@ public class TeamTagTeamVo extends BasePageVo {
     public TeamTagTeamVo() {
     }
 
-    public TeamTagTeamVo(Long tagId, String teamUuid, Integer checkedChildren, Long updateTime) {
-        this.tagId = tagId;
+    public TeamTagTeamVo(List<Long> tagIdList, String teamUuid, Integer checkedChildren, Long updateTime) {
+        this.tagIdList = tagIdList;
         this.teamUuid = teamUuid;
         this.checkedChildren = checkedChildren;
         this.updateTime = updateTime;

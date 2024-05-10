@@ -239,7 +239,13 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
             throw new MatrixViewNotFoundException(matrixVo.getName());
         }
         JSONArray attributeList = (JSONArray) JSONPath.read(matrixViewVo.getConfig(), "attributeList");
-        return attributeList.toJavaList(MatrixAttributeVo.class);
+        List<MatrixAttributeVo> matrixAttributeList = attributeList.toJavaList(MatrixAttributeVo.class);
+        for (MatrixAttributeVo matrixAttributeVo : matrixAttributeList) {
+            if (matrixAttributeVo.getUniqueIdentifier() == null) {
+                matrixAttributeVo.setUniqueIdentifier(matrixAttributeVo.getUuid());
+            }
+        }
+        return matrixAttributeList;
     }
 
     @Override

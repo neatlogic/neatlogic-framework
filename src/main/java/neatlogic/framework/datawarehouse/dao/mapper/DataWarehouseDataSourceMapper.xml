@@ -153,6 +153,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <if test="isActive != null">
                 and is_active = #{isActive}
             </if>
+            <if test="idList != null and idList.size() > 0">
+                and id in
+                <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
         </where>
     </sql>
 
@@ -173,6 +177,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         is_active as isActive
         from datawarehouse_datasource
         <include refid="searchReportDataSourceSql"></include>
+        order by id desc
         limit #{startNum}, #{pageSize}
     </select>
 

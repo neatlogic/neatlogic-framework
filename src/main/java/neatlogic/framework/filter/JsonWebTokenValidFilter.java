@@ -28,6 +28,7 @@ import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.login.core.ILoginPostProcessor;
@@ -154,8 +155,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             try {
                 returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(), ex.getMessage());
             } catch (Exception e) {
-                logger.error(ex.getMessage(), ex);
-                throw new RuntimeException(e);
+                logger.error(e.getMessage(), e);
+                throw new ApiRuntimeException(e);
             }
         }
     }

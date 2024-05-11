@@ -55,8 +55,6 @@ public interface TenantMapper {
 
     int updateTenantStatusByUuid(@Param("uuid") String uuid,@Param("status") String status);
 
-    int updateTenantModule(TenantModuleVo tenantModuleVo);
-
     int updateTenantVisitTime(String tenant);
 
     int checkTenantUuidIsExists(@Param("uuid") String uuid);

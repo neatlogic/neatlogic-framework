@@ -119,11 +119,20 @@
                 `checked_children` = VALUES(`checked_children`),
                 `update_time`     = VALUES(`update_time`)
     </insert>
+    <insert id="insertTeamTag">
+        insert into `team_tag` (`id`, `matrix_uuid`, `matrix_type`, `matrix_attr`,`matrix_attr_value`,`checked_children`)
+        values (#{id}, #{matrixUuid}, #{matrixType}, #{matrixAttr}, #{matrixAttrValue}, #{checkedChildren})
+    </insert>
 
     <delete id="deleteTeamTagTeamExpired">
         delete
         from `team_tag_team`
         where `tag_id` = #{tagId} and `update_time` != #{updateTime}
+    </delete>
+    <delete id="deleteTeamTag">
+        delete tt.* from `team_tag` tt
+        left join `team_tag_team` ttt on tt.`id` = ttt.`tag_id`
+        where tt.id = #{value}
     </delete>
 </mapper>
 

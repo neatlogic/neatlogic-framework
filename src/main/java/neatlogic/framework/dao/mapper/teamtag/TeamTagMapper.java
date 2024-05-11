@@ -38,4 +38,8 @@ public interface TeamTagMapper {
     int insertTeamTagTeam(TeamTagTeamVo teamTagTeamVo);
 
     void deleteTeamTagTeamExpired(@Param("tagId") Long tagId,@Param("updateTime") Long updateTime);
+
+    void insertTeamTag(TeamTagVo teamTagVo);
+
+    void deleteTeamTag(Long tagId);
 }

@@ -259,19 +259,6 @@
         WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="updateTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
-        UPDATE
-        `tenant_module`
-        SET `lcd` = NOW(3)
-        <if test="ddlStatus != null">
-            ,`ddl_status` = #{ddlStatus}
-        </if>
-        <if test="dmlStatus != null">
-            ,`dml_status` = #{dmlStatus}
-        </if>
-        WHERE `tenant_uuid` = #{tenantUuid}
-        AND `module_id` = #{moduleId}
-    </update>
     <update id="updateTenantVisitTime">
         update `tenant` set `visit_time` = now() where `uuid` = #{value}
     </update>

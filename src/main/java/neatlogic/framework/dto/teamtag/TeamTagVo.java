@@ -33,6 +33,8 @@ public class TeamTagVo extends BasePageVo {
     private String matrixUuid;
     @EntityField(name = "矩阵名", type = ApiParamType.STRING)
     private String matrixName;
+    @EntityField(name = "矩阵类型", type = ApiParamType.STRING)
+    private String matrixType;
     @EntityField(name = "矩阵列唯一标识", type = ApiParamType.STRING)
     private String matrixAttr;
     @EntityField(name = "标签名（矩阵列的值）", type = ApiParamType.STRING)
@@ -95,5 +97,13 @@ public class TeamTagVo extends BasePageVo {
 
     public void setIdList(List<Long> idList) {
         this.idList = idList;
+    }
+
+    public String getMatrixType() {
+        return matrixType;
+    }
+
+    public void setMatrixType(String matrixType) {
+        this.matrixType = matrixType;
     }
 }

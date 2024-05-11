@@ -209,9 +209,11 @@
     <insert id="insertTenantModule" parameterType="neatlogic.framework.dto.TenantModuleVo">
         INSERT IGNORE INTO `tenant_module` (`tenant_uuid`,
                                             `module_id`,
+                                            `version`,
                                             `fcd`)
         VALUES (#{tenantModule.tenantUuid},
                 #{tenantModule.moduleId},
+                #{tenantModule.version},
                 #{updateTag})
     </insert>
     <insert id="insertTenantModuleDmlSql">

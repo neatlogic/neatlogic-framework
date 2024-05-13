@@ -109,10 +109,12 @@ public class FullTextIndexUtil {
             CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
             OffsetAttribute offset = stream.addAttribute(OffsetAttribute.class);// 位置数据
             TypeAttribute type = stream.addAttribute(TypeAttribute.class);
+
             stream.reset();
             while (stream.incrementToken()) {
                 wordList.add(new FullTextIndexWordOffsetVo(term.toString(), type.type(), offset.startOffset(), offset.endOffset()));
             }
+
             stream.end();
             stream.close();
         }

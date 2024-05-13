@@ -1,9 +1,9 @@
 package neatlogic.framework.condition.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.Expression;
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.form.constvalue.FormConditionModel;
-import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 
@@ -13,6 +13,11 @@ import java.util.List;
  * @Description: 条件处理器类
  */
 public interface IConditionHandler {
+
+    /**
+     * 参数归属
+     */
+    String getBelong();
 
     /**
      * @Description: 条件英文名

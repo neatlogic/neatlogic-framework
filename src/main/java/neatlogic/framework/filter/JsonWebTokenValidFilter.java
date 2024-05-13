@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.filter;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -67,8 +68,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         Cookie[] cookies = request.getCookies();
         String timezone = "+8:00";
-        boolean isUnExpired = false;
-        UserVo userVo = null;
+        boolean isUnExpired;
+        UserVo userVo;
         String authType = "default";
         ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth(authType);
         ILoginAuthHandler loginAuth = defaultLoginAuth;
@@ -227,7 +228,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      *
      * @return 不超时返回权限信息，否则返回null
      */
-    private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) throws CloneNotSupportedException {
+    private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         JwtVo jwt = userVo.getJwtVo();
         Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
         if (authenticationInfoStr == null) {
@@ -247,7 +248,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
             }
         } else {
-            AuthenticationInfoVo authenticationInfoVo = JSONObject.toJavaObject(JSONObject.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
+            AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
             UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             return true;
         }

@@ -32,32 +32,51 @@ import java.util.Map.Entry;
 @RootComponent
 public class ConditionHandlerFactory extends ModuleInitializedListenerBase {
 
-	private static final Map<String, IConditionHandler> conditionHandlerMap = new HashMap<>();
+    private static final Map<String, HashMap<String, IConditionHandler>> conditionHandlerMap = new HashMap<>();
 
-	private static final List<IConditionHandler> conditionHandlerList = new ArrayList<>();
+    private static final Map<String, List<IConditionHandler>> conditionHandlerList = new HashMap<>();
 
-	public static IConditionHandler getHandler(String name) {
-		return conditionHandlerMap.get(name);
-	}
+    public static IConditionHandler getHandler(String belong, String name) {
+        if (conditionHandlerMap.containsKey(belong)) {
+            return conditionHandlerMap.get(belong).get(name);
+        }
+        return null;
+    }
 
-	public static List<IConditionHandler> getConditionHandlerList() {
-		return conditionHandlerList;
-	}
-	
-	@Override
-	public void onInitialized(NeatLogicWebApplicationContext context) {
-		Map<String, IConditionHandler> myMap = context.getBeansOfType(IConditionHandler.class);
-		for (Entry<String, IConditionHandler> entry : myMap.entrySet()) {
-			IConditionHandler conditionHandler = entry.getValue();
-			conditionHandlerMap.put(conditionHandler.getName(), conditionHandler);
-			conditionHandlerList.add(conditionHandler);
-		}
-	}
+    public static IConditionHandler getHandler(String name) {
+        for (Entry<String, HashMap<String, IConditionHandler>> entry : conditionHandlerMap.entrySet()) {
+            if (entry.getValue().containsKey(name)) {
+                return entry.getValue().get(name);
+            }
+        }
+        return null;
+    }
 
-	@Override
-	protected void myInit() {
-		// TODO Auto-generated method stub
-		
-	}
+    public static List<IConditionHandler> getConditionHandlerList(String belong) {
+        if (conditionHandlerList.containsKey(belong)) {
+            return conditionHandlerList.get(belong);
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void onInitialized(NeatLogicWebApplicationContext context) {
+        Map<String, IConditionHandler> myMap = context.getBeansOfType(IConditionHandler.class);
+        for (Entry<String, IConditionHandler> entry : myMap.entrySet()) {
+            IConditionHandler conditionHandler = entry.getValue();
+            if (!conditionHandlerMap.containsKey(conditionHandler.getBelong())) {
+                conditionHandlerMap.put(conditionHandler.getBelong(), new HashMap<>());
+                conditionHandlerList.put(conditionHandler.getBelong(), new ArrayList<>());
+            }
+            conditionHandlerMap.get(conditionHandler.getBelong()).put(conditionHandler.getName(), conditionHandler);
+            conditionHandlerList.get(conditionHandler.getBelong()).add(conditionHandler);
+        }
+    }
+
+    @Override
+    protected void myInit() {
+        // TODO Auto-generated method stub
+
+    }
 
 }

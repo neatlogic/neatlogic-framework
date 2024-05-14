@@ -25,7 +25,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-public class AttributeDataVo implements Comparable<AttributeDataVo> {
+import java.io.Serializable;
+
+public class AttributeDataVo implements Comparable<AttributeDataVo>, Serializable {
     private Long id;
     private String formUuid;
     private String tag;

@@ -74,7 +74,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         Set<String> headerSet = new HashSet<>(); //使用到的header
         Set<String> roleUuidSet = new HashSet<>(roleUuidList);
         getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet);
-        if (isRuleRole && CollectionUtils.isNotEmpty(roleUuidSet)) {
+        if (Boolean.TRUE.equals(isRuleRole) && CollectionUtils.isNotEmpty(roleUuidSet)) {
             roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet);
         } else {
             roleUuidList = new ArrayList<>(roleUuidSet);
@@ -101,7 +101,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
     }
 
     @Override
-    public Set<String> getTeamSetWithParents(List<String> teamUuidList){
+    public Set<String> getTeamSetWithParents(List<String> teamUuidList) {
         Set<String> upwardUuidSet = new HashSet<>();
         List<TeamVo> teamList = teamMapper.getTeamByUuidList(teamUuidList);
         for (TeamVo teamVo : teamList) {
@@ -143,25 +143,31 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
     }
 
     /**
+     * 获取用户上下文中或请求中的headers
+     */
+    private JSONObject getHeaders() {
+        JSONObject headers = new JSONObject();
+        if (UserContext.get() != null && UserContext.get().getJwtVo() != null) {
+            headers = UserContext.get().getJwtVo().getHeaders();
+        } else if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {
+            Enumeration<String> envNames = RequestContext.get().getRequest().getHeaderNames();
+            while (envNames != null && envNames.hasMoreElements()) {
+                String key = envNames.nextElement();
+                String value = RequestContext.get().getRequest().getHeader(key);
+                headers.put(key, value);
+            }
+        }
+        return headers;
+    }
+
+    /**
      * 去掉不满足规则的角色
      *
      * @param roleUuidList 角色
      */
     private List<String> removeInValidRoleUuidList(List<String> roleUuidList, Set<String> headerSet) {
-        JSONObject headers = new JSONObject();
+        JSONObject headers = getHeaders();
         List<String> validRoleUuidList = new ArrayList<>();
-        if (UserContext.get() != null) {
-            headers = UserContext.get().getJwtVo().getHeaders();
-        } else {
-            if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {
-                Enumeration<String> envNames = RequestContext.get().getRequest().getHeaderNames();
-                while (envNames != null && envNames.hasMoreElements()) {
-                    String key = envNames.nextElement();
-                    String value = RequestContext.get().getRequest().getHeader(key);
-                    headers.put(key, value);
-                }
-            }
-        }
         List<RoleVo> roleVos = roleMapper.getRoleByUuidList(roleUuidList);
         for (RoleVo ro : roleVos) {
             String rule = ro.getRule();

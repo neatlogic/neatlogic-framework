@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.dto.BaseEditorVo;
+import neatlogic.framework.util.UuidUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +35,7 @@ public class FormVersionVo extends BaseEditorVo {
     private Integer isActive;
     private JSONObject formConfig;
     private String sceneUuid;
+    @JSONField(serialize = false)
     private List<FormAttributeVo> formExtendAttributeList;
     @JSONField(serialize = false)
     private List<FormAttributeVo> formAttributeList;
@@ -275,6 +277,42 @@ public class FormVersionVo extends BaseEditorVo {
     }
 
     public List<FormAttributeVo> getFormExtendAttributeList() {
+        if (formExtendAttributeList == null) {
+            if (MapUtils.isNotEmpty(getFormConfig())) {
+                JSONObject formExtendConfig = this.formConfig.getJSONObject("formExtendConfig");
+                if (MapUtils.isNotEmpty(formExtendConfig)) {
+                    JSONArray attributeArray = formExtendConfig.getJSONArray("attributeList");
+                    if (CollectionUtils.isNotEmpty(attributeArray)) {
+                        formExtendAttributeList = new ArrayList<>();
+                        for (int i = 0; i < attributeArray.size(); i++) {
+                            JSONObject attributeObj = attributeArray.getJSONObject(i);
+                            if (MapUtils.isEmpty(attributeObj)) {
+                                continue;
+                            }
+                            String parentUuid = attributeObj.getString("parentUuid");
+                            String tag = attributeObj.getString("tag");
+                            String key = attributeObj.getString("key");
+                            String label = attributeObj.getString("label");
+                            String type = attributeObj.getString("type");
+                            String handler = attributeObj.getString("handler");
+                            JSONObject config = attributeObj.getJSONObject("config");
+                            FormAttributeVo formAttributeVo = new FormAttributeVo();
+                            formAttributeVo.setFormUuid(formUuid);
+                            formAttributeVo.setFormVersionUuid(uuid);
+                            formAttributeVo.setParentUuid(parentUuid);
+                            formAttributeVo.setTag(tag);
+                            formAttributeVo.setKey(key);
+                            formAttributeVo.setUuid(UuidUtil.getCustomUUID(parentUuid + "#" + tag + "#" + key));
+                            formAttributeVo.setLabel(label);
+                            formAttributeVo.setType(type);
+                            formAttributeVo.setHandler(handler);
+                            formAttributeVo.setConfig(config);
+                            formExtendAttributeList.add(formAttributeVo);
+                        }
+                    }
+                }
+            }
+        }
         return formExtendAttributeList;
     }
 

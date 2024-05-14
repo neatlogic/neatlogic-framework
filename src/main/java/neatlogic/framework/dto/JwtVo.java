@@ -30,7 +30,7 @@ public class JwtVo implements Serializable {
     private String tokenHash;
 
     @EntityField(name = "登录认证 请求headers", type = ApiParamType.STRING)
-    JSONObject headers;
+    JSONObject headers = new JSONObject();
 
     public JwtVo() {
 

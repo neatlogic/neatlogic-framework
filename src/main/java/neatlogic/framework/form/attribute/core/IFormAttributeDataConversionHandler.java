@@ -43,6 +43,15 @@ public interface IFormAttributeDataConversionHandler {
     Object valueConversionText(AttributeDataVo attributeDataVo, JSONObject configObj);
 
     /**
+     * 获取简单值，例如下拉框值为{"value":"a", "text":"A"}，返回值为a
+     * @param originalValue
+     * @return
+     */
+    default Object getSimpleValue(Object originalValue) {
+        return originalValue;
+    }
+
+    /**
      * 数据转换，用于邮件模板展示表单信息
      *
      * @param attributeDataVo

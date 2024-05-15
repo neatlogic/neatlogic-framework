@@ -57,6 +57,8 @@ public class Integration2FormAttrDependencyHandler extends FixedTableDependencyH
                 if (formVersionVo != null) {
                     FormVo formVo = formMapper.getFormByUuid(formVersionVo.getFormUuid());
                     if (formVo != null) {
+                        String mainSceneUuid = formVersionVo.getFormConfig().getString("uuid");
+                        formVersionVo.setSceneUuid(mainSceneUuid);
                         List<FormAttributeVo> formAttributeList = formVersionVo.getFormAttributeList();
                         if (CollectionUtils.isNotEmpty(formAttributeList)) {
                             for (FormAttributeVo formAttributeVo : formAttributeList) {

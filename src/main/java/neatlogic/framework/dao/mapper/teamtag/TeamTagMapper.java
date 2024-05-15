@@ -17,6 +17,7 @@
 
 package neatlogic.framework.dao.mapper.teamtag;
 
+import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.dto.teamtag.TeamTagTeamVo;
 import neatlogic.framework.dto.teamtag.TeamTagVo;
 import org.apache.ibatis.annotations.Param;
@@ -42,4 +43,6 @@ public interface TeamTagMapper {
     void insertTeamTag(TeamTagVo teamTagVo);
 
     void deleteTeamTag(Long tagId);
+
+    void deleteTeamTagTeam(@Param("tagIdList") JSONArray tagIdList,@Param("teamUuid") String teamUuid);
 }

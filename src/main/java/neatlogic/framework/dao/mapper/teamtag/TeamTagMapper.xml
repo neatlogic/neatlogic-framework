@@ -40,7 +40,7 @@
         FROM `team_tag`
         <where>
             <if test="keyword != null and keyword != ''">
-                `name` LIKE CONCAT('%',#{keyword},'%')
+                `matrix_attr_value` LIKE CONCAT('%',#{keyword},'%')
             </if>
             <if test="idList != null and idList.size() > 0">
                 `id` in
@@ -63,7 +63,7 @@
                 left JOIN `matrix` m ON tt.matrix_uuid = m.uuid
         <where>
             <if test="keyword != null and keyword != ''">
-                tt.`name` LIKE CONCAT('%',#{keyword},'%')
+                tt.`matrix_attr_value` LIKE CONCAT('%',#{keyword},'%')
             </if>
             <if test="idList != null and idList.size() > 0">
                 tt.`id` in
@@ -130,9 +130,18 @@
         where `tag_id` = #{tagId} and `update_time` != #{updateTime}
     </delete>
     <delete id="deleteTeamTag">
-        delete tt.* from `team_tag` tt
+        delete tt.*,ttt.* from `team_tag` tt
         left join `team_tag_team` ttt on tt.`id` = ttt.`tag_id`
         where tt.id = #{value}
+    </delete>
+    <delete id="deleteTeamTagTeam">
+        delete
+        from `team_tag_team`
+        where `tag_id` in
+        <foreach collection="tagIdList" item="tagId" separator="," open="(" close=")">
+              #{tagId}
+        </foreach>
+        and `team_uuid` = #{teamUuid}
     </delete>
 </mapper>
 

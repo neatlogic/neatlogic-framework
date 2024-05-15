@@ -24,6 +24,7 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.util.FormUtil;
 import neatlogic.module.framework.form.service.FormService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -92,6 +93,11 @@ public class RadioHandler extends FormHandlerBase {
             return textArray;
         }
         return resultObj.getJSONArray("valueList");
+    }
+
+    @Override
+    public Object getSimpleValue(Object originalValue) {
+        return FormUtil.getFormSelectAttributeValueByOriginalValue(originalValue);
     }
 
     @Override

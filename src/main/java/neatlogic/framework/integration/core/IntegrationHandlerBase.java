@@ -309,7 +309,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             integrationAuditVo.setStatus("succeed");
         }
         if (connection != null && MapUtils.isNotEmpty(connection.getHeaderFields())) {
-            integrationAuditVo.setHeaders(JSONObject.parseObject(JSONObject.toJSONString(connection.getHeaderFields())));
+            integrationAuditVo.setHeaders(JSON.parseObject(JSON.toJSONString(connection.getHeaderFields())));
         }
         integrationAuditVo.setEndTime(new Date());
         resultVo.setAuditId(integrationAuditVo.getId());
@@ -327,8 +327,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         if (result != null) {
             String resultStr = (String) result;
             try {
-                JSONObject resultObj = JSONObject.parseObject(resultStr);
-                data.put("result", JSONObject.toJSONString(resultObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+                JSONObject resultObj = JSON.parseObject(resultStr);
+                data.put("result", JSON.toJSONString(resultObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
             } catch (JSONException e) {
                 data.put("result", result);
             }

@@ -10,20 +10,20 @@ import java.util.List;
 
 public interface IIntegrationHandler {
 
-	public String getName();
+    String getName();
 
-	public default String getHandler() {
-		return ClassUtils.getUserClass(this.getClass()).getSimpleName();
-	}
+    default String getHandler() {
+        return ClassUtils.getUserClass(this.getClass()).getSimpleName();
+    }
 
-	public IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom);
+    IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom);
 
-	public Integer hasPattern();
+    Integer hasPattern();
 
-	public List<PatternVo> getInputPattern();
+    List<PatternVo> getInputPattern();
 
-	public List<PatternVo> getOutputPattern();
+    List<PatternVo> getOutputPattern();
 
-	public void validate(IntegrationResultVo resultVo) throws ApiRuntimeException;
+    void validate(IntegrationResultVo resultVo) throws ApiRuntimeException;
 
 }

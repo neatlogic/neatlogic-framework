@@ -16,295 +16,300 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.integration.dao.mapper.IntegrationMapper">
-	<sql id="searchIntegrationAuditCondition">
-		<where>
-			`start_time` &gt;= #{startTime}
-			AND `end_time` &lt;= #{endTime}
-			<if test="integrationUuid != null and integrationUuid != ''">
-				AND integration_uuid = #{integrationUuid}
-			</if>
-			<if test="userUuidList != null and userUuidList.size() > 0">
-				AND `user_uuid` IN
-				<foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
-					#{uuid}
-				</foreach>
-			</if>
-			<if test="statusList != null and statusList.size() > 0">
-				AND `status` IN
-				<foreach collection="statusList" item="status" open="(" separator="," close=")">
-					#{status}
-				</foreach>
-			</if>
-		</where>
-	</sql>
+    <sql id="searchIntegrationAuditCondition">
+        <where>
+            <if test="startTime != null">`start_time` &gt;= #{startTime}</if>
+            <if test="endTime != null">AND `end_time` &lt;= #{endTime}</if>
+            <if test="idList != null and idList.size() > 0">
+                AND id in
+                <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+            <if test="integrationUuid != null and integrationUuid != ''">
+                AND integration_uuid = #{integrationUuid}
+            </if>
+            <if test="integrationUuidList != null and integrationUuidList.size() > 0">
+                AND integration_uuid in
+                <foreach collection="integrationUuidList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+            <if test="userUuidList != null and userUuidList.size() > 0">
+                AND `user_uuid` IN
+                <foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
+                    #{uuid}
+                </foreach>
+            </if>
+            <if test="statusList != null and statusList.size() > 0">
+                AND `status` IN
+                <foreach collection="statusList" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+    </sql>
 
 
-	<select id="searchIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo" resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
-		SELECT
-		`id`,
-		`integration_uuid` AS integrationUuid,
-		`user_uuid` AS userUuid,
-		(SELECT user_name FROM user WHERE uuid = user_uuid) AS userName,
-		`request_from` AS requestFrom,
-		`server_id` AS serverId,
-		`start_time` AS startTime,
-		`end_time` AS endTime,
-		`status`,
-		`param_file_path` AS paramFilePath,
-		`result_file_path` AS resultFilePath,
-		`error_file_path` AS errorFilePath,
-		(UNIX_TIMESTAMP(IFNULL(end_time, NOW()))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost
-		FROM
-		`integration_audit`
-		<include refid="searchIntegrationAuditCondition" />
-		ORDER BY id DESC
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
-	</select>
+    <select id="searchIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo"
+            resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
+        SELECT
+        `id`,
+        `integration_uuid` AS integrationUuid,
+        `user_uuid` AS userUuid,
+        (SELECT user_name FROM user WHERE uuid = user_uuid) AS userName,
+        `request_from` AS requestFrom,
+        `server_id` AS serverId,
+        `start_time` AS startTime,
+        `end_time` AS endTime,
+        `status`,
+        `param_file_path` AS paramFilePath,
+        `result_file_path` AS resultFilePath,
+        `error_file_path` AS errorFilePath,
+        (UNIX_TIMESTAMP(IFNULL(end_time, NOW()))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost
+        FROM
+        `integration_audit`
+        <include refid="searchIntegrationAuditCondition"/>
+        ORDER BY id DESC
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
 
-	<select id="getIntegrationAuditCount" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM
-		`integration_audit`
-		<include refid="searchIntegrationAuditCondition" />
-	</select>
+    <select id="getIntegrationAuditCount" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM
+        `integration_audit`
+        <include refid="searchIntegrationAuditCondition"/>
+    </select>
 
-	<select id="getIntegrationByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.integration.dto.IntegrationVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`url`,
-		`handler`,
-		`method`,
-		is_active AS isActive,
-		`config`
-		FROM
-		`integration`
-		WHERE
-		uuid = #{value}
-	</select>
+    <select id="getIntegrationByUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.integration.dto.IntegrationVo">
+        SELECT `uuid`,
+               `name`,
+               `url`,
+               `handler`,
+               `method`,
+               is_active AS isActive,
+               `config`
+        FROM `integration`
+        WHERE uuid = #{value}
+    </select>
 
-	<select id="getIntegrationByName" parameterType="java.lang.String" resultType="neatlogic.framework.integration.dto.IntegrationVo">
-		SELECT
-			`uuid`,
-			`name`,
-			`url`,
-			`handler`,
-			`method`,
-			is_active AS isActive,
-			`config`
-		FROM
-			`integration`
-		WHERE
-			`name` = #{value}
-	</select>
+    <select id="getIntegrationByName" parameterType="java.lang.String"
+            resultType="neatlogic.framework.integration.dto.IntegrationVo">
+        SELECT `uuid`,
+               `name`,
+               `url`,
+               `handler`,
+               `method`,
+               is_active AS isActive,
+               `config`
+        FROM `integration`
+        WHERE `name` = #{value}
+    </select>
 
-	<select id="checkIntegrationExists" parameterType="java.lang.String" resultType="int">
-		SELECT COUNT(`uuid`) FROM `integration` WHERE `uuid` = #{value}
-	</select>
+    <select id="checkIntegrationExists" parameterType="java.lang.String" resultType="int">
+        SELECT COUNT(`uuid`)
+        FROM `integration`
+        WHERE `uuid` = #{value}
+    </select>
 
-	<select id="searchIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo" resultType="neatlogic.framework.integration.dto.IntegrationVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`url`,
-		`handler`,
-		`method`,
-		is_active AS isActive,
-		`config`
-		FROM
-		`integration`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				AND (name LIKE concat('%', #{keyword}, '%')
-				OR url LIKE concat('%', #{keyword}, '%'))
-			</if>
-			<if test="handler != null and handler != ''">
-				AND handler = #{handler}
-			</if>
-			<if test="isActive != null">
-				AND is_active = #{isActive}
-			</if>
-		</where>
-		ORDER BY fcd DESC
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
-	</select>
-	<select id="getIntegrationListByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.integration.dto.IntegrationVo">
-		SELECT
-		`uuid`,
-		`name`,
-		`url`,
-		`handler`,
-		`method`,
-		`is_active` AS isActive,
-		`config`
-		FROM `integration`
-		WHERE `uuid` IN
-		<foreach collection="list" item="uuid" open="(" separator="," close=")">
-			#{uuid}
-		</foreach>
-	</select>
+    <select id="searchIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo"
+            resultType="neatlogic.framework.integration.dto.IntegrationVo">
+        SELECT
+        `uuid`,
+        `name`,
+        `url`,
+        `handler`,
+        `method`,
+        is_active AS isActive,
+        `config`
+        FROM
+        `integration`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE concat('%', #{keyword}, '%')
+                OR url LIKE concat('%', #{keyword}, '%'))
+            </if>
+            <if test="handler != null and handler != ''">
+                AND handler = #{handler}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+        </where>
+        ORDER BY fcd DESC
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+    <select id="getIntegrationListByUuidList" parameterType="java.lang.String"
+            resultType="neatlogic.framework.integration.dto.IntegrationVo">
+        SELECT
+        `uuid`,
+        `name`,
+        `url`,
+        `handler`,
+        `method`,
+        `is_active` AS isActive,
+        `config`
+        FROM `integration`
+        WHERE `uuid` IN
+        <foreach collection="list" item="uuid" open="(" separator="," close=")">
+            #{uuid}
+        </foreach>
+    </select>
 
-	<select id="searchIntegrationForSelect" parameterType="neatlogic.framework.integration.dto.IntegrationVo" resultType="neatlogic.framework.common.dto.ValueTextVo">
-		SELECT
-		`uuid` as `value`,
-		`name` as `text`
-		FROM
-		`integration`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				AND (name LIKE concat('%', #{keyword}, '%')
-				OR url LIKE concat('%', #{keyword}, '%'))
-			</if>
-			<if test="handler != null and handler != ''">
-				AND handler = #{handler}
-			</if>
-			<if test="isActive != null">
-				AND is_active = #{isActive}
-			</if>
-			<if test="defaultValue != null and defaultValue.size() >0">
-				AND uuid in
-				<foreach collection="defaultValue" item="uuid" open="(" separator="," close=")">
-					#{uuid}
-				</foreach>
-			</if>
-		</where>
-		ORDER BY fcd DESC
-		<if test="needPage == true">
-			LIMIT #{startNum}, #{pageSize}
-		</if>
-	</select>
+    <select id="searchIntegrationForSelect" parameterType="neatlogic.framework.integration.dto.IntegrationVo"
+            resultType="neatlogic.framework.common.dto.ValueTextVo">
+        SELECT
+        `uuid` as `value`,
+        `name` as `text`
+        FROM
+        `integration`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE concat('%', #{keyword}, '%')
+                OR url LIKE concat('%', #{keyword}, '%'))
+            </if>
+            <if test="handler != null and handler != ''">
+                AND handler = #{handler}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+            <if test="defaultValue != null and defaultValue.size() >0">
+                AND uuid in
+                <foreach collection="defaultValue" item="uuid" open="(" separator="," close=")">
+                    #{uuid}
+                </foreach>
+            </if>
+        </where>
+        ORDER BY fcd DESC
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
 
-	<select id="searchIntegrationCount" parameterType="neatlogic.framework.integration.dto.IntegrationVo" resultType="int">
-		SELECT
-		COUNT(1)
-		FROM
-		`integration`
-		<where>
-			<if test="keyword != null and keyword != ''">
-				AND (name LIKE concat('%', #{keyword}, '%')
-				OR url LIKE concat('%', #{keyword}, '%'))
-			</if>
-			<if test="handler != null and handler != ''">
-				AND handler = #{handler}
-			</if>
-			<if test="isActive != null">
-				AND is_active = #{isActive}
-			</if>
-		</where>
-	</select>
+    <select id="searchIntegrationCount" parameterType="neatlogic.framework.integration.dto.IntegrationVo"
+            resultType="int">
+        SELECT
+        COUNT(1)
+        FROM
+        `integration`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE concat('%', #{keyword}, '%')
+                OR url LIKE concat('%', #{keyword}, '%'))
+            </if>
+            <if test="handler != null and handler != ''">
+                AND handler = #{handler}
+            </if>
+            <if test="isActive != null">
+                AND is_active = #{isActive}
+            </if>
+        </where>
+    </select>
 
-	<select id="checkNameIsRepeats" parameterType="neatlogic.framework.integration.dto.IntegrationVo" resultType="int">
-		select count(1) from `integration` where `name` = #{name} and `uuid` != #{uuid}
-	</select>
+    <select id="checkNameIsRepeats" parameterType="neatlogic.framework.integration.dto.IntegrationVo" resultType="int">
+        select count(1)
+        from `integration`
+        where `name` = #{name}
+          and `uuid` != #{uuid}
+    </select>
 
-	<select id="checkUuidListExists" parameterType="java.util.List" resultType="java.lang.String">
-		select `uuid` from `integration`
+    <select id="checkUuidListExists" parameterType="java.util.List" resultType="java.lang.String">
+        select `uuid` from `integration`
         where `uuid` in
-		<foreach collection="list" item="item" open="(" separator="," close=")">
-			#{item}
-		</foreach>
-	</select>
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 
-	<update id="updateIntegrationActive" parameterType="neatlogic.framework.integration.dto.IntegrationVo">
-		UPDATE
-		`integration`
-		SET
-		is_active = #{isActive}
-		WHERE `uuid` = #{uuid}
-	</update>
+    <update id="updateIntegrationActive" parameterType="neatlogic.framework.integration.dto.IntegrationVo">
+        UPDATE
+            `integration`
+        SET is_active = #{isActive}
+        WHERE `uuid` = #{uuid}
+    </update>
 
-	<update id="updateIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo">
-		UPDATE
-		`integration`
-		SET
-		`name` = #{name},
-		`url` = #{url},
-		`handler` = #{handler},
-		`method` = #{method},
-		`config` = #{configStr},
-		`lcd` = NOW(3),
-		`lcu` = #{lcu}
-		WHERE `uuid` = #{uuid}
-	</update>
+    <update id="updateIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo">
+        UPDATE
+            `integration`
+        SET `name`    = #{name},
+            `url`     = #{url},
+            `handler` = #{handler},
+            `method`  = #{method},
+            `config`  = #{configStr},
+            `lcd`     = NOW(3),
+            `lcu`     = #{lcu}
+        WHERE `uuid` = #{uuid}
+    </update>
 
-	<insert id="insertIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo">
-		INSERT INTO `integration` (
-		`uuid`,
-		`name`,
-		`url`,
-		`handler`,
-		`method`,
-		`config`,
-		`is_active`,
-		`fcd`,
-		`fcu`,
-		`lcd`,
-		`lcu`
-		)
-		VALUES
-		(
-		#{uuid},
-		#{name},
-		#{url},
-		#{handler},
-		#{method},
-		#{configStr},
-		#{isActive},
-		NOW(3),
-		#{fcu},
-		NOW(3),
-		#{fcu}
-		)
-	</insert>
+    <insert id="insertIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo">
+        INSERT INTO `integration` (`uuid`,
+                                   `name`,
+                                   `url`,
+                                   `handler`,
+                                   `method`,
+                                   `config`,
+                                   `is_active`,
+                                   `fcd`,
+                                   `fcu`,
+                                   `lcd`,
+                                   `lcu`)
+        VALUES (#{uuid},
+                #{name},
+                #{url},
+                #{handler},
+                #{method},
+                #{configStr},
+                #{isActive},
+                NOW(3),
+                #{fcu},
+                NOW(3),
+                #{fcu})
+    </insert>
 
-	<insert id="insertIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo">
-		INSERT INTO `integration_audit` (
-		`id`,
-		`integration_uuid`,
-		`user_uuid`,
-		`request_from`,
-		`server_id`,
-		`start_time`,
-		`end_time`,
-		`status`,
-		`param_file_path`,
-		`result_file_path`,
-		`error_file_path`,
-		`headers`
+    <insert id="insertIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo">
+        INSERT INTO `integration_audit` (`id`,
+                                         `integration_uuid`,
+                                         `user_uuid`,
+                                         `request_from`,
+                                         `server_id`,
+                                         `start_time`,
+                                         `end_time`,
+                                         `status`,
+                                         `param_file_path`,
+                                         `result_file_path`,
+                                         `error_file_path`,
+                                         `headers`
 -- 		`param_hash`,
 -- 		`result_hash`,
 -- 		`error_hash`
-		)
-		VALUES
-		(
-			#{id},
-			#{integrationUuid},
-			#{userUuid},
-			#{requestFrom},
-			#{serverId},
-			#{startTime},
-			#{endTime},
-			#{status},
-			#{paramFilePath},
-			#{resultFilePath},
-			#{errorFilePath},
-		    #{headersStr})
-	</insert>
+        )
+        VALUES (#{id},
+                #{integrationUuid},
+                #{userUuid},
+                #{requestFrom},
+                #{serverId},
+                #{startTime},
+                #{endTime},
+                #{status},
+                #{paramFilePath},
+                #{resultFilePath},
+                #{errorFilePath},
+                #{headersStr})
+    </insert>
 
-	<delete id="deleteIntegrationByUuid" parameterType="java.lang.String">
-		DELETE
-		FROM `integration`
-		WHERE `uuid` = #{value}
-	</delete>
+    <delete id="deleteIntegrationByUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `integration`
+        WHERE `uuid` = #{value}
+    </delete>
 
-	<delete id="deleteAuditByDayBefore" parameterType="int">
-		delete
-		from integration_audit
-		where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
-	</delete>
+    <delete id="deleteAuditByDayBefore" parameterType="int">
+        delete
+        from integration_audit
+        where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
 </mapper>

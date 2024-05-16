@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.form.dto;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -91,6 +92,15 @@ public class AttributeDataVo implements Comparable<AttributeDataVo>, Serializabl
     }
 
     public String getData() {
+        if (dataObj != null) {
+            if (dataObj instanceof JSONObject || dataObj instanceof JSONArray) {
+                data = JSON.toJSONString(dataObj);
+            } else if (dataObj instanceof String) {
+                data = ((String) dataObj);
+            } else {
+                data = dataObj.toString();
+            }
+        }
         return data;
     }
 

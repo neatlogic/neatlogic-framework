@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.restful.core;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -70,10 +71,10 @@ public class ApiValidateAndHelpBase {
         data.put("userUuid", userContext.getUserUuid());
         data.put("ip", requestIp);
         if (MapUtils.isNotEmpty(paramObj)) {
-            data.put("param", JSONObject.toJSONString(paramObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat));
+            data.put("param", JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat));
         }
         if (result != null) {
-            data.put("result", JSONObject.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+            data.put("result", JSON.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
         }
         if (StringUtils.isNotBlank(error)) {
             data.put("error", error);
@@ -98,7 +99,7 @@ public class ApiValidateAndHelpBase {
             data.put("param", param);
         }
         if (result != null) {
-            data.put("result", JSONObject.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
+            data.put("result", JSON.toJSONString(result, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat, SerializerFeature.DisableCircularReferenceDetect));
         }
         if (StringUtils.isNotBlank(error)) {
             data.put("error", error);
@@ -183,7 +184,7 @@ public class ApiValidateAndHelpBase {
             if (isDifferent) {
                 System.out.println("API:" + apiClass.getName());
                 System.out.println("返回参数：" + returnFormat.toJSONString());
-                System.out.println("接口配置：" + JSONObject.toJSONString(outputObj));
+                System.out.println("接口配置：" + JSON.toJSONString(outputObj));
                 System.out.println();
             }
         }
@@ -229,7 +230,7 @@ public class ApiValidateAndHelpBase {
         }
     }
 
-    protected void validApiFowRaw(Class<?> apiClass) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
+    protected void validApiFowRaw(Class<?> apiClass) throws SecurityException, PermissionDeniedException {
         // 获取目标类
         boolean isAuth = false;
         List<String> authNameList = new ArrayList<>();
@@ -303,6 +304,10 @@ public class ApiValidateAndHelpBase {
         if (input != null) {
             Param[] params = input.value();
             for (Param p : params) {
+                if (p.isExcluded()) {
+                    //删除排除属性
+                    paramObj.remove(p.name());
+                }
                 if (p.type().equals(ApiParamType.NOAUTH)) {
                     continue;
                 }
@@ -347,9 +352,9 @@ public class ApiValidateAndHelpBase {
                         } else if (p.type().equals(ApiParamType.LONG)) {
                             paramObj.put(p.name(), Long.parseLong(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.JSONARRAY)) {
-                            paramObj.put(p.name(), JSONArray.parse(p.defaultValue()));
+                            paramObj.put(p.name(), JSON.parse(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.JSONOBJECT)) {
-                            paramObj.put(p.name(), JSONObject.parse(p.defaultValue()));
+                            paramObj.put(p.name(), JSON.parse(p.defaultValue()));
                         } else if (p.type().equals(ApiParamType.ENUM)) {
                             paramObj.put(p.name(), p.defaultValue());
                         }
@@ -366,13 +371,13 @@ public class ApiValidateAndHelpBase {
                 }
                 if (p.maxSize() > 0) {
                     if (paramValue instanceof JSONArray) {
-                        JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
+                        JSONArray paramArray = JSON.parseArray(paramValue.toString());
                         if (paramArray.size() > p.maxSize()) {
                             throw new ParamValueTooLongException(p.name(), paramArray.size(), p.maxSize());
                         }
                     }
                     if (paramValue instanceof JSONObject) {
-                        JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
+                        JSONObject paramJson = JSON.parseObject(paramValue.toString());
                         if (paramJson.size() > p.maxSize()) {
                             throw new ParamValueTooLongException(p.name(), paramJson.size(), p.maxSize());
                         }
@@ -387,13 +392,13 @@ public class ApiValidateAndHelpBase {
                 }
                 if (p.minSize() > 0) {
                     if (paramValue instanceof JSONArray) {
-                        JSONArray paramArray = JSONArray.parseArray(paramValue.toString());
+                        JSONArray paramArray = JSON.parseArray(paramValue.toString());
                         if (paramArray.size() < p.minSize()) {
                             throw new ParamValueTooShortException(p.name(), paramArray.size(), p.minSize());
                         }
                     }
                     if (paramValue instanceof JSONObject) {
-                        JSONObject paramJson = JSONObject.parseObject(paramValue.toString());
+                        JSONObject paramJson = JSON.parseObject(paramValue.toString());
                         if (paramJson.size() < p.minSize()) {
                             throw new ParamValueTooShortException(p.name(), paramJson.size(), p.minSize());
                         }
@@ -464,6 +469,9 @@ public class ApiValidateAndHelpBase {
                         Input input = (Input) anno;
                         Param[] params = input.value();
                         for (Param p : params) {
+                            if (p.isExcluded()) {
+                                continue;
+                            }
                             JSONObject paramObj = new JSONObject();
                             paramObj.put("name", p.name());
                             if (p.maxLength() > 0) {
@@ -534,10 +542,10 @@ public class ApiValidateAndHelpBase {
                         String content = example.example();
                         if (StringUtils.isNotBlank(content)) {
                             try {
-                                jsonObj.put("example", JSONObject.parseObject(content));
+                                jsonObj.put("example", JSON.parseObject(content));
                             } catch (Exception ex) {
                                 try {
-                                    jsonObj.put("example", JSONArray.parseArray(content));
+                                    jsonObj.put("example", JSON.parseArray(content));
                                 } catch (Exception ignored) {
 
                                 }
@@ -583,7 +591,7 @@ public class ApiValidateAndHelpBase {
      * @Returns: java.lang.annotation.Annotation
      **/
     protected Annotation getAnnotation(String methodName, Class<?> t, Class<?>... paramClass) {
-        Object target = null;
+        Object target;
         try {
             Object proxy = AopContext.currentProxy();
             //获取代理的真实bean
@@ -625,7 +633,7 @@ public class ApiValidateAndHelpBase {
                         valueList.add(value);
                     }
                 }
-                if (valueList.size() > 0) {
+                if (!valueList.isEmpty()) {
                     return String.join(",", valueList);
                 }
             } else {
@@ -644,7 +652,7 @@ public class ApiValidateAndHelpBase {
 
                     }
                 }
-                if (valueList.size() > 0) {
+                if (!valueList.isEmpty()) {
                     return String.join(",", valueList);
                 }
             }

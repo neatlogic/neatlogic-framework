@@ -31,6 +31,8 @@ public @interface Param {
 
     boolean isRequired() default false;
 
+    boolean isExcluded() default false;
+
     String rule() default "";
 
     String desc() default "";

@@ -180,7 +180,6 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     apiConfigVo = apiVo;
                 }
                 if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
-                    //TODO 对象冲突
                     saveAudit(apiVo, paramObj, result, error, startTime, endTime);
                 }
             }

@@ -219,6 +219,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE `name` = #{value}
     </select>
 
+    <select id="getFormActiveVersionByFormUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormVersionVo">
+        SELECT a.`uuid`,
+               a.`version`,
+               a.`is_active`   AS isActive,
+               a.`form_uuid`   AS formUuid,
+               a.`form_config` AS formConfigStr,
+               a.`fcu`,
+               a.`fcd`,
+               a.`lcu`,
+               a.`lcd`,
+               b.name          AS formName
+        FROM `form_version` a
+                 join `form` b ON a.form_uuid = b.uuid
+        WHERE a.form_uuid = #{value}
+          and a.is_active = 1
+    </select>
+
     <select id="getFormVersionByFormUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.form.dto.FormVersionVo">
         SELECT `uuid`,
@@ -307,28 +325,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
     </select>
 
-    <select id="getFormExtendAttributeListByFormUuidAndFormVersionUuid" parameterType="java.util.HashMap" resultType="neatlogic.framework.form.dto.FormAttributeVo">
-        SELECT
-            `form_uuid` AS formUuid,
-            `formversion_uuid` AS formVersionUuid,
-            `parent_uuid` AS parentUuid,
-            `tag`,
-            `key`,
-            `uuid`,
-            `label`,
-            `type`,
-            `handler`,
-            `config` AS configStr
+    <select id="getFormExtendAttributeListByFormUuidAndFormVersionUuid" parameterType="java.util.HashMap"
+            resultType="neatlogic.framework.form.dto.FormAttributeVo">
+        SELECT `form_uuid`        AS formUuid,
+               `formversion_uuid` AS formVersionUuid,
+               `parent_uuid`      AS parentUuid,
+               `tag`,
+               `key`,
+               `uuid`,
+               `label`,
+               `type`,
+               `handler`,
+               `config`           AS configStr
         FROM `form_extend_attribute`
         WHERE `form_uuid` = #{formUuid}
           AND `formversion_uuid` = #{formVersionUuid}
     </select>
 
     <select id="getFormAttributeMatrixCount" resultType="int">
-        SELECT COUNT(1) FROM `form_attribute_matrix`
+        SELECT COUNT(1)
+        FROM `form_attribute_matrix`
     </select>
 
-    <select id="getFormAttributeMatrixList" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="java.util.HashMap">
+    <select id="getFormAttributeMatrixList" parameterType="neatlogic.framework.common.dto.BasePageVo"
+            resultType="java.util.HashMap">
         select `matrix_uuid`          AS matrixUuid,
                `form_version_uuid`    AS formVersionUuid,
                `form_attribute_label` AS formAttributeLabel,
@@ -367,7 +387,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         ORDER BY a.`form_uuid`
     </select>
 
-    <select id="getFormAttributeDataListByProcessTaskId" parameterType="java.lang.Long" resultType="neatlogic.framework.form.dto.AttributeDataVo">
+    <select id="getFormAttributeDataListByProcessTaskId" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.form.dto.AttributeDataVo">
         SELECT a.`id`,
                a.`form_uuid`       AS formUuid,
                a.`handler`,
@@ -379,14 +400,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where b.processtask_id = #{value}
     </select>
 
-    <select id="getFormAttributeDataListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.form.dto.AttributeDataVo">
+    <select id="getFormAttributeDataListByIdList" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.form.dto.AttributeDataVo">
         SELECT
-            `id`,
-            `form_uuid` AS formUuid,
-            `handler`,
-            `attribute_label` AS attributeLabel,
-            `attribute_uuid` AS attributeUuid,
-            `data`
+        `id`,
+        `form_uuid` AS formUuid,
+        `handler`,
+        `attribute_label` AS attributeLabel,
+        `attribute_uuid` AS attributeUuid,
+        `data`
         FROM `form_attribute_data`
         WHERE `id` IN
         <foreach collection="list" item="id" open="(" separator="," close=")">
@@ -523,15 +545,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertFormExtendAttribute" parameterType="neatlogic.framework.form.dto.FormAttributeVo">
         INSERT INTO `form_extend_attribute` (`form_uuid`,
-                                      `formversion_uuid`,
-                                      `parent_uuid`,
-                                      `tag`,
-                                      `key`,
-                                      `uuid`,
-                                      `label`,
-                                      `type`,
-                                      `handler`,
-                                      `config`)
+                                             `formversion_uuid`,
+                                             `parent_uuid`,
+                                             `tag`,
+                                             `key`,
+                                             `uuid`,
+                                             `label`,
+                                             `type`,
+                                             `handler`,
+                                             `config`)
         VALUES (#{formUuid},
                 #{formVersionUuid},
                 #{parentUuid},
@@ -545,49 +567,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </insert>
 
     <insert id="insertFormAttributeData" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
-        INSERT INTO `form_attribute_data` (
-            `id`,
-            `form_uuid`,
-            `handler`,
-            `attribute_label`,
-            `attribute_uuid`,
-            `data`
-        )
-        VALUES
-            (
-                #{id},
+        INSERT INTO `form_attribute_data` (`id`,
+                                           `form_uuid`,
+                                           `handler`,
+                                           `attribute_label`,
+                                           `attribute_uuid`,
+                                           `data`)
+        VALUES (#{id},
                 #{formUuid},
                 #{handler},
                 #{attributeLabel},
                 #{attributeUuid},
-                #{data}
-            )
+                #{data})
         ON DUPLICATE KEY
-        UPDATE `data` = #{data,typeHandler=CompressHandler}
+            UPDATE `data` = #{data,typeHandler=CompressHandler}
     </insert>
 
     <insert id="insertFormExtendAttributeData" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
-        INSERT INTO `form_extend_attribute_data` (
-            `id`,
-            `form_uuid`,
-            `handler`,
-            `tag`,
-            `attribute_label`,
-            `attribute_uuid`,
-            `data`
-        )
-        VALUES
-            (
-                #{id},
+        INSERT INTO `form_extend_attribute_data` (`id`,
+                                                  `form_uuid`,
+                                                  `handler`,
+                                                  `tag`,
+                                                  `attribute_label`,
+                                                  `attribute_uuid`,
+                                                  `data`)
+        VALUES (#{id},
                 #{formUuid},
                 #{handler},
                 #{tag},
                 #{attributeLabel},
                 #{attributeUuid},
-                #{data}
-            )
+                #{data})
         ON DUPLICATE KEY
-        UPDATE `data` = #{data,typeHandler=CompressHandler}
+            UPDATE `data` = #{data,typeHandler=CompressHandler}
     </insert>
 
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">
@@ -637,7 +649,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </delete>
 
     <delete id="deleteFormExtendAttributeByFormUuidAndFormVersionUuid" parameterType="java.util.HashMap">
-        DELETE FROM `form_extend_attribute`
+        DELETE
+        FROM `form_extend_attribute`
         WHERE `form_uuid` = #{formUuid}
           AND `formversion_uuid` = #{formVersionUuid}
     </delete>

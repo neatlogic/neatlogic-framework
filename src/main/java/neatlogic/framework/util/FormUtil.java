@@ -215,6 +215,8 @@ public class FormUtil {
         if (formVersionVo == null) {
             return;
         }
+        String mainSceneUuid = formVersionVo.getFormConfig().getString("uuid");
+        formVersionVo.setSceneUuid(mainSceneUuid);
         List<FormAttributeVo> formAttributeList = formVersionVo.getFormAttributeList();
         if (CollectionUtils.isEmpty(formAttributeList)) {
             return;

@@ -125,6 +125,8 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
         }
         // 插入依赖
         FormUtil.saveDependency(formVersion);
+        String mainSceneUuid = formVersion.getFormConfig().getString("uuid");
+        formVersion.setSceneUuid(mainSceneUuid);
         List<FormAttributeVo> formAttributeList = formVersion.getFormAttributeList();
         // 激活版本
         FormVersionVo oldActiveFormVersion = formMapper.getActionFormVersionByFormUuid(form.getUuid());

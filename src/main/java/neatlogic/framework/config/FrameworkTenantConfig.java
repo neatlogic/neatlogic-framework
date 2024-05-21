@@ -19,7 +19,7 @@ import neatlogic.framework.util.$;
 
 public enum FrameworkTenantConfig implements ITenantConfig{
     API_QPS("apiqps", null, "nfc.frameworktenantconfig.apiqps"),
-    DISABLED_MODULELIST("diabled.modulelist", null,"nfc.frameworktenantconfig.disabledmodulelist");
+    DISABLED_MODULEGROUPLIST("diabled.modulegrouplist", null,"nfc.frameworktenantconfig.disabledmodulegrouplist");
     ;
 
     String key;

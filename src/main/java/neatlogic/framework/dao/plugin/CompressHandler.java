@@ -35,7 +35,7 @@ public class CompressHandler implements TypeHandler<String>, NeatLogicTypeHandle
 
     @Override
     public String handleParameter(String parameter) {
-        int maxLength = 32000;
+        int maxLength = 1000;
         if (Config.ENABLE_GZIP() && StringUtils.isNotBlank(parameter) && parameter.length() > maxLength) {
             parameter = "GZIP:" + GzipUtil.compress(parameter);
         }

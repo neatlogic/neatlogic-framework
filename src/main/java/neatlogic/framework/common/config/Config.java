@@ -52,7 +52,6 @@ public class Config {
     private static String JWT_SECRET = "neatlogic#neatlogic$secret";
     private static String NEATLOGIC_HOME;
     //    private static Map<String, String> ES_CLUSTERS;
-    private static boolean ES_ENABLE;
     private static String DB_HOST;
     private static Integer DB_PORT;
     private static String DB_URL;
@@ -181,9 +180,6 @@ public class Config {
         return ES_CLUSTERS;
     }*/
 
-    public static boolean ES_ENABLE() {
-        return ES_ENABLE;
-    }
 
     public static String DB_HOST() {
         return DB_HOST;
@@ -201,17 +197,29 @@ public class Config {
         return DB_TRANSACTION_TIMEOUT;
     }
 
-    public static int DATASOURCE_CONNECT_TIMEOUT() { return DATASOURCE_CONNECT_TIMEOUT;}
+    public static int DATASOURCE_CONNECT_TIMEOUT() {
+        return DATASOURCE_CONNECT_TIMEOUT;
+    }
 
-    public static Integer DATASOURCE_MAXIMUN_POOL_SIZE() { return DATASOURCE_MAXIMUM_POOL_SIZE;}
+    public static Integer DATASOURCE_MAXIMUN_POOL_SIZE() {
+        return DATASOURCE_MAXIMUM_POOL_SIZE;
+    }
 
-    public static Integer DATASOURCE_MAX_LIFETIME() { return DATASOURCE_MAX_LIFETIME;}
+    public static Integer DATASOURCE_MAX_LIFETIME() {
+        return DATASOURCE_MAX_LIFETIME;
+    }
 
-    public static Integer DATASOURCE_MINIMUM_IDLE() { return DATASOURCE_MINIMUM_IDLE;}
+    public static Integer DATASOURCE_MINIMUM_IDLE() {
+        return DATASOURCE_MINIMUM_IDLE;
+    }
 
-    public static Integer DATASOURCE_VALIDATION_TIMEOUT() { return DATASOURCE_VALIDATION_TIMEOUT;}
+    public static Integer DATASOURCE_VALIDATION_TIMEOUT() {
+        return DATASOURCE_VALIDATION_TIMEOUT;
+    }
 
-    public static Integer DATASOURCE_IDLE_TIMEOUT() { return DATASOURCE_IDLE_TIMEOUT;}
+    public static Integer DATASOURCE_IDLE_TIMEOUT() {
+        return DATASOURCE_IDLE_TIMEOUT;
+    }
 
     public static String MONGO_HOST() {
         return MONGO_HOST;
@@ -505,12 +513,12 @@ public class Config {
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
             DB_TRANSACTION_TIMEOUT = prop.getProperty("db.transaction.timeout");
-            DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout","5000"));
-            DATASOURCE_MAXIMUM_POOL_SIZE = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size","20"));
-            DATASOURCE_MAX_LIFETIME = Integer.parseInt(prop.getProperty("datasource.max.lifetime","-1"));
-            DATASOURCE_MINIMUM_IDLE = Integer.parseInt(prop.getProperty("datasource.minimum.idle","-1"));
-            DATASOURCE_VALIDATION_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.validation.timeout","-1"));
-            DATASOURCE_IDLE_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.idle.timeout","-1"));
+            DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));
+            DATASOURCE_MAXIMUM_POOL_SIZE = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size", "20"));
+            DATASOURCE_MAX_LIFETIME = Integer.parseInt(prop.getProperty("datasource.max.lifetime", "-1"));
+            DATASOURCE_MINIMUM_IDLE = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "-1"));
+            DATASOURCE_VALIDATION_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "-1"));
+            DATASOURCE_IDLE_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.idle.timeout", "-1"));
             DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
@@ -526,7 +534,6 @@ public class Config {
             MOBILE_IS_ONLINE = Boolean.parseBoolean(prop.getProperty("mobile.is.online", "false"));
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
-            ES_ENABLE = Boolean.parseBoolean(prop.getProperty("es.enable", "false"));
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "neatlogic");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");

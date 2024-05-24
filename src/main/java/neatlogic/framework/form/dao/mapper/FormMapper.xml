@@ -578,9 +578,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{handler},
                 #{attributeLabel},
                 #{attributeUuid},
-                #{data})
+                #{data,typeHandler=CompressHandler})
         ON DUPLICATE KEY
             UPDATE `data` = #{data,typeHandler=CompressHandler}
+    </insert>
+
+    <insert id="insertFormAttributeDataList" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
+        INSERT INTO `form_attribute_data` (`id`,
+                                           `form_uuid`,
+                                           `handler`,
+                                           `attribute_label`,
+                                           `attribute_uuid`,
+                                           `data`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},
+            #{item.formUuid},
+            #{item.handler},
+            #{item.attributeLabel},
+            #{item.attributeUuid},
+            #{item.data,typeHandler=CompressHandler})
+        </foreach>
+            ON DUPLICATE KEY
+        UPDATE `data` = VALUES(`data`)
     </insert>
 
     <insert id="insertFormExtendAttributeData" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
@@ -597,9 +617,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{tag},
                 #{attributeLabel},
                 #{attributeUuid},
-                #{data})
+                #{data,typeHandler=CompressHandler})
         ON DUPLICATE KEY
             UPDATE `data` = #{data,typeHandler=CompressHandler}
+    </insert>
+
+    <insert id="insertFormExtendAttributeDataList" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
+        INSERT INTO `form_extend_attribute_data` (`id`,
+                                                  `form_uuid`,
+                                                  `handler`,
+                                                  `tag`,
+                                                  `attribute_label`,
+                                                  `attribute_uuid`,
+                                                  `data`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.id},
+            #{item.formUuid},
+            #{item.handler},
+            #{item.tag},
+            #{item.attributeLabel},
+            #{item.attributeUuid},
+            #{item.data,typeHandler=CompressHandler})
+        </foreach>
+            ON DUPLICATE KEY
+        UPDATE `data` = VALUES(`data`)
     </insert>
 
     <delete id="deleteFormAttributeByFormUuid" parameterType="java.lang.String">

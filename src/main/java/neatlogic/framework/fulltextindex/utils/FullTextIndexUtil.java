@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.fulltextindex.utils;
 
+import neatlogic.framework.fulltextindex.core.FullTextSlicerFactory;
+import neatlogic.framework.fulltextindex.core.IFullTextSlicer;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordOffsetVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -117,8 +119,25 @@ public class FullTextIndexUtil {
 
             stream.end();
             stream.close();
+
+            //额外的分词器
+            List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
+            if (CollectionUtils.isNotEmpty(slicerList)) {
+                for (IFullTextSlicer slicer : slicerList) {
+                    slicer.sliceWord(wordList, content);
+                }
+            }
         }
         return wordList;
+    }
+
+    public static void main(String[] arg) throws IOException {
+        String content = "今天天气不错，有个ip是192.168.122.224/29 80.40.16.28/32，哈哈哈额，另一个IP是192.168.0.2";
+        List<FullTextIndexWordOffsetVo> list = sliceWord(content);
+        for (FullTextIndexWordOffsetVo vo : list) {
+            System.out.println("s:" + vo.getStart() + " e:" + vo.getEnd() + " w:" + vo.getWord() + " t:" + vo.getType());
+        }
+
     }
 
     /**

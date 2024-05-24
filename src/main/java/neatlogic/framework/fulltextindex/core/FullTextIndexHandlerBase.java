@@ -265,7 +265,8 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
         if (isRebuildAll) {
             //删除所有已经创建的索引
-            fullTextIndexMapper.deleteFullTextIndexByType(fullTextIndexTypeVo);
+            //fullTextIndexMapper.deleteFullTextIndexByType(fullTextIndexTypeVo);
+            //!!!!!注意：以下直接使用truncate语句
             databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_target_" + fullTextIndexTypeVo.getModuleId());
             databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_field_" + fullTextIndexTypeVo.getModuleId());
             databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "fulltextindex_offset_" + fullTextIndexTypeVo.getModuleId());

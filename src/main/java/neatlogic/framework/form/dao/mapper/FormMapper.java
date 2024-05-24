@@ -106,7 +106,11 @@ public interface FormMapper {
 
     int insertFormAttributeData(AttributeDataVo attributeDataVo);
 
+    int insertFormAttributeDataList(List<? extends AttributeDataVo> attributeDataVo);
+
     int insertFormExtendAttributeData(AttributeDataVo attributeDataVo);
+
+    int insertFormExtendAttributeDataList(List<? extends AttributeDataVo> attributeDataList);
 
     int deleteFormAttributeByFormUuid(String formUuid);
 

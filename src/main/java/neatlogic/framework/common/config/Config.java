@@ -127,6 +127,8 @@ public class Config {
 
     private static String FILE_HANDLER;//文件处理器
 
+    private static boolean ENABLE_METHOD_TIMING_ASPECT;// 启动方法执行耗时日志
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -404,6 +406,9 @@ public class Config {
         return AUTOEXEC_TOKEN;
     }
 
+    public static boolean ENABLE_METHOD_TIMING_ASPECT() {
+        return ENABLE_METHOD_TIMING_ASPECT;
+    }
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -562,6 +567,7 @@ public class Config {
 
             AUTOEXEC_TOKEN = prop.getProperty("autoexec.token", "499922b4317c251c2ce525f7b83e3d94");
 
+            ENABLE_METHOD_TIMING_ASPECT = Boolean.parseBoolean(prop.getProperty("enable.method.timing.aspect", "false"));
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");
             Set<Class<? extends IConfigListener>> listeners = reflections.getSubTypesOf(IConfigListener.class);

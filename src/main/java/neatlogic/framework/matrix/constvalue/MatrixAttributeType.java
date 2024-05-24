@@ -3,29 +3,31 @@ package neatlogic.framework.matrix.constvalue;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.Expression;
-import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public enum MatrixAttributeType implements IEnum {
-    INPUT("input", new I18n("文本框"), Arrays.asList(Expression.EQUAL, Expression.LIKE), Expression.LIKE),
-    SELECT("select", new I18n("下拉框"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-    DATE("date", new I18n("日期"), Arrays.asList(Expression.EQUAL, Expression.LESSTHAN, Expression.GREATERTHAN), Expression.EQUAL),
-    USER("user", new I18n("用户"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-    TEAM("team", new I18n("分组"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE),
-    ROLE("role", new I18n("角色"), Arrays.asList(Expression.INCLUDE), Expression.INCLUDE);
+public enum MatrixAttributeType implements IMatrixAttributeType {
+    INPUT("input", "common.textbox", 1, Arrays.asList(Expression.EQUAL, Expression.LIKE), Expression.LIKE),
+    SELECT("select", "common.select", 2,Collections.singletonList(Expression.INCLUDE), Expression.INCLUDE),
+    DATE("date", "common.date", 3,Arrays.asList(Expression.EQUAL, Expression.LESSTHAN, Expression.GREATERTHAN), Expression.EQUAL),
+    USER("user", "common.user", 4,Collections.singletonList(Expression.INCLUDE), Expression.INCLUDE),
+    TEAM("team", "common.group", 5,Collections.singletonList(Expression.INCLUDE), Expression.INCLUDE),
+    ROLE("role", "common.role", 6,Collections.singletonList(Expression.INCLUDE), Expression.INCLUDE),
+    REGION("region", "common.region", 7,Collections.singletonList(Expression.INCLUDE), Expression.INCLUDE);
 
-    private String value;
-    private I18n text;
-    private List<Expression> expressionList;
-    private Expression expression;
+    private final String value;
+    private final String text;
+    private final int sort;
+    private final List<Expression> expressionList;
+    private final Expression expression;
 
-    private MatrixAttributeType(String value, I18n text, List<Expression> expressionList, Expression expression) {
+    private MatrixAttributeType(String value, String text,Integer sort, List<Expression> expressionList, Expression expression) {
         this.value = value;
         this.text = text;
+        this.sort = sort;
         this.expressionList = expressionList;
         this.expression = expression;
     }
@@ -35,7 +37,11 @@ public enum MatrixAttributeType implements IEnum {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
+    }
+
+    public int getSort() {
+        return sort;
     }
 
     public List<Expression> getExpressionList() {
@@ -73,6 +79,7 @@ public enum MatrixAttributeType implements IEnum {
                 {
                     this.put("value", type.getValue());
                     this.put("text", type.getText());
+                    this.put("sort", type.getSort());
                 }
             });
         }

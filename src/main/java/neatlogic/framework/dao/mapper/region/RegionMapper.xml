@@ -30,6 +30,8 @@
                `parent_id`     as parentId,
                `worktime_uuid` as worktimeUuid,
                `is_active`     as isActive,
+               `upward_id_path` AS upwardIdPath,
+               `upward_name_path` AS upwardNamePath,
                `lft`,
                `rht`
         FROM `region`
@@ -52,6 +54,21 @@
             #{id}
         </foreach>
     </select>
+
+    <select id="getAncestorsAndSelfByLftRht" resultType="neatlogic.framework.dto.region.RegionVo" useCache="false">
+        SELECT
+        a.`id`,
+        a.`name`,
+        a.`parent_id` as parentId,
+        a.`worktime_uuid` as worktimeUuid,
+        a.`is_active` as isActive,
+        a.`lft`,
+        a.`rht`
+        FROM `region` a
+        WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+        ORDER BY a.`lft` ASC
+    </select>
+
     <select id="searchRegionCount" resultType="java.lang.Integer">
         SELECT
         count(`id`)
@@ -75,6 +92,8 @@
         `parent_id` as parentId,
         `worktime_uuid` as worktimeUuid,
         `is_active` as isActive,
+        `upward_id_path` AS upwardIdPath,
+        `upward_name_path` AS upwardNamePath,
         `lft`,
         `rht`
         FROM `region`
@@ -98,6 +117,8 @@
                `parent_id`     as parentId,
                `worktime_uuid` as worktimeUuid,
                `is_active`     as isActive,
+               `upward_id_path` AS upwardIdPath,
+               `upward_name_path` AS upwardNamePath,
                `lft`,
                `rht`
         FROM `region`
@@ -160,17 +181,59 @@
           and r.`is_active` = 1
     </select>
 
+    <update id="updateUpwardIdPathByLftRht">
+        UPDATE `region` d
+        JOIN (
+        SELECT b.`id` AS `id`, GROUP_CONCAT(a.`id` ORDER BY a.`lft`) AS upward_id_path
+        FROM `region` a
+        JOIN `region` b ON a.`lft` &lt;= b.`lft` AND a.`rht` &gt;= b.`rht`
+        <where>
+            <if test="lft != null">
+                AND b.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND b.`rht` &lt;= #{rht}
+            </if>
+        </where>
+        GROUP BY b.`id`
+        ) c ON c.`id` = d.`id`
+        SET d.`upward_id_path` = c.`upward_id_path`
+    </update>
+
+    <update id="updateUpwardNamePathByLftRht">
+        UPDATE `region` d
+        JOIN (
+        SELECT b.`id` AS `id`, GROUP_CONCAT(a.`name` ORDER BY a.`lft` SEPARATOR '/') AS upward_name_path
+        FROM `region` a
+        JOIN `region` b ON a.`lft` &lt;= b.`lft` AND a.`rht` &gt;= b.`rht`
+        <where>
+            <if test="lft != null">
+                AND b.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND b.`rht` &lt;= #{rht}
+            </if>
+        </where>
+        GROUP BY b.`id`
+        ) c ON c.`id` = d.`id`
+        SET d.`upward_name_path` = c.`upward_name_path`
+    </update>
+
     <insert id="insertRegion">
-        insert into `region` (`id`, `name`, `parent_id`, `worktime_uuid`, `is_active`)
-        values (#{id}, #{name}, #{parentId}, #{workTimeUuid}, #{isActive})
+        insert into `region` (`id`, `name`, `parent_id`, `worktime_uuid`, `is_active`, `lft`, `rht`, `upward_id_path`,
+                              `upward_name_path`)
+        values (#{id}, #{name}, #{parentId}, #{workTimeUuid}, #{isActive}, #{lft}, #{rht}, #{upwardIdPath},
+                #{upwardNamePath})
         ON DUPLICATE KEY
-            UPDATE `name`          = #{name},
-                   `parent_id`     = #{parentId},
-                   `worktime_uuid` = #{workTimeUuid},
-                   `is_active`     = #{isActive}
+            UPDATE `name`             = #{name},
+                   `parent_id`        = #{parentId},
+                   `worktime_uuid`    = #{workTimeUuid},
+                   `is_active`        = #{isActive},
+                   `upward_id_path`   = #{upwardIdPath},
+                   `upward_name_path` = #{upwardNamePath}
     </insert>
     <insert id="insertRegionTeam">
-        insert into `region_team` (`region_id`, `type`, `team_uuid`, `checked_children`, `update_time`)
+        insert into `region_team` (`region_id`, `type`, `team_uuid`, `checked_children`,`update_time`)
         values (#{regionId}, #{type}, #{teamUuid}, #{checkedChildren}, #{updateTime})
         ON DUPLICATE KEY
             UPDATE

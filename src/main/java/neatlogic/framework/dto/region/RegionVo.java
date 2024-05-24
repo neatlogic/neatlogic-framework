@@ -49,6 +49,10 @@ public class RegionVo extends BasePageVo{
     private int childrenCount = 0;
     @EntityField(name = "地域", type = ApiParamType.JSONARRAY)
     private List<RegionVo> children = new ArrayList<>();
+    @EntityField(name = "所有父id路径", type = ApiParamType.STRING)
+    private String upwardIdPath;
+    @EntityField(name = "所有父name路径", type = ApiParamType.STRING)
+    private String upwardNamePath;
 
     @JSONField(serialize=false)
     private RegionVo parent;
@@ -167,5 +171,21 @@ public class RegionVo extends BasePageVo{
 
     public void setIdList(List<Long> idList) {
         this.idList = idList;
+    }
+
+    public String getUpwardIdPath() {
+        return upwardIdPath;
+    }
+
+    public void setUpwardIdPath(String upwardIdPath) {
+        this.upwardIdPath = upwardIdPath;
+    }
+
+    public String getUpwardNamePath() {
+        return upwardNamePath;
+    }
+
+    public void setUpwardNamePath(String upwardNamePath) {
+        this.upwardNamePath = upwardNamePath;
     }
 }

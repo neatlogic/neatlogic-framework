@@ -35,6 +35,8 @@ public interface RegionMapper {
 
     List<RegionVo> getRegionListByIdList(List<Long> idList);
 
+    List<RegionVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
     int searchRegionCount(RegionVo region);
 
     List<RegionVo> searchRegion(RegionVo region);
@@ -48,6 +50,10 @@ public interface RegionMapper {
     List<Long> getRegionIdListByTeamUuidListAndType(@Param("teamUuidList") List<String> teamUuidList, @Param("type") String type);
 
     List<Long> getRegionIdListByTeamUuidListAndCheckedChildren(@Param("teamUuidList") List<String> teamUuidList, @Param("type") String type, @Param("checkedChildren") int checkedChildren);
+
+    int updateUpwardIdPathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
+
+    int updateUpwardNamePathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);
 
     Long getParentIdById(Long id);
 

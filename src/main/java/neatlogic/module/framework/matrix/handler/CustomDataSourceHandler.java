@@ -30,6 +30,8 @@ import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
 import neatlogic.framework.matrix.constvalue.MatrixType;
 import neatlogic.framework.matrix.constvalue.SearchExpression;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerBase;
+import neatlogic.framework.matrix.core.IMatrixAttrType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixAttributeMapper;
 import neatlogic.framework.matrix.dao.mapper.MatrixDataMapper;
 import neatlogic.framework.matrix.dto.*;
@@ -848,39 +850,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         String value = valueObj.toString();
         resultObj.put("value", value);
         resultObj.put("text", value);
-        if (MatrixAttributeType.SELECT.getValue().equals(type)) {
-            if (matrixAttribute != null) {
-                JSONObject config = matrixAttribute.getConfig();
-                if (MapUtils.isNotEmpty(config)) {
-                    JSONArray dataList = config.getJSONArray("dataList");
-                    if (CollectionUtils.isNotEmpty(dataList)) {
-                        for (int i = 0; i < dataList.size(); i++) {
-                            JSONObject data = dataList.getJSONObject(i);
-                            if (Objects.equals(value, data.getString("value"))) {
-                                resultObj.put("text", data.getString("text"));
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (MatrixAttributeType.USER.getValue().equals(type)) {
-            UserVo userVo = userMapper.getUserBaseInfoByUuid(value);
-            if (userVo != null) {
-                resultObj.put("text", userVo.getUserName());
-                resultObj.put("avatar", userVo.getAvatar());
-                resultObj.put("pinyin", userVo.getPinyin());
-                resultObj.put("vipLevel", userVo.getVipLevel());
-            }
-        } else if (MatrixAttributeType.TEAM.getValue().equals(type)) {
-            TeamVo teamVo = teamMapper.getTeamByUuid(value);
-            if (teamVo != null) {
-                resultObj.put("text", teamVo.getName());
-            }
-        } else if (MatrixAttributeType.ROLE.getValue().equals(type)) {
-            RoleVo roleVo = roleMapper.getRoleByUuid(value);
-            if (roleVo != null) {
-                resultObj.put("text", roleVo.getName());
-            }
+        IMatrixAttrType matrixAttrType = MatrixAttrTypeHandlerFactory.getHandler(type);
+        if(matrixAttrType != null){
+            matrixAttrType.getTextByValue(matrixAttribute,valueObj,resultObj);
         }
         return resultObj;
     }

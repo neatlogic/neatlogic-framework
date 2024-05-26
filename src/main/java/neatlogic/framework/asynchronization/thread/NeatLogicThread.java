@@ -25,6 +25,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.CountDownLatch;
+
 public abstract class NeatLogicThread implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
     protected UserContext userContext;
@@ -33,6 +35,8 @@ public abstract class NeatLogicThread implements Runnable {
     protected RequestContext requestContext;
     private String threadName;
     private boolean isUnique = false;
+
+    private CountDownLatch countDownLatch;
 
     /*public NeatLogicThread() {
         userContext = UserContext.get();
@@ -84,6 +88,9 @@ public abstract class NeatLogicThread implements Runnable {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
+            if (countDownLatch != null) {
+                countDownLatch.countDown();
+            }
             // 清除所有threadlocal
             if (TenantContext.get() != null) {
                 TenantContext.get().release();
@@ -117,5 +124,13 @@ public abstract class NeatLogicThread implements Runnable {
 
     public String getThreadName() {
         return threadName;
+    }
+
+    public CountDownLatch getCountDownLatch() {
+        return countDownLatch;
+    }
+
+    public void setCountDownLatch(CountDownLatch countDownLatch) {
+        this.countDownLatch = countDownLatch;
     }
 }

@@ -40,6 +40,11 @@ public class CachedThreadPool {
             0L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<>(queueLen), new ThreadPoolExecutor.AbortPolicy());
 
+    public static void execute(NeatLogicThread command, CountDownLatch countDownLatch) {
+        command.setCountDownLatch(countDownLatch);
+        execute(command);
+    }
+
     public static void execute(NeatLogicThread command) {
         try {
             boolean isExists = false;

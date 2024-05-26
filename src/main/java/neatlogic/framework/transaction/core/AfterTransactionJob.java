@@ -17,20 +17,27 @@ package neatlogic.framework.transaction.core;
 
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class AfterTransactionJob<T> {
     public enum EVENT {
         COMMITTED(), COMPLETED()
     }
-
+    private final static Logger logger = LoggerFactory.getLogger(AfterTransactionJob.class);
 
     private final ThreadLocal<Set<T>> THREADLOCAL = new ThreadLocal<>();
     private final ThreadLocal<Set<NeatLogicThread>> T_THREADLOCAL = new ThreadLocal<>();
+    private final ThreadLocal<List<NeatLogicThread>> LIST_THREADLOCAL = new ThreadLocal<>();
     private final String threadName;
 
     public AfterTransactionJob(String _threadName) {
@@ -120,6 +127,72 @@ public class AfterTransactionJob<T> {
         }
     }
 
+    /**
+     * 事务提交后按顺序执行线程任务
+     *
+     * @param t 线程任务
+     */
+    public void executeInOrder(NeatLogicThread t) {
+        executeInOrder(t, EVENT.COMMITTED);
+    }
+
+    /**
+     * 事务提交或完成后按顺序执行线程任务
+     *
+     * @param t 线程任务
+     * @param event 事务时间，提交或完成
+     */
+    public void executeInOrder(NeatLogicThread t, EVENT event) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            CachedThreadPool.execute(t);
+        } else {
+            List<NeatLogicThread> tList = LIST_THREADLOCAL.get();
+            if (tList == null) {
+                tList = new ArrayList<>();
+                LIST_THREADLOCAL.set(tList);
+                TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        if (event == EVENT.COMMITTED) {
+                            List<NeatLogicThread> tList = LIST_THREADLOCAL.get();
+                            for (int i = 0; i < tList.size(); i++) {
+                                NeatLogicThread t = tList.get(i);
+                                CountDownLatch latch = new CountDownLatch(1);
+                                CachedThreadPool.execute(t, latch);
+                                if (i < tList.size() - 1) {
+                                    try {
+                                        boolean flag = latch.await(10, TimeUnit.SECONDS);
+                                    } catch (InterruptedException e) {
+                                        logger.error(e.getMessage(), e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void afterCompletion(int status) {
+                        if (event == EVENT.COMPLETED) {
+                            List<NeatLogicThread> tList = LIST_THREADLOCAL.get();
+                            for (int i = 0; i < tList.size(); i++) {
+                                NeatLogicThread t = tList.get(i);
+                                CountDownLatch latch = new CountDownLatch(1);
+                                CachedThreadPool.execute(t, latch);
+                                if (i < tList.size() - 1) {
+                                    try {
+                                        boolean flag = latch.await(1, TimeUnit.MINUTES);
+                                    } catch (InterruptedException e) {
+                                        logger.error(e.getMessage(), e);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            tList.add(t);
+        }
+    }
 
     /*
      * @Description:

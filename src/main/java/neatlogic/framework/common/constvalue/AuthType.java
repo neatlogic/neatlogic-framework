@@ -75,6 +75,15 @@ public enum AuthType implements IEnum {
         return _value;
     }
 
+    public static String getPrefix(String _value) {
+        for (AuthType gs : AuthType.values()) {
+            if (_value.startsWith(gs.getValuePlugin())) {
+                return gs.getValue();
+            }
+        }
+        return null;
+    }
+
 
     @Override
     public List getValueTextList() {

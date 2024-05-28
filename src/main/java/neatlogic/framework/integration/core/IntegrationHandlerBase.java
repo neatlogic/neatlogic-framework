@@ -26,6 +26,7 @@ import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.type.ParamIrregularException;
 import neatlogic.framework.exception.type.ParamNotExistsException;
+import neatlogic.framework.exception.type.ParamTransferException;
 import neatlogic.framework.exception.type.ParamTypeNotFoundException;
 import neatlogic.framework.file.core.AuditType;
 import neatlogic.framework.file.core.Event;
@@ -54,13 +55,12 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public abstract class IntegrationHandlerBase implements IIntegrationHandler {
     static Logger logger = LoggerFactory.getLogger(IntegrationHandlerBase.class);
@@ -90,6 +90,32 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
     protected abstract void beforeSend(IntegrationVo integrationVo);
 
     protected abstract void afterReturn(IntegrationVo integrationVo);
+
+    // 构建带参数的 URL
+    private String buildUrlWithParams(String baseURL, String inputParam) {
+        StringJoiner sj = new StringJoiner("&");
+        try {
+            JSONObject inputObj = JSON.parseObject(inputParam);
+            if (MapUtils.isNotEmpty(inputObj)) {
+                for (Map.Entry<String, Object> entry : inputObj.entrySet()) {
+                    if (entry.getValue() instanceof String || entry.getValue() instanceof Number) {
+                        sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+
+        }
+        if (StringUtils.isNotBlank(sj.toString())) {
+            if (baseURL.contains("?")) {
+                return baseURL + "&" + sj;
+            } else {
+                return baseURL + "?" + sj;
+            }
+        } else {
+            return baseURL;
+        }
+    }
 
     public IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom) {
 
@@ -147,10 +173,29 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 		  校验请求参数结束
 		 */
 
-		/*
-		  创建审计记录
-		 */
+        /*
+        转换入参开始
+         */
         IntegrationAuditVo integrationAuditVo = new IntegrationAuditVo();
+        IntegrationResultVo resultVo = new IntegrationResultVo();
+        String inputParam = "{}";
+        if (inputConfig != null) {
+            inputParam = inputConfig.getString("content");
+            if (StringUtils.isNotBlank(inputParam)) {
+                try {
+                    inputParam = JavascriptUtil.transform(integrationVo.getParamObj(), inputParam);
+                    resultVo.setTransformedParam(inputParam);
+                } catch (Exception ex) {
+                    throw new ParamTransferException(ex.getMessage());
+                }
+            } else {
+                inputParam = integrationVo.getParamObj().toJSONString();
+            }
+        } else {
+            inputParam = integrationVo.getParamObj().toJSONString();
+        }
+
+
         integrationAuditVo.setRequestFrom(iRequestFrom.toString());
         integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());// 用户非必填，因作业不存在登录用户
         integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
@@ -159,7 +204,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             integrationAuditVo.setParam(requestParamObj.toJSONString());
         }
 
-        IntegrationResultVo resultVo = new IntegrationResultVo();
+
         HttpURLConnection connection = null;
         try {
             HttpsURLConnection.setDefaultHostnameVerifier(new NullHostNameVerifier());
@@ -167,6 +212,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             sc.init(null, trustAllCerts, new SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
+
+            if (StringUtils.isNotBlank(integrationVo.getMethod()) && integrationVo.getMethod().equalsIgnoreCase("get")) {
+                url = buildUrlWithParams(url, inputParam);
+            }
             URL getUrl = new URL(url);
             connection = (HttpURLConnection) getUrl.openConnection();
             // 设置http method
@@ -219,40 +268,19 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             integrationAuditVo.setStatus("failed");
         }
         if (connection != null) {
-            // 转换输入参数
-            // if (integrationVo.getMethod().equals(HttpMethod.POST.toString())) {
-            String inputParam = "{}";
-            if (inputConfig != null) {
-                inputParam = inputConfig.getString("content");
-                // 内容不为空代表需要通过freemarker转换
-                if (StringUtils.isNotBlank(inputParam)) {
-                    try {
-                        // content = FreemarkerUtil.transform(integrationVo.getParamObj(), content);
-                        inputParam = JavascriptUtil.transform(integrationVo.getParamObj(), inputParam);
-                        resultVo.setTransformedParam(inputParam);
-                    } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
-                        resultVo.appendError(ex.getMessage());
-                        integrationAuditVo.appendError(ex.getMessage());
-                        integrationAuditVo.setStatus("failed");
-                    }
-                } else {
-                    inputParam = integrationVo.getParamObj().toJSONString();
+
+            if (connection.getDoOutput()) {
+                try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
+                    out.write(inputParam.getBytes(StandardCharsets.UTF_8));
+                    out.flush();
+                    // out.writeBytes(content);
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                    resultVo.appendError(e.getMessage());
+                    integrationAuditVo.appendError(e.getMessage());
+                    integrationAuditVo.setStatus("failed");
                 }
-            } else {
-                inputParam = integrationVo.getParamObj().toJSONString();
             }
-            try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                out.write(inputParam.getBytes(StandardCharsets.UTF_8));
-                out.flush();
-                // out.writeBytes(content);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-                resultVo.appendError(e.getMessage());
-                integrationAuditVo.appendError(e.getMessage());
-                integrationAuditVo.setStatus("failed");
-            }
-            // }
 
             // 处理返回值
             try {
@@ -286,9 +314,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 if (StringUtils.isNotBlank(content)) {
                     try {
                         if (resultVo.getRawResult().startsWith("{")) {
-                            resultVo.setTransformedResult(JavascriptUtil.transform(JSONObject.parseObject(resultVo.getRawResult()), content));
+                            resultVo.setTransformedResult(JavascriptUtil.transform(JSON.parseObject(resultVo.getRawResult()), content));
                         } else if (resultVo.getRawResult().startsWith("[")) {
-                            resultVo.setTransformedResult(JavascriptUtil.transform(JSONArray.parseArray(resultVo.getRawResult()), content));
+                            resultVo.setTransformedResult(JavascriptUtil.transform(JSON.parseArray(resultVo.getRawResult()), content));
                         }
                         hasTransferred = true;
                     } catch (Exception ex) {

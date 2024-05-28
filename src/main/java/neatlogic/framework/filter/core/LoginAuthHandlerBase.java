@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.filter.core;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
@@ -110,7 +111,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             if (authenticationInfoVo != null) {
                 if (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())) {
                     authenticationInfoVo.setHeaderSet(null);
-                    AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
+                    AuthenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
                 }
             }
             if (isValidTokenCreateTime()) {

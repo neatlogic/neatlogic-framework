@@ -98,9 +98,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             JSONObject inputObj = JSON.parseObject(inputParam);
             if (MapUtils.isNotEmpty(inputObj)) {
                 for (Map.Entry<String, Object> entry : inputObj.entrySet()) {
-                    if (entry.getValue() instanceof String || entry.getValue() instanceof Number) {
-                        sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
-                    }
+                    //if (entry.getValue() instanceof String || entry.getValue() instanceof Number) {
+                    sj.add(URLEncoder.encode(entry.getKey(), "UTF-8") + "=" + URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
+                    //}
                 }
             }
         } catch (Exception ignored) {

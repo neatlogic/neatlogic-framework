@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FullTextIpSlicer implements IFullTextSlicer {
+public class IpSlicer implements IFullTextSlicer {
 
     private static List<FullTextIndexWordOffsetVo> extractIP(String content) {
         List<FullTextIndexWordOffsetVo> ipParts = new ArrayList<>();

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.login.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -96,7 +97,7 @@ public class LoginController {
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
                                   HttpServletRequest request, HttpServletResponse response) throws Exception {
         JSONObject returnObj = new JSONObject();
-        JSONObject jsonObj = JSONObject.parseObject(json);
+        JSONObject jsonObj = JSON.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
         //初始化request上下文
         RequestContext.init(request, request.getRequestURI(), response);
@@ -183,7 +184,7 @@ public class LoginController {
                 if (authenticationInfoVo != null) {
                     if(CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())){
                         authenticationInfoVo.setHeaderSet(null);
-                        AuthenticationInfoStr = JSONObject.toJSONString(authenticationInfoVo);
+                        AuthenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
                     }
                 }
                 // 保存 user 登录访问时间
@@ -216,7 +217,7 @@ public class LoginController {
 
     @RequestMapping(value = "/get/captcha/{tenant}")
     public void getCaptcha(@RequestBody String json, @PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        JSONObject jsonObj = JSONObject.parseObject(json);
+        JSONObject jsonObj = JSON.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
         if (StringUtils.isBlank(tenant)) {
             tenant = request.getHeader("Tenant");

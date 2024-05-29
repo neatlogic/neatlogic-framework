@@ -65,6 +65,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
         
         String authorization = request.getHeader("Authorization");
 
+
         if (StringUtils.isBlank(authorization) ) {
             if (StringUtils.isNotBlank(authorizationFromCookie)) {
                 userVo.setCookieAuthorization(authorizationFromCookie);

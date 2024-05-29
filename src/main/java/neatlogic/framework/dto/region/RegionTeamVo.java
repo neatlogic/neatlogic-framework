@@ -25,8 +25,6 @@ import neatlogic.framework.restful.annotation.EntityField;
 public class RegionTeamVo extends BasePageVo {
     @EntityField(name = "地域id", type = ApiParamType.LONG)
     private Long regionId;
-    @EntityField(name = "地域类型", type = ApiParamType.LONG)
-    private String type;
     @EntityField(name = "分组uuid", type = ApiParamType.LONG)
     private String teamUuid;
     @EntityField(name = "是否包含子分组", type = ApiParamType.LONG)
@@ -37,17 +35,15 @@ public class RegionTeamVo extends BasePageVo {
     public RegionTeamVo() {
     }
 
-    public RegionTeamVo(Long regionId, String type, String teamUuid, Integer checkedChildren, Long updateTime) {
+    public RegionTeamVo(Long regionId, String teamUuid, Integer checkedChildren, Long updateTime) {
         this.regionId = regionId;
-        this.type = type;
         this.teamUuid = teamUuid;
         this.checkedChildren = checkedChildren;
         this.updateTime = updateTime;
     }
 
-    public RegionTeamVo(Long regionId, String type) {
+    public RegionTeamVo(Long regionId) {
         this.regionId = regionId;
-        this.type = type;
     }
 
 
@@ -57,14 +53,6 @@ public class RegionTeamVo extends BasePageVo {
 
     public void setRegionId(Long regionId) {
         this.regionId = regionId;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 
     public String getTeamUuid() {

@@ -63,10 +63,10 @@ public interface RegionMapper {
 
     void insertRegionTeam(RegionTeamVo regionTeamVo);
 
-    void deleteRegionExpired(@Param("regionId") Long regionId, @Param("type") String type, @Param("updateTime") Long updateTime);
+    void deleteRegionExpired(@Param("regionId") Long regionId, @Param("updateTime") Long updateTime);
 
     void deleteRegionTeamByRegionId(Long id);
 
-    void deleteRegionTeamByRegionIdAndTypeAndTeamUuidList(@Param("regionId") Long regionId, @Param("type") String type, @Param("teamUuidArray") JSONArray teamUuidArray);
+    void deleteRegionTeamByRegionIdAndTypeAndTeamUuidList(@Param("regionId") Long regionId, @Param("teamUuidArray") JSONArray teamUuidArray);
 
 }

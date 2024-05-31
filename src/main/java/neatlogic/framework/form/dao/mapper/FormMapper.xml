@@ -291,6 +291,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT a.`form_uuid`        AS formUuid,
                a.`formversion_uuid` as formversionUuid,
                a.`uuid`,
+               a.`key`,
                a.`label`,
                a.`type`,
                a.`handler`,
@@ -307,6 +308,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`form_uuid` AS formUuid,
         a.`formversion_uuid` as formversionUuid,
         a.`uuid`,
+        a.`key`,
         a.`label`,
         a.`type`,
         a.`handler`,
@@ -326,6 +328,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         b.`form_uuid` AS formUuid,
         b.`formversion_uuid` AS formversionUuid,
         b.`uuid`,
+        b.`key`,
         b.`label`,
         b.`type`,
         b.`handler`,
@@ -408,6 +411,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                a.`form_uuid`       AS formUuid,
                a.`handler`,
                a.`attribute_label` AS attributeLabel,
+               a.`attribute_key`  AS attributeKey,
                a.`attribute_uuid`  AS attributeUuid,
                a.`data`
         FROM `form_attribute_data` a
@@ -422,6 +426,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `form_uuid` AS formUuid,
         `handler`,
         `attribute_label` AS attributeLabel,
+        `attribute_key` AS attributeKey,
         `attribute_uuid` AS attributeUuid,
         `data`
         FROM `form_attribute_data`
@@ -543,6 +548,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         INSERT INTO `form_attribute` (`form_uuid`,
                                       `formversion_uuid`,
                                       `uuid`,
+                                      `key`,
                                       `label`,
                                       `type`,
                                       `handler`,
@@ -551,6 +557,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         VALUES (#{formUuid},
                 #{formVersionUuid},
                 #{uuid},
+                #{key},
                 #{label},
                 #{type},
                 #{handler},
@@ -586,12 +593,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                                            `form_uuid`,
                                            `handler`,
                                            `attribute_label`,
+                                           `attribute_key`,
                                            `attribute_uuid`,
                                            `data`)
         VALUES (#{id},
                 #{formUuid},
                 #{handler},
                 #{attributeLabel},
+                #{attributeKey},
                 #{attributeUuid},
                 #{data,typeHandler=CompressHandler})
         ON DUPLICATE KEY
@@ -603,6 +612,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `form_uuid`,
         `handler`,
         `attribute_label`,
+        `attribute_key`,
         `attribute_uuid`,
         `data`)
         VALUES
@@ -611,6 +621,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{item.formUuid},
             #{item.handler},
             #{item.attributeLabel},
+            #{item.attributeKey},
             #{item.attributeUuid},
             #{item.data,typeHandler=CompressHandler})
         </foreach>
@@ -624,6 +635,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                                                   `handler`,
                                                   `tag`,
                                                   `attribute_label`,
+                                                  `attribute_key`,
                                                   `attribute_uuid`,
                                                   `data`)
         VALUES (#{id},
@@ -631,6 +643,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{handler},
                 #{tag},
                 #{attributeLabel},
+                #{attributeKey},
                 #{attributeUuid},
                 #{data,typeHandler=CompressHandler})
         ON DUPLICATE KEY
@@ -643,6 +656,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `handler`,
         `tag`,
         `attribute_label`,
+        `attribute_key`,
         `attribute_uuid`,
         `data`)
         VALUES
@@ -652,6 +666,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{item.handler},
             #{item.tag},
             #{item.attributeLabel},
+            #{item.attributeKey},
             #{item.attributeUuid},
             #{item.data,typeHandler=CompressHandler})
         </foreach>

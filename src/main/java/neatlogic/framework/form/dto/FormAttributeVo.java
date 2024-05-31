@@ -96,11 +96,12 @@ public class FormAttributeVo implements Serializable {
         this.formVersionUuid = formVersionUuid;
     }
 
-    public FormAttributeVo(String formUuid, String formVersionUuid, String uuid, String label, String type,
+    public FormAttributeVo(String formUuid, String formVersionUuid, String uuid, String key, String label, String type,
                            String handler, boolean isRequired, JSONObject config, String data) {
         this.uuid = uuid;
         this.formUuid = formUuid;
         this.formVersionUuid = formVersionUuid;
+        this.key = key;
         this.label = label;
         this.type = type;
         this.handler = handler;

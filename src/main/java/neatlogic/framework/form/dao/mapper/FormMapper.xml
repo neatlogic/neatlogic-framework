@@ -286,6 +286,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE `uuid` = #{uuid}
     </select>
 
+    <select id="getFormAttributeByUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.form.dto.FormAttributeVo">
+        SELECT a.`form_uuid`        AS formUuid,
+               a.`formversion_uuid` as formversionUuid,
+               a.`uuid`,
+               a.`label`,
+               a.`type`,
+               a.`handler`,
+               a.`config`           AS configStr,
+               a.`data`
+        FROM `form_attribute` a
+                 JOIN `form_version` b ON b.`uuid` = a.`formversion_uuid` AND b.`is_active` = 1
+        WHERE a.`uuid` = #{value}
+    </select>
+
     <select id="getFormAttributeList" parameterType="neatlogic.framework.form.dto.FormAttributeVo"
             resultType="neatlogic.framework.form.dto.FormAttributeVo">
         SELECT
@@ -585,11 +600,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertFormAttributeDataList" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
         INSERT INTO `form_attribute_data` (`id`,
-                                           `form_uuid`,
-                                           `handler`,
-                                           `attribute_label`,
-                                           `attribute_uuid`,
-                                           `data`)
+        `form_uuid`,
+        `handler`,
+        `attribute_label`,
+        `attribute_uuid`,
+        `data`)
         VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.id},
@@ -599,7 +614,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{item.attributeUuid},
             #{item.data,typeHandler=CompressHandler})
         </foreach>
-            ON DUPLICATE KEY
+        ON DUPLICATE KEY
         UPDATE `data` = VALUES(`data`)
     </insert>
 
@@ -624,12 +639,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertFormExtendAttributeDataList" parameterType="neatlogic.framework.form.dto.AttributeDataVo">
         INSERT INTO `form_extend_attribute_data` (`id`,
-                                                  `form_uuid`,
-                                                  `handler`,
-                                                  `tag`,
-                                                  `attribute_label`,
-                                                  `attribute_uuid`,
-                                                  `data`)
+        `form_uuid`,
+        `handler`,
+        `tag`,
+        `attribute_label`,
+        `attribute_uuid`,
+        `data`)
         VALUES
         <foreach collection="list" item="item" separator=",">
             (#{item.id},
@@ -640,7 +655,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{item.attributeUuid},
             #{item.data,typeHandler=CompressHandler})
         </foreach>
-            ON DUPLICATE KEY
+        ON DUPLICATE KEY
         UPDATE `data` = VALUES(`data`)
     </insert>
 

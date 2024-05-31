@@ -26,11 +26,14 @@ public interface IFormCrossoverService extends ICrossoverService {
 
     JSONObject getMyDetailedDataForSelectHandler(AttributeDataVo attributeDataVo, JSONObject configObj);
 
+    FormAttributeVo getFormAttributeByUuid(String uuid);
+
     /**
      * 获取表单组件列表
+     *
      * @param formUuid 表单UUID
      * @param formName 表单名
-     * @param tag 标签
+     * @param tag      标签
      * @return 组件列表
      */
     List<FormAttributeVo> getFormAttributeList(String formUuid, String formName, String tag);

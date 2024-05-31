@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component("processFormMapper")
-public interface FormMapper {
+public interface FormMapper  {
     int checkFormCustomItemNameIsExists(FormCustomItemVo formCustomItemVo);
 
     List<FormCustomItemVo> searchFormCustomItem(FormCustomItemVo formCustomItemVo);
@@ -65,6 +65,8 @@ public interface FormMapper {
     int checkFormNameIsRepeat(FormVo formVo);
 
     int checkFormVersionIsExists(String uuid);
+
+    FormAttributeVo getFormAttributeByUuid(String uuid);
 
     List<FormAttributeVo> getFormAttributeList(FormAttributeVo formAttributeVo);
 

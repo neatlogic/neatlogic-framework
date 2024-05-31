@@ -63,7 +63,7 @@ public class FileServiceImpl implements IFileCrossoverService {
     static Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
 
     /*查看审计记录时可显示的最大字节数，超过此数需要下载文件后查看*/
-    private final static int MAX_FILE_SIZE = 1024 * 1024;
+    private static final int MAX_FILE_SIZE = 1024 * 1024;
 
     @Resource
     private ServerMapper serverMapper;

@@ -45,7 +45,8 @@ public class ApiAuditCleaner extends AuditCleanerBase {
     @Resource
     private DatabaseFragmentMapper databaseFragmentMapper;
 
-    private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
+
     @Override
     public String getName() {
         return "API-AUDIT";
@@ -57,19 +58,21 @@ public class ApiAuditCleaner extends AuditCleanerBase {
         File dir = new File(directoryPath);
         if (dir.exists()) {
             File[] listFiles = dir.listFiles();
-            Arrays.sort(listFiles, Comparator.comparing(File::lastModified));
-            for (File file : listFiles) {
-                try (ReversedLinesFileReader rlfr = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
-                    String lastLine = rlfr.readLine();
-                    if (lastLine.startsWith("fileFooter##########") && lastLine.endsWith("##########fileFooter")) {
-                        String formatStr = lastLine.substring(20, lastLine.length() - 20);
-                        LocalDate endDate = LocalDate.parse(formatStr, dateTimeFormatter);
-                        if (LocalDate.now().toEpochDay() - endDate.toEpochDay() > dayBefore) {
-                            file.delete();
+            if (listFiles != null) {
+                Arrays.sort(listFiles, Comparator.comparing(File::lastModified));
+                for (File file : listFiles) {
+                    try (ReversedLinesFileReader rlfr = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
+                        String lastLine = rlfr.readLine();
+                        if (lastLine.startsWith("fileFooter##########") && lastLine.endsWith("##########fileFooter")) {
+                            String formatStr = lastLine.substring(20, lastLine.length() - 20);
+                            LocalDate endDate = LocalDate.parse(formatStr, dateTimeFormatter);
+                            if (LocalDate.now().toEpochDay() - endDate.toEpochDay() > dayBefore) {
+                                file.delete();
+                            }
                         }
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
                     }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
                 }
             }
         }

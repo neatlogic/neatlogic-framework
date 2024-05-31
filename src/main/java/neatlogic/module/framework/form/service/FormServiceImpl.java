@@ -292,6 +292,11 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         return resultObj;
     }
 
+    @Override
+    public FormAttributeVo getFormAttributeByUuid(String uuid) {
+        return formMapper.getFormAttributeByUuid(uuid);
+    }
+
     private String getValue(String matrixUuid, ValueTextVo mapping, String text) {
         if (StringUtils.isBlank(text)) {
             return text;

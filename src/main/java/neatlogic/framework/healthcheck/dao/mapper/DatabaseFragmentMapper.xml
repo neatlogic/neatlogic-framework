@@ -53,12 +53,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <include refid="searchDatabaseFragmentCondition"></include>
     </select>
 
-    <!--<update id="rebuildTable">
+    <update id="rebuildTable">
         alter table ${schemaName}.${tableName}
             engine = innodb
-    </update>-->
+    </update>
 
-    <update id="rebuildTable">
+    <update id="truncateTable">
         truncate table ${schemaName}.${tableName}
     </update>
 </mapper>

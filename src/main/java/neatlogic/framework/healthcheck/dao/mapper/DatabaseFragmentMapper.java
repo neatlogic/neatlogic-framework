@@ -27,5 +27,7 @@ public interface DatabaseFragmentMapper {
     int searchDatabaseFragmentCount(DatabaseFragmentVo databaseFragmentVo);
 
     void rebuildTable(@Param("schemaName") String schemaName, @Param("tableName") String tableName);
+
+    void truncateTable(@Param("schemaName") String schemaName, @Param("tableName") String tableName);
 }
 

@@ -38,7 +38,7 @@ import java.util.Comparator;
 @Component
 public class ApiAuditCleaner extends AuditCleanerBase {
 
-    private static Logger logger = LoggerFactory.getLogger(ApiAuditCleaner.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiAuditCleaner.class);
 
     @Resource
     private ApiAuditMapper apiAuditMapper;

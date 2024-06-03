@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.module.framework.dao.mapper.dynamicplugin.DynamicPluginMapper">
+
+    <select id="getDynamicPluginList" resultType="neatlogic.framework.dynamicplugin.dto.DynamicPluginVo">
+        SELECT
+            `id`,
+            `key`,
+            `name`,
+            `type`,
+            `is_active` AS isActive,
+            `class_name` AS className,
+            `file_id` AS fileId,
+            `file_name` AS fileName,
+            `description`,
+            `error`,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        FROM `dynamic_plugin`
+    </select>
+
+    <select id="getDynamicPluginById" parameterType="java.lang.Long" resultType="neatlogic.framework.dynamicplugin.dto.DynamicPluginVo">
+        SELECT
+            `id`,
+            `key`,
+            `name`,
+            `type`,
+            `is_active` AS isActive,
+            `class_name` AS className,
+            `file_id` AS fileId,
+            `file_name` AS fileName,
+            `description`,
+            `error`,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        FROM `dynamic_plugin`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getDynamicPluginByKey" parameterType="java.lang.String" resultType="neatlogic.framework.dynamicplugin.dto.DynamicPluginVo">
+        SELECT
+            `id`,
+            `key`,
+            `name`,
+            `type`,
+            `is_active` AS isActive,
+            `class_name` AS className,
+            `file_id` AS fileId,
+            `file_name` AS fileName,
+            `description`,
+            `error`,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        FROM `dynamic_plugin`
+        WHERE `key` = #{value}
+    </select>
+
+    <select id="getDynamicPluginListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dynamicplugin.dto.DynamicPluginVo">
+        SELECT
+            `id`,
+            `key`,
+            `name`,
+            `type`,
+            `is_active` AS isActive,
+            `class_name` AS className,
+            `file_id` AS fileId,
+            `file_name` AS fileName,
+            `description`,
+            `error`,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        FROM `dynamic_plugin`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="getDynamicPluginCount" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `dynamic_plugin`
+        <if test="keyword != null and keyword != ''">
+            WHERE `key` like concat('%', #{keyword}, '%') OR `name` like concat('%', #{keyword}, '%')
+        </if>
+    </select>
+
+    <select id="searchDynamicPluginList" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="neatlogic.framework.dynamicplugin.dto.DynamicPluginVo">
+        SELECT
+        `id`,
+        `key`,
+        `name`,
+        `type`,
+        `is_active` AS isActive,
+        `class_name` AS className,
+        `file_id` AS fileId,
+        `file_name` AS fileName,
+        `description`,
+        `error`,
+        `fcu`,
+        `fcd`,
+        `lcu`,
+        `lcd`
+        FROM `dynamic_plugin`
+        <if test="keyword != null and keyword != ''">
+            WHERE `key` like concat('%', #{keyword}, '%') OR `name` like concat('%', #{keyword}, '%')
+        </if>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertDynamicPlugin" parameterType="neatlogic.framework.dynamicplugin.dto.DynamicPluginVo">
+        INSERT INTO `dynamic_plugin` (
+            `id`,
+            `key`,
+            `name`,
+            `type`,
+            `is_active`,
+            `class_name`,
+            `file_id`,
+            `file_name`,
+            `description`,
+            `error`,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        )
+        VALUES
+            (
+                #{id},
+                #{key},
+                #{name},
+                #{type},
+                #{isActive},
+                #{className},
+                #{fileId},
+                #{fileName},
+                #{description},
+                #{error},
+                #{fcu},
+                NOW(),
+                #{lcu},
+                NOW()
+            )
+            ON DUPLICATE KEY UPDATE
+            `is_active` = #{isActive},
+            `class_name` = #{className},
+            `file_id` = #{fileId},
+            `file_name` = #{fileName},
+            `description` = #{description},
+            `error` = #{error},
+            `lcu` = #{lcu},
+            `lcd` = NOW()
+    </insert>
+
+    <delete id="deleteDynamicPluginById" parameterType="java.lang.Long">
+        DELETE FROM `dynamic_plugin` WHERE `id` = #{value}
+    </delete>
+</mapper>

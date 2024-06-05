@@ -20,6 +20,7 @@ public class AttributeExtendedDataVo extends AttributeDataVo{
 
     public AttributeExtendedDataVo(AttributeDataVo attributeDataVo, Object extendedData) {
         this.setAttributeUuid(attributeDataVo.getAttributeUuid());
+        this.setAttributeKey(attributeDataVo.getAttributeKey());
         this.setAttributeLabel(attributeDataVo.getAttributeLabel());
         this.setHandler(attributeDataVo.getHandler());
         this.extendedData = extendedData;

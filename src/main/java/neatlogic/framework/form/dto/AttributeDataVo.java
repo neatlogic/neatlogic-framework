@@ -33,6 +33,7 @@ public class AttributeDataVo implements Comparable<AttributeDataVo>, Serializabl
     private String formUuid;
     private String tag;
     private String attributeUuid;
+    private String attributeKey;
     private String attributeLabel;
     private String handler;
     @JSONField(serialize = false)
@@ -65,6 +66,14 @@ public class AttributeDataVo implements Comparable<AttributeDataVo>, Serializabl
 
     public void setAttributeUuid(String attributeUuid) {
         this.attributeUuid = attributeUuid;
+    }
+
+    public String getAttributeKey() {
+        return attributeKey;
+    }
+
+    public void setAttributeKey(String attributeKey) {
+        this.attributeKey = attributeKey;
     }
 
     public String getAttributeLabel() {

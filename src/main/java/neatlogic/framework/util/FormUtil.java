@@ -501,6 +501,8 @@ public class FormUtil {
         formAttributeVo.setHandler(handler);
         String label = componentObj.getString("label");
         formAttributeVo.setLabel(label);
+        String key = componentObj.getString("key");
+        formAttributeVo.setKey(key);
         String type = componentObj.getString("type");
         formAttributeVo.setType(type);
         JSONObject config = componentObj.getJSONObject("config");

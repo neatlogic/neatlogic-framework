@@ -20,15 +20,18 @@ package neatlogic.module.framework.matrix.attrtype.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
-import neatlogic.framework.matrix.core.IMatrixAttrType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+
 @Service
-public class MatrixSelectAttrTypeHandler implements IMatrixAttrType {
+public class MatrixSelectAttrTypeHandler extends MatrixAttrTypeBase {
     @Override
     public String getHandler() {
         return MatrixAttributeType.SELECT.getValue();
@@ -48,6 +51,27 @@ public class MatrixSelectAttrTypeHandler implements IMatrixAttrType {
                             resultObj.put("text", data.getString("text"));
                         }
                     }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        JSONObject config = matrixAttributeVo.getConfig();
+        Map<String, String> configTextValueMap = new HashMap<>();
+        if (MapUtils.isNotEmpty(config)) {
+            JSONArray dataList = config.getJSONArray("dataList");
+            for (int i = 0; i < dataList.size(); i++) {
+                JSONObject dataObj = dataList.getJSONObject(i);
+                configTextValueMap.put(dataObj.getString("text"), dataObj.getString("value"));
+            }
+            for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                String value = entry.getKey();
+                if (configTextValueMap.containsValue(value)) {
+                    valueMap.put(value, value);
+                } else if (configTextValueMap.containsKey(value)) {
+                    valueMap.put(value, configTextValueMap.get(value));
                 }
             }
         }

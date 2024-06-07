@@ -17,35 +17,10 @@
 
 package neatlogic.framework.matrix.core;
 
-import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.matrix.dto.MatrixAttributeVo;
-
-import java.util.Map;
-
-public interface IMatrixAttrType {
-    /**
-     * 处理器名
-     */
-    String getHandler();
-
-    /**
-     * 获取矩阵值回显
-     */
-    void getTextByValue(MatrixAttributeVo matrixAttribute, Object valueObj, JSONObject resultObj);
-
-
-    /**
-     * 导出excel时转换值
-     *
-     * @param value 值
-     */
-    String getValueWhenExport(String value);
-
-    /**
-     * 根据导入的值转换成系统的值
-     *
-     * @param valueMap 值map
-     */
-    void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap);
+public abstract class MatrixAttrTypeBase implements IMatrixAttrType{
+    @Override
+    public String getValueWhenExport(String value) {
+        return value;
+    }
 
 }

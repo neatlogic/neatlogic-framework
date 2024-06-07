@@ -21,14 +21,17 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.region.RegionMapper;
 import neatlogic.framework.dto.region.RegionVo;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
-import neatlogic.framework.matrix.core.IMatrixAttrType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
-public class MatrixRegionAttrTypeHandler implements IMatrixAttrType {
+public class MatrixRegionAttrTypeHandler extends MatrixAttrTypeBase {
     @Resource
     RegionMapper regionMapper;
 
@@ -43,6 +46,67 @@ public class MatrixRegionAttrTypeHandler implements IMatrixAttrType {
         RegionVo regionVo = regionMapper.getRegionById(value);
         if (regionVo != null) {
             resultObj.put("text", regionVo.getUpwardNamePath());
+        }
+    }
+
+    @Override
+    public String getValueWhenExport(String value) {
+        RegionVo regionVo = regionMapper.getRegionById(Long.valueOf(value));
+        if (regionVo != null) {
+            return regionVo.getUpwardNamePath();
+        } else {
+            return value;
+        }
+    }
+
+    @Override
+    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
+        List<Long> regionIdList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+            String key = entry.getKey();
+            try {
+                regionIdList.add(Long.parseLong(key));
+            } catch (Exception ignored) {
+            }
+        }
+        if(CollectionUtils.isNotEmpty(regionIdList)) {
+            List<RegionVo> regionVos = regionMapper.getRegionListByIdList(regionIdList);
+            if(CollectionUtils.isNotEmpty(regionVos)){
+                for (RegionVo regionVo: regionVos){
+                    valueMap.put(regionVo.getId().toString(),regionVo.getId().toString());
+                    needSearchValue.remove(regionVo.getId().toString());
+                }
+            }
+        }
+
+        if(CollectionUtils.isEmpty(needSearchValue)){
+            return;
+        }
+        //通过name查找
+        List<RegionVo> regionVos = regionMapper.getRegionByNameList(new ArrayList<>(needSearchValue));
+        if (CollectionUtils.isNotEmpty(regionVos)) {
+            for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                String key = entry.getKey();
+                if (!needSearchValue.contains(key)) {
+                    continue;
+                }
+                List<RegionVo> tmp = regionVos.stream().filter(o -> Objects.equals(o.getName(), key)).collect(Collectors.toList());
+                if (tmp.size() == 1) {
+                    valueMap.put(key, tmp.get(0).getId().toString());
+                    needSearchValue.remove(key);
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(needSearchValue)){
+            return;
+        }
+        //通过upwardNamePath查找
+        regionVos = regionMapper.getRegionByUpwardNamePath(needSearchValue);
+        if (CollectionUtils.isNotEmpty(regionVos)) {
+            for (RegionVo regionVo : regionVos) {
+                valueMap.put(regionVo.getUpwardNamePath(), regionVo.getId().toString());
+            }
         }
     }
 }

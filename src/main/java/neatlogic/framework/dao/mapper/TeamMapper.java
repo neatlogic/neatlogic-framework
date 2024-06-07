@@ -75,6 +75,10 @@ public interface TeamMapper {
 
     String getTeamUuidByUpwardNamePath(String upwardNamePath);
 
+    List<TeamVo> getTeamByNameList(List<String> needSearchValue);
+
+    List<TeamVo> getTeamByUpwardNamePathList(List<String> needSearchValue);
+
     int checkTitleIsReferenceByTitleId(Long id);
 
     int searchTeamCountForMatrix(MatrixDataVo searchVo);
@@ -110,4 +114,5 @@ public interface TeamMapper {
     int deleteTeamRoleByTeamUuidList(List<String> teamUuidList);
 
     int deleteTeamUserTitleByTeamUuid(String uuid);
+
 }

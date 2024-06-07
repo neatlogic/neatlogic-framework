@@ -21,13 +21,19 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
-import neatlogic.framework.matrix.core.IMatrixAttrType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
-public class MatrixRoleAttrTypeHandler implements IMatrixAttrType {
+public class MatrixRoleAttrTypeHandler extends MatrixAttrTypeBase {
     @Resource
     RoleMapper roleMapper;
 
@@ -42,6 +48,50 @@ public class MatrixRoleAttrTypeHandler implements IMatrixAttrType {
         RoleVo roleVo = roleMapper.getRoleByUuid(value);
         if (roleVo != null) {
             resultObj.put("text", roleVo.getName());
+        }
+    }
+
+    @Override
+    public String getValueWhenExport(String value) {
+        RoleVo role = roleMapper.getRoleByUuid(value);
+        if (role != null) {
+            return role.getName();
+        } else {
+            return value;
+        }
+    }
+
+    @Override
+    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
+        //通过uuid搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<RoleVo> roleVos = roleMapper.getRoleByUuidList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(roleVos)) {
+                List<String> roleUuidList = roleVos.stream().map(RoleVo::getUuid).collect(Collectors.toList());
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (roleUuidList.contains(entry.getKey())) {
+                        valueMap.put(entry.getKey(), entry.getKey());
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(needSearchValue)){
+            return;
+        }
+        //通过name搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<RoleVo> roleVos = roleMapper.getRoleByNameList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(roleVos)) {
+                Map<String, String> roleNameUuidMap = roleVos.stream().collect(Collectors.toMap(RoleVo::getName, RoleVo::getUuid));
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (roleNameUuidMap.containsKey(entry.getKey())) {
+                        valueMap.put(entry.getKey(), roleNameUuidMap.get(entry.getKey()));
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
         }
     }
 }

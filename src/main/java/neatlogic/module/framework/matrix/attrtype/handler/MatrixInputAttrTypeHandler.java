@@ -15,37 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.matrix.core;
+package neatlogic.module.framework.matrix.attrtype.handler;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
-public interface IMatrixAttrType {
-    /**
-     * 处理器名
-     */
-    String getHandler();
+@Service
+public class MatrixInputAttrTypeHandler extends MatrixAttrTypeBase {
+    @Override
+    public String getHandler() {
+        return MatrixAttributeType.INPUT.getValue();
+    }
 
-    /**
-     * 获取矩阵值回显
-     */
-    void getTextByValue(MatrixAttributeVo matrixAttribute, Object valueObj, JSONObject resultObj);
+    @Override
+    public void getTextByValue(MatrixAttributeVo matrixAttribute, Object valueObj, JSONObject resultObj) {
+        resultObj.put("text", valueObj.toString());
+    }
 
-
-    /**
-     * 导出excel时转换值
-     *
-     * @param value 值
-     */
-    String getValueWhenExport(String value);
-
-    /**
-     * 根据导入的值转换成系统的值
-     *
-     * @param valueMap 值map
-     */
-    void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap);
-
+    @Override
+    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        valueMap.replaceAll((k, v) -> k);
+    }
 }

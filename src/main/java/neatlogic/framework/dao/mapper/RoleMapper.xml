@@ -516,6 +516,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <include refid="searchRoleForMatrixSql"/>
         LIMIT #{startNum}, #{pageSize}
     </select>
+    <select id="getRoleByNameList" resultType="neatlogic.framework.dto.RoleVo">
+        SELECT
+            `id`,
+            `uuid`,
+            `name`,
+            `description`,
+            `rule`,
+            `is_delete` AS isDelete
+        FROM `role`
+        where `name` in
+        <foreach collection="list" item="name" separator="," open="(" close=")" >
+            #{name}
+        </foreach>
+    </select>
 
     <insert id="insertRole" parameterType="neatlogic.framework.dto.RoleVo">
         INSERT INTO `role` (`id`, `uuid`, `name`, `description`, `rule`, `is_delete`)

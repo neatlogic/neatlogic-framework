@@ -20,40 +20,37 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.common.util.PageUtil;
-import neatlogic.framework.dao.mapper.RoleMapper;
-import neatlogic.framework.dao.mapper.TeamMapper;
-import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dto.RoleVo;
-import neatlogic.framework.dto.TeamVo;
-import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.matrix.batch.BatchIteratorRunner;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
 import neatlogic.framework.matrix.constvalue.MatrixType;
 import neatlogic.framework.matrix.constvalue.SearchExpression;
-import neatlogic.framework.matrix.core.MatrixDataSourceHandlerBase;
 import neatlogic.framework.matrix.core.IMatrixAttrType;
 import neatlogic.framework.matrix.core.MatrixAttrTypeHandlerFactory;
+import neatlogic.framework.matrix.core.MatrixDataSourceHandlerBase;
 import neatlogic.framework.matrix.dao.mapper.MatrixAttributeMapper;
 import neatlogic.framework.matrix.dao.mapper.MatrixDataMapper;
 import neatlogic.framework.matrix.dto.*;
 import neatlogic.framework.matrix.exception.*;
 import neatlogic.framework.util.ExcelUtil;
 import neatlogic.framework.util.TableResultUtil;
-import neatlogic.framework.util.TimeUtil;
 import neatlogic.framework.util.UuidUtil;
+import neatlogic.framework.util.excel.ExcelPagedRowIterator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +59,7 @@ import java.util.stream.Collectors;
  **/
 @Component
 public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
+    private static final Logger logger = LoggerFactory.getLogger(CustomDataSourceHandler.class);
 
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -70,15 +68,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
     private MatrixDataMapper matrixDataMapper;
-
-    @Resource
-    private UserMapper userMapper;
-
-    @Resource
-    private TeamMapper teamMapper;
-
-    @Resource
-    private RoleMapper roleMapper;
 
     @Override
     public String getHandler() {
@@ -129,7 +118,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
     @Override
     protected JSONObject myImportMatrix(MatrixVo matrixVo, MultipartFile multipartFile) throws IOException {
         JSONObject returnObj = new JSONObject();
-        int update = 0, insert = 0, unExist = 0;
+        AtomicInteger update = new AtomicInteger();
+        AtomicInteger insert = new AtomicInteger();
+        Map<String, Map<String, String>> invalidDataMap = new HashMap<>();
+        BatchIteratorRunner.State state = new BatchIteratorRunner.State();
+        int unExist = 0;
 //        MultipartFile multipartFile;
         InputStream is;
 //        MultipartFile multipartFile = entry.getValue();
@@ -150,7 +143,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             }
             Workbook wb = WorkbookFactory.create(is);
             Sheet sheet = wb.getSheetAt(0);
-            int rowNum = sheet.getLastRowNum();
             //获取头栏位
             Row headerRow = sheet.getRow(0);
             int colNum = headerRow.getLastCellNum();
@@ -158,59 +150,108 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (colNum != attributeVoList.size() + 1) {
                 throw new MatrixHeaderMisMatchException(originalFilename);
             }
-            //解析数据
-            for (int i = 1; i <= rowNum; i++) {
-                Row row = sheet.getRow(i);
-                boolean isNew = false;
-                String uuid = null;
-                List<MatrixColumnVo> rowData = new ArrayList<>();
-                for (int j = 0; j < colNum; j++) {
-                    Cell tbodycell = row.getCell(j);
-                    String value = getCellValue(tbodycell);
-                    Cell theadCell = headerRow.getCell(j);
-                    String columnName = theadCell.getStringCellValue();
-                    if (("uuid").equals(columnName)) {
-                        MatrixDataVo dataVo = new MatrixDataVo();
-                        dataVo.setMatrixUuid(matrixUuid);
-                        dataVo.setUuid(value);
-                        if (StringUtils.isBlank(value) || matrixDataMapper.getDynamicTableDataCountByUuid(dataVo) == 0) {
-                            uuid = UuidUtil.randomUuid();
-                            isNew = true;
-                            rowData.add(new MatrixColumnVo("uuid", uuid));
-                        } else {
-                            uuid = value;
+
+            //多线程分页批同时处理
+            BatchIteratorRunner<Row> runner = new BatchIteratorRunner<>();
+            ExcelPagedRowIterator pagedRowIterator = new ExcelPagedRowIterator(sheet, 5);
+            List<Iterator<Row>> pageIterators = pagedRowIterator.getPageIterators();
+            try {
+                state = runner.execute(pageIterators, (iterator, rowList) -> {
+                    int pageSize = Math.min(pagedRowIterator.getPageSize(), 30);
+                    Row currentRow = iterator.next();
+                    if (rowList.size() < pageSize) {
+                        rowList.add(currentRow);
+                        if (rowList.size() != pageSize && iterator.hasNext()) {
+                            return;
                         }
-                    } else {
-                        MatrixAttributeVo attributeVo = headerMap.get(columnName);
-                        if (attributeVo != null) {
-                            String attributeUuid = attributeVo.getUuid();
-                            if (StringUtils.isNotBlank(attributeUuid)) {
-                                if (matrixAttributeValueVerify(attributeVo, value)) {
-                                    rowData.add(new MatrixColumnVo(attributeUuid, value));
-                                } else {
-                                    throw new MatrixImportDataIllegalException(i + 1, j + 1, value);
+                    }
+
+                    Map<String, Map<String, String>> colValueMap = new HashMap<>();
+                    for (int j = 0; j < colNum; j++) {
+                        for (Row row : rowList) {
+                            colValueMap.computeIfAbsent(headerRow.getCell(j).getStringCellValue(), k -> new HashMap<>()).put(getCellValue(row.getCell(j)), null);
+                        }
+                    }
+                    //批量查出字段的值
+                    for (int j = 0; j < colNum; j++) {
+                        Cell theadCell = headerRow.getCell(j);
+                        String columnName = theadCell.getStringCellValue();
+                        if (!("uuid").equals(columnName)) {
+                            MatrixAttributeVo attributeVo = headerMap.get(columnName);
+                            if (attributeVo != null) {
+                                String attributeUuid = attributeVo.getUuid();
+                                if (StringUtils.isNotBlank(attributeUuid)) {
+                                    String type = attributeVo.getType();
+                                    IMatrixAttrType matrixAttrType = MatrixAttrTypeHandlerFactory.getHandler(type);
+                                    if (matrixAttrType == null) {
+                                        throw new MatrixAttributeTypeNotFoundException(matrixVo.getName(), attributeVo.getUuid(), attributeVo.getType());
+                                    }
+                                    matrixAttrType.getRealValueBatch(attributeVo, colValueMap.get(columnName));
                                 }
                             }
                         }
                     }
-                }
-                if (isNew) {
-                    Integer maxSort = matrixDataMapper.getMaxSort(matrixUuid);
-                    maxSort = maxSort == null ? 1 : maxSort + 1;
-                    rowData.add(new MatrixColumnVo("sort", maxSort.toString()));
-                    matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
-                    insert++;
-                    update++;
-                } else {
-                    matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuid, matrixUuid);
-                }
+                    //遍历当前页row执行导入
+                    for (Row row : rowList) {
+                        boolean isNew = false;
+                        String uuid = null;
+                        List<MatrixColumnVo> rowData = new ArrayList<>();
+                        for (int j = 0; j < colNum; j++) {
+                            Cell tbodycell = row.getCell(j);
+                            String value = getCellValue(tbodycell);
+                            Cell theadCell = headerRow.getCell(j);
+                            String columnName = theadCell.getStringCellValue();
+                            if (("uuid").equals(columnName)) {
+                                MatrixDataVo dataVo = new MatrixDataVo();
+                                dataVo.setMatrixUuid(matrixUuid);
+                                dataVo.setUuid(value);
+                                isNew = matrixDataMapper.getDynamicTableDataCountByUuid(dataVo) == 0;
+                                if (StringUtils.isBlank(value) || value.length() != 32) {
+                                    uuid = UuidUtil.randomUuid();
+                                } else {
+                                    uuid = value;
+                                }
+                                if (isNew) {
+                                    rowData.add(new MatrixColumnVo("uuid", uuid));
+                                }
+                            } else {
+                                MatrixAttributeVo attributeVo = headerMap.get(columnName);
+                                if (attributeVo != null) {
+                                    String attributeUuid = attributeVo.getUuid();
+                                    if (StringUtils.isNotBlank(attributeUuid)) {
+                                        Map<String, String> realValueMap = colValueMap.get(columnName);
+                                        if (realValueMap.containsKey(value) && realValueMap.get(value) != null) {
+                                            rowData.add(new MatrixColumnVo(attributeUuid, realValueMap.get(value)));
+                                        } else {
+                                            invalidDataMap.computeIfAbsent(String.valueOf(row.getRowNum()), k -> new HashMap<>()).put(String.valueOf(j + 1), value);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (isNew) {
+                            Integer maxSort = matrixDataMapper.getMaxSort(matrixUuid);
+                            maxSort = maxSort == null ? 1 : maxSort + 1;
+                            rowData.add(new MatrixColumnVo("sort", maxSort.toString()));
+                            matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
+                            insert.getAndIncrement();
+                            update.getAndIncrement();
+                        } else {
+                            matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuid, matrixUuid);
+                        }
+                    }
+                    rowList.clear();
+                }, "MATRIX_IMPORT_EXCEL");
+            } catch (InterruptedException ex) {
+                logger.error(ex.getMessage(), ex);
             }
         } else {
             throw new MatrixDataNotFoundException(originalFilename);
         }
         returnObj.put("insert", insert);
         returnObj.put("update", update);
-        returnObj.put("unExist", unExist);
+        returnObj.put("invalidDataMap", invalidDataMap);
+        returnObj.put("state", state);
         return returnObj;
     }
 
@@ -250,21 +291,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         for (MatrixAttributeVo attributeVo : attributeVoList) {
                             String value = map.get(attributeVo.getUuid());
                             if (StringUtils.isNotBlank(value)) {
-                                if (GroupSearch.USER.getValue().equals(attributeVo.getType())) {
-                                    UserVo user = userMapper.getUserBaseInfoByUuid(value);
-                                    if (user != null) {
-                                        map.put(attributeVo.getUuid(), user.getUserName());
-                                    }
-                                } else if (GroupSearch.TEAM.getValue().equals(attributeVo.getType())) {
-                                    TeamVo team = teamMapper.getTeamByUuid(value);
-                                    if (team != null) {
-                                        map.put(attributeVo.getUuid(), team.getName());
-                                    }
-                                } else if (GroupSearch.ROLE.getValue().equals(attributeVo.getType())) {
-                                    RoleVo role = roleMapper.getRoleByUuid(value);
-                                    if (role != null) {
-                                        map.put(attributeVo.getUuid(), role.getName());
-                                    }
+                                IMatrixAttrType matrixAttrType = MatrixAttrTypeHandlerFactory.getHandler(attributeVo.getType());
+                                if (matrixAttrType != null) {
+                                    map.put(attributeVo.getUuid(), matrixAttrType.getValueWhenExport(value));
+                                } else {
+                                    throw new MatrixAttributeTypeNotFoundException(matrixVo.getName(), attributeVo.getUuid(), attributeVo.getType());
                                 }
                             }
                         }
@@ -545,7 +576,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                             }
                         } else {
 //                            if (StringUtils.isBlank(filterVo.getType())) {
-                                filterVo.setType(matrixAttributeVo.getType());
+                            filterVo.setType(matrixAttributeVo.getType());
 //                            }
                         }
                     }
@@ -567,7 +598,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         List<Map<String, String>> distinctList = new ArrayList<>();
         for (Map<String, String> dataMap : dataMapList) {
-            if(distinctList.contains(dataMap)){
+            if (distinctList.contains(dataMap)) {
                 continue;
             }
             distinctList.add(dataMap);
@@ -578,6 +609,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     /**
      * 自定义矩阵下拉框类型数据，根据text转换成value
+     *
      * @param matrixAttribute
      * @param keyword
      * @param expression
@@ -599,17 +631,18 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             if (StringUtils.isNotBlank(text)) {
                 if (SearchExpression.LI == expression) {
                     if (text.contains(keyword)) {
-                        valueList.add((String)e.getValue());
+                        valueList.add((String) e.getValue());
                     }
                 } else if (SearchExpression.EQ == expression) {
                     if (Objects.equals(text, keyword)) {
-                        valueList.add((String)e.getValue());
+                        valueList.add((String) e.getValue());
                     }
                 }
             }
         }
         return valueList;
     }
+
     @Override
     protected JSONObject mySaveTableRowData(String matrixUuid, JSONObject rowDataObj) {
         List<MatrixAttributeVo> attributeList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixUuid);
@@ -731,7 +764,12 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         if (DateUtil.isCellDateFormatted(cell)) {
                             value = formatter.format(cell.getDateCellValue());
                         } else {
-                            value = String.valueOf(cell.getNumericCellValue());
+                            double cellValue = cell.getNumericCellValue();
+                            if (cellValue == (int) cellValue) {
+                                value = String.valueOf((int) cellValue);
+                            } else {
+                                value = String.valueOf(cellValue);
+                            }
                         }
                         break;
                     case BOOLEAN:
@@ -756,7 +794,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
      * @param selectValueList
      */
     private void decodeDataConfig(MatrixAttributeVo attributeVo, List<String> selectValueList) {
-            JSONObject config = attributeVo.getConfig();
+        JSONObject config = attributeVo.getConfig();
         if (MapUtils.isNotEmpty(config)) {
             JSONArray dataList = config.getJSONArray("dataList");
             if (CollectionUtils.isNotEmpty(dataList)) {
@@ -771,46 +809,6 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
         }
-    }
-
-    /**
-     * @param matrixAttributeVo
-     * @param value
-     * @return boolean
-     * @Time:2020年12月1日
-     * @Description: 矩阵属性值合法性校验
-     */
-    private boolean matrixAttributeValueVerify(MatrixAttributeVo matrixAttributeVo, String value) {
-        String type = matrixAttributeVo.getType();
-        if (type.equals(MatrixAttributeType.INPUT.getValue())) {
-            return true;
-        } else if (type.equals(MatrixAttributeType.SELECT.getValue())) {
-            JSONObject config = matrixAttributeVo.getConfig();
-            if (MapUtils.isNotEmpty(config)) {
-                JSONArray dataList = config.getJSONArray("dataList");
-                for (int i = 0; i < dataList.size(); i++) {
-                    JSONObject dataObj = dataList.getJSONObject(i);
-                    if (value.equals(dataObj.getString("value"))) {
-                        return true;
-                    }
-                }
-            }
-        } else if (type.equals(MatrixAttributeType.DATE.getValue())) {
-            SimpleDateFormat sdf = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
-            try {
-                sdf.parse(value);
-            } catch (ParseException e) {
-                return false;
-            }
-            return true;
-        } else if (type.equals(MatrixAttributeType.USER.getValue())) {
-            return userMapper.checkUserIsExists(value) > 0;
-        } else if (type.equals(MatrixAttributeType.TEAM.getValue())) {
-            return teamMapper.checkTeamIsExists(value) > 0;
-        } else if (type.equals(MatrixAttributeType.ROLE.getValue())) {
-            return roleMapper.checkRoleIsExists(value) > 0;
-        }
-        return false;
     }
 
     private List<Map<String, JSONObject>> matrixTableDataValueHandle(List<MatrixAttributeVo> matrixAttributeList, List<Map<String, String>> valueList) {
@@ -851,8 +849,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         resultObj.put("value", value);
         resultObj.put("text", value);
         IMatrixAttrType matrixAttrType = MatrixAttrTypeHandlerFactory.getHandler(type);
-        if(matrixAttrType != null){
-            matrixAttrType.getTextByValue(matrixAttribute,valueObj,resultObj);
+        if (matrixAttrType != null) {
+            matrixAttrType.getTextByValue(matrixAttribute, valueObj, resultObj);
         }
         return resultObj;
     }

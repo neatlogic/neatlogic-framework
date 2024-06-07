@@ -15,37 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.matrix.core;
+package neatlogic.framework.matrix.exception;
 
-import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import java.util.Map;
+public class MatrixAttributeTypeNotFoundException extends ApiRuntimeException {
 
-public interface IMatrixAttrType {
-    /**
-     * 处理器名
-     */
-    String getHandler();
-
-    /**
-     * 获取矩阵值回显
-     */
-    void getTextByValue(MatrixAttributeVo matrixAttribute, Object valueObj, JSONObject resultObj);
-
-
-    /**
-     * 导出excel时转换值
-     *
-     * @param value 值
-     */
-    String getValueWhenExport(String value);
-
-    /**
-     * 根据导入的值转换成系统的值
-     *
-     * @param valueMap 值map
-     */
-    void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap);
-
+    public MatrixAttributeTypeNotFoundException(String matrixName, String attributeName, String attributeType) {
+        super("在{0}矩阵中属性：“{1}”的属性类型:”{2}“不存在", matrixName, attributeName, attributeType);
+    }
 }

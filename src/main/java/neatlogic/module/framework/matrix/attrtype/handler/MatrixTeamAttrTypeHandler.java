@@ -21,13 +21,19 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
-import neatlogic.framework.matrix.core.IMatrixAttrType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
-public class MatrixTeamAttrTypeHandler implements IMatrixAttrType {
+public class MatrixTeamAttrTypeHandler extends MatrixAttrTypeBase {
     @Resource
     TeamMapper teamMapper;
 
@@ -42,6 +48,66 @@ public class MatrixTeamAttrTypeHandler implements IMatrixAttrType {
         TeamVo teamVo = teamMapper.getTeamByUuid(value);
         if (teamVo != null) {
             resultObj.put("text", teamVo.getName());
+        }
+    }
+
+    @Override
+    public String getValueWhenExport(String value) {
+        TeamVo team = teamMapper.getTeamByUuid(value);
+        if (team != null) {
+            return team.getName();
+        } else {
+            return value;
+        }
+    }
+
+    @Override
+    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
+        //通过uuid搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<TeamVo> teamVos = teamMapper.getTeamByUuidList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(teamVos)) {
+                List<String> teamUuidList = teamVos.stream().map(TeamVo::getUuid).collect(Collectors.toList());
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (teamUuidList.contains(entry.getKey())) {
+                        valueMap.put(entry.getKey(), entry.getKey());
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(needSearchValue)){
+            return;
+        }
+        //通过name搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<TeamVo> teamVos = teamMapper.getTeamByNameList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(teamVos)) {
+                Map<String, String> teamNameUuidMap = teamVos.stream().collect(Collectors.toMap(TeamVo::getName, TeamVo::getUuid));
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (teamNameUuidMap.containsKey(entry.getKey())) {
+                        valueMap.put(entry.getKey(), teamNameUuidMap.get(entry.getKey()));
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(needSearchValue)){
+            return;
+        }
+        //通过upwardNamePath搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<TeamVo> teamVos = teamMapper.getTeamByUpwardNamePathList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(teamVos)) {
+                Map<String, String> teamUpwardNamePathUuidMap = teamVos.stream().collect(Collectors.toMap(TeamVo::getUpwardNamePath, TeamVo::getUuid));
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (teamUpwardNamePathUuidMap.containsKey(entry.getKey())) {
+                        valueMap.put(entry.getKey(), teamUpwardNamePathUuidMap.get(entry.getKey()));
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
         }
     }
 }

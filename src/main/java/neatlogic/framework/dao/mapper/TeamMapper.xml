@@ -693,6 +693,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </where>
         LIMIT #{startNum}, #{pageSize}
     </select>
+    <select id="getTeamByNameList" resultType="neatlogic.framework.dto.TeamVo">
+        SELECT
+            a.`id`,
+            a.`uuid`,
+            a.`name`,
+            a.`description`,
+            a.`parent_uuid` AS parentUuid,
+            a.`is_delete` AS isDelete
+        FROM `team` a
+        where `name` in
+        <foreach collection="list" item="name" separator="," open="(" close=")">
+            #{name}
+        </foreach>
+    </select>
+    <select id="getTeamByUpwardNamePathList" resultType="neatlogic.framework.dto.TeamVo">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`description`,
+        a.`parent_uuid` AS parentUuid,
+        a.`is_delete` AS isDelete,
+        a.`upward_name_path` as upwardNamePath
+        FROM `team` a
+        where `upward_name_path` in
+        <foreach collection="list" item="upwardNamePath" separator="," open="(" close=")">
+            #{upwardNamePath}
+        </foreach>
+    </select>
 
     <insert id="insertTeam" parameterType="neatlogic.framework.dto.TeamVo">
         INSERT INTO `team` (`id`,

@@ -105,6 +105,8 @@ public interface RoleMapper {
 
     List<RoleVo> searchRoleListForMatrix(MatrixDataVo searchVo);
 
+    List<RoleVo> getRoleByNameList(List<String> needSearchValue);
+
     int insertRoleAuth(RoleAuthVo roleAuthVo);
 
     int insertRole(RoleVo roleVo);
@@ -138,4 +140,5 @@ public interface RoleMapper {
     int deleteTeamRoleByRoleUuidAndTeamUuidList(@Param("roleUuid") String roleUuid, @Param("teamUuidList") List<String> teamUuidList);
 
     int deleteTeamRole(RoleTeamVo roleTeamVo);
+
 }

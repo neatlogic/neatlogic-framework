@@ -21,13 +21,19 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
-import neatlogic.framework.matrix.core.IMatrixAttrType;
+import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
-public class MatrixUserAttrTypeHandler implements IMatrixAttrType {
+public class MatrixUserAttrTypeHandler extends MatrixAttrTypeBase {
     @Resource
     UserMapper userMapper;
 
@@ -45,6 +51,50 @@ public class MatrixUserAttrTypeHandler implements IMatrixAttrType {
             resultObj.put("avatar", userVo.getAvatar());
             resultObj.put("pinyin", userVo.getPinyin());
             resultObj.put("vipLevel", userVo.getVipLevel());
+        }
+    }
+
+    @Override
+    public String getValueWhenExport(String value) {
+        UserVo user = userMapper.getUserBaseInfoByUuid(value);
+        if (user != null) {
+            return user.getUserName();
+        } else {
+            return value;
+        }
+    }
+
+    @Override
+    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
+        //通过uuid搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<UserVo> userVos = userMapper.getUserByUserUuidList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(userVos)) {
+                List<String> userUuidList = userVos.stream().map(UserVo::getUuid).collect(Collectors.toList());
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (userUuidList.contains(entry.getKey())) {
+                        valueMap.put(entry.getKey(), entry.getKey());
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
+        }
+        if(CollectionUtils.isEmpty(needSearchValue)){
+            return;
+        }
+        //通过userId搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<UserVo> userVos = userMapper.getUserByUserIdList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(userVos)) {
+                Map<String, String> userIdUuidMap = userVos.stream().collect(Collectors.toMap(UserVo::getUserId, UserVo::getUuid));
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (userIdUuidMap.containsKey(entry.getKey())) {
+                        valueMap.put(entry.getKey(), userIdUuidMap.get(entry.getKey()));
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
         }
     }
 }

@@ -27,9 +27,7 @@ public class NeatLogicRoutingDataSource extends AbstractRoutingDataSource {
     @Override
     protected Object determineCurrentLookupKey() {
         if (TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
-            if (logger.isInfoEnabled()) {
-                logger.info("ThreadName:" + Thread.currentThread().getName() + " Tenant:" + TenantContext.get().getTenantUuid());
-            }
+            logger.debug("ThreadName:{} Tenant:{}", Thread.currentThread().getName(), TenantContext.get().getTenantUuid());
             String key = TenantContext.get().getTenantUuid();
             if (TenantContext.get().isData()) {
                 key += "_DATA";

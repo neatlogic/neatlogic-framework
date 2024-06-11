@@ -26,17 +26,20 @@
     <select id="getRegionListForTree" parameterType="java.lang.Integer"
             resultType="neatlogic.framework.dto.region.RegionVo">
         SELECT `id`,
-               `name`,
-               `parent_id`     as parentId,
-               `worktime_uuid` as worktimeUuid,
-               `is_active`     as isActive,
-               `upward_id_path` AS upwardIdPath,
-               `upward_name_path` AS upwardNamePath,
-               `lft`,
-               `rht`
+        `name`,
+        `parent_id` as parentId,
+        `worktime_uuid` as worktimeUuid,
+        `is_active` as isActive,
+        `upward_id_path` AS upwardIdPath,
+        `upward_name_path` AS upwardNamePath,
+        `lft`,
+        `rht`
         FROM `region`
         WHERE `lft` &gt;= #{lft}
-          AND `rht` &lt;= #{rht}
+        AND `rht` &lt;= #{rht}
+        <if test="isActive != null">
+            AND `is_active` = #{isActive}
+        </if>
         ORDER BY `lft`
     </select>
     <select id="getRegionListByIdList" resultType="neatlogic.framework.dto.region.RegionVo">

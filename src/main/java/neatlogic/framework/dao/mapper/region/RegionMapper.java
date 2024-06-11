@@ -29,7 +29,7 @@ public interface RegionMapper {
 
     Integer getMaxRhtCode();
 
-    List<RegionVo> getRegionListForTree(@Param("lft") Integer lft, @Param("rht") Integer rht);
+    List<RegionVo> getRegionListForTree(@Param("lft") Integer lft, @Param("rht") Integer rht, @Param("isActive") Integer isActive);
 
     RegionVo getRegionById(Long id);
 

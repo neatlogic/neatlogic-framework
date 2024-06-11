@@ -8,5 +8,5 @@ package neatlogic.framework.batch;
  * @Date: 2021/1/4 9:32 上午
  **/
 public interface BatchJob<T> {
-    void execute(T item);
+    void execute(int threadIndex, int dataIndex, T item);
 }

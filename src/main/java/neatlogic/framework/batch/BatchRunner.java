@@ -35,7 +35,7 @@ import java.util.concurrent.CountDownLatch;
  * @Date: 2021/1/4 9:31 上午
  **/
 public class BatchRunner<T> {
-    private final static Logger logger = LoggerFactory.getLogger(BatchRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(BatchRunner.class);
 
     public static class State {
         private boolean isSucceed = false;
@@ -125,7 +125,7 @@ public class BatchRunner<T> {
                         ts = TransactionUtil.openTx();
                     }
                     try {
-                        job.execute(itemList.get(i));
+                        job.execute(index,i, itemList.get(i));
                         if (ts != null) {
                             TransactionUtil.commitTx(ts);
                         }

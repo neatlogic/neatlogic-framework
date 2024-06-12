@@ -137,9 +137,9 @@ public class BatchRunner<T> {
                         if (ts != null) {
                             TransactionUtil.rollbackTx(ts);
                         }
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         state.setSucceed(false);
-                        state.setException(e);
+                        state.setException(new Exception(e));
                         logger.error(e.getMessage(), e);
                         if (ts != null) {
                             TransactionUtil.rollbackTx(ts);

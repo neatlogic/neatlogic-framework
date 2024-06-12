@@ -29,10 +29,7 @@ import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import neatlogic.framework.matrix.core.MatrixPrivateDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
-import neatlogic.framework.matrix.dto.MatrixDataVo;
-import neatlogic.framework.matrix.dto.MatrixDefaultValueFilterVo;
-import neatlogic.framework.matrix.dto.MatrixKeywordFilterVo;
-import neatlogic.framework.matrix.dto.MatrixVo;
+import neatlogic.framework.matrix.dto.*;
 import neatlogic.framework.matrix.exception.MatrixDataSourceHandlerNotFoundException;
 import neatlogic.framework.matrix.exception.MatrixNotFoundException;
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,10 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -394,6 +388,132 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         return null;
     }
 
+    private JSONObject getSelectStandardValueBySimpleValue(String matrixUuid, ValueTextVo mapping, List<String> hiddenFieldList, String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        try {
+            MatrixVo matrixVo = MatrixPrivateDataSourceHandlerFactory.getMatrixVo(matrixUuid);
+            if (matrixVo == null) {
+                matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+                if (matrixVo == null) {
+                    throw new MatrixNotFoundException(matrixUuid);
+                }
+            }
+            IMatrixDataSourceHandler matrixDataSourceHandler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
+            if (matrixDataSourceHandler == null) {
+                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
+            }
+            List<MatrixAttributeVo> matrixAttributeList = matrixDataSourceHandler.getAttributeList(matrixVo);
+//            List<String> attributeList = matrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
+            Set<String> notNullColumnSet = new HashSet<>();
+            String valueField = (String) mapping.getValue();
+            String textField = mapping.getText();
+            MatrixDataVo dataVo = new MatrixDataVo();
+            dataVo.setMatrixUuid(matrixUuid);
+            notNullColumnSet.add(valueField);
+            dataVo.setKeywordColumn(textField);
+            notNullColumnSet.add(textField);
+            List<String> columnList = new ArrayList<>();
+            columnList.add(valueField);
+            columnList.add(textField);
+            if (CollectionUtils.isNotEmpty(hiddenFieldList)) {
+                for (int i = 0; i < hiddenFieldList.size(); i++) {
+                    String hiddenField = hiddenFieldList.get(i);
+                    if (StringUtils.isNotBlank(hiddenField)) {
+//                        if (!attributeList.contains(hiddenField)) {
+//                            throw new MatrixAttributeNotFoundException(matrixVo.getName(), hiddenField);
+//                        }
+                        columnList.add(hiddenField);
+                    }
+                }
+            }
+            dataVo.setColumnList(columnList);
+            dataVo.setNotNullColumnList(new ArrayList<>(notNullColumnSet));
+            {
+                List<MatrixDefaultValueFilterVo> defaultValueFilterList = new ArrayList<>();
+                MatrixDefaultValueFilterVo matrixDefaultValueFilterVo = new MatrixDefaultValueFilterVo(
+                        null,
+                        new MatrixKeywordFilterVo(textField, SearchExpression.EQ.getExpression(), value)
+                );
+                defaultValueFilterList.add(matrixDefaultValueFilterVo);
+                dataVo.setDefaultValueFilterList(defaultValueFilterList);
+                for (int i = 0; i < 10; i++) {
+                    List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableDataNew(dataVo);
+                    for (Map<String, JSONObject> tbody : tbodyList) {
+                        JSONObject textObj = tbody.get(textField);
+                        if (MapUtils.isEmpty(textObj)) {
+                            continue;
+                        }
+                        if (Objects.equals(value, textObj.getString("text"))) {
+                            JSONObject valueObj = tbody.get(valueField);
+                            if (MapUtils.isEmpty(valueObj)) {
+                                continue;
+                            }
+                            JSONObject resultObj = new JSONObject();
+                            resultObj.put("value", valueObj.getString("value"));
+                            resultObj.put("text", textObj.getString("text"));
+                            for (String hiddenField : hiddenFieldList) {
+                                JSONObject hiddenFieldObj = tbody.get(hiddenField);
+                                if (MapUtils.isNotEmpty(hiddenFieldObj)) {
+                                    String hiddenFieldValue = hiddenFieldObj.getString("value");
+                                    resultObj.put(hiddenField, hiddenFieldValue);
+                                }
+                            }
+                            return resultObj;
+                        }
+                    }
+                    if (dataVo.getCurrentPage() >= dataVo.getPageCount()) {
+                        break;
+                    }
+                    dataVo.setCurrentPage(dataVo.getCurrentPage() + 1);
+                }
+            }
+            {
+                List<MatrixDefaultValueFilterVo> defaultValueFilterList = new ArrayList<>();
+                MatrixDefaultValueFilterVo matrixDefaultValueFilterVo = new MatrixDefaultValueFilterVo(
+                        new MatrixKeywordFilterVo(valueField, SearchExpression.EQ.getExpression(), value),
+                        null
+                );
+                defaultValueFilterList.add(matrixDefaultValueFilterVo);
+                dataVo.setDefaultValueFilterList(defaultValueFilterList);
+                for (int i = 0; i < 10; i++) {
+                    List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableDataNew(dataVo);
+                    for (Map<String, JSONObject> tbody : tbodyList) {
+                        JSONObject valueObj = tbody.get(valueField);
+                        if (MapUtils.isEmpty(valueObj)) {
+                            continue;
+                        }
+                        if (Objects.equals(value, valueObj.getString("value"))) {
+                            JSONObject textObj = tbody.get(textField);
+                            if (MapUtils.isEmpty(textObj)) {
+                                continue;
+                            }
+                            JSONObject resultObj = new JSONObject();
+                            resultObj.put("value", valueObj.getString("value"));
+                            resultObj.put("text", textObj.getString("text"));
+                            for (String hiddenField : hiddenFieldList) {
+                                JSONObject hiddenFieldObj = tbody.get(hiddenField);
+                                if (MapUtils.isNotEmpty(hiddenFieldObj)) {
+                                    String hiddenFieldValue = hiddenFieldObj.getString("value");
+                                    resultObj.put(hiddenField, hiddenFieldValue);
+                                }
+                            }
+                            return resultObj;
+                        }
+                    }
+                    if (dataVo.getCurrentPage() >= dataVo.getPageCount()) {
+                        break;
+                    }
+                    dataVo.setCurrentPage(dataVo.getCurrentPage() + 1);
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
     @Override
     public List<FormAttributeVo> getFormAttributeList(String formUuid, String formName, String tag) {
         FormVersionVo formVersion = formMapper.getActionFormVersionByFormUuid(formUuid);
@@ -425,5 +545,101 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         }
         resultList.addAll(formExtendAttributeList);
         return resultList;
+    }
+
+    @Override
+    public Object getSelectStandardValueBySimpleValue(Object dataObj, JSONObject configObj) {
+        JSONArray resultList = new JSONArray();
+        if (Objects.equals(configObj.getString("dataSource"), "static")) {
+            JSONArray dataArray = configObj.getJSONArray("dataList");
+            if (CollectionUtils.isNotEmpty(dataArray)) {
+                if (dataObj instanceof JSONArray) {
+                    JSONArray valueArray = (JSONArray) dataObj;
+                    if (CollectionUtils.isNotEmpty(valueArray)) {
+                        for (Object valueObj : valueArray) {
+                            if (valueObj instanceof JSONObject) {
+                                JSONObject jsonObj = (JSONObject) valueObj;
+                                if (dataArray.contains(jsonObj)) {
+                                    resultList.add(jsonObj);
+                                }
+                            } else {
+                                for (int i = 0; i < dataArray.size(); i++) {
+                                    JSONObject jsonObj = dataArray.getJSONObject(i);
+                                    if (MapUtils.isNotEmpty(jsonObj)) {
+                                        if (jsonObj.containsValue(valueObj)) {
+                                            resultList.add(jsonObj);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else if (dataObj instanceof JSONObject) {
+                    JSONObject jsonObj = (JSONObject) dataObj;
+                    if (dataArray.contains(jsonObj)) {
+                        resultList.add(jsonObj);
+                    }
+                } else {
+                    for (int i = 0; i < dataArray.size(); i++) {
+                        JSONObject jsonObj = dataArray.getJSONObject(i);
+                        if (MapUtils.isNotEmpty(jsonObj)) {
+                            if (jsonObj.containsValue(dataObj)) {
+                                resultList.add(jsonObj);
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            String matrixUuid = configObj.getString("matrixUuid");
+            JSONObject mappingObj = configObj.getJSONObject("mapping");
+            ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
+            List<String> hiddenFieldUuidList = new ArrayList<>();
+            JSONArray hiddenFieldArray = configObj.getJSONArray("hiddenFieldList");
+            if (CollectionUtils.isNotEmpty(hiddenFieldArray)) {
+                for (int i = 0; i < hiddenFieldArray.size(); i++) {
+                    JSONObject hiddenFieldObj = hiddenFieldArray.getJSONObject(i);
+                    if (MapUtils.isNotEmpty(hiddenFieldObj)) {
+                        hiddenFieldUuidList.add(hiddenFieldObj.getString("uuid"));
+                    }
+                }
+            }
+            if (dataObj instanceof JSONArray) {
+                JSONArray valueArray = (JSONArray) dataObj;
+                if (CollectionUtils.isNotEmpty(valueArray)) {
+                    for (int i = 0; i < valueArray.size(); i++) {
+                        Object obj = valueArray.get(i);
+                        if (obj instanceof JSONObject) {
+                            JSONObject jsonObj = (JSONObject) obj;
+                            resultList.add(jsonObj);
+                        } else {
+                            String value = obj.toString();
+                            JSONObject jsonObj = getSelectStandardValueBySimpleValue(matrixUuid, mapping, hiddenFieldUuidList, value);
+                            if (jsonObj != null) {
+                                resultList.add(jsonObj);
+                            }
+                        }
+                    }
+                }
+            } else if (dataObj instanceof JSONObject) {
+                JSONObject jsonObj = (JSONObject) dataObj;
+                resultList.add(jsonObj);
+            } else {
+                String value = dataObj.toString();
+                JSONObject jsonObj = getSelectStandardValueBySimpleValue(matrixUuid, mapping, hiddenFieldUuidList, value);
+                if (jsonObj != null) {
+                    resultList.add(jsonObj);
+                }
+            }
+        }
+        if (CollectionUtils.isNotEmpty(resultList)) {
+            boolean isMultiple = configObj.getBooleanValue("isMultiple");
+            if (isMultiple) {
+                return resultList;
+            } else {
+                return resultList.get(0);
+            }
+        }
+        return null;
     }
 }

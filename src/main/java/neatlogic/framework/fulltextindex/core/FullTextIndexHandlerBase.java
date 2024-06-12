@@ -83,10 +83,11 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     @Override
     public void deleteIndex(Long targetId) {
-       /* //设置threadlocal告诉拦截器分配到哪个表
-        FullTextIndexModuleContainer.set(this.getModuleId());*/
-        fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), this.getModuleId());
+        AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>("FULLTEXTINDEX-DELETE-" + this.getType().getType().toUpperCase(Locale.ROOT) + "-" + targetId);
+        String moduleId = this.getModuleId();
+        job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), moduleId));
     }
+
 
     /**
      * 给重建索引使用的方法，以同步方式执行索引创建

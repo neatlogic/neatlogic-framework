@@ -89,6 +89,7 @@ public class BatchRunner<T> {
             }
             try {
                 latch.await();
+                logger.info("所有批量作业线程已执行完毕");
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -125,7 +126,7 @@ public class BatchRunner<T> {
                         ts = TransactionUtil.openTx();
                     }
                     try {
-                        job.execute(index,i, itemList.get(i));
+                        job.execute(index, i, itemList.get(i));
                         if (ts != null) {
                             TransactionUtil.commitTx(ts);
                         }
@@ -143,6 +144,8 @@ public class BatchRunner<T> {
                         if (ts != null) {
                             TransactionUtil.rollbackTx(ts);
                         }
+                    } finally {
+                        logger.info("批量作业线程{}完成第{}条数据的处理", index + 1, i);
                     }
                 }
             } catch (ApiRuntimeException ex) {
@@ -150,6 +153,7 @@ public class BatchRunner<T> {
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
             } finally {
+                logger.info("批量作业线程{}完成所有任务", index + 1);
                 latch.countDown();
             }
         }

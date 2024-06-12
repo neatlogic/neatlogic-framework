@@ -121,6 +121,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         AtomicInteger update = new AtomicInteger();
         AtomicInteger insert = new AtomicInteger();
         Map<String, Map<String, String>> invalidDataMap = new HashMap<>();
+        Map<String, Map<String, String>> repeatDataMap = new HashMap<>();
         BatchIteratorRunner.State state = new BatchIteratorRunner.State();
         int unExist = 0;
 //        MultipartFile multipartFile;
@@ -186,12 +187,20 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                     if (matrixAttrType == null) {
                                         throw new MatrixAttributeTypeNotFoundException(matrixVo.getName(), attributeVo.getUuid(), attributeVo.getType());
                                     }
-                                    matrixAttrType.getRealValueBatch(attributeVo, colValueMap.get(columnName));
+                                    Set<String> repeatValueSet = matrixAttrType.getRealValueBatch(attributeVo, colValueMap.get(columnName));
+                                    for (String repeatValue : repeatValueSet) {
+                                        for (Row row : rowList) {
+                                            if (repeatValueSet.contains(getCellValue(row.getCell(j)))) {
+                                                repeatDataMap.computeIfAbsent(String.valueOf(row.getRowNum()), k -> new HashMap<>()).put(String.valueOf(j), repeatValue);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     //遍历当前页row执行导入
+                    Row:
                     for (Row row : rowList) {
                         boolean isNew = false;
                         String uuid = null;
@@ -220,10 +229,15 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                     String attributeUuid = attributeVo.getUuid();
                                     if (StringUtils.isNotBlank(attributeUuid)) {
                                         Map<String, String> realValueMap = colValueMap.get(columnName);
-                                        if (realValueMap.containsKey(value) && realValueMap.get(value) != null) {
-                                            rowData.add(new MatrixColumnVo(attributeUuid, realValueMap.get(value)));
+                                        if (!repeatDataMap.containsKey(String.valueOf(row.getRowNum())) || StringUtils.isBlank(repeatDataMap.get(String.valueOf(row.getRowNum())).get(String.valueOf(j)))) {
+                                            if (realValueMap.containsKey(value) && realValueMap.get(value) != null) {
+                                                rowData.add(new MatrixColumnVo(attributeUuid, realValueMap.get(value)));
+                                            } else {
+                                                invalidDataMap.computeIfAbsent(String.valueOf(row.getRowNum()), k -> new HashMap<>()).put(String.valueOf(j), value);
+                                                break Row;
+                                            }
                                         } else {
-                                            invalidDataMap.computeIfAbsent(String.valueOf(row.getRowNum()), k -> new HashMap<>()).put(String.valueOf(j + 1), value);
+                                            break Row;
                                         }
                                     }
                                 }
@@ -235,9 +249,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                             rowData.add(new MatrixColumnVo("sort", maxSort.toString()));
                             matrixDataMapper.insertDynamicTableData(rowData, matrixUuid);
                             insert.getAndIncrement();
-                            update.getAndIncrement();
                         } else {
                             matrixDataMapper.updateDynamicTableDataByUuid(rowData, uuid, matrixUuid);
+                            update.getAndIncrement();
                         }
                     }
                     rowList.clear();
@@ -251,6 +265,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         returnObj.put("insert", insert);
         returnObj.put("update", update);
         returnObj.put("invalidDataMap", invalidDataMap);
+        returnObj.put("repeatDataMap", repeatDataMap);
         returnObj.put("state", state);
         return returnObj;
     }

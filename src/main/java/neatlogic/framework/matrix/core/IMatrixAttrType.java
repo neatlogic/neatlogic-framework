@@ -21,6 +21,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
 
 import java.util.Map;
+import java.util.Set;
 
 public interface IMatrixAttrType {
     /**
@@ -45,7 +46,8 @@ public interface IMatrixAttrType {
      * 根据导入的值转换成系统的值
      *
      * @param valueMap 值map
+     * @return 返回存在重复值的key
      */
-    void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap);
+    Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap);
 
 }

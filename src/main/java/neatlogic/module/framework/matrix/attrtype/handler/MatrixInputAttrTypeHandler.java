@@ -23,7 +23,9 @@ import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class MatrixInputAttrTypeHandler extends MatrixAttrTypeBase {
@@ -38,7 +40,8 @@ public class MatrixInputAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+    public Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
         valueMap.replaceAll((k, v) -> k);
+        return Collections.emptySet();
     }
 }

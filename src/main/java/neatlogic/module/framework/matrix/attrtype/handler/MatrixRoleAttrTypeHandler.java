@@ -27,9 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,7 +60,7 @@ public class MatrixRoleAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+    public Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
         List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
         //通过uuid搜
         if (CollectionUtils.isNotEmpty(needSearchValue)) {
@@ -78,7 +76,7 @@ public class MatrixRoleAttrTypeHandler extends MatrixAttrTypeBase {
             }
         }
         if(CollectionUtils.isEmpty(needSearchValue)){
-            return;
+            return Collections.emptySet();
         }
         //通过name搜
         if (CollectionUtils.isNotEmpty(needSearchValue)) {
@@ -93,5 +91,6 @@ public class MatrixRoleAttrTypeHandler extends MatrixAttrTypeBase {
                 }
             }
         }
+        return Collections.emptySet();
     }
 }

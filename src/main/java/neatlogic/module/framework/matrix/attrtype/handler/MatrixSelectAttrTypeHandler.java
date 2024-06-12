@@ -26,9 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class MatrixSelectAttrTypeHandler extends MatrixAttrTypeBase {
@@ -57,7 +55,7 @@ public class MatrixSelectAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+    public Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
         JSONObject config = matrixAttributeVo.getConfig();
         Map<String, String> configTextValueMap = new HashMap<>();
         if (MapUtils.isNotEmpty(config)) {
@@ -75,5 +73,6 @@ public class MatrixSelectAttrTypeHandler extends MatrixAttrTypeBase {
                 }
             }
         }
+        return Collections.emptySet();
     }
 }

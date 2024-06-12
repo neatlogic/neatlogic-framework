@@ -60,8 +60,9 @@ public class MatrixRegionAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+    public Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
         List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
+        Set<String> repeatValueSet = new HashSet<>();
         List<Long> regionIdList = new ArrayList<>();
         for (Map.Entry<String, String> entry : valueMap.entrySet()) {
             String key = entry.getKey();
@@ -70,36 +71,37 @@ public class MatrixRegionAttrTypeHandler extends MatrixAttrTypeBase {
             } catch (Exception ignored) {
             }
         }
-        if(CollectionUtils.isNotEmpty(regionIdList)) {
+        if (CollectionUtils.isNotEmpty(regionIdList)) {
             List<RegionVo> regionVos = regionMapper.getRegionListByIdList(regionIdList);
-            if(CollectionUtils.isNotEmpty(regionVos)){
-                for (RegionVo regionVo: regionVos){
-                    valueMap.put(regionVo.getId().toString(),regionVo.getId().toString());
+            if (CollectionUtils.isNotEmpty(regionVos)) {
+                for (RegionVo regionVo : regionVos) {
+                    valueMap.put(regionVo.getId().toString(), regionVo.getId().toString());
                     needSearchValue.remove(regionVo.getId().toString());
                 }
             }
         }
 
-        if(CollectionUtils.isEmpty(needSearchValue)){
-            return;
+        if (CollectionUtils.isEmpty(needSearchValue)) {
+            return repeatValueSet;
         }
         //通过name查找
         List<RegionVo> regionVos = regionMapper.getRegionByNameList(new ArrayList<>(needSearchValue));
         if (CollectionUtils.isNotEmpty(regionVos)) {
             for (Map.Entry<String, String> entry : valueMap.entrySet()) {
                 String key = entry.getKey();
-                if (!needSearchValue.contains(key)) {
-                    continue;
-                }
                 List<RegionVo> tmp = regionVos.stream().filter(o -> Objects.equals(o.getName(), key)).collect(Collectors.toList());
-                if (tmp.size() == 1) {
-                    valueMap.put(key, tmp.get(0).getId().toString());
+                if (!tmp.isEmpty()) {
+                    if (tmp.size() == 1) {
+                        valueMap.put(key, tmp.get(0).getId().toString());
+                    } else {
+                        repeatValueSet.add(key);
+                    }
                     needSearchValue.remove(key);
                 }
             }
         }
-        if(CollectionUtils.isEmpty(needSearchValue)){
-            return;
+        if (CollectionUtils.isEmpty(needSearchValue)) {
+            return repeatValueSet;
         }
         //通过upwardNamePath查找
         regionVos = regionMapper.getRegionByUpwardNamePath(needSearchValue);
@@ -108,5 +110,7 @@ public class MatrixRegionAttrTypeHandler extends MatrixAttrTypeBase {
                 valueMap.put(regionVo.getUpwardNamePath(), regionVo.getId().toString());
             }
         }
+
+        return repeatValueSet;
     }
 }

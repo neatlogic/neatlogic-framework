@@ -27,9 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,7 +60,8 @@ public class MatrixTeamAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public void getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+    public Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
+        Set<String> repeatValueSet = new HashSet<>();
         List<String> needSearchValue = new ArrayList<>(valueMap.keySet());
         //通过uuid搜
         if (CollectionUtils.isNotEmpty(needSearchValue)) {
@@ -78,23 +77,27 @@ public class MatrixTeamAttrTypeHandler extends MatrixAttrTypeBase {
             }
         }
         if(CollectionUtils.isEmpty(needSearchValue)){
-            return;
+            return repeatValueSet;
         }
         //通过name搜
         if (CollectionUtils.isNotEmpty(needSearchValue)) {
             List<TeamVo> teamVos = teamMapper.getTeamByNameList(needSearchValue);
             if (CollectionUtils.isNotEmpty(teamVos)) {
-                Map<String, String> teamNameUuidMap = teamVos.stream().collect(Collectors.toMap(TeamVo::getName, TeamVo::getUuid));
                 for (Map.Entry<String, String> entry : valueMap.entrySet()) {
-                    if (teamNameUuidMap.containsKey(entry.getKey())) {
-                        valueMap.put(entry.getKey(), teamNameUuidMap.get(entry.getKey()));
+                    List<TeamVo> teamTmpList = teamVos.stream().filter(t-> Objects.equals(t.getName(),entry.getKey())).collect(Collectors.toList());
+                    if(CollectionUtils.isNotEmpty(teamTmpList)){
+                        if(teamTmpList.size() == 1){
+                            valueMap.put(entry.getKey(), teamTmpList.get(0).getUuid());
+                        }else{
+                            repeatValueSet.add(entry.getKey());
+                        }
                         needSearchValue.remove(entry.getKey());
                     }
                 }
             }
         }
         if(CollectionUtils.isEmpty(needSearchValue)){
-            return;
+            return repeatValueSet;
         }
         //通过upwardNamePath搜
         if (CollectionUtils.isNotEmpty(needSearchValue)) {
@@ -109,5 +112,6 @@ public class MatrixTeamAttrTypeHandler extends MatrixAttrTypeBase {
                 }
             }
         }
+        return repeatValueSet;
     }
 }

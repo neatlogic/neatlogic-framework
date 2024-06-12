@@ -150,7 +150,7 @@ public class BatchRunner<T> {
                 }
             } catch (ApiRuntimeException ex) {
                 logger.warn(ex.getMessage(), ex);
-            } catch (Exception ex) {
+            } catch (Throwable ex) {
                 logger.error(ex.getMessage(), ex);
             } finally {
                 logger.info("批量作业线程{}完成所有任务", index + 1);

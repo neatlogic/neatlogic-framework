@@ -404,8 +404,6 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             if (matrixDataSourceHandler == null) {
                 throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
             }
-            List<MatrixAttributeVo> matrixAttributeList = matrixDataSourceHandler.getAttributeList(matrixVo);
-//            List<String> attributeList = matrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
             Set<String> notNullColumnSet = new HashSet<>();
             String valueField = (String) mapping.getValue();
             String textField = mapping.getText();
@@ -421,9 +419,6 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 for (int i = 0; i < hiddenFieldList.size(); i++) {
                     String hiddenField = hiddenFieldList.get(i);
                     if (StringUtils.isNotBlank(hiddenField)) {
-//                        if (!attributeList.contains(hiddenField)) {
-//                            throw new MatrixAttributeNotFoundException(matrixVo.getName(), hiddenField);
-//                        }
                         columnList.add(hiddenField);
                     }
                 }

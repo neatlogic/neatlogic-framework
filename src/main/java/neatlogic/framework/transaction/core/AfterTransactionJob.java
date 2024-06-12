@@ -33,7 +33,8 @@ public class AfterTransactionJob<T> {
     public enum EVENT {
         COMMITTED(), COMPLETED()
     }
-    private final static Logger logger = LoggerFactory.getLogger(AfterTransactionJob.class);
+
+    private static final Logger logger = LoggerFactory.getLogger(AfterTransactionJob.class);
 
     private final ThreadLocal<Set<T>> THREADLOCAL = new ThreadLocal<>();
     private final ThreadLocal<Set<NeatLogicThread>> T_THREADLOCAL = new ThreadLocal<>();
@@ -198,7 +199,7 @@ public class AfterTransactionJob<T> {
      * @Description:
      * @Author: chenqiwei
      * @Date: 2021/1/7 4:06 下午
-     * @Params: [参数, 事务提交后回调函数, 事务完全接受后回调函数（回滚也会触发）]
+     * @Params: [参数, 事务提交后回调函数, 事务结束后回调函数（回滚也会触发）]
      * @Returns: void
      **/
     public synchronized void execute(T t, ICommitted<T> commited, ICompleted<T> completed, boolean isSync) {

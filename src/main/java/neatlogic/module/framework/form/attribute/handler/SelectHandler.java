@@ -195,6 +195,11 @@ public class SelectHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object getStandardValueBySimpleValue(Object simpleValue, JSONObject configObj) {
+        return formService.getSelectStandardValueBySimpleValue(simpleValue, configObj);
+    }
+
+    @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
         JSONArray textArray = resultObj.getJSONArray("textList");

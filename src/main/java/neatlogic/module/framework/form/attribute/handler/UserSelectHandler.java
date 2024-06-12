@@ -126,6 +126,44 @@ public class UserSelectHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object getStandardValueBySimpleValue(Object dataObj, JSONObject configObj) {
+        boolean isMultiple = configObj.getBooleanValue("isMultiple");
+        if (isMultiple) {
+            boolean flag = false;
+            for (Object data : (List) dataObj) {
+                String dataStr = data.toString();
+                if (dataStr.contains(GroupSearch.COMMON.getValuePlugin())
+                        || dataStr.contains(GroupSearch.USER.getValuePlugin())
+                        || dataStr.contains(GroupSearch.TEAM.getValuePlugin())
+                        || dataStr.contains(GroupSearch.ROLE.getValuePlugin())) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag) {
+                return dataObj;
+            } else {
+                return textConversionValue(dataObj, configObj);
+            }
+
+        } else {
+            Object data = dataObj;
+            if (dataObj instanceof List) {
+                data = ((List) dataObj).get(0);
+            }
+            String dataStr = data.toString();
+            if (dataStr.contains(GroupSearch.COMMON.getValuePlugin())
+                    || dataStr.contains(GroupSearch.USER.getValuePlugin())
+                    || dataStr.contains(GroupSearch.TEAM.getValuePlugin())
+                    || dataStr.contains(GroupSearch.ROLE.getValuePlugin())) {
+                return data;
+            } else {
+                return textConversionValue(data, configObj);
+            }
+        }
+    }
+
+    @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
         JSONArray textArray = resultObj.getJSONArray("textList");

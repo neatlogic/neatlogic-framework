@@ -48,4 +48,12 @@ public interface FormService {
      * @return 组件列表
      */
     List<FormAttributeVo> getFormAttributeList(String formUuid, String formName, String tag);
+
+    /**
+     * 通过简单值获取标准值，例如下拉框的简单值为a或A，返回标准值为{"value":"a", "text":"A"}
+     * @param simpleValue
+     * @param configObj
+     * @return
+     */
+    Object getSelectStandardValueBySimpleValue(Object simpleValue, JSONObject configObj);
 }

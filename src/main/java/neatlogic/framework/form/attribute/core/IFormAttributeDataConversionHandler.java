@@ -52,6 +52,15 @@ public interface IFormAttributeDataConversionHandler {
     }
 
     /**
+     * 通过简单值获取标准值，例如下拉框的简单值为a或A，返回标准值为{"value":"a", "text":"A"}
+     * @param simpleValue
+     * @return
+     */
+    default Object getStandardValueBySimpleValue(Object simpleValue, JSONObject configObj) {
+        return simpleValue;
+    }
+
+    /**
      * 数据转换，用于邮件模板展示表单信息
      *
      * @param attributeDataVo

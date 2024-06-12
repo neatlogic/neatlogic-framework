@@ -123,10 +123,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         Map<String, Map<String, String>> invalidDataMap = new HashMap<>();
         Map<String, Map<String, String>> repeatDataMap = new HashMap<>();
         BatchIteratorRunner.State state = new BatchIteratorRunner.State();
-        int unExist = 0;
-//        MultipartFile multipartFile;
         InputStream is;
-//        MultipartFile multipartFile = entry.getValue();
         is = multipartFile.getInputStream();
         String originalFilename = multipartFile.getOriginalFilename();
         if (StringUtils.isNotBlank(originalFilename) && originalFilename.contains(".")) {
@@ -154,7 +151,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
             //多线程分页批同时处理
             BatchIteratorRunner<Row> runner = new BatchIteratorRunner<>();
-            ExcelPagedRowIterator pagedRowIterator = new ExcelPagedRowIterator(sheet, 5);
+            int batch = 5;
+            if (sheet.getPhysicalNumberOfRows() <= 30) {//少于30行一批处理即可
+                batch = 1;
+            }
+            ExcelPagedRowIterator pagedRowIterator = new ExcelPagedRowIterator(sheet, batch);
             List<Iterator<Row>> pageIterators = pagedRowIterator.getPageIterators();
             try {
                 state = runner.execute(pageIterators, (iterator, rowList) -> {
@@ -234,10 +235,10 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                                 rowData.add(new MatrixColumnVo(attributeUuid, realValueMap.get(value)));
                                             } else {
                                                 invalidDataMap.computeIfAbsent(String.valueOf(row.getRowNum()), k -> new HashMap<>()).put(String.valueOf(j), value);
-                                                break Row;
+                                                continue Row;
                                             }
                                         } else {
-                                            break Row;
+                                            continue Row;
                                         }
                                     }
                                 }
@@ -262,6 +263,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         } else {
             throw new MatrixDataNotFoundException(originalFilename);
         }
+        returnObj.put("failed", invalidDataMap.size() + repeatDataMap.size());
         returnObj.put("insert", insert);
         returnObj.put("update", update);
         returnObj.put("invalidDataMap", invalidDataMap);

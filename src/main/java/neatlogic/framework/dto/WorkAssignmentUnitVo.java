@@ -28,6 +28,9 @@ public class WorkAssignmentUnitVo {
     @EntityField(name = "common.isdeleted", type = ApiParamType.ENUM)
     private Integer isDelete;
 
+    public WorkAssignmentUnitVo() {
+    }
+
     public WorkAssignmentUnitVo(UserVo userVo){
         this.initType = GroupSearch.USER.getValue();
         this.uuid = userVo.getUuid();

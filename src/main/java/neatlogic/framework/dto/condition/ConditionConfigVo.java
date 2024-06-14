@@ -168,7 +168,7 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
                     //append condition
                     String handler = conditionVo.getName();
                     //如果是form
-                    buildMyConditionWhereSql(sqlSb, handler, conditionVoList, i,conditionConfigVo.getSearchMode());
+                    buildMyConditionWhereSql(sqlSb, handler, groupVo, i,conditionConfigVo.getSearchMode());
                     fromConditionUuid = toConditionUuid;
                 }
                 sqlSb.append(" ) ");
@@ -186,11 +186,11 @@ public class ConditionConfigVo extends BaseEditorVo implements Serializable {
      *
      * @param sqlSb sql stringBuilder
      * @param handler 条件处理器
-     * @param conditionVoList 所有条件
+     * @param groupVo 条件组
      * @param conditionIndex 当前条件下标
      * @param searchMode 搜索模式：value|text，默认搜索value
      */
-    public void buildMyConditionWhereSql(StringBuilder sqlSb, String handler, List<ConditionVo> conditionVoList, int conditionIndex, String searchMode) {
+    public void buildMyConditionWhereSql(StringBuilder sqlSb, String handler, ConditionGroupVo groupVo, int conditionIndex, String searchMode) {
 
     }
 

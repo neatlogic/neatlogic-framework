@@ -15,13 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.form.attribute.core;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -32,21 +32,21 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
 
     public enum ConversionType {
 
-        TOVALUE("toValue", new I18n("text转换成value")),
-        TOTEXT("toText", new I18n("value转换成text"));
+        TOVALUE("toValue", "text转换成value"),
+        TOTEXT("toText", "value转换成text");
 
-        private String value;
-        private I18n text;
+        private final String value;
+        private final String text;
 
         public String getValue() {
             return value;
         }
 
         public String getText() {
-            return $.t(text.toString());
+            return $.t(text);
         }
 
-        private ConversionType(String _value, I18n _text) {
+        private ConversionType(String _value, String _text) {
             value = _value;
             text = _text;
         }
@@ -160,7 +160,7 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
         }
         if (source instanceof String) {
             try {
-                return JSONObject.parseArray((String) source);
+                return JSON.parseArray((String) source);
             } catch (Exception e) {
                 throw new AttributeValidException(attributeLabel);
             }

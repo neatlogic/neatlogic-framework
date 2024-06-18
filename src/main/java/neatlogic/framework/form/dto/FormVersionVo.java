@@ -36,6 +36,8 @@ public class FormVersionVo extends BaseEditorVo {
     private JSONObject formConfig;
     private String sceneUuid;
     @JSONField(serialize = false)
+    private List<FormAttributeVo> formCustomExtendAttributeList;
+    @JSONField(serialize = false)
     private List<FormAttributeVo> formExtendAttributeList;
     @JSONField(serialize = false)
     private List<FormAttributeVo> formAttributeList;
@@ -319,5 +321,57 @@ public class FormVersionVo extends BaseEditorVo {
 
     public void setFormExtendAttributeList(List<FormAttributeVo> formExtendAttributeList) {
         this.formExtendAttributeList = formExtendAttributeList;
+    }
+
+    public List<FormAttributeVo> getFormCustomExtendAttributeList() {
+        if (formCustomExtendAttributeList == null) {
+            if (MapUtils.isNotEmpty(getFormConfig())) {
+                JSONObject formCustomExtendConfig = this.formConfig.getJSONObject("formCustomExtendConfig");
+                if (MapUtils.isNotEmpty(formCustomExtendConfig)) {
+                    JSONArray extendConfigList = formCustomExtendConfig.getJSONArray("extendConfigList");
+                    if (CollectionUtils.isNotEmpty(extendConfigList)) {
+                        for (int i = 0; i < extendConfigList.size(); i++) {
+                            JSONObject extendConfigObj = extendConfigList.getJSONObject(i);
+                            if (MapUtils.isEmpty(extendConfigObj)) {
+                                continue;
+                            }
+                            JSONArray attributeArray = extendConfigObj.getJSONArray("attributeList");
+                            if (CollectionUtils.isNotEmpty(attributeArray)) {
+                                String mainSceneUuid = this.formConfig.getString("uuid");
+                                formCustomExtendAttributeList = new ArrayList<>();
+                                for (int j = 0; j < attributeArray.size(); j++) {
+                                    JSONObject attributeObj = attributeArray.getJSONObject(j);
+                                    if (MapUtils.isEmpty(attributeObj)) {
+                                        continue;
+                                    }
+                                    String tag = attributeObj.getString("tag");
+                                    String key = attributeObj.getString("key");
+                                    String label = attributeObj.getString("label");
+                                    String type = attributeObj.getString("type");
+                                    String handler = attributeObj.getString("handler");
+                                    JSONObject config = attributeObj.getJSONObject("config");
+                                    FormAttributeVo formAttributeVo = new FormAttributeVo();
+                                    formAttributeVo.setFormUuid(formUuid);
+                                    formAttributeVo.setFormVersionUuid(uuid);
+                                    formAttributeVo.setTag(tag);
+                                    formAttributeVo.setKey(key);
+                                    formAttributeVo.setUuid(UuidUtil.getCustomUUID(mainSceneUuid + "#" + tag + "#" + key));
+                                    formAttributeVo.setLabel(label);
+                                    formAttributeVo.setType(type);
+                                    formAttributeVo.setHandler(handler);
+                                    formAttributeVo.setConfig(config);
+                                    formCustomExtendAttributeList.add(formAttributeVo);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return formCustomExtendAttributeList;
+    }
+
+    public void setFormCustomExtendAttributeList(List<FormAttributeVo> formCustomExtendAttributeList) {
+        this.formCustomExtendAttributeList = formCustomExtendAttributeList;
     }
 }

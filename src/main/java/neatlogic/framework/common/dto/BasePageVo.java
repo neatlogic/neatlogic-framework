@@ -42,6 +42,8 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     @EntityField(name = "common.pagecount", type = ApiParamType.INTEGER)
     private Integer pageCount = 0;
+    @JSONField(serialize = false)//是否需要计算行数
+    private Boolean needRowNum = true;
 
     @JSONField(serialize = false)//数据页范围，用于查询一定范围内的数据
     private Integer[] pageRange;
@@ -85,6 +87,14 @@ public class BasePageVo implements Serializable {
 
     public void setMaxPageSize(int maxPageSize) {
         this.maxPageSize = Math.max(20, maxPageSize);
+    }
+
+    public Boolean getNeedRowNum() {
+        return needRowNum;
+    }
+
+    public void setNeedRowNum(Boolean needRowNum) {
+        this.needRowNum = needRowNum;
     }
 
     public Integer getRowNum() {

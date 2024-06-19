@@ -330,6 +330,8 @@ public class FormVersionVo extends BaseEditorVo {
                 if (MapUtils.isNotEmpty(formCustomExtendConfig)) {
                     JSONArray extendConfigList = formCustomExtendConfig.getJSONArray("extendConfigList");
                     if (CollectionUtils.isNotEmpty(extendConfigList)) {
+                        String mainSceneUuid = this.formConfig.getString("uuid");
+                        formCustomExtendAttributeList = new ArrayList<>();
                         for (int i = 0; i < extendConfigList.size(); i++) {
                             JSONObject extendConfigObj = extendConfigList.getJSONObject(i);
                             if (MapUtils.isEmpty(extendConfigObj)) {
@@ -337,8 +339,6 @@ public class FormVersionVo extends BaseEditorVo {
                             }
                             JSONArray attributeArray = extendConfigObj.getJSONArray("attributeList");
                             if (CollectionUtils.isNotEmpty(attributeArray)) {
-                                String mainSceneUuid = this.formConfig.getString("uuid");
-                                formCustomExtendAttributeList = new ArrayList<>();
                                 for (int j = 0; j < attributeArray.size(); j++) {
                                     JSONObject attributeObj = attributeArray.getJSONObject(j);
                                     if (MapUtils.isEmpty(attributeObj)) {

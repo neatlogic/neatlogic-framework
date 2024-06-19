@@ -527,7 +527,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         List<FormAttributeVo> formExtendAttributeList = new ArrayList<>();
         List<FormAttributeVo> list = formMapper.getFormExtendAttributeListByFormUuidAndFormVersionUuid(formUuid, formVersion.getUuid());
         for (FormAttributeVo formAttributeVo : list) {
-            if (Objects.equals(formAttributeVo.getTag(), tag)) {
+            if (Objects.equals(formAttributeVo.getTag(), tag) && formAttributeVo.getParentUuid() != null) {
                 formExtendAttributeList.add(formAttributeVo);
                 parentUuidList.add(formAttributeVo.getParentUuid());
             }
@@ -540,6 +540,40 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         }
         resultList.addAll(formExtendAttributeList);
         return resultList;
+    }
+
+    @Override
+    public List<FormAttributeVo> getFormAttributeListNew(String formUuid, String formName, String tag) {
+        FormVersionVo formVersion = formMapper.getActionFormVersionByFormUuid(formUuid);
+        if (formVersion == null) {
+            throw new FormActiveVersionNotFoundExcepiton(formName);
+        }
+        FormAttributeVo searchVo = new FormAttributeVo();
+        searchVo.setFormUuid(formUuid);
+        searchVo.setFormVersionUuid(formVersion.getUuid());
+        List<FormAttributeVo> formAttributeList = formMapper.getFormAttributeList(searchVo);
+        if (StringUtils.isBlank(tag)) {
+            return formAttributeList;
+        }
+        Set<String> tagSet = new HashSet<>();
+        List<FormAttributeVo> formCustomExtendAttributeList = formVersion.getFormCustomExtendAttributeList();
+        if (CollectionUtils.isNotEmpty(formCustomExtendAttributeList)) {
+            for (FormAttributeVo formAttributeVo : formCustomExtendAttributeList) {
+                tagSet.add(formAttributeVo.getTag());
+            }
+        }
+        if (tagSet.contains(tag)) {
+            List<FormAttributeVo> formExtendAttributeList = new ArrayList<>();
+            List<FormAttributeVo> list = formMapper.getFormExtendAttributeListByFormUuidAndFormVersionUuid(formUuid, formVersion.getUuid());
+            for (FormAttributeVo formAttributeVo : list) {
+                if (Objects.equals(formAttributeVo.getTag(), tag) && formAttributeVo.getParentUuid() == null) {
+                    formExtendAttributeList.add(formAttributeVo);
+                }
+            }
+            return formExtendAttributeList;
+        } else {
+            return getFormAttributeList(formUuid, formName, tag);
+        }
     }
 
     @Override

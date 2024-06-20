@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.startup;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
@@ -63,11 +64,11 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
     /**
      * 在线帮助文档根目录
      */
-    public final static String DIRECTORY_ROOT = "documentonline";
+    public static final String DIRECTORY_ROOT = "documentonline";
     /**
      * 在线帮助文档索引库位置
      */
-    public final static String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + DIRECTORY_ROOT;
+    public static final String INDEX_DIRECTORY = System.getProperty("java.io.tmpdir") + File.separator + DIRECTORY_ROOT;
     /**
      * 在线帮助文档类路径根目录
      */
@@ -77,7 +78,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
      */
     private static List<DocumentOnlineConfigVo> mappingConfigList = new ArrayList();
 
-    public final static DocumentOnlineDirectoryVo DOCUMENT_ONLINE_DIRECTORY_ROOT = new DocumentOnlineDirectoryVo("root", false);
+    public static final DocumentOnlineDirectoryVo DOCUMENT_ONLINE_DIRECTORY_ROOT = new DocumentOnlineDirectoryVo("root", false);
 
     @Override
     public String getName() {
@@ -106,7 +107,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                     continue;
                 }
                 try {
-                    JSONArray mappingArray = JSONArray.parseArray(content);
+                    JSONArray mappingArray = JSON.parseArray(content);
                     for (int i = 0; i < mappingArray.size(); i++) {
                         JSONObject mappingObj = mappingArray.getJSONObject(i);
                         DocumentOnlineConfigVo documentOnlineConfigVo = mappingObj.toJavaObject(DocumentOnlineConfigVo.class);
@@ -190,7 +191,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
                 // 文件路径字段不分词
                 document.add(new StringField("filePath", filePath, Field.Store.YES));
                 // 上层名称列表字段不分词
-                document.add(new StringField("upwardNameList", JSONArray.toJSONString(directory.getUpwardNameList()), Field.Store.YES));
+                document.add(new StringField("upwardNameList", JSON.toJSONString(directory.getUpwardNameList()), Field.Store.YES));
                 // 文件名称字段分词
                 document.add(new TextField("fileName", filename, Field.Store.YES));
                 // 文件内容字段分词
@@ -214,7 +215,7 @@ public class DocumentOnlineInitializeIndexHandler extends StartupBase {
 
         for (DocumentOnlineConfigVo documentOnlineConfigVo : mappingConfigList) {
             if (!documentOnlineConfigVo.isUsed()) {
-                logger.warn("nmfs.documentonlineinitializeindexhandler.executeforalltenant.warn_c" + JSONObject.toJSONString(documentOnlineConfigVo));
+                logger.warn($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.warn_c") + JSON.toJSONString(documentOnlineConfigVo));
             }
         }
         return 1;

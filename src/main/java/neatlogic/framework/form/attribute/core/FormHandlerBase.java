@@ -150,7 +150,10 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
         }
         if (source instanceof String) {
             return (String) source;
+        } else if (source instanceof JSONArray && CollectionUtils.isNotEmpty((JSONArray) source)) {
+            return ((JSONArray) source).getString(0);
         }
+
         throw new AttributeValidException(attributeLabel);
     }
 

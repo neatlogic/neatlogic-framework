@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
@@ -78,13 +79,13 @@ public class SelectHandler extends FormHandlerBase {
             String sourceStr = (String) source;
             if (sourceStr.startsWith("{") && sourceStr.endsWith("}")) {
                 try {
-                    return JSONObject.parseObject(sourceStr);
+                    return JSON.parseObject(sourceStr);
                 } catch (Exception e) {
                     throw new AttributeValidException(attributeLabel);
                 }
             } else if (sourceStr.startsWith("[") && sourceStr.endsWith("]")) {
                 try {
-                    return JSONObject.parseArray(sourceStr);
+                    return JSON.parseArray(sourceStr);
                 } catch (Exception e) {
                     throw new AttributeValidException(attributeLabel);
                 }
@@ -323,7 +324,7 @@ public class SelectHandler extends FormHandlerBase {
     protected List<String> myIndexFieldContentList(String data) {
         List<String> contentList = new ArrayList<>();
         if (data.startsWith("{") && data.endsWith("}")) {
-            JSONObject jsonObj = JSONObject.parseObject(data);
+            JSONObject jsonObj = JSON.parseObject(data);
             String value = jsonObj.getString("value");
             contentList.add(value);
             String text = jsonObj.getString("text");
@@ -331,7 +332,7 @@ public class SelectHandler extends FormHandlerBase {
                 contentList.add(text);
             }
         } else if (data.startsWith("[") && data.endsWith("]")) {
-            JSONArray jsonArray = JSONArray.parseArray(data);
+            JSONArray jsonArray = JSON.parseArray(data);
             for (Object obj : jsonArray) {
                 if (obj != null) {
                     if (obj instanceof JSONObject) {
@@ -347,7 +348,7 @@ public class SelectHandler extends FormHandlerBase {
                     }
                 }
             }
-            return JSONObject.parseArray(jsonArray.toJSONString(), String.class);
+            return JSON.parseArray(jsonArray.toJSONString(), String.class);
         } else {
             contentList.add(data);
         }
@@ -422,7 +423,7 @@ public class SelectHandler extends FormHandlerBase {
             if (StringUtils.isNotBlank(matrixUuid)) {
                 matrixUuidSet.add(matrixUuid);
                 Set<String> attributeUuidSet = new HashSet<>();
-                /** 字段映射 **/
+                /* 字段映射 **/
                 JSONObject mapping = config.getJSONObject("mapping");
                 if (MapUtils.isNotEmpty(mapping)) {
                     String value = mapping.getString("value");
@@ -434,7 +435,7 @@ public class SelectHandler extends FormHandlerBase {
                         attributeUuidSet.add(text);
                     }
                 }
-                /** 过滤条件 **/
+                /* 过滤条件 **/
                 JSONArray sourceColumnList = config.getJSONArray("sourceColumnList");
                 if (CollectionUtils.isNotEmpty(sourceColumnList)) {
                     for (int i = 0; i < sourceColumnList.size(); i++) {

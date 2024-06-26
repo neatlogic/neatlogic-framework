@@ -158,5 +158,9 @@ public class DatasourceManager {
         }
         //最大超时时间
         dataSource.setConnectionTimeout(Config.DATASOURCE_CONNECT_TIMEOUT());
+        //心跳防止网关强行关闭会话
+        if(Config.DATASOURCE_KEEPALIVE_TIME() != -1) {
+            dataSource.setKeepaliveTime(Config.DATASOURCE_KEEPALIVE_TIME());
+        }
     }
 }

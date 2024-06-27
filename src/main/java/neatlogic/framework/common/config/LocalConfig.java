@@ -44,7 +44,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
     static Logger logger = LoggerFactory.getLogger(LocalConfig.class);
     private static final String CONFIG_FILE = "config.properties";
 
-    private static  String propertiesFrom;
+    private static String propertiesFrom;
 
     public static String getPropertiesFrom() {
         return propertiesFrom;
@@ -91,6 +91,21 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             dbConfigMap.put("db.username", prop.getProperty("db.username", "username"));
             dbConfigMap.put("db.password", RC4Util.decrypt(prop.getProperty("db.password", "password")));
             dbConfigMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
+
+            Integer datasourceConnectTimeout = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));
+            Integer datasourceMaximumPoolSize = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size", "20"));
+            Long datasourceKeepaliveTime = Long.parseLong(prop.getProperty("datasource.keepalive.time", "1800000"));
+            Integer datasourceMaxLifetime = Integer.parseInt(prop.getProperty("datasource.max.lifetime", "1800000"));
+            Integer datasourceMinimumIdle = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "20"));
+            Integer datasourceValidationTimeout = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "5000"));
+            Integer datasourceIdleTimeout = Integer.parseInt(prop.getProperty("datasource.idle.timeout", "600000"));
+            dbConfigMap.put("datasource.connect.timeout", datasourceConnectTimeout);
+            dbConfigMap.put("datasource.maximum.pool.size", datasourceMaximumPoolSize);
+            dbConfigMap.put("datasource.keepalive.time", datasourceKeepaliveTime);
+            dbConfigMap.put("datasource.max.lifetime", datasourceMaxLifetime);
+            dbConfigMap.put("datasource.minimum.idle", datasourceMinimumIdle);
+            dbConfigMap.put("datasource.validation.timeout", datasourceValidationTimeout);
+            dbConfigMap.put("datasource.idle.timeout", datasourceIdleTimeout);
 //            dbConfigMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
 //            dbConfigMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));
 //            dbConfigMap.put("conn.maxIdle", prop.getProperty("conn.maxIdle", "16"));
@@ -102,8 +117,8 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             mongoPwd = RC4Util.decrypt(mongoPwd);
             dbConfigMap.put("mongo.url", "mongodb://" + mongoUser + ":" + mongoPwd + "@" + mongoHost + "/" + mongoDb);
             dbConfigMap.put("jms.url", prop.getProperty("jms.url", "tcp://localhost:61616"));
-            dbConfigMap.put("jms.user", prop.getProperty("jms.user","neatlogic"));
-            dbConfigMap.put("jms.password", prop.getProperty("jms.password","123456"));
+            dbConfigMap.put("jms.user", prop.getProperty("jms.user", "neatlogic"));
+            dbConfigMap.put("jms.password", prop.getProperty("jms.password", "123456"));
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }

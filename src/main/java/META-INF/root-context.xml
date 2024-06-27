@@ -47,6 +47,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <property name="password">
             <value>${db.password}</value>
         </property>
+        <property name="maximumPoolSize">
+            <value>${datasource.maximum.pool.size}</value>
+        </property>
+        <property name="maxLifetime">
+            <value>${datasource.max.lifetime}</value>
+        </property>
+        <property name="minimumIdle">
+            <value>${datasource.minimum.idle}</value>
+        </property>
+        <property name="validationTimeout">
+            <value>${datasource.validation.timeout}</value>
+        </property>
+        <property name="idleTimeout">
+            <value>${datasource.idle.timeout}</value>
+        </property>
+        <property name="connectionTimeout">
+            <value>${datasource.connect.timeout}</value>
+        </property>
+        <property name="keepaliveTime">
+            <value>${datasource.keepalive.time}</value>
+        </property>
     </bean>
 
     <!-- 配置需要在rootComponent前加载 -->

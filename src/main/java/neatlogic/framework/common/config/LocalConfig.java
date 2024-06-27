@@ -94,7 +94,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
 
             Integer datasourceConnectTimeout = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));
             Integer datasourceMaximumPoolSize = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size", "20"));
-            Long datasourceKeepaliveTime = Long.parseLong(prop.getProperty("datasource.keepalive.time", "60000"));
+            Long datasourceKeepaliveTime = Long.parseLong(prop.getProperty("datasource.keepalive.time", "180000"));
             Integer datasourceMaxLifetime = Integer.parseInt(prop.getProperty("datasource.max.lifetime", "1800000"));
             Integer datasourceMinimumIdle = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "20"));
             Integer datasourceValidationTimeout = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "5000"));

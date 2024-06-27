@@ -25,6 +25,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 public class BasePageVo implements Serializable {
@@ -180,12 +181,22 @@ public class BasePageVo implements Serializable {
     }
 
     public final String getKeyword() {
+        if (StringUtils.isNotBlank(keyword) && this.keyword.startsWith("\"") && this.keyword.endsWith("\"")) {
+            return keyword.substring(1, keyword.length() - 1);
+        }
         return keyword;
     }
 
     public final Set<String> getKeywordList() {
         if (CollectionUtils.isEmpty(this.keywordList) && StringUtils.isNotBlank(keyword)) {
-            this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
+            if (this.keyword.startsWith("\"") && this.keyword.endsWith("\"")) {
+                this.keywordList = new HashSet<String>() {{
+                    this.add(keyword.substring(1, keyword.length() - 1));
+                }};
+            } else {
+                this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
+            }
+
         }
         return this.keywordList;
     }

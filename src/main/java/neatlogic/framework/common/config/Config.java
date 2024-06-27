@@ -62,6 +62,7 @@ public class Config {
     private static Integer DATASOURCE_MINIMUM_IDLE;//此属性控制 HikariCP尝试在池中维护的最小空闲连接数
     private static Integer DATASOURCE_VALIDATION_TIMEOUT;//此属性控制测试连接是否活跃的最长时间。此值必须小于 connectionTimeout
     private static Integer DATASOURCE_IDLE_TIMEOUT;//此属性控制允许连接在池中处于空闲状态的最长时间
+    private static Long DATASOURCE_KEEPALIVE_TIME;//此属性控制允许连接在池中心跳时间，不能比DATASOURCE_MAX_LIFETIME大
     private static String DATA_HOME;// 存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
@@ -205,6 +206,10 @@ public class Config {
 
     public static Integer DATASOURCE_MAXIMUN_POOL_SIZE() {
         return DATASOURCE_MAXIMUM_POOL_SIZE;
+    }
+
+    public static Long DATASOURCE_KEEPALIVE_TIME() {
+        return DATASOURCE_KEEPALIVE_TIME;
     }
 
     public static Integer DATASOURCE_MAX_LIFETIME() {
@@ -520,10 +525,11 @@ public class Config {
             DB_TRANSACTION_TIMEOUT = prop.getProperty("db.transaction.timeout");
             DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));
             DATASOURCE_MAXIMUM_POOL_SIZE = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size", "20"));
-            DATASOURCE_MAX_LIFETIME = Integer.parseInt(prop.getProperty("datasource.max.lifetime", "-1"));
-            DATASOURCE_MINIMUM_IDLE = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "-1"));
-            DATASOURCE_VALIDATION_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "-1"));
-            DATASOURCE_IDLE_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.idle.timeout", "-1"));
+            DATASOURCE_KEEPALIVE_TIME = Long.parseLong(prop.getProperty("datasource.keepalive.time", "180000"));
+            DATASOURCE_MAX_LIFETIME = Integer.parseInt(prop.getProperty("datasource.max.lifetime", "1800000"));
+            DATASOURCE_MINIMUM_IDLE = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "20"));
+            DATASOURCE_VALIDATION_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "5000"));
+            DATASOURCE_IDLE_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.idle.timeout", "600000"));
             DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));

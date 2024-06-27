@@ -117,12 +117,12 @@ public class DatasourceManager {
         tenantDatasource.setDriverClassName(datasourceVo.getDriver());
         tenantDatasource.setUsername(datasourceVo.getUsername());
         tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
-        tenantDatasource.setPoolName("HikariCP_"+ (isDataDB ? "DATA_" : StringUtils.EMPTY) + datasourceVo.getTenantUuid());
+        tenantDatasource.setPoolName("HikariCP_" + (isDataDB ? "DATA_" : StringUtils.EMPTY) + datasourceVo.getTenantUuid());
         setDataSourceConfig(tenantDatasource);
         return tenantDatasource;
     }
 
-    public static void setDataSourceConfig(NeatLogicBasicDataSource dataSource){
+    public static void setDataSourceConfig(NeatLogicBasicDataSource dataSource) {
         //连接数大小
         dataSource.setMaximumPoolSize(Config.DATASOURCE_MAXIMUN_POOL_SIZE());
         //以下是针对Mysql的参数优化
@@ -141,22 +141,16 @@ public class DatasourceManager {
         dataSource.addDataSourceProperty("elideSetAutoCommits", true);
         dataSource.addDataSourceProperty("maintainTimeStats", false);
         //控制池中连接的最大生存期
-        if(Config.DATASOURCE_MAX_LIFETIME() != -1) {
-            dataSource.setMaxLifetime(Config.DATASOURCE_MAX_LIFETIME());
-        }
+        dataSource.setMaxLifetime(Config.DATASOURCE_MAX_LIFETIME());
         //此属性控制 HikariCP尝试在池中维护的最小空闲连接数
-        if(Config.DATASOURCE_MINIMUM_IDLE() != -1) {
-            dataSource.setMinimumIdle(Config.DATASOURCE_MINIMUM_IDLE());
-        }
+        dataSource.setMinimumIdle(Config.DATASOURCE_MINIMUM_IDLE());
         //此属性控制测试连接是否活跃的最长时间。此值必须小于 connectionTimeout
-        if(Config.DATASOURCE_VALIDATION_TIMEOUT() != -1) {
-            dataSource.setValidationTimeout(Config.DATASOURCE_VALIDATION_TIMEOUT());
-        }
+        dataSource.setValidationTimeout(Config.DATASOURCE_VALIDATION_TIMEOUT());
         //此属性控制允许连接在池中处于空闲状态的最长时间
-        if(Config.DATASOURCE_IDLE_TIMEOUT() != -1) {
-            dataSource.setIdleTimeout(Config.DATASOURCE_IDLE_TIMEOUT());
-        }
+        dataSource.setIdleTimeout(Config.DATASOURCE_IDLE_TIMEOUT());
         //最大超时时间
         dataSource.setConnectionTimeout(Config.DATASOURCE_CONNECT_TIMEOUT());
+        //心跳防止防火墙强行关闭会话
+        dataSource.setKeepaliveTime(Config.DATASOURCE_KEEPALIVE_TIME());
     }
 }

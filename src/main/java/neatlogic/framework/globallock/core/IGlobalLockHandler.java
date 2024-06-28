@@ -103,10 +103,10 @@ public interface IGlobalLockHandler {
 
     /**
      * 获取是否有锁
-     * @param key 唯一键
+     * @param param 唯一键
      * @return 是否存在
      */
-    default boolean getIsHasLockByKey(String key){
+    default boolean getIsHasLockByKey(JSONObject param){
         return false;
     };
 }

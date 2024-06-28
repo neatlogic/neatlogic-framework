@@ -13,7 +13,7 @@ public interface GlobalLockMapper {
 
     GlobalLockVo getNextGlobalLockByUuid(String uuid);
 
-    List<String> getGlobalLockUuidByKey(@Param("handler") String handler, @Param("keyword") String jobId);
+    List<String> getGlobalLockUuidByKey(@Param("handler") String handler, @Param("keyword") String keyword,@Param("handlerParamKeyword") String handlerParamKeyword);
 
     void insertLock(GlobalLockVo globalLockVo);
 

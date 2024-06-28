@@ -128,8 +128,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `global_lock`
         <where>
             handler = #{handler}
-            <if test="keyword !=null and keyword != ''">
-                and `key` like CONCAT('%',#{keyword}, '%')
+            and `key` = #{keyword}
+            <if test="handlerParamKeyword != null and handlerParamKeyword != ''">
+                and `handler_param` like CONCAT('%"',#{handlerParamKeyword}, '"%')
             </if>
         </where>
     </select>

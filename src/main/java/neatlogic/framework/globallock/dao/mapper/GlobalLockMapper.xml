@@ -189,7 +189,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         DELETE
         FROM `global_lock`
         WHERE `id` in
-        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </delete>

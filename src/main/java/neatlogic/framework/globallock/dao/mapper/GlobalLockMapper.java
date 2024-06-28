@@ -15,6 +15,8 @@ public interface GlobalLockMapper {
 
     List<String> getGlobalLockUuidByKey(@Param("handler") String handler, @Param("keyword") String keyword,@Param("handlerParamKeyword") String handlerParamKeyword);
 
+    List<Long> getGlobalLockIdByKey(@Param("handler") String handler, @Param("keyword") String keyword,@Param("handlerParamKeyword") String handlerParamKeyword);
+
     void insertLock(GlobalLockVo globalLockVo);
 
     Integer updateToLockById(Long id);
@@ -29,4 +31,5 @@ public interface GlobalLockMapper {
 
     Integer getLockCount(GlobalLockVo globalLockVo);
 
+    void deleteLockByIdList(List<Long> idList);
 }

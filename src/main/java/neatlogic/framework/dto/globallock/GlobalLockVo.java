@@ -57,6 +57,8 @@ public class GlobalLockVo extends BasePageVo {
 
     @JSONField(serialize = false)
     private List<String> uuidList;//用于过滤
+    @JSONField(serialize = false)
+    private List<Long> idList;//用于过滤
 
     public GlobalLockVo() {
 
@@ -190,5 +192,13 @@ public class GlobalLockVo extends BasePageVo {
 
     public void setUuidList(List<String> uuidList) {
         this.uuidList = uuidList;
+    }
+
+    public List<Long> getIdList() {
+        return idList;
+    }
+
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
     }
 }

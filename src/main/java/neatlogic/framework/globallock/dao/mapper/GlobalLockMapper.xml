@@ -80,6 +80,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                     #{uuid}
                 </foreach>
             </if>
+            <if test="idList != null and idList.size() >0">
+                and `id` in
+                <foreach collection="idList" item="id" close=")" open="(" separator=",">
+                    #{id}
+                </foreach>
+            </if>
         </where>
         order by is_lock desc,`fcd` desc
         <if test="needPage == true">
@@ -120,6 +126,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                     #{uuid}
                 </foreach>
             </if>
+            <if test="idList != null and idList.size() >0">
+                and `id` in
+                <foreach collection="idList" item="id" close=")" open="(" separator=",">
+                    #{id}
+                </foreach>
+            </if>
         </where>
     </select>
     <select id="getGlobalLockUuidByKey" resultType="java.lang.String">
@@ -128,7 +140,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `global_lock`
         <where>
             handler = #{handler}
-            and `key` = #{keyword}
+            and `key` like CONCAT('',#{keyword}, '%')
+            <if test="handlerParamKeyword != null and handlerParamKeyword != ''">
+                and `handler_param` like CONCAT('%"',#{handlerParamKeyword}, '"%')
+            </if>
+        </where>
+    </select>
+    <select id="getGlobalLockIdByKey" resultType="java.lang.Long">
+        SELECT
+        `id`
+        FROM `global_lock`
+        <where>
+            handler = #{handler}
+            and `key` like CONCAT('',#{keyword}, '%')
             <if test="handlerParamKeyword != null and handlerParamKeyword != ''">
                 and `handler_param` like CONCAT('%"',#{handlerParamKeyword}, '"%')
             </if>
@@ -158,6 +182,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE `uuid` in
         <foreach collection="uuidList" item="uuid" open="(" close=")" separator=",">
             #{uuid}
+        </foreach>
+    </delete>
+
+    <delete id="deleteLockByIdList" parameterType="java.lang.Long">
+        DELETE
+        FROM `global_lock`
+        WHERE `id` in
+        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+            #{id}
         </foreach>
     </delete>
 

@@ -10,10 +10,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConditionParamVo {
+public class ConditionParamVo implements Serializable, Cloneable {
     private String uuid;
     private String name;
     private String label;
@@ -247,5 +248,10 @@ public class ConditionParamVo {
 
     public void setLcd(Long lcd) {
         this.lcd = lcd;
+    }
+
+    @Override
+    public ConditionParamVo clone() throws CloneNotSupportedException {
+        return (ConditionParamVo) super.clone();
     }
 }

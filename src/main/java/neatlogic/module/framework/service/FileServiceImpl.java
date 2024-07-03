@@ -72,6 +72,11 @@ public class FileServiceImpl implements IFileCrossoverService {
     private FileMapper fileMapper;
 
     @Override
+    public FileVo getFileById(Long id) {
+        return fileMapper.getFileById(id);
+    }
+
+    @Override
     public void downloadFile(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Long id = paramObj.getLong("id");
         FileVo fileVo = fileMapper.getFileById(id);

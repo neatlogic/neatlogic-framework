@@ -16,12 +16,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.crossover;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.file.dto.FileVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public interface IFileCrossoverService extends ICrossoverService {
+
+    FileVo getFileById(Long id);
+
     void downloadFile(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     /**

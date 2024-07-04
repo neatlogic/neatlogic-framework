@@ -93,7 +93,7 @@ public class Config {
     private static String MAINTENANCE_PASSWORD;//运维用户密码
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码以及用户token创建时间
-    private static Boolean VALID_TOKEN_FCD;//校验用户token创建时间
+    private static Boolean ENABLE_VALID_TOKEN_FCD;//校验用户token创建时间
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
     private static String PUBLIC_API_AUTH_USERNAME;//外部访问接口basic认证用户名
@@ -150,14 +150,14 @@ public class Config {
             ENABLE_NO_SECRET = false;
         }
 
-        if (StringUtils.isNotBlank(System.getProperty("validTokenFcd"))) {
+        if (StringUtils.isNotBlank(System.getProperty("enableValidTokenFcd"))) {
             try {
-                VALID_TOKEN_FCD = Boolean.valueOf(System.getProperty("validTokenFcd"));
+                ENABLE_VALID_TOKEN_FCD = Boolean.valueOf(System.getProperty("enableValidTokenFcd"));
             } catch (Exception ex) {
-                VALID_TOKEN_FCD = true;
+                ENABLE_VALID_TOKEN_FCD = true;
             }
         } else {
-            VALID_TOKEN_FCD = true;
+            ENABLE_VALID_TOKEN_FCD = true;
         }
 
         if (StringUtils.isNotBlank(System.getProperty("enableInterfaceVerify"))) {
@@ -330,8 +330,8 @@ public class Config {
         return ENABLE_NO_SECRET;
     }
 
-    public static boolean VALID_TOKEN_FCD() {
-        return VALID_TOKEN_FCD;
+    public static boolean ENABLE_VALID_TOKEN_FCD() {
+        return ENABLE_VALID_TOKEN_FCD;
     }
 
     public static boolean ENABLE_GZIP() {

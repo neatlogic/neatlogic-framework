@@ -135,7 +135,7 @@ public class JwtVo implements Serializable {
     }
 
     public boolean validTokenCreateTime(Long userSessionTokenCreateTime) {
-        if (Config.ENABLE_NO_SECRET() || !Config.VALID_TOKEN_FCD() || !isValidTokenCreateTime) {
+        if (Config.ENABLE_NO_SECRET() || !Config.ENABLE_VALID_TOKEN_FCD() || !isValidTokenCreateTime) {
             return true;
         }
         return Objects.equals(userSessionTokenCreateTime, getTokenCreateTime());

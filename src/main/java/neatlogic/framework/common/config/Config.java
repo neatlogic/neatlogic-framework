@@ -150,7 +150,7 @@ public class Config {
             ENABLE_NO_SECRET = false;
         }
 
-        if (StringUtils.isNotBlank(System.getProperty("enableNoSecret"))) {
+        if (StringUtils.isNotBlank(System.getProperty("validTokenFcd"))) {
             try {
                 VALID_TOKEN_FCD = Boolean.valueOf(System.getProperty("validTokenFcd"));
             } catch (Exception ex) {

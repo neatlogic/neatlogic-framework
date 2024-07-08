@@ -67,7 +67,6 @@ public class DependencyManager {
      * @param clazz 引用关系处理器类
      * @param from  被引用者（上游）值（如：服务时间窗口uuid）
      * @param to    引用者（下游）值（如：服务uuid）
-     * @return
      */
     public static int insert(Class<? extends IDependencyHandler> clazz, Object from, Object to, JSONObject config) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
@@ -80,7 +79,6 @@ public class DependencyManager {
      * @param clazz   引用关系处理器类
      * @param from    被引用者（上游）值（如：服务时间窗口uuid）
      * @param toArray 引用者（下游）值（如：服务uuid）
-     * @return
      */
     public static int insert(Class<? extends IDependencyHandler> clazz, Object from, JSONArray toArray) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
@@ -92,7 +90,6 @@ public class DependencyManager {
      *
      * @param clazz 引用关系处理器类
      * @param to    引用者（下游）值（如：服务uuid）
-     * @return
      */
     public static int delete(Class<? extends IDependencyHandler> clazz, Object to) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());

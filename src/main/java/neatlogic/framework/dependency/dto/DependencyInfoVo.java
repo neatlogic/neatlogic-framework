@@ -85,18 +85,16 @@ public class DependencyInfoVo {
     public String getPath() {
         if (path == null) {
             if (StringUtils.isNotBlank(lastName) && CollectionUtils.isNotEmpty(pathList)) {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.append("<span>");
-                stringBuilder.append(lastName);
-                stringBuilder.append("</span>");
-                stringBuilder.append("<span class='text-tip'>");
-                stringBuilder.append(" [");
-                stringBuilder.append(groupName);
-                stringBuilder.append(" / ");
-                stringBuilder.append(String.join(" / ", pathList));
-                stringBuilder.append("]");
-                stringBuilder.append("</span>");
-                path = stringBuilder.toString();
+                path = "<span>" +
+                        lastName +
+                        "</span>" +
+                        "<span class='text-tip'>" +
+                        " [" +
+                        groupName +
+                        " / " +
+                        String.join(" / ", pathList) +
+                        "]" +
+                        "</span>";
             }
         }
         return path;

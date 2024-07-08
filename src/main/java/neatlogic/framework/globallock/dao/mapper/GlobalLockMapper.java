@@ -7,7 +7,11 @@ import java.util.List;
 
 public interface GlobalLockMapper {
 
-    List<GlobalLockVo> getGlobalLockByUuidForUpdate(String id);
+    List<GlobalLockVo> getGlobalLockByUuid(String id);
+
+    String getGlobalLockPkByUuidForUpdate(String uuid);
+
+    String getGlobalLockPkByUuid(String uuid);
 
     GlobalLockVo getGlobalLockById(Long lockId);
 
@@ -32,4 +36,7 @@ public interface GlobalLockMapper {
     Integer getLockCount(GlobalLockVo globalLockVo);
 
     void deleteLockByIdList(List<Long> idList);
+
+    void insertLockPk(String uuid);
+
 }

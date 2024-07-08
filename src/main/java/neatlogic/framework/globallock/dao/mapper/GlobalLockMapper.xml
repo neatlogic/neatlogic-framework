@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.globallock.dao.mapper.GlobalLockMapper">
-    <select id="getGlobalLockByUuidForUpdate" parameterType="java.lang.String"
+    <select id="getGlobalLockByUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
         SELECT `id`,
                `uuid`,
@@ -27,8 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                `description`,
                `fcd`
         FROM `global_lock`
-        WHERE `uuid` = #{value} FOR
-        UPDATE
+        WHERE `uuid` = #{value}
     </select>
 
     <select id="getGlobalLockById" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
@@ -158,6 +157,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </if>
         </where>
     </select>
+    <select id="getGlobalLockPkByUuidForUpdate" resultType="java.lang.String">
+        SELECT `lock_uuid`
+        FROM `global_lock_pk`
+        WHERE `lock_uuid` = #{value} FOR
+        UPDATE
+    </select>
+
+    <select id="getGlobalLockPkByUuid" resultType="java.lang.String">
+        SELECT `lock_uuid`
+        FROM `global_lock_pk`
+        WHERE `lock_uuid` = #{value}
+    </select>
 
     <update id="updateToLockById">
         UPDATE `global_lock`
@@ -168,6 +179,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <insert id="insertLock" parameterType="neatlogic.framework.dto.globallock.GlobalLockVo">
         INSERT INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `is_lock`, `description`, `fcd`)
         VALUES (#{id}, #{uuid}, #{key}, #{handler}, #{handlerParamStr}, #{isLock}, #{description}, now())
+    </insert>
+
+    <insert id="insertLockPk" parameterType="java.lang.String">
+        INSERT IGNORE INTO `global_lock_pk` (`lock_uuid`)
+        VALUES (#{value})
     </insert>
 
     <delete id="deleteLock" parameterType="java.lang.Long">

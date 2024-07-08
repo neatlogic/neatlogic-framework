@@ -24,6 +24,7 @@ import neatlogic.framework.globallock.core.IGlobalLockHandler;
 import neatlogic.framework.globallock.dao.mapper.GlobalLockMapper;
 import neatlogic.framework.lock.core.LockManager;
 import neatlogic.framework.transaction.util.TransactionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +56,13 @@ public class GlobalLockManager {
     public static void insertLock(GlobalLockVo globalLockVo) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
-            globalLockMapper.insertLock(globalLockVo);
+            if(StringUtils.isBlank(globalLockMapper.getGlobalLockPkByUuid(globalLockVo.getUuid()))) {
+                globalLockMapper.insertLockPk(globalLockVo.getUuid());
+            }
             //获取所有该key的锁和未上锁的队列 for update
-            List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
+            globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
+            globalLockMapper.insertLock(globalLockVo);
+            List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuid(globalLockVo.getUuid());
             //执行mode 策略 验证是否允许上锁
             if (GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getIsCanInsertLock(globalLockVoList, globalLockVo)) {
                 TransactionUtil.commitTx(transactionStatus);
@@ -97,7 +102,8 @@ public class GlobalLockManager {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
             //获取所有该key的锁和未上锁的队列 for update
-            List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
+            globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
+            List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuid(globalLockVo.getUuid());
             //执行mode 策略 验证是否允许上锁
             if (GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getIsCanLock(globalLockVoList, globalLockVo)) {
                 globalLockMapper.updateToLockById(globalLockVo.getId());
@@ -124,7 +130,7 @@ public class GlobalLockManager {
             TransactionStatus transactionStatus = TransactionUtil.openTx();
             try {
                 //获取所有该key的锁和未上锁的队列 for update
-                globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
+                globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
                 globalLockMapper.deleteLock(lockId);
                 TransactionUtil.commitTx(transactionStatus);
             } catch (Exception ex) {
@@ -147,7 +153,7 @@ public class GlobalLockManager {
             TransactionStatus transactionStatus = TransactionUtil.openTx();
             try {
                 //获取所有该key的锁和未上锁的队列 for update
-                globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid());
+                globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
                 globalLockMapper.deleteLock(lockId);
                 //只有释放已经获得锁的才notify
                 if(globalLockVo.getIsLock() == 1) {
@@ -187,7 +193,7 @@ public class GlobalLockManager {
     }
 
     public static boolean getIsBeenLocked(GlobalLockVo globalLockVo) {
-        return globalLockMapper.getGlobalLockByUuidForUpdate(globalLockVo.getUuid()).stream().anyMatch(o -> Objects.equals(o.getIsLock(), 1));
+        return globalLockMapper.getGlobalLockByUuid(globalLockVo.getUuid()).stream().anyMatch(o -> Objects.equals(o.getIsLock(), 1));
     }
 
     public static JSONObject searchGlobalLock(GlobalLockVo globalLockVo) {

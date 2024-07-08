@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.dependency.handler;
 
 import neatlogic.framework.dependency.constvalue.FrameworkFromType;
-import neatlogic.framework.dependency.core.CustomTableDependencyHandlerBase;
+import neatlogic.framework.dependency.core.CustomDependencyHandlerBase;
 import neatlogic.framework.dependency.core.IFromType;
 import neatlogic.framework.dependency.dto.DependencyInfoVo;
 import neatlogic.framework.form.dao.mapper.FormMapper;
@@ -33,7 +33,7 @@ import java.util.List;
  **/
 //@Service
 @Deprecated
-public class MatrixFormAttributeDependencyHandler extends CustomTableDependencyHandlerBase {
+public class MatrixFormAttributeDependencyHandler extends CustomDependencyHandlerBase {
 
     @Resource
     private FormMapper formMapper;

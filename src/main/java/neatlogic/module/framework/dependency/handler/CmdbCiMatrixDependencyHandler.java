@@ -18,7 +18,7 @@ package neatlogic.module.framework.dependency.handler;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dependency.constvalue.FrameworkFromType;
-import neatlogic.framework.dependency.core.CustomTableDependencyHandlerBase;
+import neatlogic.framework.dependency.core.CustomDependencyHandlerBase;
 import neatlogic.framework.dependency.core.IFromType;
 import neatlogic.framework.dependency.dto.DependencyInfoVo;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @since: 2021/4/6 15:21
  **/
 @Service
-public class CmdbCiMatrixDependencyHandler extends CustomTableDependencyHandlerBase {
+public class CmdbCiMatrixDependencyHandler extends CustomDependencyHandlerBase {
 
     @Resource
     private MatrixMapper matrixMapper;

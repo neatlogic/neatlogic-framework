@@ -3,7 +3,7 @@ package neatlogic.module.framework.dependency.handler;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dependency.constvalue.FrameworkFromType;
-import neatlogic.framework.dependency.core.FixedTableDependencyHandlerBase;
+import neatlogic.framework.dependency.core.DefaultDependencyHandlerBase;
 import neatlogic.framework.dependency.core.IFromType;
 import neatlogic.framework.dependency.dto.DependencyInfoVo;
 import neatlogic.framework.dependency.dto.DependencyVo;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class Matrix2FormAttributeDependencyHandler extends FixedTableDependencyHandlerBase {
+public class Matrix2FormAttributeDependencyHandler extends DefaultDependencyHandlerBase {
 
     @Resource
     private FormMapper formMapper;

@@ -107,8 +107,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertDependency" parameterType="neatlogic.framework.dependency.dto.DependencyVo">
         INSERT INTO `dependency` (`from`, `type`, `to`, `config`)
-        VALUES (#{from}, #{type}, #{to}, #{configStr})
-        ON DUPLICATE KEY UPDATE `config` = #{configStr}
+        VALUES (#{from}, #{type}, #{to}, #{configStr,typeHandler=CompressHandler})
+        ON DUPLICATE KEY UPDATE `config` = #{configStr,typeHandler=CompressHandler}
     </insert>
 
     <delete id="deleteDependency" parameterType="neatlogic.framework.dependency.dto.DependencyVo">

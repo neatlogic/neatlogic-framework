@@ -14,12 +14,33 @@ public class TreeNodeVo {
 
     private String idKey;
     private String parentIdKey;
+    private String nameKey;
     private Object idValue;
     private Object parentIdValue;
     private String tableName;
     private Integer lft;
     private Integer rht;
     private int childrenCount;
+    public TreeNodeVo() {
+    }
+    public TreeNodeVo(String tableName, int lft, int rht) {
+        this.tableName = tableName;
+        this.lft = lft;
+        this.rht = rht;
+    }
+
+    public TreeNodeVo(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public TreeNodeVo(String tableName, String idKey, String nameKey, String parentIdKey, Integer lft, Integer rht) {
+        this.tableName = tableName;
+        this.idKey = idKey;
+        this.nameKey = nameKey;
+        this.parentIdKey = parentIdKey;
+        this.lft = lft;
+        this.rht = rht;
+    }
 
     public String getIdKey() {
         return idKey;
@@ -92,5 +113,13 @@ public class TreeNodeVo {
 
     public void setChildrenCount(int childrenCount) {
         this.childrenCount = childrenCount;
+    }
+
+    public String getNameKey() {
+        return nameKey;
+    }
+
+    public void setNameKey(String nameKey) {
+        this.nameKey = nameKey;
     }
 }

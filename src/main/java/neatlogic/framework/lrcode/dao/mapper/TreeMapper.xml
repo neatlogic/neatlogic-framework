@@ -81,12 +81,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </choose>
     </select>
 
-    <update id="updateTreeNodeLeftRightCodeById">
-        UPDATE `${tableName}`
-        SET `lft` = #{lft},
-            `rht` = #{rht}
-        WHERE `${idKey}` = #{idValue}
-    </update>
+    <select id="getAncestorsAndSelfByLftRht" resultType="neatlogic.framework.lrcode.dto.TreeNodeVo" useCache="false">
+        SELECT
+            a.`${idKey}` as idKey,
+            a.`${nameKey}` as nameKey,
+            a.`${parentIdKey}` as parentIdKey,
+            a.`lft`,
+            a.`rht`
+        FROM `${tableName}` a
+        WHERE a.`lft` &lt;= #{lft} AND a.`rht` &gt;= #{rht}
+        ORDER BY a.`lft` ASC
+    </select>
 
     <select id="getTreeNodeById" resultType="neatlogic.framework.lrcode.dto.TreeNodeVo">
         SELECT `${idKey}`       AS idValue,
@@ -101,6 +106,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         select IFNULL(MAX(`rht`), 1) + 1
         from `${tableName}`
     </select>
+
+    <update id="updateTreeNodeLeftRightCodeById">
+        UPDATE `${tableName}`
+        SET `lft` = #{lft},
+            `rht` = #{rht}
+        WHERE `${idKey}` = #{idValue}
+    </update>
 
     <update id="batchUpdateTreeNodeLeftCode">
         UPDATE `${tableName}`
@@ -151,5 +163,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             `rht` = NULL
         WHERE `lft` &gt;= #{lft}
           AND `rht` &lt;= #{rht}
+    </update>
+
+
+    <update id="updateUpwardIdPathByLftRht">
+        UPDATE `${tableName}` d
+        JOIN (
+        SELECT b.`id` AS `id`, GROUP_CONCAT(a.`id` ORDER BY a.`lft`) AS upward_id_path
+        FROM `${tableName}` a
+        JOIN `${tableName}` b ON a.`lft` &lt;= b.`lft` AND a.`rht` &gt;= b.`rht`
+        <where>
+            <if test="lft != null">
+                AND b.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND b.`rht` &lt;= #{rht}
+            </if>
+        </where>
+        GROUP BY b.`id`
+        ) c ON c.`id` = d.`id`
+        SET d.`upward_id_path` = c.`upward_id_path`
+    </update>
+
+    <update id="updateUpwardNamePathByLftRht">
+        UPDATE `${tableName}` d
+        JOIN (
+        SELECT b.`id` AS `id`, GROUP_CONCAT(a.`name` ORDER BY a.`lft` SEPARATOR '/') AS upward_name_path
+        FROM `${tableName}` a
+        JOIN `${tableName}` b ON a.`lft` &lt;= b.`lft` AND a.`rht` &gt;= b.`rht`
+        <where>
+            <if test="lft != null">
+                AND b.`lft` &gt;= #{lft}
+            </if>
+            <if test="rht != null">
+                AND b.`rht` &lt;= #{rht}
+            </if>
+        </where>
+        GROUP BY b.`id`
+        ) c ON c.`id` = d.`id`
+        SET d.`upward_name_path` = c.`upward_name_path`
     </update>
 </mapper>

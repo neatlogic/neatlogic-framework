@@ -22,65 +22,40 @@ import java.util.List;
 
 public interface TreeMapper {
     /**
+     * 判断左右编码是否全部正确，符合下列条件的才正确
+     *
      * @return int 返回左右编码不正确的个数
-     * @Time:2020年7月20日
-     * @Description: 判断左右编码是否全部正确，符合下列条件的才正确
+     * @since :2020年7月20日
      * 1.左右编码不能为null
      * 2.左编码不能小于2，右编码不能小于3
      * 3.子节点的左编码大于父节点的左编码，子节点的右编码小于父节点的右编码
      * 4.没有子节点的节点左编码比右编码小1
      */
-    public Object checkLeftRightCodeIsWrong(@Param("tableName") String tableName, @Param("idKey") String idKey);
-    /**
-     * @Description: 左右编码不能为null
-     * @Author: linbq
-     * @Date: 2021/3/17 19:10
-     * @Params:[tableName, idKey, idValue]
-     * @Returns:java.lang.Object
-     **/
-//    public Object checkLeftRightCodeIsNull(@Param("tableName")String tableName, @Param("idKey") String idKey, @Param("idValue") Object idValue);
-    /**
-     * @Description: 左编码不能小于2，右编码不能小于3
-     * @Author: linbq
-     * @Date: 2021/3/17 19:11
-     * @Params:[tableName]
-     * @Returns:java.lang.Object
-     **/
-//    public Object checkLftLt2OrRhtLt3IsExists(@Param("tableName")String tableName, @Param("idKey") String idKey);
-    /**
-     * @Description: 子节点的左编码大于父节点的左编码，子节点的右编码小于父节点的右编码
-     * @Author: linbq
-     * @Date: 2021/3/17 19:11
-     * @Params:[tableName]
-     * @Returns:java.lang.Object
-     **/
-//    public Object checkChildLftLeParentLftOrChildRhtGeParentRhtIsExists(@Param("tableName")String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey);
+    Object checkLeftRightCodeIsWrong(@Param("tableName") String tableName, @Param("idKey") String idKey);
 
-    /**
-     * @Description: 叶子节点的左右编码是否不连续
-     * @Author: linbq
-     * @Date: 2021/3/17 19:11
-     * @Params:[tableName]
-     * @Returns:java.lang.Object
-     **/
-//    public Object checkLeafNodeLeftRightCodeAreNotContinuous(@Param("tableName")String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey);
-    public List<TreeNodeVo> getTreeNodeListByParentId(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("parentIdValue") Object parentIdValue, @Param("condition") String condition, @Param("sortKey") String sortKey);
+    List<TreeNodeVo> getTreeNodeListByParentId(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("parentIdValue") Object parentIdValue, @Param("condition") String condition, @Param("sortKey") String sortKey);
 
-    public int updateTreeNodeLeftRightCodeById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idValue") Object idValue, @Param("lft") int lft, @Param("rht") int rht);
+    List<TreeNodeVo> getAncestorsAndSelfByLftRht(TreeNodeVo treeNodeVo);
 
-    public TreeNodeVo getTreeNodeById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("idValue") Object idValue);
+    int updateTreeNodeLeftRightCodeById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idValue") Object idValue, @Param("lft") int lft, @Param("rht") int rht);
 
-    public int batchUpdateTreeNodeLeftCode(@Param("tableName") String tableName, @Param("minCode") Integer minCode, @Param("step") int step, @Param("condition") String condition);
+    TreeNodeVo getTreeNodeById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("idValue") Object idValue);
 
-    public int batchUpdateTreeNodeRightCode(@Param("tableName") String tableName, @Param("minCode") Integer minCode, @Param("step") int step, @Param("condition") String condition);
+    int batchUpdateTreeNodeLeftCode(@Param("tableName") String tableName, @Param("minCode") Integer minCode, @Param("step") int step, @Param("condition") String condition);
 
-    public int batchUpdateTreeNodeLeftRightCodeByLeftRightCode(@Param("tableName") String tableName, @Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step, @Param("condition") String condition);
+    int batchUpdateTreeNodeRightCode(@Param("tableName") String tableName, @Param("minCode") Integer minCode, @Param("step") int step, @Param("condition") String condition);
 
-    public int checkTreeNodeIsExistsByLeftRightCode(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idValue") Object idValue, @Param("lft") Integer lft, @Param("rht") Integer rht);
+    int batchUpdateTreeNodeLeftRightCodeByLeftRightCode(@Param("tableName") String tableName, @Param("lft") Integer lft, @Param("rht") Integer rht, @Param("step") int step, @Param("condition") String condition);
 
-    public int updateTreeNodeParentIdById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("idValue") Object idValue, @Param("parentIdValue") Object parentIdValue);
+    int checkTreeNodeIsExistsByLeftRightCode(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idValue") Object idValue, @Param("lft") Integer lft, @Param("rht") Integer rht);
 
-    public int batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode(@Param("tableName") String tableName, @Param("lft") Integer lft, @Param("rht") Integer rht);
+    int updateTreeNodeParentIdById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("parentIdKey") String parentIdKey, @Param("idValue") Object idValue, @Param("parentIdValue") Object parentIdValue);
 
-    public int getRootRht(String tableName);
+    int batchUpdateTreeNodeLeftRightCodeToNullByLeftRightCode(@Param("tableName") String tableName, @Param("lft") Integer lft, @Param("rht") Integer rht);
+
+    int getRootRht(String tableName);
+
+    int updateUpwardIdPathByLftRht(TreeNodeVo treeNodeVo);
+
+    int updateUpwardNamePathByLftRht(TreeNodeVo treeNodeVo);
 }

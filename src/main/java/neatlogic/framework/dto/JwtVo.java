@@ -46,6 +46,11 @@ public class JwtVo implements Serializable {
         jwtBodyObj.put("createTime", tokenCreateTime);
         if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {
             JSONObject headers = new JSONObject();
+            //补充设备header,防止移动端和pc端session互相影响
+            String deviceHeader = RequestContext.get().getRequest().getHeader("Device");
+            if(StringUtils.isNotBlank(deviceHeader)){
+                headers.put("Device", deviceHeader);
+            }
             if (CollectionUtils.isNotEmpty(authenticationInfoVo.getHeaderSet())) {
                 for (String header : authenticationInfoVo.getHeaderSet()) {
                     String value = RequestContext.get().getRequest().getHeader(header);

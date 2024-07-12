@@ -21,7 +21,10 @@ import neatlogic.framework.common.ReturnJson;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
+import neatlogic.framework.config.FrameworkTenantConfig;
+import neatlogic.framework.dao.mapper.ConfigMapper;
 import neatlogic.framework.dao.mapper.ThemeMapper;
+import neatlogic.framework.dto.ConfigVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.ThemeVo;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
@@ -54,6 +57,8 @@ public class TenantController {
     private boolean isLoad = false;
     @Resource
     private ThemeMapper themeMapper;
+    @Resource
+    private ConfigMapper configMapper;
 
     private void getCommercialModule() {
         Reflections reflections = new Reflections("neatlogic");
@@ -115,6 +120,13 @@ public class TenantController {
             //单点登录
             if (StringUtils.isNotEmpty(Config.SSO_TICKET_KEY())) {
                 data.put("ssoTicketKey", Config.SSO_TICKET_KEY());
+            }
+            // 是否允许移动端下载附件
+            ConfigVo configVo = configMapper.getConfigByKey(FrameworkTenantConfig.ALLOW_MOBILE_DOWNLOAD_FILE.getKey());
+            if (configVo != null) {
+                data.put("allowMobileDownloadFile", configVo.getValue());
+            } else {
+                data.put("allowMobileDownloadFile", FrameworkTenantConfig.ALLOW_MOBILE_DOWNLOAD_FILE.getValue());
             }
             ReturnJson.success(data, response);
         } catch (Exception e) {

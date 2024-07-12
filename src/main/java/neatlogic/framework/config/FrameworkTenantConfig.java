@@ -20,7 +20,7 @@ import neatlogic.framework.util.$;
 public enum FrameworkTenantConfig implements ITenantConfig{
     API_QPS("apiqps", null, "nfc.frameworktenantconfig.apiqps"),
     DISABLED_MODULEGROUPLIST("diabled.modulegrouplist", null,"nfc.frameworktenantconfig.disabledmodulegrouplist"),
-    ALLOW_MOBILE_DOWNLOAD_FILE("allowMobileDownloadFile", "0","是否允许移动端下载附件"),
+    ALLOW_MOBILE_DOWNLOAD_FILE("allow.mobile.download.file", "0","nfc.frameworktenantconfig.allowmobiledownloadfile"),
     ;
 
     String key;

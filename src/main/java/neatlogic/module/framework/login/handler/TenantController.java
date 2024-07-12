@@ -122,11 +122,11 @@ public class TenantController {
                 data.put("ssoTicketKey", Config.SSO_TICKET_KEY());
             }
             // 是否允许移动端下载附件
-            ConfigVo configVo = configMapper.getConfigByKey(FrameworkTenantConfig.ALLOW_MOBILE_DOWNLOAD_FILE.getKey());
+            ConfigVo configVo = configMapper.getConfigByKey(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED.getKey());
             if (configVo != null) {
-                data.put("allowMobileDownloadFile", configVo.getValue());
+                data.put("mobileFileDownloadEnabled", configVo.getValue());
             } else {
-                data.put("allowMobileDownloadFile", FrameworkTenantConfig.ALLOW_MOBILE_DOWNLOAD_FILE.getValue());
+                data.put("mobileFileDownloadEnabled", FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED.getValue());
             }
             ReturnJson.success(data, response);
         } catch (Exception e) {

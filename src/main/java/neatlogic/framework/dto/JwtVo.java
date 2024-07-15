@@ -127,6 +127,10 @@ public class JwtVo implements Serializable {
             JSONObject tokenJson = new JSONObject();
             tokenJson.put("tenant", jwtBodyObj.getString("tenant"));
             tokenJson.put("useruuid", jwtBodyObj.getString("useruuid"));
+            //无需校验则创建token的时间：用户登入登出不互相挤掉
+            if(isNotValidTokenCreateTime()) {
+                tokenJson.put("createTime", jwtBodyObj.getString("createTime"));
+            }
             if (jwtBodyObj.containsKey("headers")) {
                 tokenJson.put("headers", jwtBodyObj.getString("headers"));
             }
@@ -139,8 +143,13 @@ public class JwtVo implements Serializable {
         isValidTokenCreateTime = validTokenCreateTime;
     }
 
+    public boolean isNotValidTokenCreateTime() {
+        return Config.ENABLE_NO_SECRET() || !Config.ENABLE_VALID_TOKEN_FCD() || !isValidTokenCreateTime;
+
+    }
+
     public boolean validTokenCreateTime(Long userSessionTokenCreateTime) {
-        if (Config.ENABLE_NO_SECRET() || !Config.ENABLE_VALID_TOKEN_FCD() || !isValidTokenCreateTime) {
+        if (isNotValidTokenCreateTime()) {
             return true;
         }
         return Objects.equals(userSessionTokenCreateTime, getTokenCreateTime());

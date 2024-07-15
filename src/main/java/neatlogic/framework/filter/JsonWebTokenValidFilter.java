@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.filter;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -98,11 +99,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             logger.debug("======= defaultLoginAuth: ");
             //先按 default 认证，不存在才根据具体 AuthType 认证用户
             userVo = defaultLoginAuth.auth(cachedRequest, response);
-            if(userVo != null){
+            if (userVo != null) {
                 logger.debug("======= getUser succeed: " + userVo.getUuid());
                 isExpired = userExpirationValid(userVo, timezone, request, response);
                 //用户如果过期则抛弃
-                if(isExpired) {
+                if (isExpired) {
                     userVo = null;
                 }
             }
@@ -127,7 +128,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                                     loginPostProcessor.loginAfterInitialization();
                                 }
-                            }else {
+                            } else {
                                 returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, loginAuth.directUrl());
                                 return;
                             }
@@ -233,9 +234,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      */
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         JwtVo jwt = userVo.getJwtVo();
-        //临时测试注释session 缓存
-        //Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
-        //if (authenticationInfoStr == null) {
+        Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
+        if (authenticationInfoStr == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
             if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
                 Date visitTime = userSessionVo.getSessionTime();
@@ -251,11 +251,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 }
                 userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
             }
-        //} else {
-        //   AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
-        //    UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
-        //    return true;
-        //}
+        } else {
+            AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
+            UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+            return false;
+        }
         return true;
     }
 

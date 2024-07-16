@@ -21,6 +21,8 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Date;
+
 public class ModuleVo {
     @EntityField(name = "模块id", type = ApiParamType.STRING)
     private String id;
@@ -55,16 +57,17 @@ public class ModuleVo {
     private String parent;
     @EntityField(name = "是否商业模块", type = ApiParamType.BOOLEAN)
     private boolean isCommercial;
+    @EntityField(name = "模块修改时间，即jar的最后修改时间", type = ApiParamType.LONG)
+    private Date lastModified;
 
     public ModuleVo() {
     }
 
-    public ModuleVo(String id, String name, String urlMapping, String moduleDescription, String version, String group, String groupName, String groupSort, String groupDescription, String path, String parent, boolean isCommercial) {
+    public ModuleVo(String id, String name, String urlMapping, String moduleDescription, String group, String groupName, String groupSort, String groupDescription, String path, String parent, boolean isCommercial) {
         this.id = id;
         this.name = name;
         this.urlMapping = urlMapping;
         this.description = moduleDescription;
-        this.version = version;
         this.group = group;
         this.groupName = groupName;
         this.groupSort = Integer.parseInt(groupSort);
@@ -208,5 +211,13 @@ public class ModuleVo {
 
     public void setChangelogVersion(String changelogVersion) {
         this.changelogVersion = changelogVersion;
+    }
+
+    public Date getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 }

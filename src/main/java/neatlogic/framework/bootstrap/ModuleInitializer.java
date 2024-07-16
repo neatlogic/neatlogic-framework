@@ -42,6 +42,7 @@ import org.springframework.web.WebApplicationInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URL;
@@ -149,40 +150,48 @@ public class ModuleInitializer implements WebApplicationInitializer {
             groupName = neatlogicE.attributeValue("groupName");
             groupSort = neatlogicE.attributeValue("groupSort");
             groupDescription = neatlogicE.attributeValue("groupDescription");
-            String pomPropertiesPath = getPomPropertiesPath(path);
-            if (StringUtils.isBlank(pomPropertiesPath)) {
-                pomPropertiesPath = "META-INF/maven/com.neatlogic/neatlogic-" + moduleId + "/pom.properties";
-            }
-            version = Config.getProperty(pomPropertiesPath, "version");
-            moduleVoList.add(new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription, path, parent, isCommercial));
+            ModuleVo moduleVo = new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, group, groupName, groupSort, groupDescription, path, parent, isCommercial);
+            moduleVoList.add(moduleVo);
+            setVersionAndLastModified(moduleVo);
         }
         return moduleVoList;
     }
 
     /**
      * 根据context.xml path 获取 pom.properties path
+     * 并设置模块的版本和最后修改时间
      */
-    private String getPomPropertiesPath(String resourceContextPath) {
+    private void setVersionAndLastModified(ModuleVo moduleVo) {
         // 获取资源的URL
-        URL resourceUrl = Config.class.getClassLoader().getResource(resourceContextPath);
+        String pomPropertiesPath = null;
+        URL resourceUrl = Config.class.getClassLoader().getResource(moduleVo.getPath());
         if (resourceUrl != null) {
             try {
                 // 如果资源在JAR文件中，获取JAR文件的URL
                 String jarUrl = resourceUrl.toString().replaceFirst("jar:file:", "").replaceFirst("!.*", "");
+                File jar = new File(jarUrl);
+                if (jar.exists()) {
+                    moduleVo.setLastModified(new Date(jar.lastModified()));
+                }
                 try (JarFile jarFile = new JarFile(jarUrl)) {
                     Enumeration<JarEntry> entries = jarFile.entries();
                     while (entries.hasMoreElements()) {
                         JarEntry entry = entries.nextElement();
                         String entryName = entry.getName();
                         if (entryName.endsWith("pom.properties")) {
-                            return entryName;
+                            pomPropertiesPath = entryName;
+                            break;
                         }
                     }
                 }
             } catch (Exception ignored) {
             }
         }
-        return null;
+
+        if (StringUtils.isBlank(pomPropertiesPath)) {
+            pomPropertiesPath = "META-INF/maven/com.neatlogic/neatlogic-" + moduleVo.getId() + "/pom.properties";
+        }
+        moduleVo.setVersion(Config.getProperty(pomPropertiesPath, "version"));
     }
 
     /**
@@ -352,7 +361,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
             versionList.sort(fileNameComparator);
             for (String version : versionList) {
                 Resource[] versionResources = resolver.getResources("classpath*:neatlogic/resources/framework/**/changelog/" + version + "/neatlogic.sql");
-                for(Resource resource: versionResources) {
+                for (Resource resource : versionResources) {
                     Reader scriptReader = new InputStreamReader(resource.getInputStream());
                     ScriptRunnerManager.runScriptWithJdbc(scriptReader, version, JdbcUtil.getNeatlogicConnection(), "neatlogic.sql");
                 }
@@ -442,7 +451,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                                 int currentVersionTmp = Integer.parseInt((moduleVersionMap.get(moduleId).replace("-", StringUtils.EMPTY) + "00").substring(0, 10));
                                 if (versionTmp >= currentVersionTmp) {
                                     Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/**/changelog/" + version + "/neatlogic_tenant.sql");
-                                    for(Resource resource : resources){
+                                    for (Resource resource : resources) {
                                         Reader scriptReader = new InputStreamReader(resource.getInputStream());
                                         boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicTenantConnection(tenant, false), "neatlogic_tenant.sql");
                                         if (isErrorTmp) {

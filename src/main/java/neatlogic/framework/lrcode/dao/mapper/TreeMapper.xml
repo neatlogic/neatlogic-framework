@@ -165,6 +165,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
           AND `rht` &lt;= #{rht}
     </update>
 
+    <select id="getTreeNodeList"  parameterType="neatlogic.framework.lrcode.dto.TreeNodeVo" resultType="neatlogic.framework.lrcode.dto.TreeNodeVo">
+        select `${idKey}` as idKey,`${parentIdKey}` as parentIdKey,`lft`,`rht`
+        FROM `${tableName}`
+        ORDER BY `lft`
+        <if test="needPage == true">
+            LIMIT #{startNum}, #{pageSize}
+        </if>
+    </select>
+
+    <select id="getUpwardIdPathListByLftRht" resultType="java.lang.String">
+        select a.`${idKey}` from `${tableName}` a where
+        a.`lft` &lt;= #{lft}
+        AND a.`rht` &gt;= #{rht}
+        order by a.`lft`
+    </select>
+    <select id="getTreeNodeCount" resultType="java.lang.Integer">
+        select count(`${idKey}`)
+        FROM `${tableName}`
+    </select>
+    <select id="getUpwardNamePathListByLftRht" resultType="java.lang.String">
+        select a.`${nameKey}` from `${tableName}` a where
+        a.`lft` &lt;= #{lft}
+        AND a.`rht` &gt;= #{rht}
+        order by a.`lft`
+    </select>
 
     <update id="updateUpwardIdPathByLftRht">
         UPDATE `${tableName}` d
@@ -202,5 +227,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         GROUP BY b.`id`
         ) c ON c.`id` = d.`id`
         SET d.`upward_name_path` = c.`upward_name_path`
+    </update>
+
+    <update id="updateTreeNodeUpwardIdPathById">
+        UPDATE `${tableName}` set  ${upwardIdPathKey} = #{upwardIdPath} where `${idKey}` = #{idKeyValue}
+    </update>
+    <update id="updateTreeNodeUpwardNamePathById">
+        UPDATE `${tableName}` set ${upwardNamePathKey} = #{upwardNamePath} where `${idKey}` = #{idKeyValue}
     </update>
 </mapper>

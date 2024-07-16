@@ -55,7 +55,20 @@ public interface TreeMapper {
 
     int getRootRht(String tableName);
 
+    List<TreeNodeVo> getTreeNodeList(TreeNodeVo treeNodeVo);
+
+    List<String> getUpwardIdPathListByLftRht(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("lft") Integer lft, @Param("rht") Integer rht);
+
+    List<String> getUpwardNamePathListByLftRht(@Param("tableName") String tableName, @Param("nameKey") String nameKey, @Param("lft") Integer lft, @Param("rht") Integer rht);
+
+    int getTreeNodeCount(TreeNodeVo treeNodeVo);
+
     int updateUpwardIdPathByLftRht(TreeNodeVo treeNodeVo);
 
     int updateUpwardNamePathByLftRht(TreeNodeVo treeNodeVo);
+
+    int updateTreeNodeUpwardIdPathById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idKeyValue") String idKeyValue, @Param("upwardIdPathKey") String upwardIdPathKey, @Param("upwardIdPath") String upwardIdPath);
+
+    int updateTreeNodeUpwardNamePathById(@Param("tableName") String tableName, @Param("idKey") String idKey, @Param("idKeyValue") String idKeyValue, @Param("upwardNamePathKey") String upwardNamePathKey, @Param("upwardNamePath") String upwardNamePath);
+
 }

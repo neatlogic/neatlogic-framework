@@ -1,5 +1,7 @@
 package neatlogic.framework.lrcode.dto;
 
+import neatlogic.framework.common.dto.BasePageVo;
+
 /**
  * @Title: TreeNodeVo
  * @Package neatlogic.framework.tree.dto
@@ -8,13 +10,15 @@ package neatlogic.framework.lrcode.dto;
  * @Date: 2021/3/17 6:30
 
  **/
-public class TreeNodeVo {
+public class TreeNodeVo extends BasePageVo {
 
     public final static String ROOT_UUID = "0";
 
     private String idKey;
     private String parentIdKey;
     private String nameKey;
+    private String upwardIdPathKey;
+    private String upwardNamePathKey;
     private Object idValue;
     private Object parentIdValue;
     private String tableName;
@@ -121,5 +125,21 @@ public class TreeNodeVo {
 
     public void setNameKey(String nameKey) {
         this.nameKey = nameKey;
+    }
+
+    public String getUpwardIdPathKey() {
+        return upwardIdPathKey;
+    }
+
+    public void setUpwardIdPathKey(String upwardIdPathKey) {
+        this.upwardIdPathKey = upwardIdPathKey;
+    }
+
+    public String getUpwardNamePathKey() {
+        return upwardNamePathKey;
+    }
+
+    public void setUpwardNamePathKey(String upwardNamePathKey) {
+        this.upwardNamePathKey = upwardNamePathKey;
     }
 }

@@ -120,6 +120,10 @@ public class TenantController {
             }
             // 是否允许移动端下载附件
             data.put("mobileFileDownloadEnabled", ConfigManager.getConfig(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED));
+            // Chrome浏览器最低版本，低于该设置版本会跳转至浏览器版本不兼容页面，默认95
+            data.put("minimumChromeBrowserVersion", ConfigManager.getConfig(FrameworkTenantConfig.MINIMUM_CHROME_BROWSER_VERSION));
+            // Firefox浏览器最低版本，低于该设置版本会跳转至浏览器版本不兼容页面，默认0
+            data.put("minimumFirefoxBrowserVersion", ConfigManager.getConfig(FrameworkTenantConfig.MINIMUM_FIREFOX_BROWSER_VERSION));
             ReturnJson.success(data, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -58,6 +58,8 @@ public interface ILoginAuthHandler {
 
     /**
      * 是否需要更新校验token createTime
+     * 类似hmac认证这类认证只是一次性认证，应该复用session
+     * 生成的token hash无需包含tokenCreateTime，也无需更新tokenCreateTime，否则可能会导致同个用户浏览器登录失效或者每次请求都会生成一个session的问题。
      */
     boolean isValidTokenCreateTime();
 

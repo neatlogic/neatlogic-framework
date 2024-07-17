@@ -279,6 +279,6 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public boolean isValidTokenCreateTime() {
-        return true;
+        return false;
     }
 }

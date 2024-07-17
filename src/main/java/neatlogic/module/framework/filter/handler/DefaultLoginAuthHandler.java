@@ -135,4 +135,10 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
         return Config.DIRECT_URL();
     }
 
+
+    @Override
+    public boolean isValidTokenCreateTime() {
+        return true;
+    }
+
 }

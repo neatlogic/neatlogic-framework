@@ -128,7 +128,8 @@ public class JwtVo implements Serializable {
             tokenJson.put("tenant", jwtBodyObj.getString("tenant"));
             tokenJson.put("useruuid", jwtBodyObj.getString("useruuid"));
             //无需校验则创建token的时间：用户登入登出不互相挤掉
-            if(isNotValidTokenCreateTime()) {
+            //hmac等无需校验时间的接口不能加时间戳，应该复用同一个session
+            if((Config.ENABLE_NO_SECRET() || !Config.ENABLE_VALID_TOKEN_FCD()) && isValidTokenCreateTime) {
                 tokenJson.put("createTime", jwtBodyObj.getString("createTime"));
             }
             if (jwtBodyObj.containsKey("headers")) {

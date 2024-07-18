@@ -18,7 +18,6 @@ package neatlogic.framework.file.core;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.file.dao.mapper.FileMapper;
 import neatlogic.framework.file.dto.FileVo;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,9 +25,6 @@ import javax.annotation.Resource;
 
 @Service
 public class FileManager implements IFileManager {
-    @Resource
-    private ApplicationContext applicationContext;
-
     @Resource
     private FileMapper fileMapper;
 

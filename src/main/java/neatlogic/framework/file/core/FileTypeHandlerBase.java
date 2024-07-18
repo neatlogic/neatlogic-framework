@@ -20,15 +20,22 @@ import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.util.Md5Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FileTypeHandlerBase implements IFileTypeHandler {
-    private final static Logger logger = LoggerFactory.getLogger(FileTypeHandlerBase.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileTypeHandlerBase.class);
+    protected IFileManager fileManager;
+
+    @Autowired
+    public void setFileManager(FileManager _fileManager) {
+        fileManager = _fileManager;
+    }
 
     @Override
     public final void deleteFile(FileVo fileVo, JSONObject paramObj) throws Exception {
         if (myDeleteFile(fileVo, paramObj)) {
             try {
-                FileManager.deleteFileById(fileVo.getId());
+                fileManager.deleteFile(fileVo.getId());
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
             }

@@ -18,32 +18,19 @@ package neatlogic.framework.file.core;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.file.dao.mapper.FileMapper;
 import neatlogic.framework.file.dto.FileVo;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 @Service
 public class FileManager implements IFileManager {
-    @Autowired
+    @Resource
     private ApplicationContext applicationContext;
 
     @Resource
     private FileMapper fileMapper;
-
-    private static IFileManager fileManager;
-
-    @PostConstruct
-    public void init() {
-        fileManager = applicationContext.getBean(IFileManager.class);
-    }
-
-    public static void deleteFileById(Long fileId) throws Exception {
-        fileManager.deleteFile(fileId);
-    }
 
     @Transactional
     public void deleteFile(Long fileId) throws Exception {

@@ -550,7 +550,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `user` a
                  JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
                  JOIN `team` c ON b.`team_uuid` = c.`uuid` AND c.`uuid` = #{teamUuid}
-                 JOIN `user_password` d ON a.`uuid` = d.`user_uuid` AND d.`is_active` = 1
+                 LEFT JOIN `user_password` d ON a.`uuid` = d.`user_uuid` AND d.`is_active` = 1
         WHERE a.`is_active` = 1
     </select>
 

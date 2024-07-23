@@ -5,13 +5,16 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class UserSessionVo {
+public class UserSessionVo implements Serializable {
     private String userUuid;
     private Date sessionTime;
     @EntityField(name = "权限字符串", type = ApiParamType.STRING)
     private String authInfoStr;
+    @EntityField(name = "权限字符串", type = ApiParamType.STRING)
+    private String authInfoHash;
     @EntityField(name = "权限", type = ApiParamType.STRING)
     private AuthenticationInfoVo authInfo;
 
@@ -79,5 +82,13 @@ public class UserSessionVo {
 
     public void setTokenHash(String tokenHash) {
         this.tokenHash = tokenHash;
+    }
+
+    public String getAuthInfoHash() {
+        return authInfoHash;
+    }
+
+    public void setAuthInfoHash(String authInfoHash) {
+        this.authInfoHash = authInfoHash;
     }
 }

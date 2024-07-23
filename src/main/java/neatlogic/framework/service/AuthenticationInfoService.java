@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.service;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 
 import java.util.List;
@@ -47,6 +48,15 @@ public interface AuthenticationInfoService {
      * @param isRuleRole 是否过滤不符合规则的角色
      */
     AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole);
+
+    /**
+     * 查询用户鉴权时，需要用到到userUuid、teamUuidList、roleUuidList，其中roleUuidList包含用户所在分组的拥护角色列表。可以控制是否过滤不符合规则的角色
+     *
+     * @param userUuid   用户uuid
+     * @param isRuleRole 是否过滤不符合规则的角色
+     * @param originHeader 历史header， 不为空则无需获取当前请求的header
+     */
+    AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole, JSONObject originHeader);
 
     /**
      * 补充父级组

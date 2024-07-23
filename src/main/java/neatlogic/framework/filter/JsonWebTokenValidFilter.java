@@ -24,6 +24,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
+import neatlogic.framework.dao.mapper.UserSessionContentMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
@@ -50,6 +51,9 @@ import java.util.Date;
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     @Resource
     private UserSessionMapper userSessionMapper;
+
+    @Resource
+    private UserSessionContentMapper userSessionContentMapper;
 
     /**
      * Default constructor.
@@ -243,9 +247,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 int expire = Config.USER_EXPIRETIME();
                 long expireTime = expire * 60L * 1000L + visitTime.getTime();
                 if (now.getTime() < expireTime) {
+                    String authInfo = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
+                    userSessionVo.setAuthInfoStr(authInfo);
                     userSessionMapper.updateUserSession(jwt.getTokenHash());
                     AuthenticationInfoVo authenticationInfo = userSessionVo.getAuthInfo();
-                    UserSessionCache.addItem(jwt.getTokenHash(), userSessionVo.getAuthInfoStr());
+                    UserSessionCache.addItem(jwt.getTokenHash(), JSON.toJSONString(authenticationInfo));
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return false;
                 }

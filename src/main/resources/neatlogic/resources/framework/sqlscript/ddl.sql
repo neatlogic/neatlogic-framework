@@ -1253,15 +1253,16 @@ CREATE TABLE IF NOT EXISTS `user_role`  (
 -- ----------------------------
 -- Table structure for user_session
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS `user_session`  (
+CREATE TABLE IF NOT EXISTS `user_session` (
   `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户uuid',
   `token_hash` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'token哈希值',
-  `token_create_time` bigint NULL DEFAULT NULL COMMENT 'token创建的时间',
+  `token_create_time` bigint DEFAULT NULL COMMENT 'token创建的时间',
   `visit_time` timestamp(3) NULL DEFAULT NULL COMMENT '访问时间',
-  `auth_info` varchar(10000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '用户角色分组信息',
+  `auth_info_hash` char(32) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '用户角色分组信息hash',
   PRIMARY KEY (`token_hash`) USING HASH,
-  INDEX `idx_vistitime`(`visit_time`) USING BTREE
-) ENGINE = MEMORY AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户session表';
+  KEY `idx_vistitime` (`visit_time`) USING BTREE,
+  KEY `idx_useruuid` (`user_uuid`) USING BTREE
+) ENGINE=MEMORY DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户session表';
 
 -- ----------------------------
 -- Table structure for user_team
@@ -1311,3 +1312,9 @@ CREATE TABLE IF NOT EXISTS `worktime_range`  (
   `end_time` bigint NOT NULL COMMENT '结束时间戳',
   PRIMARY KEY (`worktime_uuid`, `start_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '服务窗口时间段范围表';
+
+CREATE TABLE IF NOT EXISTS `user_session_content` (
+  `hash` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '信息hash',
+  `content` text COLLATE utf8mb4_general_ci COMMENT '信息',
+  PRIMARY KEY (`hash`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户会话';

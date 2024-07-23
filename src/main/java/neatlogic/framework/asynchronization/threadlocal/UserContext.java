@@ -91,7 +91,7 @@ public class UserContext implements Serializable {
                 roleUuidList.add(roleList.getString(i));
             }
         }
-        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList, new HashSet<>()));
+        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList, new HashSet<>(), null));
         instance.set(context);
         return context;
     }

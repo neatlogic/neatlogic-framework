@@ -26,6 +26,8 @@ public interface UserSessionMapper {
 
     List<UserSessionVo> getUserSessionByUuid(String userUuid);
 
+    List<UserSessionVo> getUserSessionByUuidList(List<String> userUuidList);
+
     int getAllOnlineUserCount(Date sessionTime);
 
     List<String> getAllOnlineUser(@Param("sessionTime") Date sessionTime, @Param("startNum") Integer startNum, @Param("pageSize") Integer pageSize);
@@ -49,15 +51,19 @@ public interface UserSessionMapper {
 
     int getUserSessionCountByDate(String limitDate);
 
-    int insertUserSession(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfo") String authInfo);
+    int insertUserSession(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfoHash") String authInfoHash);
 
-    int insertUserSessionWithoutTokenCreateTime(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfo") String authInfo);
+    int insertUserSessionWithoutTokenCreateTime(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfoHash") String authInfoHash);
+
+    int updateUserSessionAuthInfoHashByTokenHashList(@Param("tokenHashList") List<String> userSessionVoList, @Param("authInfoHash") String authInfoHash);
+
+    int updateUserSessionAuthInfoHashByTokenHash(@Param("tokenHash")String tokenHash, @Param("authInfoHash") String authInfoHash);
 
     int updateUserSession(String tokenHash);
 
     int deleteUserSessionByTokenHash(String tokenHash);
 
-    void deleteUserSessionByUserUuid(String userUuid);
+    int deleteUserSessionByTokenHashList(List<String> tokenHashList);
 
     int deleteUserSessionByExpireTime(Long expireTime);
 

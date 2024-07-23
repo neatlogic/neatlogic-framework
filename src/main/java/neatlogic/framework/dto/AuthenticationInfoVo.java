@@ -15,7 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,12 +28,13 @@ import java.util.Set;
  * @author linbq
  * @since 2021/8/2 20:19
  **/
-public class AuthenticationInfoVo{
+public class AuthenticationInfoVo {
     private String userUuid;
     private final List<String> userUuidList = new ArrayList<>();
     private final List<String> teamUuidList = new ArrayList<>();
     private final List<String> roleUuidList = new ArrayList<>();
     private Set<String> headerSet = new HashSet<>(); //使用到的header
+    private JSONObject originHeader = new JSONObject(); //原始请求的header
 
 
     public boolean validUser(List<String> userUuidList) {
@@ -59,6 +62,7 @@ public class AuthenticationInfoVo{
         }
         return false;
     }
+
     public AuthenticationInfoVo() {
 
     }
@@ -67,11 +71,12 @@ public class AuthenticationInfoVo{
         this.userUuid = userUuid;
     }
 
-    public AuthenticationInfoVo(String userUuid, List<String> teamUuidList, List<String> roleUuidList, Set<String> headerSet ) {
+    public AuthenticationInfoVo(String userUuid, List<String> teamUuidList, List<String> roleUuidList, Set<String> headerSet, JSONObject originHeader) {
         this.userUuid = userUuid;
         this.teamUuidList.addAll(teamUuidList);
         this.roleUuidList.addAll(roleUuidList);
         this.headerSet.addAll(headerSet);
+        this.originHeader = originHeader;
     }
 
     public AuthenticationInfoVo(List<String> userUuidList, List<String> teamUuidList, List<String> roleUuidList, Set<String> headerSet) {
@@ -107,5 +112,17 @@ public class AuthenticationInfoVo{
 
     public void setHeaderSet(Set<String> headerSet) {
         this.headerSet = headerSet;
+    }
+
+    public JSONObject getOriginHeader() {
+        return originHeader;
+    }
+
+    public void setOriginHeader(JSONObject originHeader) {
+        this.originHeader = originHeader;
+    }
+
+    public boolean isNotNull() {
+        return CollectionUtils.isNotEmpty(userUuidList) || CollectionUtils.isNotEmpty(teamUuidList) || CollectionUtils.isNotEmpty(roleUuidList) || MapUtils.isNotEmpty(originHeader) || CollectionUtils.isNotEmpty(headerSet);
     }
 }

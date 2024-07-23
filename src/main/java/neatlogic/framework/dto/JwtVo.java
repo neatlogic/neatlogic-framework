@@ -1,5 +1,6 @@
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.common.config.Config;
@@ -25,6 +26,9 @@ public class JwtVo implements Serializable {
 
     @EntityField(name = "是否校验tokenCreateTime", type = ApiParamType.STRING)
     private boolean isValidTokenCreateTime = true;
+
+    @EntityField(name = "token", type = ApiParamType.STRING)
+    private String token;
 
     @EntityField(name = "token哈希", type = ApiParamType.STRING)
     private String tokenHash;
@@ -122,22 +126,24 @@ public class JwtVo implements Serializable {
 
     public String getTokenHash() {
         if (StringUtils.isBlank(tokenHash)) {
+            tokenHash = Md5Util.encryptMD5(getToken());
+        }
+        return tokenHash;
+    }
+
+    public String getToken() {
+        if (StringUtils.isBlank(token)) {
             String jwtBody = new String(Base64.getUrlDecoder().decode(getJwtbody()), StandardCharsets.UTF_8);
-            JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+            JSONObject jwtBodyObj = JSON.parseObject(jwtBody);
             JSONObject tokenJson = new JSONObject();
             tokenJson.put("tenant", jwtBodyObj.getString("tenant"));
             tokenJson.put("useruuid", jwtBodyObj.getString("useruuid"));
-            //无需校验则创建token的时间：用户登入登出不互相挤掉
-            //hmac等无需校验时间的接口不能加时间戳，应该复用同一个session
-            if((Config.ENABLE_NO_SECRET() || !Config.ENABLE_VALID_TOKEN_FCD()) && isValidTokenCreateTime) {
-                tokenJson.put("createTime", jwtBodyObj.getString("createTime"));
-            }
             if (jwtBodyObj.containsKey("headers")) {
                 tokenJson.put("headers", jwtBodyObj.getString("headers"));
             }
-            tokenHash = Md5Util.encryptMD5(tokenJson.toJSONString());
+            token = tokenJson.toJSONString();
         }
-        return tokenHash;
+        return token;
     }
 
     public void setValidTokenCreateTime(boolean validTokenCreateTime) {

@@ -22,15 +22,14 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
-import neatlogic.framework.dao.mapper.LoginMapper;
-import neatlogic.framework.dao.mapper.RoleMapper;
-import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dao.mapper.UserSessionMapper;
+import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
+import neatlogic.framework.dto.UserSessionContentVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -63,6 +62,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     protected static UserSessionMapper userSessionMapper;
 
+    protected static UserSessionContentMapper userSessionContentMapper;
+
     protected static AuthenticationInfoService authenticationInfoService;
 
     @Autowired
@@ -83,6 +84,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Autowired
     public void setUserSessionMapper(UserSessionMapper _userSessionMapper) {
         userSessionMapper = _userSessionMapper;
+    }
+
+    @Autowired
+    public void setUserSessionContentMapper(UserSessionContentMapper _userSessionContentMapper) {
+        userSessionContentMapper = _userSessionContentMapper;
     }
 
     @Autowired
@@ -107,19 +113,25 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
             JwtVo jwtVo = buildJwt(userVo, authenticationInfoVo);
             setResponseAuthCookie(response, request, tenant, jwtVo);
-            String AuthenticationInfoStr = null;
-            if (authenticationInfoVo != null) {
-                if (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())) {
-                    authenticationInfoVo.setHeaderSet(null);
-                    AuthenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
+            String authenticationInfoStr = null;
+            String authInfoHash = null;
+            if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
+                authenticationInfoVo.setHeaderSet(null);
+                authenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
+                if (StringUtils.isNotBlank(authenticationInfoStr)) {
+                    authInfoHash = Md5Util.encryptMD5(authenticationInfoStr);
                 }
             }
             if (isValidTokenCreateTime()) {
-                userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
+                userSessionMapper.insertUserSession(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash);
+                userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(jwtVo.getTokenHash(), jwtVo.getToken()));
+                if(StringUtils.isNotBlank(authInfoHash)) {
+                    userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(authInfoHash, authenticationInfoStr));
+                }
             } else {
                 jwtVo.setValidTokenCreateTime(isValidTokenCreateTime());
                 if (UserSessionCache.getItem(jwtVo.getTokenHash()) == null) {
-                    userSessionMapper.insertUserSessionWithoutTokenCreateTime(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
+                    userSessionMapper.insertUserSessionWithoutTokenCreateTime(userVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash);
                 }
             }
             userVo.setJwtVo(jwtVo);
@@ -205,7 +217,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Override
     public String logout() {
         UserSessionCache.removeItem(UserContext.get().getTokenHash());
-        userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
+        //不删除session 同一个用户共用一个session
+        //userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
         String url;
         try {
             String device = CommonUtil.getDevice();
@@ -222,7 +235,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     @Override
-    public String mobileLogout(){
+    public String mobileLogout() {
         return null;
     }
 
@@ -246,7 +259,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     @Override
-    public String mobileDirectUrl(){
+    public String mobileDirectUrl() {
         return null;
     }
 

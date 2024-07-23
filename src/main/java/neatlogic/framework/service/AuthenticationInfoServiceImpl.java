@@ -27,6 +27,7 @@ import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.util.FreemarkerUtil;
 import neatlogic.framework.util.RunScriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,22 +65,27 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
      */
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(String userUuid) {
-        return getAuthenticationInfo(userUuid, true);
+        return getAuthenticationInfo(userUuid, true, null);
     }
 
     @Override
     public AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole) {
+        return getAuthenticationInfo(userUuid, isRuleRole, null);
+    }
+
+    @Override
+    public AuthenticationInfoVo getAuthenticationInfo(String userUuid, Boolean isRuleRole, JSONObject originHeader) {
         List<String> teamUuidList = teamMapper.getTeamUuidListByUserUuid(userUuid);
         List<String> roleUuidList = roleMapper.getRoleUuidListByUserUuid(userUuid);
         Set<String> headerSet = new HashSet<>(); //使用到的header
         Set<String> roleUuidSet = new HashSet<>(roleUuidList);
         getTeamUuidListAndRoleUuidList(teamUuidList, roleUuidSet);
         if (Boolean.TRUE.equals(isRuleRole) && CollectionUtils.isNotEmpty(roleUuidSet)) {
-            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet);
+            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet, originHeader);
         } else {
             roleUuidList = new ArrayList<>(roleUuidSet);
         }
-        return new AuthenticationInfoVo(userUuid, teamUuidList, roleUuidList, headerSet);
+        return new AuthenticationInfoVo(userUuid, teamUuidList, roleUuidList, headerSet, originHeader);
     }
 
     /**
@@ -137,7 +143,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         }
         List<String> roleUuidList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(roleUuidSet)) {
-            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet);
+            roleUuidList = removeInValidRoleUuidList(new ArrayList<>(roleUuidSet), headerSet, null);
         }
         return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), roleUuidList, headerSet);
     }
@@ -164,9 +170,13 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
      * 去掉不满足规则的角色
      *
      * @param roleUuidList 角色
+     * @param headerSet    合法的header
+     * @param originHeader 原来合法的header
      */
-    private List<String> removeInValidRoleUuidList(List<String> roleUuidList, Set<String> headerSet) {
-        JSONObject headers = getHeaders();
+    private List<String> removeInValidRoleUuidList(List<String> roleUuidList, Set<String> headerSet, JSONObject originHeader) {
+        if (MapUtils.isEmpty(originHeader)) {
+            originHeader = getHeaders();
+        }
         List<String> validRoleUuidList = new ArrayList<>();
         List<RoleVo> roleVos = roleMapper.getRoleByUuidList(roleUuidList);
         for (RoleVo ro : roleVos) {
@@ -177,7 +187,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                     headerSet.add(matcher.group(1));
                 }
                 try {
-                    rule = FreemarkerUtil.transform(headers, rule);
+                    rule = FreemarkerUtil.transform(originHeader, rule);
                     if (RunScriptUtil.runScript(rule)) {
                         validRoleUuidList.add(ro.getUuid());
                     }

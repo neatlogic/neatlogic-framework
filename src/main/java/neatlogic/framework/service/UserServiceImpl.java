@@ -15,16 +15,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.constvalue.SystemUser;
-import neatlogic.framework.dao.mapper.RoleMapper;
-import neatlogic.framework.dao.mapper.TeamMapper;
-import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dto.RoleTeamVo;
-import neatlogic.framework.dto.RoleUserVo;
-import neatlogic.framework.dto.TeamVo;
-import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dao.cache.UserSessionCache;
+import neatlogic.framework.dao.mapper.*;
+import neatlogic.framework.dto.*;
+import neatlogic.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +43,18 @@ public class UserServiceImpl implements UserService {
 
     @Resource
     private RoleMapper roleMapper;
+
+    @Resource
+    private AuthenticationInfoService authenticationInfoService;
+
+    @Resource
+    private UserSessionContentMapper userSessionContentMapper;
+
+    @Resource
+    private UserSessionMapper userSessionMapper;
+
+    @Resource
+    private UserSessionService userSessionService;
 
     /**
      * @Description: 根据用户uuid集合与分组uuid集合查询激活的用户uuid
@@ -211,6 +223,44 @@ public class UserServiceImpl implements UserService {
             userVo = userMapper.getUserByUser(user);
         }
         return userVo;
+    }
+
+    @Override
+    public void updateUserCacheAndSessionByUserUuid(String userUuid) {
+        List<UserSessionVo> userSessionVoList = userSessionMapper.getUserSessionByUuid(userUuid);
+        Map<String, AuthenticationInfoVo> sessionTokenHashAuthInfoHashMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(userSessionVoList)) {
+            for (UserSessionVo userSessionVo : userSessionVoList) {
+                AuthenticationInfoVo authenticationInfoVo = null;
+                String token = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getTokenHash());
+                JSONObject tokenJson;
+                try {
+                    tokenJson = JSON.parseObject(token);
+                    if (MapUtils.isNotEmpty(tokenJson)) {
+                        JSONObject originHeader = tokenJson.getJSONObject("originHeader");
+                        authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userUuid, true, originHeader);
+                    }
+                } catch (Exception ignored) {
+                }
+                sessionTokenHashAuthInfoHashMap.put(userSessionVo.getTokenHash(), authenticationInfoVo);
+            }
+            if (MapUtils.isNotEmpty(sessionTokenHashAuthInfoHashMap)) {
+                for (Map.Entry<String, AuthenticationInfoVo> entry : sessionTokenHashAuthInfoHashMap.entrySet()) {
+                    String tokenHash = entry.getKey();
+                    AuthenticationInfoVo authenticationInfoVo = entry.getValue();
+                    if (authenticationInfoVo != null && authenticationInfoVo.isNotNull()) {
+                        String authenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
+                        String authInfoHash = Md5Util.encryptMD5(authenticationInfoStr);
+                        userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(authInfoHash, authenticationInfoStr));
+                        userSessionService.updateUserSessionAuthInfoHashByTokenHash(tokenHash, authInfoHash);
+                        UserSessionCache.addItem(tokenHash, authenticationInfoStr);
+                    } else {
+                        userSessionService.updateUserSessionAuthInfoHashByTokenHash(tokenHash, null);
+                        UserSessionCache.addItem(tokenHash, JSON.toJSONString(new AuthenticationInfoVo(userUuid)));
+                    }
+                }
+            }
+        }
     }
 
 }

@@ -26,14 +26,8 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.common.util.RC4Util;
-import neatlogic.framework.dao.mapper.LoginMapper;
-import neatlogic.framework.dao.mapper.TenantMapper;
-import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dao.mapper.UserSessionMapper;
-import neatlogic.framework.dto.AuthenticationInfoVo;
-import neatlogic.framework.dto.JwtVo;
-import neatlogic.framework.dto.TenantVo;
-import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dao.mapper.*;
+import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
@@ -77,6 +71,9 @@ public class LoginController {
 
     @Resource
     private UserSessionMapper userSessionMapper;
+
+    @Resource
+    private UserSessionContentMapper userSessionContentMapper;
 
     @Resource
     private LoginMapper loginMapper;
@@ -180,15 +177,19 @@ public class LoginController {
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
                 JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo);
-                String AuthenticationInfoStr = null;
-                if (authenticationInfoVo != null) {
-                    if(CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList())){
-                        authenticationInfoVo.setHeaderSet(null);
-                        AuthenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
+                String authenticationInfoStr = null;
+                String authInfoHash = null;
+                if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
+                    authenticationInfoVo.setHeaderSet(null);
+                    authenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
+                    if (StringUtils.isNotBlank(authenticationInfoStr)) {
+                        authInfoHash = Md5Util.encryptMD5(authenticationInfoStr);
+                        userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(authInfoHash, authenticationInfoStr));
                     }
                 }
                 // 保存 user 登录访问时间
-                userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), AuthenticationInfoStr);
+                userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash);
+                userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(jwtVo.getTokenHash(), jwtVo.getToken()));
                 //更新租户visitTime
                 TenantContext.get().setUseDefaultDatasource(true);
                 if (!tenantVisitSet.contains(tenant)) {

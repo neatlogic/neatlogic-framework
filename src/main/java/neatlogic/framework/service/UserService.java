@@ -59,6 +59,7 @@ public interface UserService {
 
     /**
      * 根据用户userId获取用户token
+     *
      * @param userId 用户userId
      * @return token
      */
@@ -66,8 +67,17 @@ public interface UserService {
 
     /**
      * 根据用户userId获取用户token
+     *
      * @param userId 用户userId
      * @return userVo
      */
     UserVo getUserByUser(String userId);
+
+    /**
+     * 更新用户会话cache
+     *
+     * @param userUuid 用户uuid
+     */
+    void updateUserCacheAndSessionByUserUuid(String userUuid);
+
 }

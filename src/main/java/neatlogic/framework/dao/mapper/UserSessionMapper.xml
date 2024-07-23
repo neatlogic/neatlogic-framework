@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             resultType="neatlogic.framework.dto.UserSessionVo" useCache="false">
         SELECT `user_uuid`         as userUuid,
                `visit_time`        as sessionTime,
-               `auth_info`         as authInfoStr,
+               `auth_info_hash`         as authInfoHash,
                `token_create_time` as tokenCreateTime
         FROM `user_session`
         WHERE `token_hash` = #{value}
@@ -141,25 +141,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="getUserSessionByUuid" resultType="neatlogic.framework.dto.UserSessionVo">
         SELECT `user_uuid`         as userUuid,
                `visit_time`        as sessionTime,
-               `auth_info`         as authInfoStr,
+               `auth_info_hash`    as authInfoHash,
                `token_create_time` as tokenCreateTime,
                `token_hash`        as tokenHash
         FROM `user_session`
         WHERE `user_uuid` = #{value}
     </select>
+    <select id="getUserSessionByUuidList" resultType="neatlogic.framework.dto.UserSessionVo">
+        SELECT `user_uuid`         as userUuid,
+               `visit_time`        as sessionTime,
+               `auth_info_hash`    as authInfoHash,
+               `token_create_time` as tokenCreateTime,
+               `token_hash`        as tokenHash
+        FROM `user_session`
+        WHERE `user_uuid` in
+        <foreach collection="list" item="userUuid" close=")" open="(" separator=",">
+            #{userUuid}
+        </foreach>
+    </select>
 
     <insert id="insertUserSession">
-        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
-        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfo})
+        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info_hash`)
+        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfoHash})
         ON DUPLICATE KEY
             UPDATE `visit_time`        = NOW(3),
-                   `auth_info`         = #{authInfo},
+                   `auth_info_hash`    = #{authInfoHash},
                    `token_create_time` = #{tokenCreateTime}
     </insert>
 
     <insert id="insertUserSessionWithoutTokenCreateTime">
-        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info`)
-        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfo})
+        INSERT INTO `user_session` (`user_uuid`, `visit_time`, `token_hash`, `token_create_time`, `auth_info_hash`)
+        VALUES (#{userUuid}, NOW(3), #{tokenHash}, #{tokenCreateTime}, #{authInfoHash})
         ON DUPLICATE KEY
             UPDATE `visit_time` = NOW(3)
     </insert>
@@ -169,6 +181,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         set `visit_time` = now(3)
         WHERE `token_hash` = #{value}
     </update>
+    <update id="updateUserSessionAuthInfoHashByTokenHashList">
+        update `user_session`
+        set `auth_info_hash` = #{authInfoHash}
+        where `token_hash` in
+        <foreach collection="tokenHashList" item="tokenHash" open="(" close=")">
+            #{tokenHash}
+        </foreach>
+    </update>
+    <update id="updateUserSessionAuthInfoHashByTokenHash">
+        update `user_session`
+        set `auth_info_hash` = #{authInfoHash}
+        where `token_hash` = #{tokenHash}
+    </update>
 
     <delete id="deleteUserSessionByTokenHash" parameterType="java.lang.String">
         DELETE
@@ -176,11 +201,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where `token_hash` = #{value}
     </delete>
 
-    <delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
+    <delete id="deleteUserSessionByTokenHashList" parameterType="java.lang.String">
         DELETE
         FROM `user_session`
-        where `user_uuid` = #{value}
+        where `token_hash` in
+        <foreach collection="list" item="tokenHash" open="(" close=")">
+            #{tokenHash}
+        </foreach>
     </delete>
+
     <delete id="deleteUserSessionByExpireTime" parameterType="java.lang.Long">
         DELETE
         FROM `user_session`

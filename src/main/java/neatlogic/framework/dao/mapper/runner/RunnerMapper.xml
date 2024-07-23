@@ -153,6 +153,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                `auth_type`          as authType,
                `public_key`         as publicKey,
                `private_key`        as privateKey,
+               `is_delete`          as isDelete,
                rgr.`runnergroup_id` as groupId
         FROM `runner` r
                  LEFT JOIN runnergroup_runner rgr on r.id = rgr.runner_id
@@ -281,6 +282,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                rgr.`runnergroup_id` AS groupId,
                r.`netty_ip`         as nettyIp,
                r.`netty_port`       as nettyPort,
+               r.`is_delete`        AS isDelete,
                r.`host`,
                r.`port`
         FROM runner r
@@ -300,6 +302,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         r.`auth_type` as authType,
         r.`public_key` as publicKey,
         r.`private_key` as privateKey,
+        r.`is_delete` as isDelete,
         rgr.`runnergroup_id` as groupId
         FROM `runner` r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
@@ -699,6 +702,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                ar.`public_key`                         AS publicKey,
                ar.`private_key`                        AS privateKey,
                rgr.`runnergroup_id`                    AS groupId,
+               ar.`is_delete`                          AS isDelete,
                IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
         FROM `runner` ar
                 left JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`

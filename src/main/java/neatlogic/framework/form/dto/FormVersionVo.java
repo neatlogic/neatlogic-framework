@@ -100,120 +100,134 @@ public class FormVersionVo extends BaseEditorVo {
             if (MapUtils.isNotEmpty(getFormConfig())) {
                 String _type = this.formConfig.getString("_type");
                 if ("new".equals(_type)) {
-                    // tableList是默认场景数据
-                    JSONArray tableList = this.formConfig.getJSONArray("tableList");
-                    if (CollectionUtils.isEmpty(tableList)) {
-                        return formAttributeList;
+                    List<FormAttributeVo> formHideAttributeList = new ArrayList<>();
+                    JSONArray hideComponentList = this.formConfig.getJSONArray("hideComponentList");
+                    if (CollectionUtils.isNotEmpty(hideComponentList)) {
+                        for (int i = 0; i < hideComponentList.size(); i++) {
+                            JSONObject cellObj = hideComponentList.getJSONObject(i);
+                            if (MapUtils.isEmpty(cellObj)) {
+                                continue;
+                            }
+                            FormAttributeVo formAttributeVo = createFormAttribute(cellObj);
+                            if (formAttributeVo != null) {
+                                formHideAttributeList.add(formAttributeVo);
+                            }
+                        }
                     }
+
                     // 内嵌组件关系映射，例如选项卡组件里面可以包含几个其他组件
                     Map<String, List<String>> attributeInlineMap = new HashMap<>();
                     // 默认场景里的组件列表
                     List<FormAttributeVo> defaultSceneFormAttributeList = new ArrayList<>();
-                    for (int i = 0; i < tableList.size(); i++) {
-                        JSONObject cellObj = tableList.getJSONObject(i);
-                        if (MapUtils.isEmpty(cellObj)) {
-                            continue;
-                        }
-                        JSONObject componentObj = cellObj.getJSONObject("component");
-                        if (MapUtils.isEmpty(componentObj)) {
-                            continue;
-                        }
-                        // 标签组件不能改变值，不放入组件列表里
-                        if (Objects.equals("formlabel", componentObj.getString("handler"))) {
-                            continue;
-                        }
-                        FormAttributeVo formAttributeVo = createFormAttribute(componentObj);
-                        if (formAttributeVo != null) {
-                            defaultSceneFormAttributeList.add(formAttributeVo);
-                        }
-                        JSONArray componentArray = componentObj.getJSONArray("component");
-                        if (CollectionUtils.isNotEmpty(componentArray)) {
-                            String uuid = componentObj.getString("uuid");
-                            List<String> uuidList = new ArrayList<>();
-                            for (int j = 0; j < componentArray.size(); j++) {
-                                JSONObject component = componentArray.getJSONObject(j);
-                                if (MapUtils.isNotEmpty(component)) {
-                                    formAttributeVo = createFormAttribute(component);
-                                    if (formAttributeVo != null) {
-                                        defaultSceneFormAttributeList.add(formAttributeVo);
-                                        uuidList.add(formAttributeVo.getUuid());
+                    // tableList是默认场景数据
+                    JSONArray tableList = this.formConfig.getJSONArray("tableList");
+                    if (CollectionUtils.isNotEmpty(tableList)) {
+                        for (int i = 0; i < tableList.size(); i++) {
+                            JSONObject cellObj = tableList.getJSONObject(i);
+                            if (MapUtils.isEmpty(cellObj)) {
+                                continue;
+                            }
+                            JSONObject componentObj = cellObj.getJSONObject("component");
+                            if (MapUtils.isEmpty(componentObj)) {
+                                continue;
+                            }
+                            // 标签组件不能改变值，不放入组件列表里
+                            if (Objects.equals("formlabel", componentObj.getString("handler"))) {
+                                continue;
+                            }
+                            FormAttributeVo formAttributeVo = createFormAttribute(componentObj);
+                            if (formAttributeVo != null) {
+                                defaultSceneFormAttributeList.add(formAttributeVo);
+                            }
+                            JSONArray componentArray = componentObj.getJSONArray("component");
+                            if (CollectionUtils.isNotEmpty(componentArray)) {
+                                String uuid = componentObj.getString("uuid");
+                                List<String> uuidList = new ArrayList<>();
+                                for (int j = 0; j < componentArray.size(); j++) {
+                                    JSONObject component = componentArray.getJSONObject(j);
+                                    if (MapUtils.isNotEmpty(component)) {
+                                        formAttributeVo = createFormAttribute(component);
+                                        if (formAttributeVo != null) {
+                                            defaultSceneFormAttributeList.add(formAttributeVo);
+                                            uuidList.add(formAttributeVo.getUuid());
+                                        }
                                     }
                                 }
+                                attributeInlineMap.put(uuid, uuidList);
                             }
-                            attributeInlineMap.put(uuid, uuidList);
                         }
                     }
+
                     String defaultSceneUuid = this.formConfig.getString("defaultSceneUuid");
                     if (StringUtils.isBlank(sceneUuid) && StringUtils.isNotBlank(defaultSceneUuid)) {
                         sceneUuid = defaultSceneUuid;
                     }
                     String mainSceneUuid = this.formConfig.getString("uuid");
-                    // 场景列表
-                    JSONArray sceneList = this.formConfig.getJSONArray("sceneList");
-                    if (Objects.equals(mainSceneUuid, sceneUuid) || StringUtils.isBlank(sceneUuid) || CollectionUtils.isEmpty(sceneList)) {
-                        // 如果场景UUID为空或者场景列表为空，则返回默认场景组件列表
-                        formAttributeList = defaultSceneFormAttributeList;
-                        return formAttributeList;
-                    }
-                    // 遍历场景列表，找到sceneUuid对应的场景信息
-                    for (int i = 0; i < sceneList.size(); i++) {
-                        JSONObject scene = sceneList.getJSONObject(i);
-                        if (MapUtils.isEmpty(scene)) {
-                            continue;
-                        }
-                        if (!Objects.equals(sceneUuid, scene.getString("uuid"))) {
-                            continue;
-                        }
-                        formAttributeList = new ArrayList<>();
-                        JSONArray sceneTableList = scene.getJSONArray("tableList");
-                        if (CollectionUtils.isEmpty(sceneTableList)) {
-                            return formAttributeList;
-                        }
-                        for (int j = 0; j < sceneTableList.size(); j++) {
-                            JSONObject sceneTable = sceneTableList.getJSONObject(j);
-                            if (MapUtils.isEmpty(sceneTable)) {
-                                continue;
-                            }
-                            JSONObject componentObj = sceneTable.getJSONObject("component");
-                            if (MapUtils.isEmpty(componentObj)) {
-                                continue;
-                            }
-                            Boolean inherit = componentObj.getBoolean("inherit");
-                            if (Objects.equals(inherit, true)) {
-                                String uuid = componentObj.getString("uuid");
-                                if (StringUtils.isBlank(uuid)) {
-                                    continue;
-                                }
-                                List<String> uuidList = attributeInlineMap.computeIfAbsent(uuid, key -> new ArrayList<>());
-                                uuidList.add(uuid);
-                                for (FormAttributeVo formAttributeVo : defaultSceneFormAttributeList) {
-                                    if (uuidList.contains(formAttributeVo.getUuid())) {
-                                        formAttributeList.add(formAttributeVo);
-                                    }
-                                }
-                            } else {
-                                FormAttributeVo formAttributeVo = createFormAttribute(componentObj);
-                                if (formAttributeVo != null) {
-                                    formAttributeList.add(formAttributeVo);
-                                }
-                                JSONArray componentArray = componentObj.getJSONArray("component");
-                                if (CollectionUtils.isNotEmpty(componentArray)) {
-                                    for (int k = 0; k < componentArray.size(); k++) {
-                                        JSONObject component = componentArray.getJSONObject(k);
-                                        if (MapUtils.isNotEmpty(component)) {
-                                            formAttributeVo = createFormAttribute(component);
-                                            if (formAttributeVo != null) {
-                                                formAttributeList.add(formAttributeVo);
+
+                    if (StringUtils.isNotBlank(sceneUuid) && !Objects.equals(mainSceneUuid, sceneUuid)) {
+                        // 场景列表
+                        JSONArray sceneList = this.formConfig.getJSONArray("sceneList");
+                        if (CollectionUtils.isNotEmpty(sceneList)) {
+                            // 遍历场景列表，找到sceneUuid对应的场景信息
+                            for (int i = 0; i < sceneList.size(); i++) {
+                                JSONObject scene = sceneList.getJSONObject(i);
+                                if (MapUtils.isNotEmpty(scene)) {
+                                    if (Objects.equals(sceneUuid, scene.getString("uuid"))) {
+                                        JSONArray sceneTableList = scene.getJSONArray("tableList");
+                                        if (CollectionUtils.isNotEmpty(sceneTableList)) {
+                                            formAttributeList = new ArrayList<>();
+                                            for (int j = 0; j < sceneTableList.size(); j++) {
+                                                JSONObject sceneTable = sceneTableList.getJSONObject(j);
+                                                if (MapUtils.isEmpty(sceneTable)) {
+                                                    continue;
+                                                }
+                                                JSONObject componentObj = sceneTable.getJSONObject("component");
+                                                if (MapUtils.isEmpty(componentObj)) {
+                                                    continue;
+                                                }
+                                                Boolean inherit = componentObj.getBoolean("inherit");
+                                                if (Objects.equals(inherit, true)) {
+                                                    String uuid = componentObj.getString("uuid");
+                                                    if (StringUtils.isBlank(uuid)) {
+                                                        continue;
+                                                    }
+                                                    List<String> uuidList = attributeInlineMap.computeIfAbsent(uuid, key -> new ArrayList<>());
+                                                    uuidList.add(uuid);
+                                                    for (FormAttributeVo formAttributeVo : defaultSceneFormAttributeList) {
+                                                        if (uuidList.contains(formAttributeVo.getUuid())) {
+                                                            formAttributeList.add(formAttributeVo);
+                                                        }
+                                                    }
+                                                } else {
+                                                    FormAttributeVo formAttributeVo = createFormAttribute(componentObj);
+                                                    if (formAttributeVo != null) {
+                                                        formAttributeList.add(formAttributeVo);
+                                                    }
+                                                    JSONArray componentArray = componentObj.getJSONArray("component");
+                                                    if (CollectionUtils.isNotEmpty(componentArray)) {
+                                                        for (int k = 0; k < componentArray.size(); k++) {
+                                                            JSONObject component = componentArray.getJSONObject(k);
+                                                            if (MapUtils.isNotEmpty(component)) {
+                                                                formAttributeVo = createFormAttribute(component);
+                                                                if (formAttributeVo != null) {
+                                                                    formAttributeList.add(formAttributeVo);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
-                        return formAttributeList;
                     }
-                    // 如果找不到sceneUuid对应的场景信息，则返回默认场景组件列表
-                    formAttributeList = defaultSceneFormAttributeList;
+                    if (formAttributeList == null) {
+                        // 如果找不到sceneUuid对应的场景信息，则返回默认场景组件列表
+                        formAttributeList = defaultSceneFormAttributeList;
+                    }
+                    formAttributeList.addAll(formHideAttributeList);
                     return formAttributeList;
                 } else {
                     JSONArray controllerList = this.formConfig.getJSONArray("controllerList");

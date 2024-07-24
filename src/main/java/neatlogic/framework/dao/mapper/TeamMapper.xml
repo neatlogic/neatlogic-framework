@@ -460,6 +460,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         ORDER BY a.`id`
     </select>
 
+    <select id="getTeamUserListByTeamUuidList" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.TeamUserVo" useCache="false">
+        SELECT a.`team_uuid`                                                 AS teamUuid,
+               a.`user_uuid`                                                 AS userUuid,
+               a.`title`,
+               b.`user_id`                                                   AS userId,
+               b.`user_name`                                                 AS userName,
+               (SELECT `user_info` from `user` WHERE `uuid` = a.`user_uuid`) as userInfo,
+               (SELECT `vip_level` from `user` WHERE `uuid` = a.`user_uuid`) as userVipLevel
+        FROM `user_team` a
+                 JOIN `team` t ON a.`team_uuid` = t.`uuid` and t.`is_delete` = 0
+                 JOIN `user` b ON b.`uuid` = a.`user_uuid`
+        WHERE a.`team_uuid` = #{value}
+        ORDER BY a.`id`
+    </select>
+
     <select id="getTeamUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
         select `uuid`
         from `team`

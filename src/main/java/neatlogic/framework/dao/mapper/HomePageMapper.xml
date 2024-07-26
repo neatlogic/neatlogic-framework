@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.HomePageMapper">
+    <select id="checkHomePageNameIsRepeat" parameterType="neatlogic.framework.dto.HomePageVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `home_page`
+        WHERE `id` != #{id} AND `name` = #{name}
+    </select>
+
+    <select id="getHomePageById" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.HomePageVo">
+        SELECT
+            `id`,
+            `name`,
+            `is_active` AS isActive,
+            `sort`,
+            `config` AS configStr
+        FROM `home_page`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getHomePageCount" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `home_page`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="getHomePageList" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="neatlogic.framework.dto.HomePageVo">
+        SELECT
+            `id`,
+            `name`,
+            `is_active` AS isActive,
+            `sort`
+        FROM `home_page`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY `sort`
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getHomePageAuthorityListByHomePageId" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.AuthorityVo">
+        SELECT
+            `type`,
+            `uuid`
+        FROM `home_page_authority`
+        WHERE `home_page_id` = #{value}
+    </select>
+
+    <select id="getMaxSort" resultType="java.lang.Integer" useCache="false">
+        SELECT MAX(`sort`) FROM `home_page` FOR UPDATE
+    </select>
+
+    <select id="getHomePageIdListByAuthority" parameterType="neatlogic.framework.dto.AuthenticationInfoVo" resultType="java.lang.Long">
+        SELECT
+        DISTINCT `home_page_id`
+        FROM `home_page_authority`
+        WHERE (`type` = 'common' AND `uuid` = 'alluser')
+            <if test="userUuid != null and userUuid != ''">
+                OR (`type` = 'user' AND `uuid` = #{userUuid})
+            </if>
+            <if test="teamUuidList != null and teamUuidList.size() > 0">
+                OR (`type` = 'team' AND `uuid` IN
+                <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                    #{teamUuid}
+                </foreach>
+                )
+            </if>
+            <if test="roleUuidList != null and roleUuidList.size() > 0">
+                OR (`type` = 'role' AND `uuid` IN
+                <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
+                    #{roleUuid}
+                </foreach>
+                )
+            </if>
+    </select>
+
+    <select id="getMinSortHomePageByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.HomePageVo">
+        SELECT
+            `id`,
+            `name`,
+            `is_active` AS isActive,
+            `sort`,
+            `config` AS configStr
+        FROM `home_page`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY `sort`
+        LIMIT 1
+    </select>
+
+    <insert id="insertHomePage" parameterType="neatlogic.framework.dto.HomePageVo">
+        INSERT INTO `home_page` (`id`, `name`, `is_active`, `sort`, `config`)
+        VALUES (#{id}, #{name}, #{isActive}, #{sort}, #{configStr})
+        ON DUPLICATE KEY
+        UPDATE `config` = #{configStr},
+               `is_active` = #{isActive}
+    </insert>
+
+    <insert id="insertHomePageAuthority">
+        INSERT INTO `home_page_authority` (`home_page_id`, `type`, `uuid`)
+        VALUES (#{homePageId}, #{authorityVo.type}, #{authorityVo.uuid})
+    </insert>
+
+    <update id="updateHomePageSortById" parameterType="neatlogic.framework.dto.HomePageVo">
+        UPDATE `home_page` SET `sort` = #{sort} WHERE `id` = #{id}
+    </update>
+
+    <update id="updateHomePageIsActiveById" parameterType="neatlogic.framework.dto.HomePageVo">
+        UPDATE `home_page` SET `is_active` = 1 - `is_active` WHERE `id` = #{id}
+    </update>
+
+    <update id="updateSortIncrement">
+        update `home_page` SET `sort` = `sort` + 1
+        WHERE `sort` &gt;= #{fromSort}
+        <if test="toSort != null">
+            AND `sort` &lt;= #{toSort}
+        </if>
+    </update>
+
+    <update id="updateSortDecrement">
+        update `home_page` SET `sort` = `sort` - 1
+        WHERE `sort` &gt;= #{fromSort}
+        <if test="toSort != null">
+            AND `sort` &lt;= #{toSort}
+        </if>
+    </update>
+
+    <delete id="deleteHomePageById" parameterType="java.lang.Long">
+        DELETE FROM `home_page` WHERE `id` = #{value}
+    </delete>
+
+    <delete id="deleteHomePageAuthorityByHomePageId" parameterType="java.lang.Long">
+        DELETE FROM `home_page_authority` WHERE `home_page_id` = #{value}
+    </delete>
+</mapper>

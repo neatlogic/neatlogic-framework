@@ -104,7 +104,7 @@ public class MatrixRegionAttrTypeHandler extends MatrixAttrTypeBase {
             return repeatValueSet;
         }
         //通过upwardNamePath查找
-        regionVos = regionMapper.getRegionByUpwardNamePath(needSearchValue);
+        regionVos = regionMapper.getRegionByUpwardNamePathList(needSearchValue);
         if (CollectionUtils.isNotEmpty(regionVos)) {
             for (RegionVo regionVo : regionVos) {
                 valueMap.put(regionVo.getUpwardNamePath(), regionVo.getId().toString());

@@ -47,7 +47,7 @@ public interface RegionMapper {
 
     List<RegionVo> getRegionByNameList(List<String> values);
 
-    List<RegionVo> getRegionByUpwardNamePath(List<String> values);
+    List<RegionVo> getRegionByUpwardNamePathList(List<String> values);
 
 
     int searchRegionTeamCount(RegionTeamVo region);

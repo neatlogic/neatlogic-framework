@@ -208,7 +208,7 @@
             #{name}
         </foreach>
     </select>
-    <select id="getRegionByUpwardNamePath" resultType="neatlogic.framework.dto.region.RegionVo">
+    <select id="getRegionByUpwardNamePathList" resultType="neatlogic.framework.dto.region.RegionVo">
         SELECT `id`,
         `name`,
         `parent_id`     as parentId,

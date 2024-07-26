@@ -222,19 +222,21 @@ public class FormUtil {
             return;
         }
         Map<String, FormAttributeVo> formAttributeMap = formAttributeList.stream().collect(Collectors.toMap(FormAttributeVo::getUuid, e -> e));
-        for (int i = 0; i < formAttributeDataList.size(); i++) {
-            JSONObject formAttributeDataObj = formAttributeDataList.getJSONObject(i);
-            String attributeUuid = formAttributeDataObj.getString("attributeUuid");
-            FormAttributeVo formAttributeVo = formAttributeMap.get(attributeUuid);
-            if (formAttributeVo == null) {
-                continue;
+        if(CollectionUtils.isNotEmpty(formAttributeDataList)) {
+            for (int i = 0; i < formAttributeDataList.size(); i++) {
+                JSONObject formAttributeDataObj = formAttributeDataList.getJSONObject(i);
+                String attributeUuid = formAttributeDataObj.getString("attributeUuid");
+                FormAttributeVo formAttributeVo = formAttributeMap.get(attributeUuid);
+                if (formAttributeVo == null) {
+                    continue;
+                }
+                IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(formAttributeVo.getHandler());
+                if (formAttributeHandler == null) {
+                    continue;
+                }
+                Object dataList = formAttributeHandler.conversionDataType(formAttributeDataObj.get("dataList"), formAttributeVo.getLabel());
+                formAttributeDataObj.put("dataList", dataList);
             }
-            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(formAttributeVo.getHandler());
-            if (formAttributeHandler == null) {
-                continue;
-            }
-            Object dataList = formAttributeHandler.conversionDataType(formAttributeDataObj.get("dataList"), formAttributeVo.getLabel());
-            formAttributeDataObj.put("dataList", dataList);
         }
     }
 

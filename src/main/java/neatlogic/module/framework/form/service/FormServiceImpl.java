@@ -578,6 +578,9 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
 
     @Override
     public Object getSelectStandardValueBySimpleValue(Object dataObj, JSONObject configObj) {
+        if (dataObj == null) {
+            return null;
+        }
         JSONArray resultList = new JSONArray();
         if (Objects.equals(configObj.getString("dataSource"), "static")) {
             JSONArray dataArray = configObj.getJSONArray("dataList");

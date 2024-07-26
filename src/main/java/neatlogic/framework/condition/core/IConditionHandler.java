@@ -107,4 +107,11 @@ public interface IConditionHandler {
         return null;
     }
 
+    /**
+     * 条件帮助描述
+     */
+    default String getDesc(){
+        return null;
+    }
+
 }

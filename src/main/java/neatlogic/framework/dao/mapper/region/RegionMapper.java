@@ -33,6 +33,10 @@ public interface RegionMapper {
 
     RegionVo getRegionById(Long id);
 
+    RegionVo getRegionById(String id);
+
+    RegionVo getRegionByUpwardNamePath(String upwardNamePath);
+
     List<RegionVo> getRegionListByIdList(List<Long> idList);
 
     List<RegionVo> getAncestorsAndSelfByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);

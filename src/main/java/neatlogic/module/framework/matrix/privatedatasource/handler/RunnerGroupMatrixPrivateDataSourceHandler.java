@@ -95,11 +95,13 @@ public class RunnerGroupMatrixPrivateDataSourceHandler implements IMatrixPrivate
                     Map<String, String> newMap = new HashMap<>();
                     for (String column : searchVo.getColumnList()) {
                         Object value = map.get(column);
-                        if (value != null) {
-                            String valueStr = value.toString();
-                            newMap.put(columnsMap.get(column), valueStr);
-                        } else {
-                            newMap.put(columnsMap.get(column), "");
+                        if (value == null) {
+                            value = "";
+                        }
+                        String valueStr = value.toString();
+                        newMap.put(columnsMap.get(column), valueStr);
+                        if (Objects.equals(column, "id")) {
+                            newMap.put("uuid", valueStr);
                         }
                     }
                     resultList.add(newMap);

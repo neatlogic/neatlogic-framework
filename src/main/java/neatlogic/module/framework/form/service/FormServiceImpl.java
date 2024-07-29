@@ -641,6 +641,9 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 if (CollectionUtils.isNotEmpty(valueArray)) {
                     for (int i = 0; i < valueArray.size(); i++) {
                         Object obj = valueArray.get(i);
+                        if (obj == null) {
+                            continue;
+                        }
                         if (obj instanceof JSONObject) {
                             JSONObject jsonObj = (JSONObject) obj;
                             resultList.add(jsonObj);

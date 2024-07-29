@@ -22,10 +22,10 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class HomePageNotFoundException extends ApiRuntimeException {
 
     public HomePageNotFoundException(Long id) {
-        super("首页配置：“{0}”不存在", id);
+        super("nfeh.homepagenotfoundexception.homepagenotfoundexception", id);
     }
 
     public HomePageNotFoundException(String name) {
-        super("首页配置：“{0}”不存在", name);
+        super("nfeh.homepagenotfoundexception.homepagenotfoundexception", name);
     }
 }

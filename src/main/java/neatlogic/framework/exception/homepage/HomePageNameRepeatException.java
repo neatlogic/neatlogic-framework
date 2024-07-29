@@ -21,6 +21,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class HomePageNameRepeatException extends ApiRuntimeException {
     public HomePageNameRepeatException(String name) {
-        super("首页配置：“{0}”已存在", name);
+        super("nfeh.homepagenamerepeatexception.homepagenamerepeatexception", name);
     }
 }

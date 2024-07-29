@@ -20,26 +20,29 @@ package neatlogic.framework.dto;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 
 import java.util.List;
 
 public class HomePageVo {
+    @EntityField(name = "common.id", type = ApiParamType.LONG)
     private Long id;
-
+    @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String name;
-
+    @EntityField(name = "common.isactive", type = ApiParamType.INTEGER)
     private Integer isActive;
-
+    @EntityField(name = "common.sort", type = ApiParamType.INTEGER)
     private Integer sort;
-
+    @EntityField(name = "common.config", type = ApiParamType.STRING)
     private JSONObject config;
 
     @JSONField(serialize = false)
     private String configStr;
-
+    @EntityField(name = "common.authoritylist", type = ApiParamType.JSONARRAY)
     private List<String> authorityList;
-
+    @EntityField(name = "common.authoritylist", type = ApiParamType.JSONARRAY)
     private JSONArray authorityVoList;
 
     public Long getId() {

@@ -21,12 +21,12 @@ public class HOME_PAGE_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "首页设置管理权限";
+		return "nfal.home_page_modify.getauthdisplayname";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "对首页设置添加、修改和删除";
+		return "nfal.home_page_modify.getauthintroduction";
 	}
 
 	@Override

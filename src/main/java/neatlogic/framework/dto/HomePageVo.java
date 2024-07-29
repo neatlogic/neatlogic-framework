@@ -17,6 +17,7 @@
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.util.SnowflakeUtil;
@@ -38,6 +39,8 @@ public class HomePageVo {
     private String configStr;
 
     private List<String> authorityList;
+
+    private JSONArray authorityVoList;
 
     public Long getId() {
         if (id == null) {
@@ -105,5 +108,13 @@ public class HomePageVo {
 
     public void setAuthorityList(List<String> authorityList) {
         this.authorityList = authorityList;
+    }
+
+    public JSONArray getAuthorityVoList() {
+        return authorityVoList;
+    }
+
+    public void setAuthorityVoList(JSONArray authorityVoList) {
+        this.authorityVoList = authorityVoList;
     }
 }

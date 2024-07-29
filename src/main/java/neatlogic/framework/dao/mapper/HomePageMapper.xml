@@ -107,7 +107,8 @@
             `sort`,
             `config` AS configStr
         FROM `home_page`
-        WHERE `id` IN
+        WHERE `is_active` = 1
+          AND `id` IN
         <foreach collection="list" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>

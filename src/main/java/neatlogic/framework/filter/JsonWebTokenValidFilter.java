@@ -31,6 +31,7 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.user.UserNotFoundException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.login.core.ILoginPostProcessor;
@@ -159,6 +160,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 logger.error(ex.getMessage(), ex);
                 returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, ex.getMessage());
             }
+        } catch (UserNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            try {
+                // 不返回跳转地址，直接跳转到显示错误信息页面
+                returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, null, ex.getMessage());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new ApiRuntimeException(e);
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
@@ -249,7 +259,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 if (now.getTime() < expireTime) {
                     String authInfo = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
                     userSessionVo.setAuthInfoStr(authInfo);
-                    userSessionMapper.updateUserSession(jwt.getTokenHash());
+                    userSessionMapper.updateUserSessionTimeByTokenHash(jwt.getTokenHash());
                     AuthenticationInfoVo authenticationInfo = userSessionVo.getAuthInfo();
                     UserSessionCache.addItem(jwt.getTokenHash(), JSON.toJSONString(authenticationInfo));
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);

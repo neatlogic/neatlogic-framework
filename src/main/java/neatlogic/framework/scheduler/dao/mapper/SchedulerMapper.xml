@@ -485,6 +485,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where end_time &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
 
+    <delete id="deleteAuditDetail">
+        delete a
+        FROM schedule_job_audit_detail a
+                 LEFT JOIN schedule_job_audit b ON a.`hash` = b.`content_hash`
+        WHERE b.`content_hash` IS NULL
+    </delete>
+
     <!--<delete id="deleteJobLoadTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadTimeVo">
         DELETE
         FROM `schedule_job_load_time`

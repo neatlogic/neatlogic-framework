@@ -97,6 +97,8 @@ public interface SchedulerMapper {
 
     void deleteUnusedJobStatus();
 
+    void deleteAuditDetail();
+
     void deleteAuditByDayBefore(int dayBefore);
 
 //    int deleteJobLoadTime(JobLoadTimeVo jobLoadTimeVo);

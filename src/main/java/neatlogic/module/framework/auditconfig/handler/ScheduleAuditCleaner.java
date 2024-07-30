@@ -38,7 +38,8 @@ public class ScheduleAuditCleaner extends AuditCleanerBase {
     @Override
     protected void myClean(int dayBefore) {
         schedulerMapper.deleteAuditByDayBefore(dayBefore);
+        schedulerMapper.deleteAuditDetail();
         databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "schedule_job_audit");
-
+        databaseFragmentMapper.rebuildTable(TenantContext.get().getDbName(), "schedule_job_audit_detail");
     }
 }

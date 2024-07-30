@@ -156,18 +156,20 @@ public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
                     Map<String, String> newMap = new HashMap<>();
                     for (String column : searchVo.getColumnList()) {
                         Object value = map.get(column);
-                        if (value != null) {
-                            String valueStr = value.toString();
-                            if (Objects.equals(column, "vipLevel")) {
-                                if (Objects.equals(valueStr, "1")) {
-                                    valueStr = "是";
-                                } else {
-                                    valueStr = "否";
-                                }
+                        if (value == null) {
+                            value = "";
+                        }
+                        String valueStr = value.toString();
+                        if (Objects.equals(column, "vipLevel")) {
+                            if (Objects.equals(valueStr, "1")) {
+                                valueStr = "是";
+                            } else {
+                                valueStr = "否";
                             }
-                            newMap.put(columnsMap.get(column), valueStr);
-                        } else {
-                            newMap.put(columnsMap.get(column), "");
+                        }
+                        newMap.put(columnsMap.get(column), valueStr);
+                        if (Objects.equals(column, "uuid")) {
+                            newMap.put("uuid", valueStr);
                         }
                     }
                     resultList.add(newMap);

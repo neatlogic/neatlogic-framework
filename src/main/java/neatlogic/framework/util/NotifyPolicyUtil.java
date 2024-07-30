@@ -168,14 +168,14 @@ public class NotifyPolicyUtil {
                         } else if (Objects.equals(paramMappingVo.getName(),
                                 paramMappingVo.getValue())) {
                             if (!templateParamData.containsKey(paramMappingVo.getValue())) {
-                                logger.warn(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                logger.debug(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
                             }
                         } else {
                             Object processFieldValue = templateParamData.get(paramMappingVo.getValue());
                             if (processFieldValue != null) {
                                 notifyBuilder.addData(paramMappingVo.getName(), processFieldValue);
                             } else {
-                                logger.warn(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                logger.debug(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
                             }
                         }
                     }
@@ -206,7 +206,7 @@ public class NotifyPolicyUtil {
                                 }
                             }
                         } else {
-                            logger.error("触发点：”" + notifyTriggerType + "“的接收对象：“" + receiver + "”找不到对应的用户、组、角色等数据");
+                            logger.debug("触发点：”" + notifyTriggerType + "“的接收对象：“" + receiver + "”找不到对应的用户、组、角色等数据");
                         }
                     }
                 }

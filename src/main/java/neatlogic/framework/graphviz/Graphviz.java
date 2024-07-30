@@ -29,6 +29,7 @@ public class Graphviz {
 
     List<Node> nodeList;
     LayoutType layout;
+    String rankdir;
 
     private Graphviz(Builder builder) {
         this.layerList = builder.layerList;
@@ -36,7 +37,88 @@ public class Graphviz {
         this.clusterList = builder.clusterList;
         this.layout = builder.layout;
         this.nodeList = builder.nodeList;
+        this.rankdir = builder.rankdir;
     }
+
+    public Layer getLayerById(String id) {
+        if (CollectionUtils.isNotEmpty(layerList)) {
+            return this.layerList.stream().filter(layer -> layer.getId().equals(id)).findFirst().orElse(null);
+        }
+        return null;
+    }
+
+    public void removeLayer(String id) {
+        if (CollectionUtils.isNotEmpty(layerList)) {
+            Layer layer = this.getLayerById(id);
+            if (layer != null) {
+                if (CollectionUtils.isNotEmpty(layer.getNodeList())) {
+                    for (Node node : layer.getNodeList()) {
+                        this.removeNode(node.getId());
+                    }
+                }
+                layerList.remove(layer);
+            }
+
+        }
+    }
+
+    public void removeNode(String id) {
+        if (CollectionUtils.isNotEmpty(linkList)) {
+            this.linkList.removeIf(link -> link.getFrom().equals(id) || link.getTo().equals(id));
+        }
+        if (CollectionUtils.isNotEmpty(nodeList)) {
+            this.nodeList.removeIf(node -> node.getId().equals(id));
+        }
+        if (CollectionUtils.isNotEmpty(layerList)) {
+            for (Layer layer : layerList) {
+                if (CollectionUtils.isNotEmpty(layer.getNodeList())) {
+                    this.nodeList.removeIf(node -> node.getId().equals(id));
+                }
+            }
+        }
+    }
+
+    public Node getNodeById(String id) {
+        if (CollectionUtils.isNotEmpty(nodeList)) {
+            return this.nodeList.stream().filter(node -> node.getId().equals(id)).findFirst().orElse(null);
+        }
+        return null;
+    }
+
+    public void addLink(Link link) {
+        this.linkList.add(link);
+    }
+
+
+    public List<Node> getNodeList() {
+        List<Node> _nodeList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(this.layerList)) {
+            for (Layer layer : this.layerList) {
+                if (CollectionUtils.isNotEmpty(layer.getNodeList())) {
+                    _nodeList.addAll(layer.getNodeList());
+                }
+            }
+        }
+        if (CollectionUtils.isNotEmpty(this.nodeList)) {
+            _nodeList.addAll(nodeList);
+        }
+        return _nodeList;
+    }
+
+    public List<Link> getOutgoingLinkById(String id) {
+        if (CollectionUtils.isNotEmpty(this.linkList)) {
+            return this.linkList.stream().filter(link -> link.getFrom().equals(id)).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    public List<Link> getIncomingLinkById(String id) {
+        if (CollectionUtils.isNotEmpty(this.linkList)) {
+            return this.linkList.stream().filter(link -> link.getTo().equals(id)).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
 
     public String toString() {
         StringBuilder str = new StringBuilder();
@@ -50,7 +132,7 @@ public class Graphviz {
         str.append("nodesep=.7;\n");
         str.append("size = \"11,8\";\n");
         str.append("edge [arrowhead=\"vee\"];\n");
-        str.append("rankdir=TB;");
+        str.append("rankdir=").append(this.rankdir).append(";");
         str.append("newrank=true;");//关键属性，分层和cluster同时生效
         if (layout.getSupportLayer()) {
             if (CollectionUtils.isNotEmpty(layerList)) {
@@ -92,6 +174,12 @@ public class Graphviz {
 
         List<Node> nodeList = new ArrayList<>();
         LayoutType layout;
+        String rankdir = "TB";
+
+        public Builder withRankdir(String rankdir) {
+            this.rankdir = rankdir;
+            return this;
+        }
 
         public Builder(LayoutType layout) {
             this.layout = layout;

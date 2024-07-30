@@ -28,9 +28,14 @@ public class Layer {
 
     private Layer(Builder builder) {
         nodeList = builder.nodeList;
+        if (CollectionUtils.isNotEmpty(nodeList)) {
+            for (Node node : nodeList) {
+                node.setLayer(this);
+            }
+        }
         this.id = builder.id;
         propMap.put("id", builder.id);
-        if (StringUtils.isNotBlank(builder.label)) {
+        if (builder.label != null) {
             propMap.put("label", builder.label);
         }
         if (StringUtils.isNotBlank(builder.className)) {

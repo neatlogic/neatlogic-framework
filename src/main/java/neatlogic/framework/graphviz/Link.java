@@ -26,6 +26,14 @@ public class Link {
     private final String to;
     private final Map<String, Object> propMap = new HashMap<>();
 
+    public String getFrom() {
+        return from;
+    }
+
+    public String getTo() {
+        return to;
+    }
+
     private Link(Builder builder) {
         this.from = builder.from;
         this.to = builder.to;

@@ -23,14 +23,22 @@ import java.util.*;
 public class Node {
     private final Map<String, String> propMap;
     private final String id;
-    private final int segment;
-    private final static int LABEL_LENGTH = 10;
+    private List<String> className;
+    private Layer layer;
+
+    public Layer getLayer() {
+        return layer;
+    }
+
+    public void setLayer(Layer layer) {
+        this.layer = layer;
+    }
 
     private Node(Builder builder) {
         this.id = builder.id;
         propMap = new HashMap<>();
         propMap.put("id", builder.id);
-        if (StringUtils.isNotBlank(builder.label)) {
+        if (builder.label != null) {
             propMap.put("label", builder.label);
         }
         if (StringUtils.isNotBlank(builder.tooltip)) {
@@ -38,6 +46,7 @@ public class Node {
         }
         if (CollectionUtils.isNotEmpty(builder.className)) {
             propMap.put("class", String.join(" ", builder.className));
+            this.className = builder.className;
         }
         if (StringUtils.isNotBlank(builder.fontcolor)) {
             propMap.put("fontcolor", builder.fontcolor);
@@ -48,12 +57,36 @@ public class Node {
         if (StringUtils.isNotBlank(builder.fontname)) {
             propMap.put("fontname", builder.fontname);
         }
-        this.segment = builder.segment;
+        if (StringUtils.isNotBlank(builder.shape)) {
+            propMap.put("shape", builder.shape);
+        } else {
+            propMap.put("shape", "none");
+        }
+        if (StringUtils.isNotBlank(builder.style)) {
+            propMap.put("style", builder.style);
+        }
+        if (StringUtils.isNotBlank(builder.margin)) {
+            propMap.put("margin", builder.margin);
+        }
+        if (StringUtils.isNotBlank(builder.labelloc)) {
+            propMap.put("labelloc", builder.labelloc);
+        }
+        if (StringUtils.isNotBlank(builder.height)) {
+            propMap.put("height", builder.height);
+        }
+        if (StringUtils.isNotBlank(builder.width)) {
+            propMap.put("width", builder.width);
+        }
     }
 
     public String getId() {
         return id;
     }
+
+    public List<String> getClassName() {
+        return className;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -68,9 +101,6 @@ public class Node {
         return Objects.hash(id);
     }
 
-    private int getSegment() {
-        return segment;
-    }
 
     public String toString() {
         Iterator<String> itKey = propMap.keySet().iterator();
@@ -85,8 +115,7 @@ public class Node {
                     + (value.startsWith("<") ? "" : "\"");
         }
         // lobelloc控制label位置
-        return "\"" + this.id + "\"[shape=\"none\"," + propString + ",labelloc=\"b\",imagepos=\"tc\",height="
-                + (0.85 + 0.4 * segment) + "]";
+        return "\"" + this.id + "\"[" + propString + ",imagepos=\"tc\"]";
     }
 
     public static class Builder {
@@ -97,13 +126,42 @@ public class Node {
         private String fontcolor;
         private String image;
         private String icon;
-        private int segment;
+        private String style;
+        private String shape;
+        private String margin;
+        private String height;
+        private String width;
         private String fontname = "Times";
+        private String labelloc = "b";
 
 
         public Builder(String _id) {
             this.id = _id;
-            //className.add("cinode");
+        }
+
+        public Builder withLabelloc(String _labelloc) {
+            this.labelloc = _labelloc;
+            return this;
+        }
+
+        public Builder withHeight(String _height) {
+            this.height = _height;
+            return this;
+        }
+
+        public Builder withWidth(String _width) {
+            this.width = _width;
+            return this;
+        }
+
+        public Builder withMargin(String _margin) {
+            this.margin = _margin;
+            return this;
+        }
+
+        public Builder withStyle(String _style) {
+            this.style = _style;
+            return this;
         }
 
         public Builder withIcon(String _icon) {
@@ -111,30 +169,15 @@ public class Node {
             return this;
         }
 
+        public Builder withShape(String _shape) {
+            this.shape = _shape;
+            return this;
+        }
+
 
         public Builder withLabel(String _label) {
-            if (StringUtils.isNotBlank(_label)) {
-                _label = _label.trim();
-                /*List<String> labelList = new ArrayList<>();
-                int s = _label.length() / LABEL_LENGTH;
-                for (int i = 0; i < s; i++) {
-                    labelList.add(_label.substring(0, Math.min(LABEL_LENGTH, _label.length())));
-                    _label = _label.substring(Math.min(LABEL_LENGTH, _label.length()));
-                }
-                if (StringUtils.isNotBlank(_label)) {
-                    labelList.add(_label);
-                }
-                StringBuilder returnLabel = new StringBuilder();
-                segment = 0;
-                for (String lb : labelList) {
-                    if (StringUtils.isNotBlank(returnLabel)) {
-                        returnLabel.append("\n");
-                        segment++;
-                    }
-                    returnLabel.append(lb);
-                }*/
-                segment = 0;
-                this.label = _label;//returnLabel.toString();
+            if (_label != null) {
+                this.label = _label.trim();
             }
             return this;
         }

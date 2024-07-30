@@ -49,6 +49,8 @@
         `parent_id` as parentId,
         `worktime_uuid` as worktimeUuid,
         `is_active` as isActive,
+        `upward_id_path` AS upwardIdPath,
+        `upward_name_path` AS upwardNamePath,
         `lft`,
         `rht`
         FROM `region`

@@ -1670,6 +1670,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         DELETE  FROM `user_data` WHERE `user_uuid` = #{value}
     </delete>
 
+    <delete id="deleteUserDataByUserUuidAndType">
+        DELETE  FROM `user_data` WHERE `user_uuid` = #{userUuid} and `type` = #{type}
+    </delete>
+
     <update id="updateUserTokenByUuid">
         update `user`
         set `token` = #{token}

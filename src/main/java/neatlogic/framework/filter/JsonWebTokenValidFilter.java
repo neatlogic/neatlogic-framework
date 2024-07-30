@@ -159,6 +159,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 logger.error(ex.getMessage(), ex);
                 returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, ex.getMessage());
             }
+        } catch (ApiRuntimeException ex) {
+            logger.error(ex.getMessage(), ex);
+            try {
+                // 不返回跳转地址，直接到显示错误信息页面
+                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(), ex.getMessage());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+                throw new ApiRuntimeException(e);
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {

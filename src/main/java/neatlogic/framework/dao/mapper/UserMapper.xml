@@ -807,7 +807,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="getUserDataByUserUuidAndType" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.UserDataVo" useCache="false">
         SELECT `user_uuid` as userUuid,
-               `data`      as data,
+               `data`      as dataStr,
                `type`      as type
         FROM `user_data`
         where `user_uuid` = #{userUuid}
@@ -1381,7 +1381,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertUserData" parameterType="neatlogic.framework.dto.UserDataVo">
         INSERT INTO `user_data` (`user_uuid`, `data`, `type`)
-        VALUES (#{userUuid}, #{data}, #{type})
+        VALUES (#{userUuid}, #{dataStr}, #{type})
     </insert>
 
     <!--<insert id="insertUserAgent" parameterType="neatlogic.framework.dto.UserAgentVo">
@@ -1550,7 +1550,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <update id="updateUserData" parameterType="neatlogic.framework.dto.UserDataVo">
         UPDATE `user_data`
-        SET `data` = #{data}
+        SET `data` = #{dataStr}
         WHERE `user_uuid` = #{userUuid}
           and `type` = #{type}
     </update>
@@ -1668,6 +1668,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <delete id="deleteUserDataByUserUuid" parameterType="java.lang.String">
         DELETE  FROM `user_data` WHERE `user_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteUserDataByUserUuidAndType">
+        DELETE  FROM `user_data` WHERE `user_uuid` = #{userUuid} and `type` = #{type}
     </delete>
 
     <update id="updateUserTokenByUuid">

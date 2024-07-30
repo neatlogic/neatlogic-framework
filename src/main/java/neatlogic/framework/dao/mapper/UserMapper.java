@@ -268,4 +268,6 @@ public interface UserMapper {
     void updateUserTokenByUuid(@Param("token") String token, @Param("uuid") String uuid);
 
     void deleteUserDataByUserUuid(String userUuid);
+
+    void deleteUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
 }

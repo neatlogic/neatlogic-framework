@@ -1,25 +1,26 @@
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
 public class UserDataVo implements Cloneable{
-	@EntityField(name = "用户uuid",
-			type = ApiParamType.STRING)
+	@EntityField(name = "common.useruuid", type = ApiParamType.STRING)
 	private String userUuid;
-	@EntityField(name = "数据",
-			type = ApiParamType.STRING)
-	private String data;
-	@EntityField(name = "功能类型",
-			type = ApiParamType.STRING)
+	@EntityField(name = "common.data", type = ApiParamType.JSONOBJECT)
+	private JSONObject data;
+	@EntityField(name = "common.type", type = ApiParamType.STRING)
 	private String type;
 
+	@JSONField(serialize = false)
+	private String dataStr;
 
 	public UserDataVo() {
 
 	}
 
-	public UserDataVo(String userUuid, String data, String type) {
+	public UserDataVo(String userUuid, JSONObject data, String type) {
 		this.userUuid = userUuid;
 		this.data = data;
 		this.type = type;
@@ -29,7 +30,10 @@ public class UserDataVo implements Cloneable{
 		return userUuid;
 	}
 
-	public String getData() {
+	public JSONObject getData() {
+		if (data == null && dataStr != null) {
+			data = JSONObject.parseObject(dataStr);
+		}
 		return data;
 	}
 
@@ -41,12 +45,23 @@ public class UserDataVo implements Cloneable{
 		this.userUuid = userUuid;
 	}
 
-	public void setData(String data) {
+	public void setData(JSONObject data) {
 		this.data = data;
 	}
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getDataStr() {
+		if (dataStr == null && data != null) {
+			dataStr = data.toJSONString();
+		}
+		return dataStr;
+	}
+
+	public void setDataStr(String dataStr) {
+		this.dataStr = dataStr;
 	}
 
 	public Object clone() throws CloneNotSupportedException{

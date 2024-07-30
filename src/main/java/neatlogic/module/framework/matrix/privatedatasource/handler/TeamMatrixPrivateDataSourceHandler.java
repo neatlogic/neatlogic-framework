@@ -120,10 +120,12 @@ public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSou
                     Map<String, String> newMap = new HashMap<>();
                     for (String column : searchVo.getColumnList()) {
                         Object value = map.get(column);
-                        if (value != null) {
-                            newMap.put(columnsMap.get(column), value.toString());
-                        } else {
-                            newMap.put(columnsMap.get(column), "");
+                        if (value == null) {
+                            value = "";
+                        }
+                        newMap.put(columnsMap.get(column), value.toString());
+                        if (Objects.equals(column, "uuid")) {
+                            newMap.put("uuid", value.toString());
                         }
                     }
                     resultList.add(newMap);

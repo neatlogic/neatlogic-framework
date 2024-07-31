@@ -30,6 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,7 +82,12 @@ public class DataSourceVo extends BasePageVo {
     private List<DataSourceParamVo> paramList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
     @EntityField(name = "nfdd.datasourcevo.entityfield.name.dbtype", type = ApiParamType.STRING)
     private String dbType;
-
+    @EntityField(name = "common.lastfiretime", type = ApiParamType.LONG)
+    private Date lastFireTime;
+    @EntityField(name = "common.lastfinishtime", type = ApiParamType.LONG)
+    private Date lastFinishTime;
+    @EntityField(name = "common.nextfiretime", type = ApiParamType.LONG)
+    private Date nextFireTime;
 
     public DataSourceVo() {
 
@@ -337,5 +343,29 @@ public class DataSourceVo extends BasePageVo {
 
     public void setDbType(String dbType) {
         this.dbType = dbType;
+    }
+
+    public Date getLastFireTime() {
+        return lastFireTime;
+    }
+
+    public void setLastFireTime(Date lastFireTime) {
+        this.lastFireTime = lastFireTime;
+    }
+
+    public Date getLastFinishTime() {
+        return lastFinishTime;
+    }
+
+    public void setLastFinishTime(Date lastFinishTime) {
+        this.lastFinishTime = lastFinishTime;
+    }
+
+    public Date getNextFireTime() {
+        return nextFireTime;
+    }
+
+    public void setNextFireTime(Date nextFireTime) {
+        this.nextFireTime = nextFireTime;
     }
 }

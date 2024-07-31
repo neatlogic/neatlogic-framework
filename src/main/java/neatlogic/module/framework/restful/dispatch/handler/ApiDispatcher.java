@@ -458,7 +458,7 @@ public class ApiDispatcher {
             }
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", $.t(ex.getMessage(), ex.getValues()));
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             response.setStatus(ResponseCode.EXCEPTION.getCode());
             returnObj.put("Status", "ERROR");
             returnObj.put("Message", ExceptionUtils.getStackTrace(ex));

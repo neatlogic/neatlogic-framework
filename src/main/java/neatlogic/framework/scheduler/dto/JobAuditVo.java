@@ -105,6 +105,8 @@ public class JobAuditVo extends BasePageVo {
     private String cron;
     @EntityField(name = "下次激活时间", type = ApiParamType.LONG)
     private Date nextFireTime;
+    @EntityField(name = "作业组名", type = ApiParamType.STRING)
+    private String jobGroupName;
 
     public JobAuditVo() {
         this.setPageSize(20);
@@ -224,5 +226,13 @@ public class JobAuditVo extends BasePageVo {
 
     public void setNextFireTime(Date nextFireTime) {
         this.nextFireTime = nextFireTime;
+    }
+
+    public String getJobGroupName() {
+        return jobGroupName;
+    }
+
+    public void setJobGroupName(String jobGroupName) {
+        this.jobGroupName = jobGroupName;
     }
 }

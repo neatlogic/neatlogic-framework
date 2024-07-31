@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.scheduler.core;
 
+import com.alibaba.fastjson.JSON;
 import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -31,6 +32,7 @@ import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.scheduler.exception.ScheduleIllegalParameterException;
 import neatlogic.framework.scheduler.exception.ScheduleParamNotExistsException;
 import neatlogic.framework.transaction.util.TransactionUtil;
+import neatlogic.framework.util.ConcurrentFixedSizeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
@@ -70,6 +72,8 @@ public abstract class JobBase implements IJob {
 
     private static TransactionUtil transactionUtil;
 
+    private static final ConcurrentFixedSizeMap<Long, String> auditIdServerIdScheduleGroupNameMap = new ConcurrentFixedSizeMap<>(1000);
+
     @Autowired
     public void setTransactionUtil(TransactionUtil _transactionUtil) {
         transactionUtil = _transactionUtil;
@@ -103,7 +107,7 @@ public abstract class JobBase implements IJob {
                 jobLockVo.setLock(JobLockVo.RUNNING);
                 schedulerMapper.updateJobLock(jobLockVo);
             }
-        }finally {
+        } finally {
             transactionUtil.commitTx(ts);
         }
         return jobLockVo;
@@ -115,7 +119,7 @@ public abstract class JobBase implements IJob {
         try {
             schedulerMapper.updateJobStatus(jobStatusVo);
             schedulerMapper.updateJobLock(jobLockVo);
-        }finally {
+        } finally {
             transactionUtil.commitTx(ts);
         }
     }
@@ -149,7 +153,7 @@ public abstract class JobBase implements IJob {
         String jobGroup = jobKey.getGroup();
         String tenantUuid = jobObject.getTenantUuid();
         //如果租户不存在则不执行该租户的作业
-        if(!TenantUtil.hasTenant(tenantUuid)){
+        if (!TenantUtil.hasTenant(tenantUuid)) {
             return;
         }
         // 从job组名中获取租户uuid,切换到租户的数据源
@@ -196,11 +200,23 @@ public abstract class JobBase implements IJob {
                 isAudit = jobHandler.isAudit();
             }
             // 如果作业存在并且设置为需要审计
-            if (isAudit) {
+            if (Boolean.TRUE.equals(isAudit)) {
                 JobAuditVo auditVo = new JobAuditVo(jobName, Config.SCHEDULE_SERVER_ID);
                 auditVo.setStatus(JobAuditVo.Status.RUNNING.getValue());
                 auditVo.setCron(jobObject.getCron());
                 auditVo.setNextFireTime(context.getNextFireTime());
+                auditVo.setJobGroupName(jobGroup);
+                auditVo.setStartTime(new Date());
+                String scheduleAuditStr = JSON.toJSONString(auditVo);
+                if (auditIdServerIdScheduleGroupNameMap.containsKey(auditVo.getId())) {
+                    logger.error("AuditId is repeat,auditId:{},serverId:{},preSchedule:{},nowSchedule:{}",
+                            auditVo.getId(),
+                            Config.SCHEDULE_SERVER_ID,
+                            auditIdServerIdScheduleGroupNameMap.get(auditVo.getId()),
+                            scheduleAuditStr);
+                } else {
+                    auditIdServerIdScheduleGroupNameMap.put(auditVo.getId(), scheduleAuditStr);
+                }
                 schedulerMapper.insertJobAudit(auditVo);
                 jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
                 try {

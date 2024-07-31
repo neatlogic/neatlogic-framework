@@ -272,7 +272,9 @@
         ON DUPLICATE KEY
             UPDATE `name`             = #{name},
                    `worktime_uuid`    = #{workTimeUuid},
-                   `is_active`        = #{isActive}
+                   `is_active`        = #{isActive},
+                   `upward_id_path`   = #{upwardIdPath},
+                   `upward_name_path` = #{upwardNamePath}
     </insert>
     <insert id="insertRegionTeam">
         insert into `region_team` (`region_id`, `team_uuid`, `checked_children`,`update_time`)

@@ -217,7 +217,12 @@ public abstract class JobBase implements IJob {
                 } else {
                     auditIdServerIdScheduleGroupNameMap.put(auditVo.getId(), scheduleAuditStr);
                 }
-                schedulerMapper.insertJobAudit(auditVo);
+                // TODO 临时解决多节点时生成重复雪花id（没法重现 疑难杂症）
+                try {
+                    schedulerMapper.insertJobAudit(auditVo);
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
                 jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
                 try {
                     jobHandler.executeInternal(context, jobObject);

@@ -24,19 +24,19 @@ public class ParamNotExistsException extends ApiRuntimeException {
     private static final long serialVersionUID = -2608671566655133328L;
 
     public ParamNotExistsException(String paramNames) {
-        super("参数：“{0}”不能为空",paramNames);
+        super("参数“{0}”不能为空",paramNames);
     }
 
     public ParamNotExistsException(int index, String keyName) {
-        super("第：{0}个参数的“{2}”不能为空", index, keyName);
+        super("第{0}个参数的“{2}”不能为空", index, keyName);
     }
 
     public ParamNotExistsException(int index, String paramName, String keyName) {
-        super("第：{0}个参数“{1}”的“{2}”不能为空", index, paramName, keyName);
+        super("第{0}个参数“{1}”的“{2}”不能为空", index, paramName, keyName);
     }
 
     public ParamNotExistsException(String... paramNames) {
-        super("参数：“{0}”不能同时为空", String.join("、", paramNames));
+        super("参数“{0}”不能同时为空", String.join("、", paramNames));
     }
 
     public ParamNotExistsException(List<String> eitherParamList, List<String> orParamList) {

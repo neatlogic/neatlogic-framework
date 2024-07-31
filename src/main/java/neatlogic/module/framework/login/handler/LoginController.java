@@ -168,8 +168,10 @@ public class LoginController {
                     String timezone = "+8:00";
                     authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
-                    for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                        loginPostProcessor.loginAfterInitialization();
+                    if (TenantContext.get().getTenantUuid() != null) {
+                        for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                            loginPostProcessor.loginAfterInitialization();
+                        }
                     }
                 }
             }

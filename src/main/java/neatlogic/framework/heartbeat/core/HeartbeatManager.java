@@ -17,12 +17,16 @@ package neatlogic.framework.heartbeat.core;
 
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.dao.mapper.TenantMapper;
+import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.heartbeat.dao.mapper.ServerMapper;
+import neatlogic.framework.heartbeat.dao.mapper.TenantServerMapper;
 import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
@@ -40,8 +44,18 @@ import java.util.concurrent.TimeUnit;
 @RootComponent
 public class HeartbeatManager extends ModuleInitializedListenerBase {
     private final Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
+
+    // 记录服务器启动时间
+    private final static Date START_TIME = new Date();
+
     @Autowired
     private ServerMapper serverMapper;
+
+    @Autowired
+    private TenantServerMapper tenantServerMapper;
+
+    @Autowired
+    private TenantMapper tenantMapper;
 
     @Autowired
     private TransactionUtil transactionUtil;//强迫TransactionUtil先加载，否则可能会出现空指针
@@ -60,6 +74,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         server.setHeartbeatRate(Config.SERVER_HEARTBEAT_RATE());
         server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
         serverMapper.insertServer(server);
+        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
@@ -96,6 +111,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                         }
                     }
                     serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
+                    serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
+                    insertTenantServerRunTime();
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }
@@ -133,6 +150,15 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             serverMapper.deleteCounterByToServerId(serverId);
         }
         return returnVal;
+    }
+
+    private void insertTenantServerRunTime() {
+        List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
+        for (TenantVo tenantVo : tenantList) {
+            TenantContext.get().switchTenant(tenantVo.getUuid());
+            tenantServerMapper.insertTenantServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
+        }
+        TenantContext.get().setUseDefaultDatasource(true);
     }
 
     @Override

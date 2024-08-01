@@ -78,6 +78,12 @@
 		ON DUPLICATE KEY UPDATE `counter` = `counter` + 1
 	</insert>
 
+	<insert id="insertServerRunTime">
+		INSERT INTO `server_run_time`(`server_id`, `start_time`, `heartbeat_time`)
+		VALUES(#{serverId}, #{startTime}, NOW(3))
+		ON DUPLICATE KEY UPDATE `heartbeat_time` = NOW(3)
+	</insert>
+
 	<delete id="deleteCounterByToServerId" parameterType="java.lang.Integer">
 		DELETE FROM `server_counter` WHERE `to_server_id` = #{value}
 	</delete>

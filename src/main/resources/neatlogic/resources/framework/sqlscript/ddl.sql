@@ -1340,3 +1340,13 @@ CREATE TABLE IF NOT EXISTS `home_page_authority` (
   `uuid` char(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'UUID',
   PRIMARY KEY (`home_page_id`,`type`,`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='首页设置授权表';
+
+-- ----------------------------
+-- Table structure for tenant_server_run_time
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `tenant_server_run_time` (
+  `start_time` TIMESTAMP(3) NOT NULL COMMENT '服务器启动时间',
+  `server_id` INT NOT NULL COMMENT '服务器ID',
+  `heartbeat_time` TIMESTAMP(3) NOT NULL COMMENT '心跳时间',
+  PRIMARY KEY (`start_time`,`server_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='租户服务器运行时间表';

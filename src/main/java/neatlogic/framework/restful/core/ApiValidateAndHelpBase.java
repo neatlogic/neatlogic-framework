@@ -23,12 +23,14 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.core.AuthAction;
 import neatlogic.framework.auth.core.AuthActionChecker;
+import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.dto.api.CacheControlVo;
+import neatlogic.framework.exception.auth.AuthNotFoundException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.type.*;
 import neatlogic.framework.file.core.AuditType;
@@ -276,8 +278,13 @@ public class ApiValidateAndHelpBase {
                             isAuth = true;
                             break;
                         }
+                        AuthBase a = AuthFactory.getAuthInstance(action.action().getSimpleName());
+                        if (a != null) {
+                            authNameList.add($.t(a.getAuthDisplayName()));
+                        } else {
+                            throw new AuthNotFoundException(action.action().getSimpleName());
+                        }
                     }
-                    authNameList.add($.t(AuthFactory.getAuthInstance(action.action().getSimpleName()).getAuthDisplayName()));
                 }
             } else {
                 isAuth = true;

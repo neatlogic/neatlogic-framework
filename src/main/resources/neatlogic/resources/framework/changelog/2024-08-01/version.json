@@ -1,0 +1,10 @@
+{
+  "content":[
+    {
+      "type":"新增功能",
+      "detail":[
+        {"msg":"1.增加记录服务器运行时间表server_run_time"}
+      ]
+    }
+  ]
+}

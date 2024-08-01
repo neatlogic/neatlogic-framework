@@ -174,7 +174,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         expire_count as expireCount,
         expire_unit as expireUnit,
         cron_expression as cronExpression,
-        is_active as isActive
+        is_active as isActive,
+        last_fire_time as lastFireTime,
+        last_finish_time as lastFinishTime,
+        next_fire_time as nextFireTime
         from datawarehouse_datasource
         <include refid="searchReportDataSourceSql"></include>
         order by id desc
@@ -348,6 +351,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             config       = #{configStr,typeHandler=CompressHandler},
             input_type   = #{inputType}
         where id = #{id}
+    </update>
+
+    <update id="updateDataSourceJobTimeById" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceVo">
+        UPDATE `datawarehouse_datasource`
+        SET
+            `last_fire_time` = #{lastFireTime},
+            `last_finish_time` = #{lastFinishTime},
+            `next_fire_time` = #{nextFireTime}
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateDataSourceNextFireTimeById">
+        UPDATE `datawarehouse_datasource`
+        SET
+            `next_fire_time` = #{nextFireTime}
+        WHERE `id` = #{id}
     </update>
 
     <insert id="insertDataSourceParam" parameterType="neatlogic.framework.datawarehouse.dto.DataSourceParamVo">

@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -90,6 +91,10 @@ public class ReportDataSourceJob extends JobBase {
         Long datasourceId = (Long) jobObject.getData("datasourceId");
         DataSourceVo reportDataSourceVo = reportDataSourceMapper.getDataSourceById(datasourceId);
         reportDataSourceService.executeReportDataSource(reportDataSourceVo);
+        reportDataSourceVo.setLastFireTime(context.getFireTime());
+        reportDataSourceVo.setLastFinishTime(new Date());
+        reportDataSourceVo.setNextFireTime(context.getNextFireTime());
+        reportDataSourceMapper.updateDataSourceJobTimeById(reportDataSourceVo);
     }
 
 

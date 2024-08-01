@@ -21,6 +21,7 @@ import neatlogic.framework.util.I18n;
 public enum Status {
     DOING("doing", new I18n("同步数据中")),
     DONE("done", new I18n("同步完成")),
+    ABORTED("aborted", new I18n("同步已中止")),
     FAILED("failed", new I18n("同步失败"));
 
     private final String value;

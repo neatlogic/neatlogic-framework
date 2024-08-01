@@ -105,10 +105,13 @@ CREATE TABLE IF NOT EXISTS `datawarehouse_datasource`  (
   `mode` enum('replace','append') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新模式，追加或替换',
   `expire_count` int NULL DEFAULT NULL COMMENT '过期数值',
   `module_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '所属模块',
-  `status` enum('doing','done','failed') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '同步状态',
+  `status` enum('doing','done','failed','aborted') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '同步状态',
   `data_count` int NULL DEFAULT NULL COMMENT '数据量',
   `expire_unit` enum('minute','hour','day','month','year') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '过期单位',
   `db_type` enum('mysql','mongodb') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'mysql' COMMENT '数据库类型',
+  `last_fire_time` timestamp(3) NULL DEFAULT NULL COMMENT '最后一次激活时间',
+  `last_finish_time` timestamp(3) NULL DEFAULT NULL COMMENT '最后一次完成时间',
+  `next_fire_time` timestamp(3) NULL DEFAULT NULL COMMENT '下一次激活时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_name`(`name`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '数据仓库-数据源';
@@ -1340,3 +1343,13 @@ CREATE TABLE IF NOT EXISTS `home_page_authority` (
   `uuid` char(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT 'UUID',
   PRIMARY KEY (`home_page_id`,`type`,`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='首页设置授权表';
+
+-- ----------------------------
+-- Table structure for tenant_server_run_time
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS `tenant_server_run_time` (
+  `start_time` TIMESTAMP(3) NOT NULL COMMENT '服务器启动时间',
+  `server_id` INT NOT NULL COMMENT '服务器ID',
+  `heartbeat_time` TIMESTAMP(3) NOT NULL COMMENT '心跳时间',
+  PRIMARY KEY (`start_time`,`server_id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='租户服务器运行时间表';

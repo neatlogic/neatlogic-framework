@@ -356,7 +356,7 @@ public class FormUtil {
                 uuid = sceneObj.getString("uuid");
                 if (Objects.equals(uuid, sceneUuid)) {
                     tableList = sceneObj.getJSONArray("tableList");
-                    parent = new FormAttributeParentVo(uuid, sceneObj.getString("name"), null);
+                    parent = new FormAttributeParentVo(uuid, sceneObj.getString("name"), "scene",null);
                 }
             }
         }
@@ -436,14 +436,14 @@ public class FormUtil {
             resultList.add(formAttribute);
         }
         if (Objects.equals(FormHandler.FORMTABLEINPUTER.getHandler(), handler)) {
-            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), FormHandler.FORMTABLEINPUTER.getHandler(), parent);
             JSONObject config = componentObj.getJSONObject("config");
             JSONArray dataConfigList = config.getJSONArray("dataConfig");
             for (int i = 0; i < dataConfigList.size(); i++) {
                 JSONObject dataObj = dataConfigList.getJSONObject(i);
                 resultList.addAll(getFormAttributeList(dataObj, parent2));
                 if (Objects.equals("formtable", dataObj.getString("handler"))) {
-                    FormAttributeParentVo parent3 = new FormAttributeParentVo(dataObj.getString("uuid"), dataObj.getString("label"), parent2);
+                    FormAttributeParentVo parent3 = new FormAttributeParentVo(dataObj.getString("uuid"), dataObj.getString("label"), "formtable", parent2);
                     JSONObject config2 = dataObj.getJSONObject("config");
                     if (MapUtils.isNotEmpty(config2)) {
                         JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
@@ -457,7 +457,7 @@ public class FormUtil {
                 }
             }
         } else if (Objects.equals(FormHandler.FORMTABLESELECTOR.getHandler(), handler)) {
-            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), FormHandler.FORMTABLESELECTOR.getHandler(), parent);
             JSONObject config = componentObj.getJSONObject("config");
             JSONArray dataConfigList = config.getJSONArray("dataConfig");
             for (int i = 0; i < dataConfigList.size(); i++) {
@@ -465,7 +465,7 @@ public class FormUtil {
                 resultList.addAll(getFormAttributeList(dataObj, parent2));
             }
         } else if (Objects.equals(FormHandler.FORMSUBASSEMBLY.getHandler(), handler)) {
-            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+            FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), FormHandler.FORMSUBASSEMBLY.getHandler(), parent);
             JSONObject formData = componentObj.getJSONObject("formData");
             if (MapUtils.isNotEmpty(formData)) {
                 JSONObject formConfig = formData.getJSONObject("formConfig");
@@ -477,7 +477,7 @@ public class FormUtil {
         } else {
             JSONArray componentArray = componentObj.getJSONArray("component");
             if (CollectionUtils.isNotEmpty(componentArray)) {
-                FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), parent);
+                FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), componentObj.getString("handler"), parent);
                 for (int i = 0; i < componentArray.size(); i++) {
                     JSONObject component = componentArray.getJSONObject(i);
                     if (MapUtils.isNotEmpty(component)) {

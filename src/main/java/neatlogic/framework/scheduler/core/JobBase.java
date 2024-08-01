@@ -15,7 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.scheduler.core;
 
-import com.alibaba.fastjson.JSON;
 import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -32,7 +31,6 @@ import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.scheduler.exception.ScheduleIllegalParameterException;
 import neatlogic.framework.scheduler.exception.ScheduleParamNotExistsException;
 import neatlogic.framework.transaction.util.TransactionUtil;
-import neatlogic.framework.util.ConcurrentFixedSizeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
@@ -71,8 +69,6 @@ public abstract class JobBase implements IJob {
     protected static SchedulerManager schedulerManager;
 
     private static TransactionUtil transactionUtil;
-
-    private static final ConcurrentFixedSizeMap<Long, String> auditIdServerIdScheduleGroupNameMap = new ConcurrentFixedSizeMap<>(1000);
 
     @Autowired
     public void setTransactionUtil(TransactionUtil _transactionUtil) {
@@ -205,24 +201,7 @@ public abstract class JobBase implements IJob {
                 auditVo.setStatus(JobAuditVo.Status.RUNNING.getValue());
                 auditVo.setCron(jobObject.getCron());
                 auditVo.setNextFireTime(context.getNextFireTime());
-                auditVo.setJobGroupName(jobGroup);
-                auditVo.setStartTime(new Date());
-                String scheduleAuditStr = JSON.toJSONString(auditVo);
-                if (auditIdServerIdScheduleGroupNameMap.containsKey(auditVo.getId())) {
-                    logger.error("AuditId is repeat,auditId:{},serverId:{},preSchedule:{},nowSchedule:{}",
-                            auditVo.getId(),
-                            Config.SCHEDULE_SERVER_ID,
-                            auditIdServerIdScheduleGroupNameMap.get(auditVo.getId()),
-                            scheduleAuditStr);
-                } else {
-                    auditIdServerIdScheduleGroupNameMap.put(auditVo.getId(), scheduleAuditStr);
-                }
-                // TODO 临时解决多节点时生成重复雪花id（没法重现 疑难杂症）
-                try {
-                    schedulerMapper.insertJobAudit(auditVo);
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
+                schedulerMapper.insertJobAudit(auditVo);
                 jobDetail.getJobDataMap().put("jobAuditVo", auditVo);
                 try {
                     jobHandler.executeInternal(context, jobObject);

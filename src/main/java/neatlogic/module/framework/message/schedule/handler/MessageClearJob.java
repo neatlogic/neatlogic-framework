@@ -24,9 +24,9 @@ import org.quartz.CronExpression;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -34,7 +34,7 @@ import java.util.Date;
 @DisallowConcurrentExecution
 public class MessageClearJob extends JobBase {
 
-    @Autowired
+    @Resource
     private MessageMapper messageMapper;
 
     private final String cron = "0 0 4 * * ?";

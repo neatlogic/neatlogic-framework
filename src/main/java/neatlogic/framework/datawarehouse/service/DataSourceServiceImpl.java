@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -216,10 +217,12 @@ public class DataSourceServiceImpl implements DataSourceService {
                 .withCron(dataSourceVo.getCronExpression())
                 .addData("datasourceId", dataSourceVo.getId())
                 .build();
-        if (StringUtils.isNotBlank(dataSourceVo.getCronExpression())) {
-            schedulerManager.loadJob(jobObject);
+        if (Objects.equals(dataSourceVo.getIsActive(), 1) && StringUtils.isNotBlank(dataSourceVo.getCronExpression())) {
+            Date nextFireTime = schedulerManager.loadJob(jobObject);
+            dataSourceMapper.updateDataSourceNextFireTimeById(dataSourceVo.getId(), nextFireTime);
         } else {
             schedulerManager.unloadJob(jobObject);
+            dataSourceMapper.updateDataSourceNextFireTimeById(dataSourceVo.getId(), null);
         }
     }
 

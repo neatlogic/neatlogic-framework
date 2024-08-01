@@ -20,6 +20,7 @@ import neatlogic.framework.datawarehouse.dto.DataSourceParamVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface DataWarehouseDataSourceMapper {
@@ -78,6 +79,10 @@ public interface DataWarehouseDataSourceMapper {
     void updateReportDataSourceConditionValue(DataSourceParamVo dataSourceConditionVo);
 
     void resetReportDataSourceStatus();
+
+    void updateDataSourceJobTimeById(DataSourceVo dataSourceVo);
+
+    void updateDataSourceNextFireTimeById(@Param("id") Long id, @Param("nextFireTime") Date nextFireTime);
 
     void deleteReportDataSourceById(Long id);
 

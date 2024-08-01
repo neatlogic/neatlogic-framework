@@ -1,11 +1,11 @@
 package neatlogic.framework.heartbeat.dao.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
 import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.heartbeat.dto.ServerCounterVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
 
 public interface ServerMapper {
 	//SELECT
@@ -27,7 +27,8 @@ public interface ServerMapper {
 	int insertServer(ServerClusterVo server);
 
 	int insertServerCounter(ServerCounterVo serverCounter);
-	
+
+	int insertServerRunTime(@Param("serverId") Integer serverId, @Param("startTime") Date startTime);
 	//DELETE
 	int deleteCounterByToServerId(int serverId);
 }

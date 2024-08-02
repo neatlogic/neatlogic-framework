@@ -121,6 +121,7 @@
         VALUES (#{id}, #{name}, #{isActive}, #{sort}, #{configStr})
         ON DUPLICATE KEY
         UPDATE `config` = #{configStr},
+                `name` = #{name},
                `is_active` = #{isActive}
     </insert>
 

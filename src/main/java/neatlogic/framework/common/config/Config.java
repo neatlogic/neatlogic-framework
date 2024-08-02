@@ -131,7 +131,7 @@ public class Config {
 
     private static boolean ENABLE_METHOD_TIMING_ASPECT;// 启动方法执行耗时日志
 
-    public static int SQLRUNNER_QUERY_TIMEOUT; //sql执行超时时间设置，目前就报表会用到
+    public static int SQLRUNNER_QUERY_TIMEOUT; //sql执行超时时间(s)设置，目前就报表会用到
 
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");

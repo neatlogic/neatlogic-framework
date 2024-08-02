@@ -28,6 +28,7 @@ import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.common.util.IpUtil;
+import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.auth.AuthNotFoundException;
@@ -252,7 +253,15 @@ public class ApiValidateAndHelpBase {
                         if (a != null) {
                             authNameList.add($.t(a.getAuthDisplayName()));
                         } else {
-                            throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
+                            try {
+                                AuthBase authGroup = action.action().newInstance();
+                                //排除接口用了没加载的模块权限时，找不到权限的情况
+                                if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
+                                    throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
+                                }
+                            }catch (Exception t){
+                                logger.error(t.getMessage(),t);
+                            }
                         }
                     }
                 }
@@ -287,7 +296,15 @@ public class ApiValidateAndHelpBase {
                         if (a != null) {
                             authNameList.add($.t(a.getAuthDisplayName()));
                         } else {
-                            throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
+                            try {
+                                AuthBase authGroup = action.action().newInstance();
+                                //排除接口用了没加载的模块权限时，找不到权限的情况
+                                if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
+                                    throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
+                                }
+                            }catch (Exception t){
+                                logger.error(t.getMessage(),t);
+                            }
                         }
                     }
                 }

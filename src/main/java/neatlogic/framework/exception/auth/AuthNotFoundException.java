@@ -7,6 +7,10 @@ public class AuthNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 2541167837356991977L;
 
     public AuthNotFoundException(String authName) {
-        super("权限“{0}”不存在", authName);
+        super("nfea.authnotfoundexception.authnotfoundexception.authname", authName);
+    }
+
+    public AuthNotFoundException(String apiName, String authName) {
+        super("nfea.authnotfoundexception.authnotfoundexception.apiauthname", apiName, authName);
     }
 }

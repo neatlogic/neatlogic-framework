@@ -248,8 +248,13 @@ public class ApiValidateAndHelpBase {
                             isAuth = true;
                             break;
                         }
+                        AuthBase a = AuthFactory.getAuthInstance(action.action().getSimpleName());
+                        if (a != null) {
+                            authNameList.add($.t(a.getAuthDisplayName()));
+                        } else {
+                            throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
+                        }
                     }
-                    authNameList.add($.t(AuthFactory.getAuthInstance(action.action().getSimpleName()).getAuthDisplayName()));
                 }
             } else {
                 isAuth = true;
@@ -282,7 +287,7 @@ public class ApiValidateAndHelpBase {
                         if (a != null) {
                             authNameList.add($.t(a.getAuthDisplayName()));
                         } else {
-                            throw new AuthNotFoundException(action.action().getSimpleName());
+                            throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
                         }
                     }
                 }

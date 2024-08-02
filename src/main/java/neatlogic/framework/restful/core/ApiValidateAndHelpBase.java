@@ -255,7 +255,7 @@ public class ApiValidateAndHelpBase {
                         } else {
                             try {
                                 AuthBase authGroup = action.action().newInstance();
-                                //排除接口用了没加载的模块权限时，找不到权限的情况
+                                //排除接口用了没加载模块的权限时，找不到权限的情况
                                 if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
                                     throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
                                 }
@@ -298,7 +298,7 @@ public class ApiValidateAndHelpBase {
                         } else {
                             try {
                                 AuthBase authGroup = action.action().newInstance();
-                                //排除接口用了没加载的模块权限时，找不到权限的情况
+                                //排除接口用了没加载模块的权限时，找不到权限的情况
                                 if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
                                     throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
                                 }

@@ -131,6 +131,8 @@ public class Config {
 
     private static boolean ENABLE_METHOD_TIMING_ASPECT;// 启动方法执行耗时日志
 
+    public static int SQLRUNNER_QUERY_TIMEOUT; //sql执行超时时间设置，目前就报表会用到
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -429,6 +431,10 @@ public class Config {
     public static boolean ENABLE_METHOD_TIMING_ASPECT() {
         return ENABLE_METHOD_TIMING_ASPECT;
     }
+
+    public static Integer SQLRUNNER_QUERY_TIMEOUT() {
+        return SQLRUNNER_QUERY_TIMEOUT;
+    }
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -560,6 +566,7 @@ public class Config {
             MOBILE_IS_ONLINE = Boolean.parseBoolean(prop.getProperty("mobile.is.online", "false"));
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
+            SQLRUNNER_QUERY_TIMEOUT = Integer.parseInt(prop.getProperty("sqlrunner.query.timeout", "30"));
             ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "neatlogic");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.sqlrunner;
 
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.plugin.LimitInterceptor;
 import neatlogic.framework.dao.plugin.PageInterceptor;
 import neatlogic.framework.dao.plugin.PageRowBounds;
@@ -82,6 +83,7 @@ public class SqlRunner {
         configuration.addInterceptor(new PageInterceptor());
         Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
         configuration.setEnvironment(environment);
+        configuration.setDefaultStatementTimeout(Config.SQLRUNNER_QUERY_TIMEOUT());
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOCTYPE);
         stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");

@@ -114,4 +114,14 @@ public interface IConditionHandler {
         return null;
     }
 
+    /**
+     * 是否显示，目前控制前端条件在页面中是否显示
+     *
+     * @param jsonObj 参数
+     * @param type 类型，如workcenter
+     */
+    default boolean isShow(JSONObject jsonObj,String type) {
+        return true;
+    }
+
 }

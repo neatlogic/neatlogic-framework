@@ -577,6 +577,7 @@ public class HttpRequestUtil {
 
     public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
+        DataInputStream input = null;
         if (connection != null) {
             try {
                 if (Objects.equals(this.method, "POST")) {
@@ -602,7 +603,7 @@ public class HttpRequestUtil {
                 // 处理返回值
                 this.responseCode = connection.getResponseCode();
                 if (100 <= this.responseCode && this.responseCode <= 399) {
-                    DataInputStream input = new DataInputStream(connection.getInputStream());
+                    input = new DataInputStream(connection.getInputStream());
                     if (this.outputStream == null) {
                         StringWriter writer = new StringWriter();
                         InputStreamReader reader = new InputStreamReader(input, this.charset);
@@ -613,7 +614,7 @@ public class HttpRequestUtil {
                         this.outputStream.flush();
                     }
                 } else {
-                    DataInputStream input = new DataInputStream(connection.getErrorStream());
+                    input = new DataInputStream(connection.getErrorStream());
                     StringWriter writer = new StringWriter();
                     InputStreamReader reader = new InputStreamReader(input, this.charset);
                     IOUtils.copy(reader, writer);
@@ -638,6 +639,8 @@ public class HttpRequestUtil {
                 if (UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
                     resetResponse(UserContext.get().getResponse());
                 }
+                IOUtils.closeQuietly(input); // 关闭输入流
+                IOUtils.closeQuietly(this.outputStream); // 关闭输出流
             }
         }
         return this;

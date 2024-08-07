@@ -341,7 +341,18 @@
     <select id="getDynamicTableDataListCount" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
-        COUNT(1)
+        <choose>
+            <when test="isDistinct != null and isDistinct">
+                COUNT(DISTINCT
+                <foreach collection="columnList" item="column" open=" " separator=",">
+                    a.`${column}`
+                </foreach>
+                )
+            </when>
+            <otherwise>
+                COUNT(1)
+            </otherwise>
+        </choose>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
     </select>
@@ -349,13 +360,25 @@
     <select id="getDynamicTableDataList" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT
-        a.`uuid`,
-        <foreach collection="columnList" item="column" separator=",">
-            a.`${column}`
-        </foreach>
+        <choose>
+            <when test="isDistinct != null and isDistinct">
+                DISTINCT
+                <foreach collection="columnList" item="column" open=" " separator=",">
+                    a.`${column}`
+                </foreach>
+            </when>
+            <otherwise>
+                a.`uuid`,
+                <foreach collection="columnList" item="column" separator=",">
+                    a.`${column}`
+                </foreach>
+            </otherwise>
+        </choose>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
+        <if test="isDistinct == null or !isDistinct">
         ORDER BY a.`sort` DESC
+        </if>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

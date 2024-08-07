@@ -61,11 +61,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </foreach>
         </if>
         <choose>
-            <when test="limit > 0">
-                limit #{limit}
+            <when test="limit != null">
+                <if test="limit > 0">
+                    limit #{limit}
+                </if>
             </when>
             <otherwise>
-                limit #{startNum},#{pageSize}
+                limit #{startNum}, #{pageSize}
             </otherwise>
         </choose>
     </select>

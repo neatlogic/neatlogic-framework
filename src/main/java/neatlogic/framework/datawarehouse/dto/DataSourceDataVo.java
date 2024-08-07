@@ -48,7 +48,7 @@ public class DataSourceDataVo extends BasePageVo {
     @JSONField(serialize = false)
     private List<DataSourceFieldSortVo> sortList;//排序设置
     @JSONField(serialize = false)
-    private int limit;//限制返回行数，0代表不限制
+    private Integer limit;//限制返回行数，0代表不限制
 
     public void addField(DataSourceFieldVo fieldVo) {
         if (fieldList == null) {
@@ -68,11 +68,11 @@ public class DataSourceDataVo extends BasePageVo {
     }
 
 
-    public int getLimit() {
+    public Integer getLimit() {
         return limit;
     }
 
-    public void setLimit(int limit) {
+    public void setLimit(Integer limit) {
         this.limit = limit;
     }
 

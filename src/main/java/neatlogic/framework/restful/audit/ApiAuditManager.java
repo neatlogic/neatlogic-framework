@@ -16,22 +16,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.restful.audit;
 
 import neatlogic.framework.restful.dto.ApiAuditVo;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-
-@Component
+@Deprecated
+//@Component
 public class ApiAuditManager {
     public final static int THREAD_COUNT = 3;
     private final static int QUEUE_SIZE = 512;
 
     private static List<BlockingQueue<ApiAuditVo>> queueList = new ArrayList<>();
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         for (int i = 0; i < THREAD_COUNT; i++) {
             BlockingQueue<ApiAuditVo> queue = new ArrayBlockingQueue<>(QUEUE_SIZE, true);

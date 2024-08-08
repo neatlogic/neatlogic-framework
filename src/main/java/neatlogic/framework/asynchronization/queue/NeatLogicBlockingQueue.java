@@ -29,8 +29,8 @@ public class NeatLogicBlockingQueue<T> {
         this.blockingQueue = _blockingQueue;
     }
 
-    public boolean offer(T id) {
-        return blockingQueue.offer(new Task<>(id));
+    public boolean offer(T t) {
+        return blockingQueue.offer(new Task<>(t));
     }
 
     public T take() throws InterruptedException {

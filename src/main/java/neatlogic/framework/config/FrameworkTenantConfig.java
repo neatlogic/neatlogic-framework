@@ -21,8 +21,6 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     API_QPS("apiqps", null, "nfc.frameworktenantconfig.apiqps"),
     DISABLED_MODULEGROUPLIST("diabled.modulegrouplist", null,"nfc.frameworktenantconfig.disabledmodulegrouplist"),
     MOBILE_FILE_DOWNLOAD_ENABLED("mobile.file.download.enabled", "0","nfc.frameworktenantconfig.mobilefiledownloadenabled"),
-//    MINIMUM_CHROME_BROWSER_VERSION("minimum.chrome.browser.version", "95", "nfc.frameworktenantconfig.minimumchromebrowserversion"),
-//    MINIMUM_FIREFOX_BROWSER_VERSION("minimum.firefox.browser.version", "0", "nfc.frameworktenantconfig.minimumfirefoxbrowserversion"),
     ;
 
     String key;

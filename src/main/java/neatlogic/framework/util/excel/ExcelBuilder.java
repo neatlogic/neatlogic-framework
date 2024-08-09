@@ -27,6 +27,7 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import java.util.*;
 
 public class ExcelBuilder {
+    private static final String SHEET_ILLEGAL_SYMBOL_REGEX = "(\\*|/|:|\\\\|\\[|\\]|\\?|：|？)";
     private final Class<? extends Workbook> workbookClass;
     private Workbook workbook;
     //private Sheet sheet;
@@ -199,7 +200,7 @@ public class ExcelBuilder {
         if (this.workbook == null) {
             try {
                 this.workbook = (Workbook) (Class.forName(workbookClass.getName()).newInstance());
-            } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+            } catch (Exception e) {
                 throw new UnableToCreateWorkbookException(workbookClass.getSimpleName(), e.getMessage());
             }
         }
@@ -211,8 +212,27 @@ public class ExcelBuilder {
         if (CollectionUtils.isNotEmpty(this.sheetBuilderList)) {
             for (SheetBuilder sheetBuilder : this.sheetBuilderList) {
                 Sheet sheet = null;
-                if (StringUtils.isNotBlank(sheetBuilder.getSheetName())) {
-                    sheet = this.workbook.createSheet(sheetBuilder.getSheetName());
+                String sheetName = sheetBuilder.getSheetName();
+                if (sheetName != null) {
+                    // sheet名称去掉不合法字符
+                    sheetName = sheetName.replaceAll(SHEET_ILLEGAL_SYMBOL_REGEX, "");
+                }
+                if (sheetName != null && sheetName.length() > 31) {
+                    // sheet名称不能超过31个字符
+                    sheetName = sheetName.substring(0, 31);
+                }
+                if (StringUtils.isNotBlank(sheetName)) {
+                    // 判断是否存在同名sheet
+                    if (this.workbook.getSheet(sheetName) != null) {
+                        sheetName = sheetName.substring(0, Math.min(sheetName.length(), 28));
+                        for (int i = 2; i < 10; i++) {
+                            sheetName = sheetName + "(" + i + ")";
+                            if (this.workbook.getSheet(sheetName) == null) {
+                                break;
+                            }
+                        }
+                    }
+                    sheet = this.workbook.createSheet(sheetName);
                 } else {
                     sheet = this.workbook.createSheet();
                 }

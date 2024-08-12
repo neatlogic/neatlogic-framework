@@ -55,8 +55,6 @@ public class MatrixDataVo extends BasePageVo {
      */
     private List<String> notNullColumnList;
 
-    private Boolean isDistinct;
-
     public String getMatrixUuid() {
         return matrixUuid;
     }
@@ -240,13 +238,5 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setKeywordColumnUniqueIdentifier(String keywordColumnUniqueIdentifier) {
         this.keywordColumnUniqueIdentifier = keywordColumnUniqueIdentifier;
-    }
-
-    public Boolean getIsDistinct() {
-        return isDistinct;
-    }
-
-    public void setIsDistinct(Boolean distinct) {
-        isDistinct = distinct;
     }
 }

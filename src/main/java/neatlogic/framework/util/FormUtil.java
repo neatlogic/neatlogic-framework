@@ -140,11 +140,16 @@ public class FormUtil {
                         if (MapUtils.isEmpty(dataObj)) {
                             continue;
                         }
-                        String columnUuid = dataObj.getString("uuid");
-                        if (StringUtils.isBlank(columnUuid)) {
-                            continue;
+                        Boolean isExtra = dataObj.getBoolean("isExtra");
+                        if (Boolean.TRUE.equals(isExtra)) {
+                            doSaveOrDeleteComponentDependency(isSave, formUuid, formVersionUuid, sceneUuid, dataObj);
+                        } else {
+                            String columnUuid = dataObj.getString("uuid");
+                            if (StringUtils.isBlank(columnUuid)) {
+                                continue;
+                            }
+                            DependencyManager.insert(MatrixAttr2FormAttrDependencyHandler.class, columnUuid, uuid, dependencyConfig);
                         }
-                        DependencyManager.insert(MatrixAttr2FormAttrDependencyHandler.class, columnUuid, uuid, dependencyConfig);
                     }
                 } else {
                     JSONObject mapping = config.getJSONObject("mapping");

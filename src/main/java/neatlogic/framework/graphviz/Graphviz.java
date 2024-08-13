@@ -30,6 +30,7 @@ public class Graphviz {
     List<Node> nodeList;
     LayoutType layout;
     String rankdir;
+    Boolean enforceLayerOrder = true;//强制控制层次顺序
 
     private Graphviz(Builder builder) {
         this.layerList = builder.layerList;
@@ -38,6 +39,7 @@ public class Graphviz {
         this.layout = builder.layout;
         this.nodeList = builder.nodeList;
         this.rankdir = builder.rankdir;
+        this.enforceLayerOrder = builder.enforceLayerOrder;
     }
 
     public Layer getLayerById(String id) {
@@ -137,7 +139,7 @@ public class Graphviz {
         if (layout.getSupportLayer()) {
             if (CollectionUtils.isNotEmpty(layerList)) {
                 str.append(layerList.stream().map(d -> "{" + d.toString() + "}\n").collect(Collectors.joining("")));
-                if (layerList.size() > 1) {
+                if (layerList.size() > 1 && this.enforceLayerOrder) {
                     str.append("{node[];").append(layerList.stream().map(d -> "\"" + d.getId() + "\"").collect(Collectors.joining("->"))).append("[style=invis]}");
                 }
             }
@@ -175,9 +177,15 @@ public class Graphviz {
         List<Node> nodeList = new ArrayList<>();
         LayoutType layout;
         String rankdir = "TB";
+        Boolean enforceLayerOrder = true;
 
         public Builder withRankdir(String rankdir) {
             this.rankdir = rankdir;
+            return this;
+        }
+
+        public Builder withEnforceLayerOrder(boolean enforceLayerOrder) {
+            this.enforceLayerOrder = enforceLayerOrder;
             return this;
         }
 

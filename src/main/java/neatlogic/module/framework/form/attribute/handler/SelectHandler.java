@@ -327,10 +327,10 @@ public class SelectHandler extends FormHandlerBase {
             JSONObject jsonObj = JSON.parseObject(data);
             String value = jsonObj.getString("value");
             contentList.add(value);
-            String text = jsonObj.getString("text");
-            if (StringUtils.isNotBlank(text)) {
-                contentList.add(text);
-            }
+//            String text = jsonObj.getString("text");
+//            if (StringUtils.isNotBlank(text)) {
+//                contentList.add(text);
+//            }
         } else if (data.startsWith("[") && data.endsWith("]")) {
             JSONArray jsonArray = JSON.parseArray(data);
             for (Object obj : jsonArray) {
@@ -339,10 +339,10 @@ public class SelectHandler extends FormHandlerBase {
                         JSONObject jsonObj = (JSONObject) obj;
                         String value = jsonObj.getString("value");
                         contentList.add(value);
-                        String text = jsonObj.getString("text");
-                        if (StringUtils.isNotBlank(text)) {
-                            contentList.add(text);
-                        }
+//                        String text = jsonObj.getString("text");
+//                        if (StringUtils.isNotBlank(text)) {
+//                            contentList.add(text);
+//                        }
                     } else {
                         contentList.add(obj.toString());
                     }

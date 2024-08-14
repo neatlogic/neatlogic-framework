@@ -94,6 +94,7 @@ public class Config {
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码以及用户token创建时间
     private static Boolean ENABLE_VALID_TOKEN_FCD;//校验用户token创建时间
+    private static Boolean ENABLE_VALID_LICENSE;//校验license
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
     private static String PUBLIC_API_AUTH_USERNAME;//外部访问接口basic认证用户名
@@ -160,6 +161,16 @@ public class Config {
             }
         } else {
             ENABLE_VALID_TOKEN_FCD = true;
+        }
+
+        if (StringUtils.isNotBlank(System.getProperty("enableValidLicense"))) {
+            try {
+                ENABLE_VALID_LICENSE = Boolean.valueOf(System.getProperty("enableValidLicense"));
+            } catch (Exception ex) {
+                ENABLE_VALID_LICENSE = false;
+            }
+        } else {
+            ENABLE_VALID_LICENSE = false;
         }
 
         if (StringUtils.isNotBlank(System.getProperty("enableInterfaceVerify"))) {
@@ -334,6 +345,10 @@ public class Config {
 
     public static boolean ENABLE_VALID_TOKEN_FCD() {
         return ENABLE_VALID_TOKEN_FCD;
+    }
+
+    public static boolean ENABLE_VALID_LICENSE() {
+        return ENABLE_VALID_LICENSE;
     }
 
     public static boolean ENABLE_GZIP() {

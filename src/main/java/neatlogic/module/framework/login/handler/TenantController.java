@@ -24,11 +24,13 @@ import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.config.ConfigManager;
 import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.dao.mapper.ThemeMapper;
+import neatlogic.framework.dto.LicenseVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.ThemeVo;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.service.TenantService;
+import neatlogic.framework.util.LicenseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -79,6 +81,22 @@ public class TenantController {
     @RequestMapping(value = "/check/{tenant}")
     public void checkTenant(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
+            //校验license
+            boolean isLicenseLegal = true;
+            if (Config.ENABLE_VALID_LICENSE()) {
+                if (StringUtils.isBlank(Config.LICENSE())) {
+                    isLicenseLegal = false;
+                } else {
+                    LicenseVo licenseVo = LicenseUtil.deLicense(Config.LICENSE(), Config.LICENSE_PK());
+                    if (licenseVo == null || !licenseVo.getIsValid() || Boolean.TRUE.equals(licenseVo.getIsEnd())) {
+                        isLicenseLegal = false;
+                    }
+                }
+            }
+            if(!isLicenseLegal) {
+                response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+                ReturnJson.error(ResponseCode.LICENSE_INVALID.getMessage(tenant), response);
+            }
             if (!TenantUtil.hasTenant(tenant)) {
                 // 如果cache没有租户，尝试查询数据库，检查是否存在启用租户
                 TenantVo tenantVo = tenantService.getTenantByUuid(tenant);

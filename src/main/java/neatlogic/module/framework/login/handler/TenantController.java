@@ -82,8 +82,8 @@ public class TenantController {
     public void checkTenant(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
         try {
             //校验license
-            boolean isLicenseLegal = true;
             if (Config.ENABLE_VALID_LICENSE()) {
+                boolean isLicenseLegal = true;
                 if (StringUtils.isBlank(Config.LICENSE())) {
                     isLicenseLegal = false;
                 } else {
@@ -92,10 +92,10 @@ public class TenantController {
                         isLicenseLegal = false;
                     }
                 }
-            }
-            if(!isLicenseLegal) {
-                response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
-                ReturnJson.error(ResponseCode.LICENSE_INVALID.getMessage(tenant), response);
+                if(!isLicenseLegal) {
+                    response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+                    ReturnJson.error(ResponseCode.LICENSE_INVALID.getMessage(tenant), response);
+                }
             }
             if (!TenantUtil.hasTenant(tenant)) {
                 // 如果cache没有租户，尝试查询数据库，检查是否存在启用租户

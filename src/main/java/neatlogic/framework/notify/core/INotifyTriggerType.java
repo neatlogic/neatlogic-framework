@@ -15,6 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.notify.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface INotifyTriggerType {
 
     String getTrigger();
@@ -22,4 +25,20 @@ public interface INotifyTriggerType {
     String getText();
 
     String getDescription();
+
+    /**
+     * 触发点额外包含的通知对象选项
+     * @return
+     */
+    default List<String> getIncludeList() {
+        return new ArrayList<>();
+    }
+
+    /**
+     * 触发点额外排除的通知对象选项
+     * @return
+     */
+    default List<String> getExcludeList() {
+        return new ArrayList<>();
+    }
 }

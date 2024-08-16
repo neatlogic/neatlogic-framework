@@ -62,14 +62,7 @@ public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
     protected List<ConditionParamVo> mySystemParamList() {
         List<ConditionParamVo> notifyPolicyParamList = new ArrayList<>();
         for (ExceptionNotifyParam param : ExceptionNotifyParam.values()) {
-            ConditionParamVo paramVo = new ConditionParamVo();
-            paramVo.setName(param.getValue());
-            paramVo.setLabel(param.getText());
-            paramVo.setParamType(param.getParamType().getName());
-            paramVo.setParamTypeName(param.getParamType().getText());
-            paramVo.setFreemarkerTemplate(param.getFreemarkerTemplate());
-            paramVo.setIsEditable(0);
-            notifyPolicyParamList.add(paramVo);
+            notifyPolicyParamList.add(createConditionParam(param));
         }
         return notifyPolicyParamList;
     }

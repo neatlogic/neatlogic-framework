@@ -214,7 +214,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 	</select>
 
 	<select id="getYearListByWorktimeUuid" parameterType="java.lang.String" resultType="java.lang.Integer" useCache="false">
-		SELECT distinct `year` FROM `worktime_range` WHERE `worktime_uuid` = #{value}
+		SELECT DISTINCT `year` FROM `worktime_range` WHERE `worktime_uuid` = #{value}
 	</select>
 
 	<insert id="insertWorktime" parameterType="neatlogic.framework.worktime.dto.WorktimeVo">

@@ -67,6 +67,7 @@ public class TestJob extends JobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws JobExecutionException, InterruptedException {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         long diff = 0;
+        Thread.sleep(10000L);
         if (currentTime == null) {
             currentTime = System.currentTimeMillis();
         } else {

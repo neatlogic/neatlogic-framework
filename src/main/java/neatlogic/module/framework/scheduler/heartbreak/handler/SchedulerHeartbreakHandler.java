@@ -24,21 +24,21 @@ import neatlogic.framework.scheduler.core.SchedulerManager;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.JobLockVo;
 import neatlogic.framework.scheduler.dto.JobObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
 public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 
-	@Autowired
+	@Resource
 	private SchedulerManager schedulerManager;
 
-	@Autowired
+	@Resource
 	private SchedulerMapper schedulerMapper;
 
-	@Autowired
+	@Resource
 	private TenantMapper tenantMapper;
 
 	@Override

@@ -27,7 +27,6 @@ import neatlogic.framework.mq.core.SubscribeManager;
 import neatlogic.framework.mq.dao.mapper.MqSubscribeMapper;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -39,7 +38,7 @@ public class SubscribeHeartbreakHandler implements IHeartbreakHandler {
     @Resource
     private MqSubscribeMapper mqSubscribeMapper;
 
-    @Autowired
+    @Resource
     private TenantMapper tenantMapper;
 
     @Override

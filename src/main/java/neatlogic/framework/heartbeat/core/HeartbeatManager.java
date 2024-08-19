@@ -32,9 +32,9 @@ import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.Executors;
@@ -48,16 +48,16 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
     // 记录服务器启动时间
     private final static Date START_TIME = new Date();
 
-    @Autowired
+    @Resource
     private ServerMapper serverMapper;
 
-    @Autowired
+    @Resource
     private TenantServerMapper tenantServerMapper;
 
-    @Autowired
+    @Resource
     private TenantMapper tenantMapper;
 
-    @Autowired
+    @Resource
     private TransactionUtil transactionUtil;//强迫TransactionUtil先加载，否则可能会出现空指针
 
     private static final Set<IHeartbreakHandler> set = new HashSet<>();

@@ -111,7 +111,8 @@ public class Node {
                 propString += ",";
             }
             String value = propMap.get(key);
-            propString += key + "=" + (value.startsWith("<") ? "" : "\"") + propMap.get(key)
+            value = value.replace("\"", "\\\"");
+            propString += key + "=" + (value.startsWith("<") ? "" : "\"") + value
                     + (value.startsWith("<") ? "" : "\"");
         }
         // lobelloc控制label位置

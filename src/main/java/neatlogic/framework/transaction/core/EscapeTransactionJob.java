@@ -98,11 +98,11 @@ public class EscapeTransactionJob {
                 state.setSucceed(false);
                 state.setError(ex.getMessage());
                 if (!(ex instanceof ApiRuntimeException)) {
-                    logger.error(ex.getMessage(), ex);
                     state.setException(new RuntimeException(ex));
                 } else {
                     state.setException((ApiRuntimeException) ex);
                 }
+                logger.error(ex.getMessage(), ex);
             } finally {
                 latch.countDown();
             }

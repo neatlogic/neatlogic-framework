@@ -61,4 +61,8 @@ public interface INotifyPolicyHandler {
     default int isAllowMultiPolicy() {
         return 1;
     }
+
+    default String getModuleGroup() {
+        return null;
+    }
 }

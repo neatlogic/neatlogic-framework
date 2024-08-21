@@ -27,6 +27,7 @@ import neatlogic.framework.notify.dto.NotifyTreeVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,8 +160,12 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         for (Entry<String, INotifyPolicyHandler> entry : map.entrySet()) {
             INotifyPolicyHandler notifyPolicyHandler = entry.getValue();
             if (notifyPolicyHandler.isPublic()) {
+                String moduleGroup = notifyPolicyHandler.getModuleGroup();
+                if (StringUtils.isBlank(moduleGroup)) {
+                    moduleGroup = moduleVo.getGroup();
+                }
                 notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
-                handler2ModuleGroupIdMap.put(notifyPolicyHandler.getClassName(), moduleVo.getGroup());
+                handler2ModuleGroupIdMap.put(notifyPolicyHandler.getClassName(), moduleGroup);
                 handler2ModuleIdMap.put(notifyPolicyHandler.getClassName(), moduleVo.getId());
 //                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getId(), moduleVo.getGroup(), notifyPolicyHandler.isAllowMultiPolicy()));
 

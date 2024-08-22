@@ -24,6 +24,7 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -428,5 +429,16 @@ public class CascadeHandler extends FormHandlerBase {
         }
         formAttributeVo.setMatrixUuidSet(matrixUuidSet);
         formAttributeVo.setMatrixUuidAttributeUuidSetMap(matrixUuidAttributeUuidSetMap);
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        JSONArray dataList = config.getJSONArray("dataList");
+        if (dataList == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataList");
+        }
+        if (dataList.isEmpty()) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataList", "[]");
+        }
     }
 }

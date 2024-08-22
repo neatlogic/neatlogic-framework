@@ -18,14 +18,13 @@ package neatlogic.module.framework.form.attribute.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
-import neatlogic.framework.form.attribute.core.FormAttributeDataConversionHandlerFactory;
-import neatlogic.framework.form.attribute.core.FormHandlerBase;
-import neatlogic.framework.form.attribute.core.IFormAttributeDataConversionHandler;
+import neatlogic.framework.form.attribute.core.*;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import neatlogic.framework.util.TableResultUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -661,5 +660,60 @@ public class TableSelectorHandler extends FormHandlerBase {
             return dataArray.size() + 1;
         }
         return 1;
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String matrixUuid = config.getString("matrixUuid");
+        if (matrixUuid == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.matrixUuid");
+        }
+        if (StringUtils.isBlank(matrixUuid)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.matrixUuid", matrixUuid);
+        }
+        JSONArray dataConfig = config.getJSONArray("dataConfig");
+        if (dataConfig == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataConfig");
+        }
+        if (dataConfig.isEmpty()) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataConfig", "[]");
+        }
+        for (int i = 0; i < dataConfig.size(); i++) {
+            JSONObject dataObj = dataConfig.getJSONObject(i);
+            String field = "config.dataConfig.[" + i + "]";
+            if (dataObj == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field, "null");
+            }
+            if (dataObj.isEmpty()) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field, "{}");
+            }
+            String key1 = dataObj.getString("key");
+            if (key1 == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key");
+            }
+            if (StringUtils.isBlank(key1)) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key", key1);
+            }
+            String label = dataObj.getString("label");
+            if (label == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".label");
+            }
+            if (StringUtils.isBlank(label)) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".label", label);
+            }
+            String handler = dataObj.getString("handler");
+            if (handler == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".handler");
+            }
+            if (StringUtils.isBlank(handler)) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".handler", handler);
+            }
+            IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(handler);
+            if (formAttributeHandler == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".handler", handler);
+            }
+            JSONObject config1 = dataObj.getJSONObject("config");
+            formAttributeHandler.validateExtendAttributeConfig(key + "." + key1, config1);
+        }
     }
 }

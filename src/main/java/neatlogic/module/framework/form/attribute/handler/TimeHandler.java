@@ -22,6 +22,8 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -187,5 +189,16 @@ public class TimeHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String format = config.getString("format");
+        if (format == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.format");
+        }
+        if (StringUtils.isBlank(format)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.format", format);
+        }
     }
 }

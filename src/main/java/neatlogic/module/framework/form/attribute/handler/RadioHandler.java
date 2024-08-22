@@ -24,6 +24,7 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import neatlogic.framework.util.FormUtil;
 import neatlogic.module.framework.form.service.FormService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -301,5 +302,53 @@ public class RadioHandler extends FormHandlerBase {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String dataSource = config.getString("dataSource");
+        if (dataSource == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataSource");
+        }
+        if (Objects.equals(dataSource, "static")) {
+            JSONArray dataList = config.getJSONArray("dataList");
+            if (dataList == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataList");
+            }
+            if (dataList.isEmpty()) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataList", "[]");
+            }
+        } else if (Objects.equals(dataSource, "matrix")) {
+            String matrixUuid = config.getString("matrixUuid");
+            if (matrixUuid == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.matrixUuid");
+            }
+            if (StringUtils.isBlank(matrixUuid)) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.matrixUuid", matrixUuid);
+            }
+            JSONObject mapping = config.getJSONObject("mapping");
+            if (mapping == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.mapping");
+            }
+            if (mapping.isEmpty()) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.mapping", "{}");
+            }
+            String value = mapping.getString("value");
+            if (value == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.mapping.value");
+            }
+            if (StringUtils.isBlank(value)) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.mapping.value", value);
+            }
+            String text = mapping.getString("text");
+            if (text == null) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.mapping.text");
+            }
+            if (StringUtils.isBlank(text)) {
+                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.mapping.text", text);
+            }
+        } else {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataSource", dataSource);
+        }
     }
 }

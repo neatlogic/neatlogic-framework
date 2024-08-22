@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.form.attribute.core;
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
@@ -47,5 +48,9 @@ public abstract class ControlHandlerBase implements IFormAttributeHandler {
     @Override
     public Boolean isUseFormConfig() {
         return true;
+    }
+
+    @Override
+    public void validateExtendAttributeConfig(String key, JSONObject config) {
     }
 }

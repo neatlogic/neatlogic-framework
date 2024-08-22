@@ -22,6 +22,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -147,5 +148,16 @@ public class RateHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        Integer count = config.getInteger("count");
+        if (count == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.count");
+        }
+        if (count < 1 || count > 10) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.count", count.toString());
+        }
     }
 }

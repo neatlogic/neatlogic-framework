@@ -32,6 +32,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -487,5 +488,20 @@ public class UserSelectHandler extends FormHandlerBase {
             }
         }
         return null;
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        Boolean isMultiple = config.getBoolean("isMultiple");
+        if (isMultiple == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.isMultiple");
+        }
+        JSONArray groupList = config.getJSONArray("groupList");
+        if (groupList == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.groupList");
+        }
+        if (groupList.isEmpty()) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.groupList", "[]");
+        }
     }
 }

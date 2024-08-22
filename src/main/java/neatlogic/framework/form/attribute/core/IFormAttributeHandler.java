@@ -229,4 +229,11 @@ public interface IFormAttributeHandler {
     default void makeupFormAttribute(FormAttributeVo formAttributeVo) {
 
     }
+
+    /**
+     * 校验扩展属性配置是否正确
+     * @param key
+     * @param config
+     */
+    void validateExtendAttributeConfig(String key, JSONObject config);
 }

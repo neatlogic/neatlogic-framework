@@ -1,12 +1,11 @@
 package neatlogic.framework.dto;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
 /**
  * @Title: FieldValidResultVo
  * @Package: neatlogic.framework.dto
- * @Description: TODO
  * @Author: 89770
  * @Date: 2021/2/20 17:10
  **/

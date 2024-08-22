@@ -18,6 +18,7 @@ package neatlogic.framework.crossover;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.exception.innerapi.InnerApiNotFoundException;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.aop.support.AopUtils;
 
@@ -36,8 +37,15 @@ public class CrossoverServiceFactory extends ModuleInitializedListenerBase {
                 }
             }
         }
-        return null;
-        //throw new InnerApiNotFoundException(apiClass.getName());
+        throw new InnerApiNotFoundException(apiClass.getName());
+    }
+
+    public static <T extends ICrossoverService> T tryToGetApi(Class<? extends ICrossoverService> apiClass) {
+        try {
+            return getApi(apiClass);
+        } catch (InnerApiNotFoundException e) {
+            return null;
+        }
     }
 
 

@@ -22,10 +22,10 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class FormExtendAttributeConfigIllegalException extends ApiRuntimeException {
 
     public FormExtendAttributeConfigIllegalException(String handler, String key, String field) {
-        super("表单扩展数据中，{0}类型属性{1}的配置中缺少{2}字段", handler, key, field);
+        super("nffe.formextendattributeconfigillegalexception.formextendattributeconfigillegalexception_a", handler, key, field);
     }
 
     public FormExtendAttributeConfigIllegalException(String handler, String key, String field, String value) {
-        super("表单扩展数据中，{0}类型属性{1}的配置中{2}字段值为{3}不合法", handler, key, field, value);
+        super("nffe.formextendattributeconfigillegalexception.formextendattributeconfigillegalexception_b", handler, key, field, value);
     }
 }

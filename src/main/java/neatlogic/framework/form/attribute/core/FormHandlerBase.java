@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
@@ -171,5 +172,16 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
             return (JSONArray) source;
         }
         throw new AttributeValidException(attributeLabel);
+    }
+
+    @Override
+    public void validateExtendAttributeConfig(String key, JSONObject config) {
+        if (config == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config");
+        }
+        myValidateExtendAttributeConfig(key, config);
+    }
+
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
     }
 }

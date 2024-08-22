@@ -25,6 +25,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import neatlogic.framework.worktime.dao.mapper.WorktimeMapper;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -312,5 +313,23 @@ public class DateHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String format = config.getString("format");
+        if (format == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.format");
+        }
+        if (StringUtils.isBlank(format)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.format", format);
+        }
+//        String styleType = config.getString("styleType");
+//        if (styleType == null) {
+//            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.styleType");
+//        }
+//        if (StringUtils.isBlank(styleType)) {
+//            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.styleType", styleType);
+//        }
     }
 }

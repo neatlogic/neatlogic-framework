@@ -24,6 +24,7 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class UploadHandler extends FormHandlerBase {
@@ -297,5 +299,16 @@ public class UploadHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return null;
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String uploadType = config.getString("uploadType");
+        if (uploadType == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.uploadType");
+        }
+        if (!Objects.equals(uploadType, "one") && !Objects.equals(uploadType, "more")) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.uploadType", uploadType);
+        }
     }
 }

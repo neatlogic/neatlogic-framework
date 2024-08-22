@@ -23,6 +23,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import neatlogic.framework.form.treeselect.core.ITreeSelectDataSourceHandler;
 import neatlogic.framework.form.treeselect.core.TreeSelectDataSourceFactory;
 import org.apache.commons.collections4.CollectionUtils;
@@ -241,5 +242,48 @@ public class TreeSelectHandler extends FormHandlerBase {
             return String.join("/", textList);
         }
         return resultObj.get("value");
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String dataSource = config.getString("dataSource");
+        if (dataSource == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataSource");
+        }
+        String url = config.getString("url");
+        if (url == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.url");
+        }
+        if (StringUtils.isBlank(url)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.url", url);
+        }
+        JSONObject config2 = config.getJSONObject("config");
+        if (config2 == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config");
+        }
+        if (config2.isEmpty()) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config", "{}");
+        }
+        String valueName = config2.getString("valueName");
+        if (valueName == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.valueName");
+        }
+        if (StringUtils.isBlank(valueName)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.valueName", valueName);
+        }
+        String textName = config2.getString("textName");
+        if (textName == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.textName");
+        }
+        if (StringUtils.isBlank(textName)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.textName", textName);
+        }
+        String url2 = config2.getString("url");
+        if (url2 == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.url");
+        }
+        if (StringUtils.isBlank(url2)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.url", url2);
+        }
     }
 }

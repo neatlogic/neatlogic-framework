@@ -143,4 +143,8 @@ public class TextHandler extends FormHandlerBase {
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
     }
+
+    @Override
+    public void validateExtendAttributeConfig(String key, JSONObject config) {
+    }
 }

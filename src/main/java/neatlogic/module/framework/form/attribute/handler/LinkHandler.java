@@ -22,6 +22,8 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -184,5 +186,23 @@ public class LinkHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return configObj.getString("value");
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        String value = config.getString("value");
+        if (value == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.value");
+        }
+        if (StringUtils.isBlank(value)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.value", value);
+        }
+        String text = config.getString("text");
+        if (text == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.text");
+        }
+        if (StringUtils.isBlank(text)) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.config.text", text);
+        }
     }
 }

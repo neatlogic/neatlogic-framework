@@ -24,6 +24,7 @@ import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -248,5 +249,23 @@ public class CubeHandler extends FormHandlerBase {
             return String.join(",", valueList);
         }
         return null;
+    }
+
+    @Override
+    protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+        JSONArray typeList = config.getJSONArray("typeList");
+        if (typeList == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.typeList");
+        }
+        if (typeList.isEmpty()) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.typeList", "[]");
+        }
+        JSONArray optionList = config.getJSONArray("optionList");
+        if (optionList == null) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.optionList");
+        }
+        if (optionList.isEmpty()) {
+            throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.optionList", "[]");
+        }
     }
 }

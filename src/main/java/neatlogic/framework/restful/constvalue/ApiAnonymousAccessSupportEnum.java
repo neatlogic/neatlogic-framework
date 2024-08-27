@@ -23,8 +23,8 @@ public enum ApiAnonymousAccessSupportEnum {
     ANONYMOUS_ACCESS_WITH_ENCRYPTION(true, true), // 支持匿名访问但token需要加密
     ANONYMOUS_ACCESS_WITHOUT_ENCRYPTION(true, false); // 支持匿名访问且token无需加密
 
-    final private boolean isSupportAnonymousAccess; // 是否支持匿名访问
-    final private boolean isRequireTokenEncryption; // token是否需要加密
+    private final boolean isSupportAnonymousAccess; // 是否支持匿名访问
+    private final boolean isRequireTokenEncryption; // token是否需要加密
 
     public boolean isSupportAnonymousAccess() {
         return isSupportAnonymousAccess;

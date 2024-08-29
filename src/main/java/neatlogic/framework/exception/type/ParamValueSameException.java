@@ -1,4 +1,4 @@
-/*Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+/*Copyright (C) $today.year  深圳极向量科技有限公司 All Rights Reserved.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -17,14 +17,11 @@ package neatlogic.framework.exception.type;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class ParamIrregularException extends ApiRuntimeException {
+public class ParamValueSameException extends ApiRuntimeException {
 
-    public ParamIrregularException(String paramName) {
-        super("nfet.paramirregularexception.paramirregularexception.common", paramName);
-    }
 
-    public ParamIrregularException(String paramName, String rule) {
-        super("nfet.paramirregularexception.paramirregularexception.rule", paramName, rule);
+    public ParamValueSameException(String... param) {
+        super("参数“{0}”的值不能相同", String.join(",", param));
     }
 
 }

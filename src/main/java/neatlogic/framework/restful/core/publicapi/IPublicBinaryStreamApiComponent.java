@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @Time Aug 26,2020
  * @Description: 外部接口
  */
+@Deprecated
 public interface IPublicBinaryStreamApiComponent extends IBinaryStreamApiComponent {
     /**
      * 接口唯一标识，也是访问URI

@@ -70,6 +70,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
+@Deprecated
 @Controller
 @RequestMapping("/public/api/")
 public class PublicApiDispatcher {

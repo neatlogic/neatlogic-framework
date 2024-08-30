@@ -19,6 +19,7 @@ import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+@Deprecated
 public interface IPublicJsonStreamApiComponent extends IJsonStreamApiComponent{
 
     /**

@@ -44,6 +44,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Deprecated
 @RootComponent
 public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
     static Logger logger = LoggerFactory.getLogger(PublicApiComponentFactory.class);

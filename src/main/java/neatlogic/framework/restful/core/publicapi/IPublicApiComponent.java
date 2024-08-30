@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 外部接口
  */
+@Deprecated
 public interface IPublicApiComponent extends IApiComponent {
     /**
      * 接口唯一标识，也是访问URI,不声明则需要接口管理添加实例才能使用。如果声明token则直接内部使用，单实例。

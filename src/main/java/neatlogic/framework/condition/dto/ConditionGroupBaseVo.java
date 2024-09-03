@@ -17,6 +17,7 @@ package neatlogic.framework.condition.dto;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 public class ConditionGroupBaseVo<T extends ConditionBaseVo> implements Serializable {
     private static final long serialVersionUID = 8392325201425982471L;
@@ -49,4 +50,12 @@ public class ConditionGroupBaseVo<T extends ConditionBaseVo> implements Serializ
         this.conditionRelList = conditionRelList;
     }
 
+    protected T getConditionByUuid(String uuid) {
+        for (T t : conditionList) {
+            if (Objects.equals(t.getUuid(), uuid)) {
+                return t;
+            }
+        }
+        return null;
+    }
 }

@@ -20,6 +20,7 @@ package neatlogic.framework.condition.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConditionConfigBaseVo<T extends ConditionGroupBaseVo<? extends ConditionBaseVo>> implements Serializable {
 
@@ -43,5 +44,14 @@ public class ConditionConfigBaseVo<T extends ConditionGroupBaseVo<? extends Cond
 
     public void setConditionGroupRelList(List<RelVo> conditionGroupRelList) {
         this.conditionGroupRelList = conditionGroupRelList;
+    }
+
+    protected T getConditionGroupByUuid(String uuid) {
+        for (T t : conditionGroupList) {
+            if (Objects.equals(t.getUuid(), uuid)) {
+                return t;
+            }
+        }
+        return null;
     }
 }

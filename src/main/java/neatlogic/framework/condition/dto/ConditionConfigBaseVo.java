@@ -17,12 +17,14 @@
 
 package neatlogic.framework.condition.dto;
 
+import neatlogic.framework.common.dto.BaseEditorVo;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ConditionConfigBaseVo<T extends ConditionGroupBaseVo<? extends ConditionBaseVo>> implements Serializable {
+public class ConditionConfigBaseVo<T extends ConditionGroupBaseVo<? extends ConditionBaseVo>> extends BaseEditorVo implements Serializable {
 
     private static final long serialVersionUID = 5439300427812355573L;
 

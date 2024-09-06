@@ -1393,7 +1393,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         VALUES (#{id}, #{name});
     </insert>
 
-    <!--<insert id="batchInsertUser" parameterType="java.util.List">
+    <insert id="batchInsertUser" parameterType="java.util.List">
         insert into `user` (
         `id`,
         `uuid`,
@@ -1424,7 +1424,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         email=values(email),
         phone=values(phone),
         pinyin=values(pinyin)
-    </insert>-->
+    </insert>
 
     <insert id="insertUserForLdap" parameterType="neatlogic.framework.dto.UserVo">
         insert into `user` (
@@ -1472,7 +1472,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `lcd` = #{lcd}
     </insert>
 
-    <!--<insert id="batchInsertUserTeam" parameterType="java.util.List">
+    <insert id="batchInsertUserTeam" parameterType="java.util.List">
         INSERT INTO `user_team` (
         `team_uuid`,
         `user_uuid`
@@ -1487,7 +1487,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         on DUPLICATE KEY UPDATE
         team_uuid=values(team_uuid),
         user_uuid=values(user_uuid)
-    </insert>-->
+    </insert>
 
     <insert id="batchInsertUserRole" parameterType="java.util.List">
         INSERT ignore INTO `user_role` (

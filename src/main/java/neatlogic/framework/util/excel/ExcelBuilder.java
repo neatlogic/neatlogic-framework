@@ -22,6 +22,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
 
 import java.util.*;
@@ -282,16 +283,21 @@ public class ExcelBuilder {
                     }
                 }
                 //生成数据行
-                if (CollectionUtils.isNotEmpty(sheetBuilder.getColumnList()) && CollectionUtils.isNotEmpty(sheetBuilder.getColumnList()) && CollectionUtils.isNotEmpty(sheetBuilder.getDataList())) {
+                if (CollectionUtils.isNotEmpty(sheetBuilder.getColumnList()) && CollectionUtils.isNotEmpty(sheetBuilder.getDataList())) {
                     int lastRowNum = sheet.getLastRowNum();
-                    for (Map<String, Object> dataMap : sheetBuilder.getDataList()) {
+                    for (Map<String, SheetBuilder.DataCell> dataMap : sheetBuilder.getDataList()) {
                         lastRowNum++;
                         Row row = sheet.createRow(lastRowNum);
                         int j = 0;
                         for (String column : sheetBuilder.getColumnList()) {
                             Cell cell = row.createCell(j);
                             makeupBody(cell);
-                            cell.setCellValue(dataMap.get(column) == null ? null : dataMap.get(column).toString());
+                            SheetBuilder.DataCell dataCell = dataMap.get(column);
+                            cell.setCellValue(dataMap.get(column) == null ? null : dataCell.getValue().toString());
+                            //设置跨行跨列
+                            if (dataCell.getColspan() > 0 || dataCell.getRowspan() > 0) {
+                                sheet.addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex() + dataCell.getRowspan(), cell.getColumnIndex(), cell.getColumnIndex() + dataCell.getColspan()));
+                            }
                             j++;
                         }
                     }

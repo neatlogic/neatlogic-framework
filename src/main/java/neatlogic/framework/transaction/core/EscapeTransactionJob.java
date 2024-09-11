@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CountDownLatch;
 
 public class EscapeTransactionJob {
-    private final static Logger logger = LoggerFactory.getLogger(EscapeTransactionJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(EscapeTransactionJob.class);
 
     private final IEscapeTransaction thread;
 

@@ -209,11 +209,11 @@ public interface UserMapper {
 
     int insertUserTitle(UserTitleVo userTitleVo);
 
-//    int batchInsertUser(List<UserVo> list);
+    int batchInsertUser(List<UserVo> list);
 
     int insertUserForLdap(UserVo userVo);
 
-//    int batchInsertUserTeam(List<TeamUserVo> list);
+    int batchInsertUserTeam(List<TeamUserVo> list);
 
     int batchInsertUserRole(List<RoleUserVo> list);
 

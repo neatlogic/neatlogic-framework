@@ -469,7 +469,16 @@ public class ModuleInitializer implements WebApplicationInitializer {
                                     Resource[] resources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/**/changelog/" + version + "/neatlogic_tenant.sql");
                                     for (Resource resource : resources) {
                                         Reader scriptReader = new InputStreamReader(resource.getInputStream());
-                                        boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicTenantConnection(tenant, false), "neatlogic_tenant.sql");
+                                        boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicTenantConnection(tenant, false), "neatlogic_tenant.sql",false);
+                                        if (isErrorTmp) {
+                                            isError = true;
+                                        }
+                                    }
+                                    //执行整个sql文件
+                                    Resource[] resourcesAll = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/**/changelog/" + version + "/neatlogic_tenant_all.sql");
+                                    for (Resource resourceAll : resourcesAll) {
+                                        Reader scriptReader = new InputStreamReader(resourceAll.getInputStream());
+                                        boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(tenant, moduleId, scriptReader, version, JdbcUtil.getNeatlogicTenantConnection(tenant, false), "neatlogic_tenant_all.sql",true);
                                         if (isErrorTmp) {
                                             isError = true;
                                         }

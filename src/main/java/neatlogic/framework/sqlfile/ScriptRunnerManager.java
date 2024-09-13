@@ -89,7 +89,7 @@ public class ScriptRunnerManager {
                 if (conn != null) {
                     conn.close();
                 }
-                if(runner != null){
+                if (runner != null) {
                     runner.closeConnection();
                 }
             } catch (SQLException e) {
@@ -189,7 +189,7 @@ public class ScriptRunnerManager {
      * @param scriptReader 脚本读取
      */
     public static void runScriptWithJdbc(Reader scriptReader, String version, Connection connection, String sqlFile) throws Exception {
-        runScriptWithJdbc(null, "framework", scriptReader, version, connection, sqlFile);
+        runScriptWithJdbc(null, "framework", scriptReader, version, connection, sqlFile, false);
     }
 
     /**
@@ -204,7 +204,7 @@ public class ScriptRunnerManager {
      * @param moduleId     模块id
      * @param scriptReader 脚本读取
      */
-    public static boolean runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, Connection conn, String sqlFile) throws Exception {
+    public static boolean runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, Connection conn, String sqlFile, boolean isAll) throws Exception {
         ScriptRunner runner = null;
         StringWriter logStrWriter = new StringWriter();
         PrintWriter logWriter = new PrintWriter(logStrWriter);
@@ -254,40 +254,18 @@ public class ScriptRunnerManager {
                     sqlSb.append(line);
                     continue;
                 }
+
                 sqlSb.append(line);
                 String sql = sqlSb.toString();
-                sqlSb.setLength(0);
-                // 如果没有执行过该sql，则执行
-                String sqlHash = Md5Util.encryptMD5(sql);
-                if (!hasRunSqlMd5List.contains(sqlHash)) {
-                    runner.runScript(new StringReader(sql));
-                    ChangelogAuditVo changelogAuditVo;
-                    if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                        String error;
-                        if (tenant == null) {
-                            error = "  ✖" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
-                        } else {
-                            error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
-                        }
-                        //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
-                        int ignored = 0;
-                        if (ignoreKeyList.stream().anyMatch(o -> errStrWriter.toString().toLowerCase(Locale.ROOT).contains(o))) {
-                            ignored = 1;
-                        } else {
-                            System.out.println(error);
-                            isError = true;
-                        }
-                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, error, 0, ignored);
-                        insertChangelogAudit(changelogAuditVo);
-                        insertChangelogAuditDetail(sqlHash, sql);
-                        errStrWriter.getBuffer().setLength(0);
-                    } else {
-                        changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, 1);
-                        hasRunSqlMd5List.add(sqlHash);
-                        insertChangelogAudit(changelogAuditVo);
-                        insertChangelogAuditDetail(sqlHash, sql);
-                    }
+                if (!isAll) {
+                    //清空sql
+                    sqlSb.setLength(0);
+                    isError = executeSql(sql, hasRunSqlMd5List, runner, errStrWriter, tenant, moduleId, version, sqlFile, isError);
                 }
+            }
+            if (isAll) {
+                String sql = sqlSb.toString();
+                isError = executeSql(sql, hasRunSqlMd5List, runner, errStrWriter, tenant, moduleId, version, sqlFile, false);
             }
         } catch (ModuleInitRuntimeException ex) {
             throw new ModuleInitRuntimeException(ex);
@@ -310,6 +288,55 @@ public class ScriptRunnerManager {
                 logger.error(e.getMessage());
             }
 
+        }
+        return isError;
+    }
+
+    /**
+     * 执行sql
+     *
+     * @param sql              sql
+     * @param hasRunSqlMd5List 执行过的sql md5列表
+     * @param runner           sql执行对象
+     * @param errStrWriter     异常输出writer
+     * @param tenant           租户
+     * @param moduleId         模块id
+     * @param version          版本
+     * @param sqlFile          sql文件名
+     * @param isError          是否异常
+     */
+    private static boolean executeSql(String sql, List<String> hasRunSqlMd5List, ScriptRunner runner, StringWriter errStrWriter, TenantVo tenant, String moduleId, String version, String sqlFile, boolean isError) throws Exception {
+        String tenantUuid = tenant == null ? "0" : tenant.getUuid(); //主库用0表示
+        // 如果没有执行过该sql，则执行
+        String sqlHash = Md5Util.encryptMD5(sql);
+        if (!hasRunSqlMd5List.contains(sqlHash)) {
+            runner.runScript(new StringReader(sql));
+            ChangelogAuditVo changelogAuditVo;
+            if (StringUtils.isNotBlank(errStrWriter.toString())) {
+                String error;
+                if (tenant == null) {
+                    error = "  ✖" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+                } else {
+                    error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+                }
+                //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
+                int ignored = 0;
+                if (ignoreKeyList.stream().anyMatch(o -> errStrWriter.toString().toLowerCase(Locale.ROOT).contains(o))) {
+                    ignored = 1;
+                } else {
+                    System.out.println(error);
+                    isError = true;
+                }
+                changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, error, 0, ignored);
+                insertChangelogAudit(changelogAuditVo);
+                insertChangelogAuditDetail(sqlHash, sql);
+                errStrWriter.getBuffer().setLength(0);
+            } else {
+                changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, 1);
+                hasRunSqlMd5List.add(sqlHash);
+                insertChangelogAudit(changelogAuditVo);
+                insertChangelogAuditDetail(sqlHash, sql);
+            }
         }
         return isError;
     }

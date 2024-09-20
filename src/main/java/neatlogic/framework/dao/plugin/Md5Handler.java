@@ -15,9 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dao.plugin;
 
+import neatlogic.framework.util.Md5Util;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.springframework.util.DigestUtils;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -36,10 +36,11 @@ public class Md5Handler implements TypeHandler<Object>, NeatLogicTypeHandler<Obj
     public Object handleParameter(Object parameter) {
         if (parameter != null) {
             String parameterStr = parameter.toString().toLowerCase(Locale.ROOT);
-            parameter = DigestUtils.md5DigestAsHex(parameterStr.getBytes());
+            parameter = Md5Util.encryptMD5(parameterStr);
         }
         return parameter;
     }
+
 
     @Override
     public String getResult(ResultSet rs, String columnName) throws SQLException {

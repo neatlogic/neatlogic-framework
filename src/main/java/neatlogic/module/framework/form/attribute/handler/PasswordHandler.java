@@ -51,13 +51,7 @@ public class PasswordHandler extends FormHandlerBase {
 
     @Override
     public Object conversionDataType(Object source, String attributeLabel) {
-        if (source == null) {
-            return null;
-        }
-        if (source instanceof String) {
-            return RC4Util.encrypt((String) source);
-        }
-        throw new AttributeValidException(attributeLabel);
+        return convertToString(source, attributeLabel);
     }
 
     @Override
@@ -156,5 +150,16 @@ public class PasswordHandler extends FormHandlerBase {
     @Override
     public Object dataTransformationForExcel(AttributeDataVo attributeDataVo, JSONObject configObj) {
         return attributeDataVo.getDataObj();
+    }
+
+    @Override
+    public Object passwordEncryption(Object source, JSONObject configObj) {
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof String) {
+            return RC4Util.encrypt((String) source);
+        }
+        return source;
     }
 }

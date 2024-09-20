@@ -114,4 +114,14 @@ public interface IFormAttributeDataConversionHandler {
         return 1;
     }
 
+    /**
+     * 密码加密
+     * @param source 属性原始数据
+     * @param configObj 属性配置信息
+     * @return 返回加密后的数据
+     */
+    default Object passwordEncryption(Object source, JSONObject configObj) {
+        return source;
+    }
+
 }

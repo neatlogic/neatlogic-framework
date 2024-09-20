@@ -23,7 +23,6 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Locale;
 
 public class Md5Handler implements TypeHandler<Object>, NeatLogicTypeHandler<Object> {
 
@@ -35,7 +34,8 @@ public class Md5Handler implements TypeHandler<Object>, NeatLogicTypeHandler<Obj
     @Override
     public Object handleParameter(Object parameter) {
         if (parameter != null) {
-            String parameterStr = parameter.toString().toLowerCase(Locale.ROOT);
+            //String parameterStr = parameter.toString().toLowerCase(Locale.ROOT);
+            String parameterStr = parameter.toString();
             parameter = Md5Util.encryptMD5(parameterStr);
         }
         return parameter;

@@ -20,10 +20,11 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ModuleGroupVo {
+public class ModuleGroupVo implements Serializable {
 
     @EntityField(name = "模块分组", type = ApiParamType.STRING)
     private String group;

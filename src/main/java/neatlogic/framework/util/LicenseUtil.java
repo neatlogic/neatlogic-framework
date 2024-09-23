@@ -17,18 +17,25 @@ package neatlogic.framework.util;
 
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.dto.LicenseVo;
+import neatlogic.framework.common.constvalue.license.ILicensePolicy;
+import neatlogic.framework.dto.license.LicenseInvalidVo;
+import neatlogic.framework.dto.license.LicenseVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class LicenseUtil {
     static Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
 
+    public static Map<String, LicenseInvalidVo> licenseInvalidTipsMap = new HashMap<>();
+
+    public static Map<String, ILicensePolicy> licensePolicyMap = new HashMap<>();
     /**
      * 根据租户设置license
      *

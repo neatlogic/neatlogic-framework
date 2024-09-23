@@ -1,19 +1,21 @@
-/*Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+/*
+ * Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-
-package neatlogic.framework.dto;
+package neatlogic.framework.dto.license;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.config.Config;
@@ -23,10 +25,11 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LicenseVo {
+public class LicenseVo implements Serializable {
     @EntityField(name = "nfd.licensevo.entityfield.name.dburl", type = ApiParamType.STRING)
     private String dbUrl;
     @EntityField(name = "nfd.licensevo.entityfield.name.purchaser", type = ApiParamType.STRING)
@@ -49,13 +52,18 @@ public class LicenseVo {
     private Boolean isEnd;
     @EntityField(name = "nfd.licensevo.entityfield.name.isvalid", type = ApiParamType.BOOLEAN)
     private Boolean isValid;
+    @EntityField(name = "模块规则", type = ApiParamType.JSONOBJECT)
+    private List<LicenseModuleVo> modulesPolicy;
 
     public Boolean getIsValid() {
-        return expirationDate != null && StringUtils.isNotBlank(dbUrl) && Config.DB_URL().equalsIgnoreCase(dbUrl);
+        return StringUtils.isNotBlank(dbUrl) && Config.DB_URL().equalsIgnoreCase(dbUrl);
     }
 
     public Long getEndDate() {
-        return expirationDate + (long) gracePeriod * 24 * 60 * 60 * 1000;
+        if(expirationDate != null) {
+            return expirationDate + (long) gracePeriod * 24 * 60 * 60 * 1000;
+        }
+        return null;
     }
 
 
@@ -121,5 +129,13 @@ public class LicenseVo {
 
     public void setModules(List<String> modules) {
         this.modules = modules;
+    }
+
+    public List<LicenseModuleVo> getModulesPolicy() {
+        return modulesPolicy;
+    }
+
+    public void setModulesPolicy(List<LicenseModuleVo> modulesPolicy) {
+        this.modulesPolicy = modulesPolicy;
     }
 }

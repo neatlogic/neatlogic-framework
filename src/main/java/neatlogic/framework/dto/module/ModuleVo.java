@@ -21,9 +21,10 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ModuleVo {
+public class ModuleVo implements Serializable {
     @EntityField(name = "模块id", type = ApiParamType.STRING)
     private String id;
     @EntityField(name = "模块名", type = ApiParamType.STRING)

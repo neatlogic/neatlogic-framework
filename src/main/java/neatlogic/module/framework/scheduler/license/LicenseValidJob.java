@@ -48,10 +48,10 @@ import java.util.stream.Collectors;
  */
 @Component
 @DisallowConcurrentExecution
-public class LicensePolicyValidJob extends JobBase {
+public class LicenseValidJob extends JobBase {
     @Override
     public String getGroupName() {
-        return TenantContext.get().getTenantUuid() + "-LICENSE-POLICY-VALID-GROUP";
+        return TenantContext.get().getTenantUuid() + "-LICENSE-VALID-GROUP";
     }
 
     @Override
@@ -67,7 +67,7 @@ public class LicensePolicyValidJob extends JobBase {
     @Override
     public void initJob(String tenantUuid) {
         //每个小时的50分执行一次
-        JobObject jobObject = new JobObject.Builder("LICENSE-POLICY-VALID-JOB", this.getGroupName(), this.getClassName(), tenantUuid)
+        JobObject jobObject = new JobObject.Builder("LICENSE-VALID-JOB", this.getGroupName(), this.getClassName(), tenantUuid)
                 .withCron("0 50 * * * ?")
                 //.withIntervalInSeconds(10)//test
                 .build();

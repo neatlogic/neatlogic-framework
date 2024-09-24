@@ -22,7 +22,8 @@ import neatlogic.framework.util.$;
 public enum LicenseInvalidTypeEnum {
 
     ERROR("error", "异常"),
-    WARN("warn", "告警");
+    WARN("warn", "告警"),
+    INFO("info", "提示");
     private final String value;
     private final String text;
 

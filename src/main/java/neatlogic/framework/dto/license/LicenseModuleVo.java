@@ -17,6 +17,7 @@
 
 package neatlogic.framework.dto.license;
 
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.LicenseUtil;
@@ -36,7 +37,7 @@ public class LicenseModuleVo implements Serializable {
     List<LicenseModulePolicyVo> policy;
 
     @EntityField(name = "nfd.licensevo.entityfield.name.graceperiod", type = ApiParamType.INTEGER)
-    private int gracePeriod;
+    private int gracePeriod = 0;
     @EntityField(name = "到期禁用模块", type = ApiParamType.INTEGER)
     private int isBanModule;
 
@@ -55,6 +56,10 @@ public class LicenseModuleVo implements Serializable {
 
     public void setExpirationDate(Long expirationDate) {
         this.expirationDate = expirationDate;
+    }
+
+    public Boolean getIsWillExpired() {
+        return expirationDate != null && (expirationDate - (long)Config.LICENSE_WILL_EXPIRED_NOTIFY_DAY() * 24 * 60 * 60 * 1000) < System.currentTimeMillis();
     }
 
     public Boolean getIsExpired() {

@@ -132,7 +132,9 @@ public class Config {
 
     private static boolean ENABLE_METHOD_TIMING_ASPECT;// 启动方法执行耗时日志
 
-    public static int SQLRUNNER_QUERY_TIMEOUT; //sql执行超时时间(s)设置，目前就报表会用到
+    private static int SQLRUNNER_QUERY_TIMEOUT; //sql执行超时时间(s)设置，目前就报表会用到
+
+    private static int LICENSE_WILL_EXPIRED_NOTIFY_DAY;//license 即将超时提醒天数
 
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
@@ -450,6 +452,9 @@ public class Config {
     public static Integer SQLRUNNER_QUERY_TIMEOUT() {
         return SQLRUNNER_QUERY_TIMEOUT;
     }
+    public static Integer LICENSE_WILL_EXPIRED_NOTIFY_DAY() {
+        return LICENSE_WILL_EXPIRED_NOTIFY_DAY;
+    }
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -539,14 +544,14 @@ public class Config {
     private static void loadNacosProperties(String configInfo) {
         try {
             Properties prop = new Properties();
-            if (StringUtils.isNotBlank(configInfo)) {
+           /* if (StringUtils.isNotBlank(configInfo)) {
                 prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
                 System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos"));
-            } else {
+            } else {*/
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
                 System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
-            }
+            //}
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
@@ -611,6 +616,7 @@ public class Config {
             AUTOEXEC_TOKEN = prop.getProperty("autoexec.token", "499922b4317c251c2ce525f7b83e3d94");
 
             ENABLE_METHOD_TIMING_ASPECT = Boolean.parseBoolean(prop.getProperty("enable.method.timing.aspect", "false"));
+            LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");
             Set<Class<? extends IConfigListener>> listeners = reflections.getSubTypesOf(IConfigListener.class);

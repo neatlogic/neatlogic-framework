@@ -16,12 +16,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.fulltextindex.dto.fulltextindex;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class FullTextIndexWordOffsetVo {
     private String word;
     private String type;
     private int start;
     private int end;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FullTextIndexWordOffsetVo)) return false;
+        FullTextIndexWordOffsetVo that = (FullTextIndexWordOffsetVo) o;
+        return start == that.start && end == that.end && Objects.equals(word, that.word) && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(word, type, start, end);
+    }
 
     public FullTextIndexWordOffsetVo() {
     }

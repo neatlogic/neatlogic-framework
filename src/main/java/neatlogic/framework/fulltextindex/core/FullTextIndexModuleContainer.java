@@ -7,12 +7,10 @@ import java.util.Locale;
 /**
  * @Title: FullTextIndexModuleContainer
  * @Package: neatlogic.framework.fulltextindex.core
- * @Description: TODO
- * @author: chenqiwei
  * @date: 2021/3/15:14 下午
  **/
 public class FullTextIndexModuleContainer {
-    private final static ThreadLocal<String> MODULE_ID = new ThreadLocal<>();
+    private static final ThreadLocal<String> MODULE_ID = new ThreadLocal<>();
 
     public static void set(String moduleId) {
         if (StringUtils.isNotBlank(moduleId)) {

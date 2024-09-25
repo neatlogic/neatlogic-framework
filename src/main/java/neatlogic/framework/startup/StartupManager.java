@@ -41,9 +41,9 @@ import java.util.stream.Collectors;
 
 @RootComponent
 public class StartupManager extends ModuleInitializedListenerBase {
-    private final static Logger logger = LoggerFactory.getLogger(StartupManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(StartupManager.class);
 
-    private final static List<IStartup> startupList = new ArrayList<>();
+    private static final List<IStartup> startupList = new ArrayList<>();
 
     public static List<IStartup> getStartupList() {
         return startupList;

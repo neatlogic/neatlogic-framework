@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class DocumentVo extends BasePageVo {
     private final Logger logger = LoggerFactory.getLogger(DocumentVo.class);
@@ -53,7 +52,7 @@ public class DocumentVo extends BasePageVo {
     @JSONField(serialize = false)//查询条件：分词列表
     private List<FullTextIndexWordVo> fullTextIndexWordList;
     @EntityField(name = "关键字分词结果", type = ApiParamType.JSONARRAY)
-    private Set<String> wordList;
+    private List<String> wordList;
     @EntityField(name = "是否有权限查看", type = ApiParamType.BOOLEAN)
     private Boolean canRead = true;
     @EntityField(name = "搜索命中次数", type = ApiParamType.INTEGER)
@@ -131,7 +130,7 @@ public class DocumentVo extends BasePageVo {
         this.clickCount = clickCount;
     }
 
-    public Set<String> getWordList() {
+    public List<String> getWordList() {
         if (CollectionUtils.isEmpty(wordList) && StringUtils.isNotBlank(getKeyword())) {
             try {
                 wordList = FullTextIndexUtil.sliceKeyword(getKeyword());

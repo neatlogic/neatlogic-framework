@@ -27,23 +27,71 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.wltea.analyzer.cfg.DefaultConfig;
+import org.wltea.analyzer.dic.Dictionary;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FullTextIndexUtil {
     static Logger logger = LoggerFactory.getLogger(FullTextIndexUtil.class);
-    private static final Analyzer indexAnalyzer = new IKAnalyzer(false);//分词细一点
-    private static final Analyzer searchAnalyzer = new IKAnalyzer(true);//分词粗一点
+    private static final Analyzer smartAnalyzer = new IKAnalyzer(true);//分词细一点
+    private static final Analyzer termAnalyzer = new IKAnalyzer(true);//分词粗一点
+
+    static {
+        //初始化字典，便于后面动态增加词
+        Dictionary.initial(DefaultConfig.getInstance());
+    }
+
+    // 获取 Dictionary 实例
+    Dictionary dictionary = Dictionary.getSingleton();
     private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+
+    //添加词进字典
+    public static void addWord(String... words) {
+        if (words != null && words.length > 0) {
+            List<String> wordList = Arrays.asList(words);
+            wordList.removeIf(StringUtils::isBlank);
+            if (CollectionUtils.isNotEmpty(wordList)) {
+                Set<String> newWordList = new HashSet<>();
+                for (String word : wordList) {
+                    word = word.replace("_", "");
+                    word = word.replace("-", "");
+                    String[] newwords = word.split("\\s+");
+                    if (newwords.length > 0) {
+                        Collections.addAll(newWordList, newwords);
+                    }
+                }
+                Dictionary dictionary = Dictionary.getSingleton();
+                dictionary.addWords(newWordList);
+            }
+        }
+    }
+
+    //添加词进字典
+    public static void addWord(List<String> wordList) {
+        if (CollectionUtils.isNotEmpty(wordList)) {
+            wordList.removeIf(StringUtils::isBlank);
+            if (CollectionUtils.isNotEmpty(wordList)) {
+                Set<String> newWordList = new HashSet<>();
+                for (String word : wordList) {
+                    word = word.replace("_", "");
+                    word = word.replace("-", "");
+                    String[] words = word.split("\\s+");
+                    if (words.length > 0) {
+                        Collections.addAll(newWordList, words);
+                    }
+                }
+                Dictionary dictionary = Dictionary.getSingleton();
+                dictionary.addWords(newWordList);
+            }
+        }
+    }
 
     /**
      * 对搜索关键字进行分词
@@ -51,13 +99,16 @@ public class FullTextIndexUtil {
      * @param keyword 搜索关键字
      * @return 分词结果
      */
-    public static Set<String> sliceKeyword(String keyword) {
-        Set<String> wordList = new HashSet<>();
-        /*
-         * for (String w : word.split("[\\s]+")) { if (StringUtils.isNotBlank(w)
-         * && !wholdWordList.contains(w)) { wholdWordList.add(w); } }
-         */
+    public static List<String> sliceKeyword(String keyword) {
+        List<String> wordList = new ArrayList<>();
+
+
         if (StringUtils.isNotBlank(keyword)) {
+            //碰到-或_，统一去掉，当成一个词处理
+            keyword = keyword.replace("_", "");
+            keyword = keyword.replace("-", "");
+
+            //转换所有双引号为半角双引号
             keyword = keyword.replace("'", "\"");
             keyword = keyword.replace("“", "\"");
             keyword = keyword.replace("”", "\"");
@@ -67,7 +118,9 @@ public class FullTextIndexUtil {
                 Matcher matcher = pattern.matcher(keyword);
                 while (matcher.find()) {
                     String w = matcher.group(1);
-                    wordList.add(w);
+                    if (!wordList.contains(w)) {
+                        wordList.add(w);
+                    }
                     matcher.appendReplacement(temp, " ");
                 }
                 matcher.appendTail(temp);
@@ -76,12 +129,14 @@ public class FullTextIndexUtil {
             if (StringUtils.isNotBlank(keyword)) {
                 try {
                     Reader reader = new StringReader(keyword);
-                    TokenStream stream = searchAnalyzer.tokenStream(null, reader);
+                    TokenStream stream = smartAnalyzer.tokenStream(null, reader);
                     CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
                     stream.reset();
                     while (stream.incrementToken()) {
                         String w = term.toString();
-                        wordList.add(w);
+                        if (!wordList.contains(w)) {
+                            wordList.add(w);
+                        }
                     }
                     stream.end();
                     stream.close();
@@ -89,9 +144,6 @@ public class FullTextIndexUtil {
                     logger.error(ex.getMessage(), ex);
                 }
             }
-        }
-        if (CollectionUtils.isEmpty(wordList) && StringUtils.isNotBlank(keyword)) {
-            wordList.add(keyword);
         }
         return wordList;
     }
@@ -106,19 +158,39 @@ public class FullTextIndexUtil {
     public static List<FullTextIndexWordOffsetVo> sliceWord(String content) throws IOException {
         List<FullTextIndexWordOffsetVo> wordList = new ArrayList<>();
         if (StringUtils.isNotBlank(content)) {
-            Reader reader = new StringReader(content);
-            TokenStream stream = indexAnalyzer.tokenStream("", reader);
-            CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
-            OffsetAttribute offset = stream.addAttribute(OffsetAttribute.class);// 位置数据
-            TypeAttribute type = stream.addAttribute(TypeAttribute.class);
+            //碰到-或_，统一去掉，当成一个词处理
+            content = content.replace("_", "");
+            content = content.replace("-", "");
 
-            stream.reset();
-            while (stream.incrementToken()) {
-                wordList.add(new FullTextIndexWordOffsetVo(term.toString(), type.type(), offset.startOffset(), offset.endOffset()));
+            Reader smartReader = new StringReader(content);
+            //先用智能分词处理一次
+            TokenStream smartStream = smartAnalyzer.tokenStream("", smartReader);
+            CharTermAttribute smartTerm = smartStream.addAttribute(CharTermAttribute.class);
+            OffsetAttribute smartOffset = smartStream.addAttribute(OffsetAttribute.class);// 位置数据
+            TypeAttribute smartType = smartStream.addAttribute(TypeAttribute.class);
+            smartStream.reset();
+            while (smartStream.incrementToken()) {
+                wordList.add(new FullTextIndexWordOffsetVo(smartTerm.toString(), smartType.type(), smartOffset.startOffset(), smartOffset.endOffset()));
             }
 
-            stream.end();
-            stream.close();
+            smartStream.end();
+            smartStream.close();
+
+            //再用词组分词处理一次
+            Reader termReader = new StringReader(content);
+            TokenStream termStream = termAnalyzer.tokenStream("", termReader);
+            CharTermAttribute termTerm = termStream.addAttribute(CharTermAttribute.class);
+            OffsetAttribute termOffset = termStream.addAttribute(OffsetAttribute.class);// 位置数据
+            TypeAttribute termType = termStream.addAttribute(TypeAttribute.class);
+            termStream.reset();
+            while (termStream.incrementToken()) {
+                FullTextIndexWordOffsetVo wordOffsetVo = new FullTextIndexWordOffsetVo(termTerm.toString(), termType.type(), termOffset.startOffset(), termOffset.endOffset());
+                if (!wordList.contains(wordOffsetVo)) {
+                    wordList.add(wordOffsetVo);
+                }
+            }
+            termStream.end();
+            termStream.close();
 
             //额外的分词器
             List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
@@ -131,12 +203,18 @@ public class FullTextIndexUtil {
         return wordList;
     }
 
-    public static void main(String[] arg) throws IOException {
-        String content = "今天天气不错，有个ip是192.168.122.224/29 80.40.16.28/32，哈哈哈额，另一个IP是192.168.0.2";
+    public static void main(String[] arg) throws IOException, NoSuchFieldException, IllegalAccessException {
+        Dictionary dictionary = Dictionary.getSingleton();
+        dictionary.addWords(new ArrayList<String>() {{
+            this.add("OBS华为云");
+        }});
+
+        String content = "OBS华为云";
         List<FullTextIndexWordOffsetVo> list = sliceWord(content);
         for (FullTextIndexWordOffsetVo vo : list) {
             System.out.println("s:" + vo.getStart() + " e:" + vo.getEnd() + " w:" + vo.getWord() + " t:" + vo.getType());
         }
+
 
     }
 

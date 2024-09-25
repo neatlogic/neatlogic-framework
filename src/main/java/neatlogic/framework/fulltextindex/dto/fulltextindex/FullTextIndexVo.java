@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class FullTextIndexVo {
-    private final static Logger logger = LoggerFactory.getLogger(FullTextIndexVo.class);
+    private static final Logger logger = LoggerFactory.getLogger(FullTextIndexVo.class);
     @EntityField(name = "目标id", type = ApiParamType.LONG)
     private Long targetId;
     @EntityField(name = "目标类型", type = ApiParamType.STRING)
@@ -204,10 +204,19 @@ public class FullTextIndexVo {
         }
 
         public WordVo(String content) {
+            //处理掉下划线和中划线
+            if (StringUtils.isNotBlank(content)) {
+                content = content.replace("-", "");
+                content = content.replace("_", "");
+            }
             this.content = content;
         }
 
         public WordVo(Boolean isNeedSliceWord, String content) {
+            if (StringUtils.isNotBlank(content)) {
+                content = content.replace("-", "");
+                content = content.replace("_", "");
+            }
             this.isNeedSliceWord = isNeedSliceWord;
             this.content = content;
         }

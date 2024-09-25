@@ -62,7 +62,11 @@ public class IpSlicer implements IFullTextSlicer {
     public void sliceWord(List<FullTextIndexWordOffsetVo> wordList, String content) {
         List<FullTextIndexWordOffsetVo> ipParts = extractIP(content);
         if (CollectionUtils.isNotEmpty(ipParts)) {
-            wordList.addAll(ipParts);
+            for (FullTextIndexWordOffsetVo ipPart : ipParts) {
+                if (!wordList.contains(ipPart)) {
+                    wordList.add(ipPart);
+                }
+            }
         }
     }
 }

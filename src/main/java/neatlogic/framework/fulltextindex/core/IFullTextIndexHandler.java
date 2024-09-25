@@ -22,6 +22,18 @@ public interface IFullTextIndexHandler {
 
     IFullTextIndexType getType();
 
+    /**
+     * 初始化专有名词入字典
+     */
+    default <T> void initialTerms(T param) {
+    }
+
+
+    /**
+     * 添加专有名词入字典
+     */
+    default void addTerms(String... term) {
+    }
 
     /*
      * @Description: 创建索引

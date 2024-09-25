@@ -25,8 +25,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BasePageVo implements Serializable {
     //以当前页起最多展示页码数
@@ -53,7 +53,7 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private String keyword;
     @JSONField(serialize = false)
-    private Set<String> keywordList;
+    private List<String> keywordList;
     @EntityField(name = "总条数", type = ApiParamType.INTEGER)
     @JSONField(serialize = false)
     private Integer rowNum = 0;
@@ -187,10 +187,10 @@ public class BasePageVo implements Serializable {
         return keyword;
     }
 
-    public final Set<String> getKeywordList() {
+    public final List<String> getKeywordList() {
         if (CollectionUtils.isEmpty(this.keywordList) && StringUtils.isNotBlank(keyword)) {
             if (this.keyword.startsWith("\"") && this.keyword.endsWith("\"")) {
-                this.keywordList = new HashSet<String>() {{
+                this.keywordList = new ArrayList<String>() {{
                     this.add(keyword.substring(1, keyword.length() - 1));
                 }};
             } else {

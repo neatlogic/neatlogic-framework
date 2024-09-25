@@ -81,6 +81,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
      **/
     protected abstract String getModuleId();
 
+
     @Override
     public void deleteIndex(Long targetId) {
         AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>("FULLTEXTINDEX-DELETE-" + this.getType().getType().toUpperCase(Locale.ROOT) + "-" + targetId);
@@ -227,6 +228,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         }
         fatherElement.setContent(newContentList);
     }
+
 
     @Override
     public final void makeupDocument(DocumentVo documentVo) {

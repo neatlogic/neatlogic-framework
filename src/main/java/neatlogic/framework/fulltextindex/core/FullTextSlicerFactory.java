@@ -19,10 +19,13 @@ package neatlogic.framework.fulltextindex.core;
 
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class FullTextSlicerFactory {
+    private static final Logger logger = LoggerFactory.getLogger(FullTextSlicerFactory.class);
     private static final Map<String, IFullTextSlicer> slicerMap = new HashMap<>();
     private static final List<IFullTextSlicer> slicerList = new ArrayList<>();
 
@@ -38,7 +41,7 @@ public class FullTextSlicerFactory {
                     slicerList.add(slicer);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                logger.error(ex.getMessage(), ex);
             }
         }
     }

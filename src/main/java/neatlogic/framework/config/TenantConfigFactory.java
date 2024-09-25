@@ -29,7 +29,7 @@ public class TenantConfigFactory {
 
         for (Class<? extends ITenantConfig> clazz : clazzSet) {
             ITenantConfig[] tenantConfigs = clazz.getEnumConstants();
-            if (tenantConfigs != null && tenantConfigs.length > 0) {
+            if (tenantConfigs != null) {
                 for (ITenantConfig tenantConfig : tenantConfigs) {
                     tenantConfigMap.put(tenantConfig.getKey(), tenantConfig);
                 }

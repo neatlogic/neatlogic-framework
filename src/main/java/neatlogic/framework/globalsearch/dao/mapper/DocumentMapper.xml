@@ -34,20 +34,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="searchDocument" parameterType="neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo"
             resultType="neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo">
         SELECT
-        count(b.target_id) AS hitCount,
+        count(b.word_id) AS hitCount,
         a.target_type AS type,
-        a.target_id AS targetId,
-        GROUP_CONCAT(DISTINCT concat(b.target_field,':',c.start,',',c.end)
-        ORDER BY c.start ASC
-        SEPARATOR
-        ';') AS offset
+        a.target_id AS targetId
+        <if test="needOffset == 1">
+            ,
+            GROUP_CONCAT(DISTINCT concat(b.target_field,':',c.start,',',c.end)
+            ORDER BY c.start ASC
+            SEPARATOR
+            ';') AS offset
+        </if>
         FROM
         `fulltextindex_target_${moduleId}` a
         JOIN `fulltextindex_field_${moduleId}` b ON a.target_id = b.target_id
-        JOIN `fulltextindex_offset_${moduleId}` c on b.id = c.field_id
+        <if test="needOffset == 1">
+            JOIN `fulltextindex_offset_${moduleId}` c on b.id = c.field_id
+        </if>
         <include refid="searchDocumentCondition"/>
         GROUP BY b.target_id
-        ORDER BY hitCount desc, b.target_id desc
+        ORDER BY hitCount desc
         LIMIT #{startNum}, #{pageSize}
     </select>
 

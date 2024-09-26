@@ -45,6 +45,8 @@ public class DocumentVo extends BasePageVo {
     private String typeText;
     @EntityField(name = "目标链接", type = ApiParamType.STRING)
     private String targetUrl;
+    @JSONField(serialize = false)
+    private Integer needOffset;//是否需要返回关键字的位置
     @JSONField(serialize = false)//查询条件：类型列表
     private List<String> typeList;
     @JSONField(serialize = false)//查询条件：文档所属模块
@@ -94,6 +96,14 @@ public class DocumentVo extends BasePageVo {
 
     public String getType() {
         return type;
+    }
+
+    public Integer getNeedOffset() {
+        return needOffset;
+    }
+
+    public void setNeedOffset(Integer needOffset) {
+        this.needOffset = needOffset;
     }
 
     public void setType(String type) {

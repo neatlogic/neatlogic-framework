@@ -48,8 +48,6 @@ public class FullTextIndexUtil {
         Dictionary.initial(DefaultConfig.getInstance());
     }
 
-    // 获取 Dictionary 实例
-    Dictionary dictionary = Dictionary.getSingleton();
     private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
     //添加词进字典
@@ -63,8 +61,12 @@ public class FullTextIndexUtil {
                     word = word.replace("_", "");
                     word = word.replace("-", "");
                     String[] newwords = word.split("\\s+");
-                    if (newwords.length > 0) {
-                        Collections.addAll(newWordList, newwords);
+                    for (String w : newwords) {
+                        if (StringUtils.isNotBlank(w) && StringUtils.isNotBlank(w.trim())) {
+                            if (w.trim().length() <= 200) {
+                                newWordList.add(w.trim());
+                            }
+                        }
                     }
                 }
                 Dictionary dictionary = Dictionary.getSingleton();
@@ -83,8 +85,12 @@ public class FullTextIndexUtil {
                     word = word.replace("_", "");
                     word = word.replace("-", "");
                     String[] words = word.split("\\s+");
-                    if (words.length > 0) {
-                        Collections.addAll(newWordList, words);
+                    for (String w : words) {
+                        if (StringUtils.isNotBlank(w) && StringUtils.isNotBlank(w.trim())) {
+                            if (w.trim().length() <= 200) {
+                                newWordList.add(w.trim());
+                            }
+                        }
                     }
                 }
                 Dictionary dictionary = Dictionary.getSingleton();

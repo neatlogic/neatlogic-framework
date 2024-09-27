@@ -544,14 +544,14 @@ public class Config {
     private static void loadNacosProperties(String configInfo) {
         try {
             Properties prop = new Properties();
-           /* if (StringUtils.isNotBlank(configInfo)) {
+           if (StringUtils.isNotBlank(configInfo)) {
                 prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
                 System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos"));
-            } else {*/
+            } else {
                 // 如果从nacos中读不出配置，则使用本地配置文件配置
                 prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
                 System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
-            //}
+            }
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));

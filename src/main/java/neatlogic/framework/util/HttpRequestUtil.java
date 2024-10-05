@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -625,7 +626,7 @@ public class HttpRequestUtil {
                 // 以下针对内部系统之间的接口调用
                 String message = e.getMessage();
                 try {
-                    JSONObject object = JSONObject.parseObject(message);
+                    JSONObject object = JSON.parseObject(message);
                     message = object.getString("Message");
                 } catch (Exception ignored) {
                 }
@@ -671,7 +672,7 @@ public class HttpRequestUtil {
 
     public JSONObject getResultJson() {
         if (StringUtils.isNotBlank(result)) {
-            return JSONObject.parseObject(result);
+            return JSON.parseObject(result);
         } else {
             return null;
         }
@@ -679,7 +680,7 @@ public class HttpRequestUtil {
 
     public JSONArray getResultJsonArray() {
         if (StringUtils.isNotBlank(result)) {
-            return JSONObject.parseArray(result);
+            return JSON.parseArray(result);
         } else {
             return null;
         }

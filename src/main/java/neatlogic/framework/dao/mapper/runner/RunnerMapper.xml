@@ -41,6 +41,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <collection property="runnerIdList" ofType="java.lang.Long">
             <id column="runnerId"/>
         </collection>
+        <collection property="tagList" ofType="java.lang.String">
+            <id column="tagName"/>
+        </collection>
     </resultMap>
 
     <resultMap id="runnerMapGroupMap" type="neatlogic.framework.dto.runner.RunnerGroupVo">
@@ -188,6 +191,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         nk.`group_id` as groupId,
         nk.`network_ip` as networkIp,
         nk.`mask` as mask,
+        t.`name` as tagName,
         r.`id` as runnerId
         FROM
         (SELECT DISTINCT
@@ -208,6 +212,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         LEFT JOIN runnergroup_network nk ON g.`id` = nk.`group_id`
         LEFT JOIN runnergroup_runner rgr ON rgr.`runnergroup_id` = g.`id`
         LEFT JOIN runner r ON r.`id` = rgr.`runner_id`
+        LEFT JOIN runnergroup_tag rt ON g.`id` = rt.`group_id`
+        LEFT JOIN tag t ON t.`id` = rt.`tag_id`
         ORDER BY g.`id` DESC, nk.`id` DESC
 
     </select>
@@ -749,6 +755,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             ( #{groupId}, #{runnerId})
         </foreach>
     </insert>
+    <insert id="insertRunnerTag">
+        INSERT INTO `runnergroup_tag`(`group_id`,`tag_id`)
+        VALUES (#{groupId},
+                #{tagId})
+    </insert>
 
     <delete id="deleteRunnerById">
         delete
@@ -773,6 +784,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         from runnergroup_runner
         where `runnergroup_id` = #{groupId}
           and `runner_id` = #{runnerId}
+    </delete>
+    <delete id="deleteGroupTag">
+        delete
+        from runnergroup_tag
+        where `group_id` = #{value}
     </delete>
 
 </mapper>

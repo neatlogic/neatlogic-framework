@@ -16,10 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.dao.mapper.runner;
 
 
-import neatlogic.framework.dto.runner.GroupNetworkVo;
-import neatlogic.framework.dto.runner.RunnerGroupVo;
-import neatlogic.framework.dto.runner.RunnerMapVo;
-import neatlogic.framework.dto.runner.RunnerVo;
+import neatlogic.framework.dto.runner.*;
 import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -93,6 +90,8 @@ public interface RunnerMapper {
 
     void insertNetwork(GroupNetworkVo networkVo);
 
+    void insertRunnerTag(GroupTagVo groupTagVo);
+
     void replaceRunner(RunnerVo runnerVo);
 
     void insertRunnerGroupRunnerByRunnerIdListAndGroupId(@Param("runnerIdList") List<Long> runnerIdList, @Param("groupId") Long groupId);
@@ -114,5 +113,7 @@ public interface RunnerMapper {
     void deleteRunnerGroupRunnerByRunnerId(Long runnerId);
 
     void deleteRunnerGroupRunnerByGroupIdAndRunnerId(@Param("groupId") Long groupId, @Param("runnerId") Long runnerId);
+
+    void deleteGroupTag(Long groupId);
 
 }

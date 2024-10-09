@@ -46,6 +46,8 @@ public class RunnerGroupVo extends BasePageVo {
     private List<Long> runnerIdList;
     @EntityField(name = "组内runner个数", type = ApiParamType.INTEGER)
     private Integer runnerCount = 0;
+    @EntityField(name = "标签", type = ApiParamType.STRING)
+    private List<String> tagList;
 
     private List<GroupNetworkVo> networkList;
 
@@ -145,5 +147,13 @@ public class RunnerGroupVo extends BasePageVo {
 
     public void setRunnerCount(Integer runnerCount) {
         this.runnerCount = runnerCount;
+    }
+
+    public List<String> getTagList() {
+        return tagList;
+    }
+
+    public void setTagList(List<String> tagList) {
+        this.tagList = tagList;
     }
 }

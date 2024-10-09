@@ -2,19 +2,44 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.TagMapper">
 
+	<select id="getTagIdByNameAndType" resultType="java.lang.Long">
+		SELECT
+		`id`
+		FROM `tag`
+		where
+			`type` = #{type} and `name` LIKE CONCAT('%', #{name}, '%')
+	</select>
+
+	<select id="getTagLockById" resultType="neatlogic.framework.dto.TagVo">
+		SELECT
+			`id`,
+			`name`,
+			`type`
+		FROM `tag`
+		where `id` = #{id} for update
+	</select>
+
 	<select id="searchTag" parameterType="neatlogic.framework.dto.TagVo" resultType="neatlogic.framework.dto.TagVo">
 		SELECT
 		`id`,
-		`name`
+		`name`,
+		`type`
 		FROM `tag`
 		<where>
+			`type` = #{type}
 			<if test="name != null and name != ''">
 				and name LIKE CONCAT('%', #{name}, '%')
 			</if>
-			<if test="id != null and id != 0L">
-				AND `id` = #{id}
-			</if>
 		</where>
+	</select>
+
+	<select id="searchNoUseTag" resultType="neatlogic.framework.dto.TagVo">
+		SELECT
+			`id`,
+			`name`,
+			`type`
+		FROM `tag` t left join `runnergroup_tag` rt on t.id = rt.tag_id
+		where t.type = 'runnergroup' and rt.group_id is null
 	</select>
 	
 	<select id="getTagListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.TagVo">
@@ -27,15 +52,12 @@
 	#{id}
 	</foreach>
 	</select>
-	
+
 	<insert id="insertTag" parameterType="neatlogic.framework.dto.TagVo">
-		<selectKey keyProperty="id" resultType="java.lang.Long" order="AFTER">
-			select LAST_INSERT_ID() as id
-		</selectKey>
 		INSERT INTO `tag`(
-			`name`
+		`id`,`name`,`type`
 		) VALUES (
-			#{name}
+		#{id},#{name},#{type}
 		)
 	</insert>
 

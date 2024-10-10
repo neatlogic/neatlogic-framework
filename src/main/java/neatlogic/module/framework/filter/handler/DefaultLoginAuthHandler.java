@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.exception.tenant.TenantInvalidException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.zip.GZIPInputStream;
 @Service
 public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
@@ -112,6 +114,10 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                         if (result.equals(jwtParts[2])) {
                             String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8);
                             JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+                            //防止header中的租户和token不一致
+                            if(!Objects.equals(request.getHeader("tenant"),jwtBodyObj.getString("tenant"))){
+                                throw new TenantInvalidException(request.getHeader("tenant"));
+                            }
                             userVo.setUuid(jwtBodyObj.getString("useruuid"));
                             userVo.setUserId(jwtBodyObj.getString("userid"));
                             userVo.setUserName(jwtBodyObj.getString("username"));

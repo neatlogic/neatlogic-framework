@@ -26,9 +26,9 @@ import java.util.Set;
 
 public interface RunnerMapper {
 
-    List<GroupNetworkVo> getAllNetworkMask();
+    List<GroupNetworkVo> getAllNetworkMask(List<Long> runnerGroupIdList);
 
-    List<RunnerMapVo> getAllRunnerMap();
+    List<RunnerMapVo> getAllRunnerMap(List<Long> runnerGroupIdList);
 
     List<RunnerVo> getRunnerListByGroupId(Long runnerGroupId);
 
@@ -59,6 +59,8 @@ public interface RunnerMapper {
     List<RunnerGroupVo> getRunnerGroupByIdList(List<Long> idlist);
 
     RunnerGroupVo getRunnerGroupByName(String string);
+
+    List<RunnerGroupVo> getRunnerGroupByTagIdList(List<Long> tagIdList);
 
     List<RunnerMapVo> getRunnerMapListByRunnerGroupId(Long runnerGroupId);
 

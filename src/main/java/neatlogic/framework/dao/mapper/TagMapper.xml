@@ -19,6 +19,15 @@
 		where `id` = #{id} for update
 	</select>
 
+	<select id="getTagById" resultType="neatlogic.framework.dto.TagVo">
+		SELECT
+			`id`,
+			`name`,
+			`type`
+		FROM `tag`
+		where `id` = #{id}
+	</select>
+
 	<select id="searchTag" parameterType="neatlogic.framework.dto.TagVo" resultType="neatlogic.framework.dto.TagVo">
 		SELECT
 		`id`,
@@ -52,6 +61,111 @@
 	#{id}
 	</foreach>
 	</select>
+	<select id="searchTagCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer" useCache="false">
+		SELECT
+		COUNT(1)
+		FROM
+		`tag` a
+		<where>
+			<include refid="searchForMatrixSql"/>
+		</where>
+	</select>
+	<select id="searchTagForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.util.HashMap" useCache="false">
+		SELECT
+		a.id,a.`name`,a.`type`
+		FROM
+		`tag` a
+		<where>
+			<include refid="searchForMatrixSql"/>
+		</where>
+	</select>
+	<sql id="searchForMatrixSql">
+		<if test="notNullColumnList != null and notNullColumnList.size() > 0">
+			<foreach collection="notNullColumnList" item="notColumn" separator="AND">
+				${notColumn} IS NOT NULL
+			</foreach>
+		</if>
+		<if test="filterList != null and filterList.size() > 0">
+			AND
+			<foreach collection="filterList" item="filter" separator="AND">
+				<choose>
+					<when test="filter.expression == 'equal'">
+						<choose>
+							<when test="filter.valueList.size() > 1">
+								${filter.uuid} IN
+								<foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+									#{item}
+								</foreach>
+							</when>
+							<otherwise>
+								${filter.uuid} = #{filter.valueList[0]}
+							</otherwise>
+						</choose>
+					</when>
+					<when test="filter.expression == 'notequal'">
+						<choose>
+							<when test="filter.valueList.size() > 1">
+								(${filter.uuid} NOT IN
+								<foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+									#{item}
+								</foreach>
+								OR ${filter.uuid} IS NULL)
+							</when>
+							<otherwise>
+								${filter.uuid} != #{filter.valueList[0]}
+							</otherwise>
+						</choose>
+					</when>
+					<when test="filter.expression == 'like'">
+						<choose>
+							<when test="filter.valueList.size() > 1">
+								${filter.uuid} IN
+								<foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+									#{item}
+								</foreach>
+							</when>
+							<otherwise>
+								${filter.uuid} LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+							</otherwise>
+						</choose>
+					</when>
+					<when test="filter.expression == 'notlike'">
+						<choose>
+							<when test="filter.valueList.size() > 1">
+								(${filter.uuid} NOT IN
+								<foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+									#{item}
+								</foreach>
+								OR ${filter.uuid} IS NULL)
+							</when>
+							<otherwise>
+								(${filter.uuid} NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR ${filter.uuid} IS NULL)
+							</otherwise>
+						</choose>
+					</when>
+					<when test="filter.expression == 'is-null'">
+						(${filter.uuid} IS NULL OR ${filter.uuid} = '')
+					</when>
+					<when test="filter.expression == 'is-not-null'">
+						(${filter.uuid} IS NOT NULL AND ${filter.uuid} != '')
+					</when>
+					<otherwise>
+						<choose>
+							<when test="filter.valueList.size() > 1">
+								${filter.uuid} IN
+								<foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
+									#{item}
+								</foreach>
+							</when>
+							<otherwise>
+								${filter.uuid} = #{filter.valueList[0]}
+							</otherwise>
+						</choose>
+					</otherwise>
+				</choose>
+			</foreach>
+		</if>
+	</sql>
 
 	<insert id="insertTag" parameterType="neatlogic.framework.dto.TagVo">
 		INSERT INTO `tag`(

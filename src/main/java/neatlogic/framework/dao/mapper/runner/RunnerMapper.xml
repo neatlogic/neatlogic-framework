@@ -26,6 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                rn.`mask`
         FROM `runnergroup_network` rn
                  join runnergroup r on rn.group_id = r.id
+        <where>
+            <if test="list != null and list.size() > 0">
+                and r.`id` in
+                <foreach collection="list" item="runnergroupId" separator="," open="(" close=")">
+                    #{runnergroupId}
+                </foreach>
+            </if>
+        </where>
     </select>
 
     <resultMap id="runnerGroupMap" type="neatlogic.framework.dto.runner.RunnerGroupVo">
@@ -142,7 +150,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `runner` ar
                  LEFT JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
                  LEFT JOIN `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
-        where ar.is_delete = 0;
+        <where>
+            ar.is_delete = 0
+            <if test="list != null and list.size() > 0">
+                and rgr.`runnergroup_id` in
+                <foreach collection="list" item="runnergroupId" separator="," open="(" close=")">
+                    #{runnergroupId}
+                </foreach>
+            </if>
+        </where>
+
     </select>
 
     <select id="getRunnerById" resultMap="runnerMap" useCache="false">
@@ -695,6 +712,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM
             runnergroup rg
         where rg.name = #{value}
+    </select>
+    <select id="getRunnerGroupByTagIdList" resultType="neatlogic.framework.dto.runner.RunnerGroupVo">
+        SELECT
+            distinct
+            rg.`id`,
+            rg.`name`,
+            rg.`description`
+        FROM
+            runnergroup rg left join runnergroup_tag rt on rg.id = rt.group_id
+        where rt.tag_id in
+        <foreach collection="list" item="tagId" close=")" open="(" separator=",">
+            #{tagId}
+        </foreach>
     </select>
     <select id="getRunnerMapListByRunnerGroupId" resultType="neatlogic.framework.dto.runner.RunnerMapVo" useCache="false">
         SELECT ar.`id`,

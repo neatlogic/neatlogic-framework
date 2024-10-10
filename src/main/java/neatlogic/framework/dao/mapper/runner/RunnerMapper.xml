@@ -713,15 +713,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             runnergroup rg
         where rg.name = #{value}
     </select>
-    <select id="getRunnerGroupByTagIdList" resultType="neatlogic.framework.dto.runner.RunnerGroupVo">
+    <select id="getRunnerGroupByTagIdOrNameList" resultType="neatlogic.framework.dto.runner.RunnerGroupVo">
         SELECT
             distinct
             rg.`id`,
             rg.`name`,
             rg.`description`
         FROM
-            runnergroup rg left join runnergroup_tag rt on rg.id = rt.group_id
+            runnergroup rg
+                left join runnergroup_tag rt on rg.id = rt.group_id
+                left join tag t on rt.tag_id = t.id
         where rt.tag_id in
+        <foreach collection="list" item="tagId" close=")" open="(" separator=",">
+            #{tagId}
+        </foreach>
+        or
+        t.`name` in
         <foreach collection="list" item="tagId" close=")" open="(" separator=",">
             #{tagId}
         </foreach>

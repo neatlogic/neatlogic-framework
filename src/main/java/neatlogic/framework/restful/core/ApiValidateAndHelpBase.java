@@ -259,8 +259,8 @@ public class ApiValidateAndHelpBase {
                                 if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
                                     throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
                                 }
-                            }catch (Exception t){
-                                logger.error(t.getMessage(),t);
+                            } catch (Exception t) {
+                                logger.error(t.getMessage(), t);
                             }
                         }
                     }
@@ -302,8 +302,8 @@ public class ApiValidateAndHelpBase {
                                 if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
                                     throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
                                 }
-                            }catch (Exception t){
-                                logger.error(t.getMessage(),t);
+                            } catch (Exception t) {
+                                logger.error(t.getMessage(), t);
                             }
                         }
                     }
@@ -463,7 +463,8 @@ public class ApiValidateAndHelpBase {
                 EntityField entityField = (EntityField) annotation;
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("name", field.getName());
-                paramObj.put("type", entityField.type().getValue() + "[" + entityField.type().getText() + "]");
+                paramObj.put("type", entityField.type().getValue());
+                paramObj.put("typeText", entityField.type().getText());
                 paramObj.put("description", $.t(entityField.name()));
 
                 if (loop && field.getType().isAssignableFrom(List.class)) {
@@ -506,7 +507,8 @@ public class ApiValidateAndHelpBase {
                             if (p.maxLength() > 0) {
                                 paramObj.put("maxLength", p.maxLength());
                             }
-                            paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
+                            paramObj.put("type", p.type().getValue());
+                            paramObj.put("typeText", p.type().getText());
                             String rule = "";
                             if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
                                 rule = getEnumMember(p);
@@ -537,7 +539,8 @@ public class ApiValidateAndHelpBase {
                                 } else {
                                     JSONObject paramObj = new JSONObject();
                                     paramObj.put("name", p.name());
-                                    paramObj.put("type", ApiParamType.JSONARRAY.getValue() + "[" + ApiParamType.JSONARRAY.getText() + "]");
+                                    paramObj.put("type", ApiParamType.JSONARRAY.getValue());
+                                    paramObj.put("typeText", ApiParamType.JSONARRAY.getText());
                                     if (StringUtils.isNotBlank(p.desc())) {
                                         paramObj.put("description", p.desc());
                                     }
@@ -557,7 +560,8 @@ public class ApiValidateAndHelpBase {
                             } else {
                                 JSONObject paramObj = new JSONObject();
                                 paramObj.put("name", p.name());
-                                paramObj.put("type", p.type().getValue() + "[" + p.type().getText() + "]");
+                                paramObj.put("type", p.type().getValue());
+                                paramObj.put("typeText", p.type().getText());
                                 paramObj.put("description", $.t(p.desc()));
                                 paramObj.put("help", $.t(p.help()));
                                 outputList.add(paramObj);

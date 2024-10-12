@@ -123,6 +123,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                             userVo.setUserName(jwtBodyObj.getString("username"));
                             userVo.setIsSuperAdmin(jwtBodyObj.getBoolean("isSuperAdmin"));
                             userVo.getJwtVo().setTokenCreateTime(jwtBodyObj.getLong("createTime"));
+                            userVo.setTenant(jwtBodyObj.getString("tenant"));
                             return userVo;
                         }
                     } catch (NoSuchAlgorithmException | InvalidKeyException e) {

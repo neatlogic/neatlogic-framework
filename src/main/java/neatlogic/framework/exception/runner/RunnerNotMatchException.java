@@ -25,6 +25,10 @@ public class RunnerNotMatchException extends ApiRuntimeException {
         super("nfer.runnernotmatchexception.runnernotmatchexception.ipresourceid", ip, resourceId);
     }
 
+    public RunnerNotMatchException(String ip, Long resourceId, String tag) {
+        super("ip: {0}({1})找不到匹配的runner，请核对标签为{2}runner组配置", ip, resourceId, tag);
+    }
+
     public RunnerNotMatchException() {
         super("nfer.runnernotmatchexception.runnernotmatchexception.noparam");
     }

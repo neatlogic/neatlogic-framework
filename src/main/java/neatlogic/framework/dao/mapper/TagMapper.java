@@ -24,6 +24,8 @@ public interface TagMapper {
     List<TagVo> searchNoUseTag();
 
     List<TagVo> getTagListByIdList(List<Long> IdList);
+
+    List<TagVo> getTagListByIdOrNameList(List<String> runnerGroupTagList);
     
     int insertTag(TagVo tagVo);
 

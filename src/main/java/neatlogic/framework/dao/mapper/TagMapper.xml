@@ -61,6 +61,21 @@
 	#{id}
 	</foreach>
 	</select>
+	<select id="getTagListByIdOrNameList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TagVo">
+		SELECT
+		`id`,
+		`name`
+		FROM `tag`
+		WHERE `id` IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+		or
+		`name` IN
+		<foreach collection="list" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
 	<select id="searchTagCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer" useCache="false">
 		SELECT
 		COUNT(1)

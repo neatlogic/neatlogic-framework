@@ -135,7 +135,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <select id="getAllRunnerMap" resultMap="runnerMapMap" useCache="false">
-        SELECT ar.`id`,
+        SELECT distinct
+               ar.`id`,
                ar.`name`,
                ar.`url`,
                ar.`host`,
@@ -243,6 +244,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM
             runnergroup rg
         where rg.id = #{value}
+    </select>
+
+    <select id="getRunnerGroupByIdOrName" resultType="neatlogic.framework.dto.runner.RunnerGroupVo" useCache="false">
+        SELECT
+            rg.`id`,
+            rg.`name`,
+            rg.`description`
+        FROM
+            runnergroup rg
+        where rg.id = #{value} or rg.`name` = #{value}
     </select>
 
     <select id="getRunnerGroupByIdList" resultType="neatlogic.framework.dto.runner.RunnerGroupVo" useCache="false">

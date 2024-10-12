@@ -56,6 +56,8 @@ public interface RunnerMapper {
 
     RunnerGroupVo getRunnerGroupById(Long id);
 
+    RunnerGroupVo getRunnerGroupByIdOrName(String runnerGroup);
+
     List<RunnerGroupVo> getRunnerGroupByIdList(List<Long> idlist);
 
     RunnerGroupVo getRunnerGroupByName(String string);

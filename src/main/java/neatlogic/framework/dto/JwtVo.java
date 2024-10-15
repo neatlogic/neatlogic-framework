@@ -3,6 +3,7 @@ package neatlogic.framework.dto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
@@ -45,7 +46,7 @@ public class JwtVo implements Serializable {
         jwtBodyObj.put("useruuid", checkUserVo.getUuid());
         jwtBodyObj.put("userid", checkUserVo.getUserId());
         jwtBodyObj.put("username", checkUserVo.getUserName());
-        jwtBodyObj.put("tenant", checkUserVo.getTenant());
+        jwtBodyObj.put("tenant", TenantContext.get().getTenantUuid());
         jwtBodyObj.put("isSuperAdmin", checkUserVo.getIsSuperAdmin());
         jwtBodyObj.put("createTime", tokenCreateTime);
         if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {

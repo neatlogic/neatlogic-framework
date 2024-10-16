@@ -514,6 +514,10 @@ public class FormUtil {
         formAttributeVo.setType(type);
         JSONObject config = componentObj.getJSONObject("config");
         if (MapUtils.isNotEmpty(config)) {
+            if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
+                JSONObject formData = componentObj.getJSONObject("formData");
+                config.put("formData", formData);
+            }
             boolean isRequired = config.getBooleanValue("isRequired");
             formAttributeVo.setRequired(isRequired);
             String defaultValue = config.getString("defaultValue");

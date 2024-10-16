@@ -162,4 +162,15 @@ public class PasswordHandler extends FormHandlerBase {
         }
         return source;
     }
+
+    @Override
+    public String passwordDecryption(Object source, JSONObject configObj, String attributeUuid, JSONObject otherParamConfig) {
+        if (source == null) {
+            return null;
+        }
+        if (source instanceof String) {
+            return RC4Util.decrypt((String) source);
+        }
+        return null;
+    }
 }

@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.dto.BaseEditorVo;
+import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.util.UuidUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -255,6 +256,10 @@ public class FormVersionVo extends BaseEditorVo {
             String label = componentObj.getString("label");
             String type = componentObj.getString("type");
             String handler = componentObj.getString("handler");
+            if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
+                JSONObject formData = componentObj.getJSONObject("formData");
+                config.put("formData", formData);
+            }
             boolean isRequired = config.getBooleanValue("isRequired");
             String defaultValue = config.getString("defaultValue");
             return new FormAttributeVo(this.getFormUuid(), this.getUuid(), uuid, key, label, type, handler, isRequired, config, defaultValue);

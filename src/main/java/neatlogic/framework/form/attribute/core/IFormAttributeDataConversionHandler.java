@@ -124,4 +124,14 @@ public interface IFormAttributeDataConversionHandler {
         return source;
     }
 
+    /**
+     * 密码解密
+     * @param source 属性原始数据
+     * @param configObj 属性配置信息
+     * @return 返回解密后的数据
+     */
+    default String passwordDecryption(Object source, JSONObject configObj, String attributeUuid, JSONObject otherParamConfig) {
+        return null;
+    }
+
 }

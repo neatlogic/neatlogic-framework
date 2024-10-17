@@ -27,6 +27,9 @@ public class MatrixAttributeVo extends BasePageVo {
 
 	@EntityField( name = "属性唯一标识", type = ApiParamType.STRING)
 	private String uniqueIdentifier;
+
+	@EntityField( name = "默认属性唯一标识", type = ApiParamType.STRING)
+	private String defaultUniqueIdentifier;
     @EntityField( name = "属性名", type = ApiParamType.STRING)
     private String name;
     @EntityField( name = "属性label", type = ApiParamType.STRING)
@@ -75,6 +78,14 @@ public class MatrixAttributeVo extends BasePageVo {
 
 	public void setUniqueIdentifier(String uniqueIdentifier) {
 		this.uniqueIdentifier = uniqueIdentifier;
+	}
+
+	public String getDefaultUniqueIdentifier() {
+		return defaultUniqueIdentifier;
+	}
+
+	public void setDefaultUniqueIdentifier(String defaultUniqueIdentifier) {
+		this.defaultUniqueIdentifier = defaultUniqueIdentifier;
 	}
 
 	public String getName() {

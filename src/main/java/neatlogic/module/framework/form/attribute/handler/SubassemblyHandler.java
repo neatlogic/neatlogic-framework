@@ -180,18 +180,51 @@ public class SubassemblyHandler extends FormHandlerBase {
                                     String uuid = component.getString("uuid");
                                     JSONObject config = component.getJSONObject("config");
                                     IFormAttributeDataConversionHandler formAttributeDataConversionHandler = FormAttributeDataConversionHandlerFactory.getHandler(handler);
-                                    if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
+                                    if (Objects.equals(handler, FormHandler.FORMPASSWORD.getHandler())) {
+                                        if (Objects.equals(uuid, attributeUuid)) {
+                                            String rowUuid = otherParamConfig.getString("rowUuid");
+                                            for (int j = 0; j < dataArray.size(); j++) {
+                                                JSONObject dataObj = dataArray.getJSONObject(j);
+                                                if (MapUtils.isNotEmpty(dataObj)) {
+                                                    if (Objects.equals(dataObj.getString("uuid"), rowUuid)) {
+
+                                                    }
+                                                    Object data = dataObj.get(uuid);
+                                                    if (data != null) {
+                                                        String result = formAttributeDataConversionHandler.passwordDecryption(data, config, attributeUuid, otherParamConfig);
+                                                        if (result != null) {
+                                                            return result;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                    } else if (Objects.equals(handler, FormHandler.FORMTABLEINPUTER.getHandler())) {
+                                        for (int j = 0; j < dataArray.size(); j++) {
+                                            JSONObject dataObj = dataArray.getJSONObject(j);
+                                            if (MapUtils.isNotEmpty(dataObj)) {
+                                                Object data = dataObj.get(uuid);
+                                                if (data != null) {
+                                                    String result = formAttributeDataConversionHandler.passwordDecryption(data, config, attributeUuid, otherParamConfig);
+                                                    if (result != null) {
+                                                        return result;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
                                         JSONObject formData1 = component.getJSONObject("formData");
                                         config.put("formData", formData1);
-                                    }
-                                    for (int j = 0; j < dataArray.size(); j++) {
-                                        JSONObject dataObj = dataArray.getJSONObject(j);
-                                        if (MapUtils.isNotEmpty(dataObj)) {
-                                            Object data = dataObj.get(uuid);
-                                            if (data != null) {
-                                                String result = formAttributeDataConversionHandler.passwordDecryption(data, config, attributeUuid, otherParamConfig);
-                                                if (result != null) {
-                                                    return result;
+                                        for (int j = 0; j < dataArray.size(); j++) {
+                                            JSONObject dataObj = dataArray.getJSONObject(j);
+                                            if (MapUtils.isNotEmpty(dataObj)) {
+                                                Object data = dataObj.get(uuid);
+                                                if (data != null) {
+                                                    String result = formAttributeDataConversionHandler.passwordDecryption(data, config, attributeUuid, otherParamConfig);
+                                                    if (result != null) {
+                                                        return result;
+                                                    }
                                                 }
                                             }
                                         }

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.restful.dispatch.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -145,7 +146,7 @@ public class AnonymousApiDispatcher {
                             returnObj.put("Status", "OK");
                             returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                         } else {
-                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
                     } else {
                         returnObj.putAll(restComponent.help());
@@ -172,7 +173,7 @@ public class AnonymousApiDispatcher {
                             returnObj.put("Status", "OK");
                             returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                         } else {
-                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
                     } else {
                         returnObj.putAll(restComponent.help());
@@ -199,7 +200,7 @@ public class AnonymousApiDispatcher {
                             returnObj.put("Status", "OK");
                             returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
                         } else {
-                            returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                            returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
                     } else {
                         returnObj.putAll(restComponent.help());
@@ -230,9 +231,9 @@ public class AnonymousApiDispatcher {
                             }
                         } else {
                             if (restComponent.disableReturnCircularReferenceDetect()) {
-                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV, SerializerFeature.DisableCircularReferenceDetect)));
+                                returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV, SerializerFeature.DisableCircularReferenceDetect)));
                             } else {
-                                returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
+                                returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                             }
                         }
                     } else {

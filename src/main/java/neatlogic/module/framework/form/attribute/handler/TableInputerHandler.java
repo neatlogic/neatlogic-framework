@@ -899,58 +899,63 @@ public class TableInputerHandler extends FormHandlerBase {
         return dataArray;
     }
 
+//    @Override
+//    public String passwordDecryption(Object source, JSONObject configObj, String attributeUuid, JSONObject otherParamConfig) {
+//        JSONArray dataArray = null;
+//        if (source instanceof JSONArray) {
+//            dataArray = (JSONArray) source;
+//        }
+//        if (CollectionUtils.isEmpty(dataArray)) {
+//            return null;
+//        }
+//        String rowUuid = otherParamConfig.getString("rowUuid");
+//        JSONArray dataConfig = configObj.getJSONArray("dataConfig");
+//        if (CollectionUtils.isNotEmpty(dataConfig)) {
+//            for (int i = 0; i < dataConfig.size(); i++) {
+//                JSONObject attr = dataConfig.getJSONObject(i);
+//                String handler = attr.getString("handler");
+//                if (Objects.equals(handler, FormHandler.FORMPASSWORD.getHandler())) {
+//                    String uuid = attr.getString("uuid");
+//                    if (Objects.equals(uuid, attributeUuid)) {
+//                        for (int j = 0; j < dataArray.size(); j++) {
+//                            JSONObject dataObj = dataArray.getJSONObject(j);
+//                            if (MapUtils.isNotEmpty(dataObj)) {
+//                                if (Objects.equals(dataObj.getString("uuid"), rowUuid)) {
+//                                    String data = dataObj.getString(uuid);
+//                                    if (StringUtils.isNotBlank(data)) {
+////                                        dataObj.put(uuid, RC4Util.encrypt(data));
+//                                        return RC4Util.decrypt(data);
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                } else if (Objects.equals(handler, "formtable")) {
+//                    JSONObject config = attr.getJSONObject("config");
+//                    if (MapUtils.isEmpty(config)) {
+//                        continue;
+//                    }
+//                    String uuid = attr.getString("uuid");
+//                    for (int j = 0; j < dataArray.size(); j++) {
+//                        JSONObject dataObj = dataArray.getJSONObject(j);
+//                        if (MapUtils.isNotEmpty(dataObj)) {
+//                            JSONArray data = dataObj.getJSONArray(uuid);
+//                            if (CollectionUtils.isNotEmpty(data)) {
+//                                String result = this.passwordDecryption(data, config, attributeUuid, otherParamConfig);
+//                                if (result != null) {
+//                                    return result;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        return null;
+//    }
+
     @Override
-    public String passwordDecryption(Object source, JSONObject configObj, String attributeUuid, JSONObject otherParamConfig) {
-        JSONArray dataArray = null;
-        if (source instanceof JSONArray) {
-            dataArray = (JSONArray) source;
-        }
-        if (CollectionUtils.isEmpty(dataArray)) {
-            return null;
-        }
-        String rowUuid = otherParamConfig.getString("rowUuid");
-        JSONArray dataConfig = configObj.getJSONArray("dataConfig");
-        if (CollectionUtils.isNotEmpty(dataConfig)) {
-            for (int i = 0; i < dataConfig.size(); i++) {
-                JSONObject attr = dataConfig.getJSONObject(i);
-                String handler = attr.getString("handler");
-                if (Objects.equals(handler, FormHandler.FORMPASSWORD.getHandler())) {
-                    String uuid = attr.getString("uuid");
-                    if (Objects.equals(uuid, attributeUuid)) {
-                        for (int j = 0; j < dataArray.size(); j++) {
-                            JSONObject dataObj = dataArray.getJSONObject(j);
-                            if (MapUtils.isNotEmpty(dataObj)) {
-                                if (Objects.equals(dataObj.getString("uuid"), rowUuid)) {
-                                    String data = dataObj.getString(uuid);
-                                    if (StringUtils.isNotBlank(data)) {
-//                                        dataObj.put(uuid, RC4Util.encrypt(data));
-                                        return RC4Util.decrypt(data);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else if (Objects.equals(handler, "formtable")) {
-                    JSONObject config = attr.getJSONObject("config");
-                    if (MapUtils.isEmpty(config)) {
-                        continue;
-                    }
-                    String uuid = attr.getString("uuid");
-                    for (int j = 0; j < dataArray.size(); j++) {
-                        JSONObject dataObj = dataArray.getJSONObject(j);
-                        if (MapUtils.isNotEmpty(dataObj)) {
-                            JSONArray data = dataObj.getJSONArray(uuid);
-                            if (CollectionUtils.isNotEmpty(data)) {
-                                String result = this.passwordDecryption(data, config, attributeUuid, otherParamConfig);
-                                if (result != null) {
-                                    return result;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return null;
+    public JSONObject passwordDecryption(Object source, String attributeUuid, JSONObject otherParamConfig) {
+        return withinPasswordDecryption(source, attributeUuid, otherParamConfig);
     }
 }

@@ -18,16 +18,20 @@ package neatlogic.framework.form.attribute.core;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 
 import javax.annotation.Resource;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAttributeDataConversionHandler {
 
@@ -183,5 +187,56 @@ public abstract class FormHandlerBase implements IFormAttributeHandler, IFormAtt
     }
 
     protected void myValidateExtendAttributeConfig(String key, JSONObject config) {
+    }
+
+    /**
+     * 组件内部密码组件密码解密
+     * @param source
+     * @param attributeUuid
+     * @param otherParamConfig
+     * @return
+     */
+    protected JSONObject withinPasswordDecryption(Object source, String attributeUuid, JSONObject otherParamConfig) {
+        JSONObject resultObj = new JSONObject();
+        JSONArray dataArray = null;
+        if (source instanceof JSONArray) {
+            dataArray = (JSONArray) source;
+        }
+        if (CollectionUtils.isEmpty(dataArray)) {
+            return resultObj;
+        }
+        String rowUuid = otherParamConfig.getString("rowUuid");
+        for (Object obj : dataArray) {
+            if (obj instanceof JSONObject) {
+                JSONObject dataObj = (JSONObject) obj;
+                if (MapUtils.isNotEmpty(dataObj)) {
+                    for (Map.Entry<String, Object> entry : dataObj.entrySet()) {
+                        if (Objects.equals(entry.getKey(), "uuid")) {
+                            continue;
+                        }
+                        if (Objects.equals(entry.getKey(), attributeUuid)) {
+                            if (Objects.equals(dataObj.getString("uuid"), rowUuid)) {
+                                String password = RC4Util.decrypt((String) entry.getValue());
+                                resultObj.put("password", password);
+                            }
+                        } else {
+                            if (entry.getValue() instanceof JSONArray) {
+                                JSONObject passwordDecryptionObj = withinPasswordDecryption(entry.getValue(), attributeUuid, otherParamConfig);
+                                if (MapUtils.isNotEmpty(passwordDecryptionObj)) {
+                                    JSONArray parentUuidList = passwordDecryptionObj.getJSONArray("parentUuidList");
+                                    if (parentUuidList == null) {
+                                        parentUuidList = new JSONArray();
+                                        passwordDecryptionObj.put("parentUuidList", parentUuidList);
+                                    }
+                                    parentUuidList.add(entry.getKey());
+                                    return passwordDecryptionObj;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return resultObj;
     }
 }

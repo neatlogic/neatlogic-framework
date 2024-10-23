@@ -53,11 +53,24 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
     private static final Map<String, String> handler2ModuleIdMap = new HashMap<>();
 
     public static INotifyPolicyHandler getHandler(String handler) {
-        return notifyPolicyHandlerMap.get(handler);
+        INotifyPolicyHandler notifyPolicyHandler = notifyPolicyHandlerMap.get(handler);
+        if (notifyPolicyHandler == null) {
+            int index = handler.lastIndexOf(".");
+            notifyPolicyHandler = notifyPolicyHandlerMap.get(handler.substring(index + 1));
+        }
+        return notifyPolicyHandler;
     }
 
     public static List<INotifyPolicyHandler> getHandlerList() {
-        return new ArrayList<>(notifyPolicyHandlerMap.values());
+        List<INotifyPolicyHandler> resultList = new ArrayList<>();
+        for (Map.Entry<String, INotifyPolicyHandler> entry : notifyPolicyHandlerMap.entrySet()) {
+            INotifyPolicyHandler notifyPolicyHandler = entry.getValue();
+            if (resultList.contains(notifyPolicyHandler)) {
+                continue;
+            }
+            resultList.add(notifyPolicyHandler);
+        }
+        return resultList;
     }
 
     public static String getModuleIdByHandler(String handler) {
@@ -164,9 +177,12 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
                 if (StringUtils.isBlank(moduleGroup)) {
                     moduleGroup = moduleVo.getGroup();
                 }
-                notifyPolicyHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
-                handler2ModuleGroupIdMap.put(notifyPolicyHandler.getClassName(), moduleGroup);
-                handler2ModuleIdMap.put(notifyPolicyHandler.getClassName(), moduleVo.getId());
+                String className = notifyPolicyHandler.getClassName();
+                int index = className.lastIndexOf(".");
+                notifyPolicyHandlerMap.put(className.substring(index + 1), notifyPolicyHandler);
+                notifyPolicyHandlerMap.put(className, notifyPolicyHandler);
+                handler2ModuleGroupIdMap.put(className, moduleGroup);
+                handler2ModuleIdMap.put(className, moduleVo.getId());
 //                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getId(), moduleVo.getGroup(), notifyPolicyHandler.isAllowMultiPolicy()));
 
 //                INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();

@@ -35,5 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <plugin interceptor="neatlogic.framework.dao.plugin.SqlSessionCacheClearInterceptor"/>
         <plugin interceptor="neatlogic.framework.dao.plugin.ExceptionCatchInterceptor"/>
         <plugin interceptor="neatlogic.framework.dao.plugin.BaseEditorVoParameterInterceptor"/>
+        <plugin interceptor="neatlogic.framework.dao.plugin.LicensePolicyInterceptor"/>
     </plugins>
 </configuration>

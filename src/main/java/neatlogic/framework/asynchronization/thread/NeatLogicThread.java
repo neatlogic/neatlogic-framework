@@ -15,10 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.asynchronization.thread;
 
-import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
-import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.asynchronization.threadlocal.*;
 import neatlogic.framework.cache.threadlocal.CacheContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.lang3.StringUtils;
@@ -98,11 +95,17 @@ public abstract class NeatLogicThread implements Runnable {
             if (UserContext.get() != null) {
                 UserContext.get().release();
             }
+            if (RequestContext.get() != null) {
+                RequestContext.get().release();
+            }
             if (InputFromContext.get() != null) {
                 InputFromContext.get().release();
             }
-            if (RequestContext.get() != null) {
-                RequestContext.get().release();
+            if (ConditionParamContext.get() != null) {
+                ConditionParamContext.get().release();
+            }
+            if (LicensePolicyContext.get() != null) {
+                LicensePolicyContext.get().release();
             }
             CacheContext.release();
         }

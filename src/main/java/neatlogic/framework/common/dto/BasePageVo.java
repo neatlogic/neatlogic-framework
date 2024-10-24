@@ -78,6 +78,8 @@ public class BasePageVo implements Serializable {
     @EntityField(name = "最大分页", type = ApiParamType.INTEGER)
     @JSONField(serialize = false)
     private int maxPageSize = 100;
+    @EntityField(name = "最大限制数，用于拦截", type = ApiParamType.LONG)
+    private int policyLimit;
 
     public BasePageVo() {
     }
@@ -261,5 +263,13 @@ public class BasePageVo implements Serializable {
 
     public void setExpectOffsetRowNum(Integer expectOffsetRowNum) {
         this.expectOffsetRowNum = expectOffsetRowNum;
+    }
+
+    public int getPolicyLimit() {
+        return policyLimit;
+    }
+
+    public void setPolicyLimit(int policyLimit) {
+        this.policyLimit = policyLimit;
     }
 }

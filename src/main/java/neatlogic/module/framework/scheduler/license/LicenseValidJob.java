@@ -37,10 +37,7 @@ import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,6 +75,7 @@ public class LicenseValidJob extends JobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception {
         //校验license是否即将过期或已过期
         if (StringUtils.isNotBlank(Config.LICENSE())) {
+            Map<String, LicenseInvalidVo> licenseInvalidVoMap = LicenseUtil.tenantLicenseInvalidTipsMap.computeIfAbsent(TenantContext.get().getTenantUuid(), k -> new HashMap<>());
             LicenseVo licenseVo = LicenseUtil.deLicense(Config.LICENSE(), Config.LICENSE_PK());
             if (licenseVo != null) {
                 List<LicenseModuleVo> licenseModuleVos = licenseVo.getModulesPolicy();
@@ -95,16 +93,16 @@ public class LicenseValidJob extends JobBase {
                                     gracePeriod = String.format($.t("nmfsl.licensepolicyvalidjob.isendgraceperiod"), licenseModuleVo.getGracePeriod());
                                 }
                                 String tip = String.format($.t("nmfsl.licensepolicyvalidjob.isend"), orinModuleGroupName, orinModuleGroup, TimeUtil.convertDateToString(new Date(licenseModuleVo.getExpirationDate()), TimeUtil.YYYY_MM_DD), gracePeriod);
-                                LicenseUtil.licenseInvalidTipsMap.put(orinModuleGroup, new LicenseInvalidVo(Collections.singletonList(ModuleUtil.getModuleGroup(orinModuleGroup)), LicenseInvalidTypeEnum.ERROR.getValue(), tip));
+                                licenseInvalidVoMap.put(orinModuleGroup, new LicenseInvalidVo(Collections.singletonList(ModuleUtil.getModuleGroup(orinModuleGroup)), LicenseInvalidTypeEnum.ERROR.getValue(), tip));
                             } else if (Boolean.TRUE.equals(licenseModuleVo.getIsExpired())) {
                                 String gracePeriod = StringUtils.EMPTY;
                                 if (licenseModuleVo.getGracePeriod() > 0) {
                                     gracePeriod = String.format($.t("nmfsl.licensepolicyvalidjob.isexpiredgraceperiod"), licenseModuleVo.getGracePeriod());
                                 }
                                 String tip = String.format($.t("nmfsl.licensepolicyvalidjob.isexpired"), orinModuleGroupName, orinModuleGroup, TimeUtil.convertDateToString(new Date(licenseModuleVo.getExpirationDate()), TimeUtil.YYYY_MM_DD), gracePeriod);
-                                LicenseUtil.licenseInvalidTipsMap.put(orinModuleGroup, new LicenseInvalidVo(Collections.singletonList(ModuleUtil.getModuleGroup(orinModuleGroup)), LicenseInvalidTypeEnum.WARN.getValue(), tip));
+                                licenseInvalidVoMap.put(orinModuleGroup, new LicenseInvalidVo(Collections.singletonList(ModuleUtil.getModuleGroup(orinModuleGroup)), LicenseInvalidTypeEnum.WARN.getValue(), tip));
                             } else if (Boolean.TRUE.equals(licenseModuleVo.getIsWillExpired())) {
-                                LicenseUtil.licenseInvalidTipsMap.put(orinModuleGroup, new LicenseInvalidVo(Collections.singletonList(ModuleUtil.getModuleGroup(orinModuleGroup)), LicenseInvalidTypeEnum.INFO.getValue(), String.format($.t("nmfsl.licensepolicyvalidjob.iswillexpired"), orinModuleGroupName, orinModuleGroup, TimeUtil.convertDateToString(new Date(licenseModuleVo.getExpirationDate()), TimeUtil.YYYY_MM_DD))));
+                                licenseInvalidVoMap.put(orinModuleGroup, new LicenseInvalidVo(Collections.singletonList(ModuleUtil.getModuleGroup(orinModuleGroup)), LicenseInvalidTypeEnum.INFO.getValue(), String.format($.t("nmfsl.licensepolicyvalidjob.iswillexpired"), orinModuleGroupName, orinModuleGroup, TimeUtil.convertDateToString(new Date(licenseModuleVo.getExpirationDate()), TimeUtil.YYYY_MM_DD))));
                             }
                         }
                     }

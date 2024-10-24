@@ -17,11 +17,13 @@
 
 package neatlogic.framework.dto.license;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.LicenseUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -59,7 +61,7 @@ public class LicenseModuleVo implements Serializable {
     }
 
     public Boolean getIsWillExpired() {
-        return expirationDate != null && (expirationDate - (long)Config.LICENSE_WILL_EXPIRED_NOTIFY_DAY() * 24 * 60 * 60 * 1000) < System.currentTimeMillis();
+        return expirationDate != null && (expirationDate - (long) Config.LICENSE_WILL_EXPIRED_NOTIFY_DAY() * 24 * 60 * 60 * 1000) < System.currentTimeMillis();
     }
 
     public Boolean getIsExpired() {
@@ -70,9 +72,9 @@ public class LicenseModuleVo implements Serializable {
         return expirationDate != null && expirationDate + (long) gracePeriod * 24 * 60 * 60 * 1000 < System.currentTimeMillis();
     }
 
-    public Boolean getIsInvalidPolicy(){
-        if(CollectionUtils.isNotEmpty(policy)){
-            return policy.stream().anyMatch(p->LicenseUtil.licenseInvalidTipsMap.containsKey(p.getKey()));
+    public Boolean getIsInvalidPolicy() {
+        if (CollectionUtils.isNotEmpty(policy) && TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
+            return policy.stream().anyMatch(p -> LicenseUtil.tenantLicenseInvalidTipsMap.get(TenantContext.get().getTenantUuid()).containsKey(p.getKey()));
         }
         return false;
     }

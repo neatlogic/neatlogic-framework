@@ -33,9 +33,10 @@ import java.util.Objects;
 public class LicenseUtil {
     static Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
 
-    public static Map<String, LicenseInvalidVo> licenseInvalidTipsMap = new HashMap<>();
+    public static Map<String, Map<String,LicenseInvalidVo>> tenantLicenseInvalidTipsMap = new HashMap<>();
 
     public static Map<String, ILicensePolicy> licensePolicyMap = new HashMap<>();
+
     /**
      * 根据租户设置license
      *

@@ -17,6 +17,7 @@
 
 package neatlogic.framework.dto.license;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.restful.annotation.EntityField;
@@ -25,6 +26,8 @@ import java.io.Serializable;
 import java.util.List;
 
 public class LicenseInvalidVo implements Serializable {
+    @EntityField(name = "租户", type = ApiParamType.JSONARRAY)
+    private String tenant;
     @EntityField(name = "模块组", type = ApiParamType.JSONARRAY)
     private List<ModuleGroupVo> moduleGroupVos;
     @EntityField(name = "类型", type = ApiParamType.STRING)
@@ -36,6 +39,15 @@ public class LicenseInvalidVo implements Serializable {
         this.moduleGroupVos = moduleGroupVos;
         this.type = type;
         this.msg = msg;
+        this.tenant = TenantContext.get().getTenantUuid();
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
     }
 
     public List<ModuleGroupVo> getModuleGroupVos() {

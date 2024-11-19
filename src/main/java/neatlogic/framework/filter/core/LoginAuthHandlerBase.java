@@ -105,8 +105,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             }
             userVo = null;
         }
-        //通过第三方认证接口认证。第一次认证通过后需构建并设置response 认证 cookie
-        if (userVo != null && !Objects.equals(getType(), "default")) {
+        //通过第三方认证or default的header认证。第一次认证通过后需构建并设置response 认证 cookie
+        if (userVo != null && (!Objects.equals(getType(), "default") || (Objects.equals(getType(), "default") && StringUtils.isBlank(userVo.getCookieAuthorization())))) {
             logger.debug("======= myAuth: {} ===== {}", getType(), userVo.getUserId());
             JwtVo jwtVo = new JwtVo();
             AuthenticationInfoVo authenticationInfoVo = null;
@@ -131,7 +131,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr);
 
             } else {
-                if(authenticationInfo != null) {
+                if (authenticationInfo != null) {
                     authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
                 }
             }

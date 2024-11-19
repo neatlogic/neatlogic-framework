@@ -241,8 +241,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      */
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         JwtVo jwt = userVo.getJwtVo();
-        Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
-        if (authenticationInfoStr == null) {
+        if (!UserSessionCache.containsKey(jwt.getTokenHash())) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
             if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
                 Date visitTime = userSessionVo.getSessionTime();
@@ -261,7 +260,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
             }
         } else {
-            AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
+            Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
+            AuthenticationInfoVo authenticationInfoVo;
+            if (authenticationInfoStr == null) {
+                authenticationInfoVo = new AuthenticationInfoVo();
+            } else {
+                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
+            }
             UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             return false;
         }

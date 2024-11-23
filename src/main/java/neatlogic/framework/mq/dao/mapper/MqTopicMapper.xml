@@ -18,30 +18,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <mapper namespace="neatlogic.framework.mq.dao.mapper.MqTopicMapper">
 
     <select id="getTopicByName" parameterType="java.lang.String" resultType="neatlogic.framework.mq.dto.TopicVo">
-        SELECT name, is_active as isActive, config as configStr, handler
+        SELECT name,
+               label,
+               is_active as isActive,
+               config    as configStr,
+               handler
         FROM mq_topic
         WHERE name = #{value}
     </select>
 
 
-    <select id="getTopicList" resultType="neatlogic.framework.mq.dto.TopicVo">
-        SELECT name, is_active AS isActive, config AS configStr, handler
+    <select id="searchTopic" parameterType="neatlogic.framework.mq.dto.TopicVo"
+            resultType="neatlogic.framework.mq.dto.TopicVo">
+        SELECT
+        name,
+        label,
+        is_active AS isActive,
+        config AS configStr,
+        handler
         FROM mq_topic
+        <where>
+            <if test="handler != null and handler != ''">
+                handler = #{handler}
+            </if>
+        </where>
     </select>
 
     <update id="saveTopicConfig" parameterType="neatlogic.framework.mq.dto.TopicVo">
-        INSERT INTO mq_topic (name, config, is_active, handler)
-        VALUES (#{name}, #{configStr}, 1, #{handler})
+        INSERT INTO mq_topic (name, label, config, is_active, handler)
+        VALUES (#{name}, #{label}, #{configStr}, 1, #{handler})
         ON DUPLICATE KEY UPDATE config = #{configStr}
     </update>
 
+    <insert id="saveTopic" parameterType="neatlogic.framework.mq.dto.TopicVo">
+        INSERT INTO mq_topic (name, label, is_active, handler)
+        VALUES (#{name}, #{label}, #{isActive}, #{handler})
+        ON DUPLICATE KEY UPDATE label     = #{label},
+                                is_active = #{isActive}
+    </insert>
+
     <insert id="saveTopicIsActive" parameterType="neatlogic.framework.mq.dto.TopicVo">
-        INSERT INTO mq_topic (name, is_active, handler)
-        VALUES (#{name}, #{isActive}, #{handler})
+        INSERT INTO mq_topic (name, label, is_active, handler)
+        VALUES (#{name}, #{label}, #{isActive}, #{handler})
         ON DUPLICATE KEY UPDATE is_active = #{isActive}
     </insert>
 
-    <delete id="deleteInActiveTopic" parameterType="java.lang.String">
+    <delete id="deleteTopicByName" parameterType="java.lang.String">
         DELETE
         FROM mq_topic
         WHERE name = #{value}

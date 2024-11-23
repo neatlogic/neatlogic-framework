@@ -65,6 +65,7 @@ public class TopicFactory extends ModuleInitializedListenerBase {
                 topicVo.setLabel(component.getLabel());
                 topicVo.setDescription(component.getDescription());
                 topicVo.setHandler(component.getHandler());
+                topicVo.setIsActive(1);
                 topicList.add(topicVo);
             }
         }

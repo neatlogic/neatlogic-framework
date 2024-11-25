@@ -341,7 +341,17 @@
     <select id="getDynamicTableDataListCount" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
-        COUNT(1)
+            <choose>
+                <when test="distinct">
+                    COUNT(distinct
+                    <foreach collection="columnList" item="column" separator=",">
+                        a.`${column}`
+                    </foreach>)
+                </when>
+                <otherwise>
+                    COUNT(1)
+                </otherwise>
+            </choose>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
     </select>
@@ -349,13 +359,29 @@
     <select id="getDynamicTableDataList" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT
-        a.`uuid`,
-        <foreach collection="columnList" item="column" separator=",">
-            a.`${column}`
-        </foreach>
+        <choose>
+            <when test="distinct">
+                distinct
+                <foreach collection="columnList" item="column" separator=",">
+                    a.`${column}`
+                </foreach>
+            </when>
+            <otherwise>
+                a.`uuid`,
+                <foreach collection="columnList" item="column" separator=",">
+                    a.`${column}`
+                </foreach>
+            </otherwise>
+        </choose>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
-        ORDER BY a.`sort` DESC
+        <choose>
+            <when test="distinct">
+            </when>
+            <otherwise>
+                ORDER BY a.`sort` DESC
+            </otherwise>
+        </choose>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

@@ -600,11 +600,13 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 }
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
-            int rowNum = matrixDataMapper.getDynamicTableDataListCount(dataVo);
-            if (rowNum == 0) {
-                return resultList;
+            if (Objects.equals(dataVo.getRowNum(), 0)) {
+                int rowNum = matrixDataMapper.getDynamicTableDataListCount(dataVo);
+                if (rowNum == 0) {
+                    return resultList;
+                }
+                dataVo.setRowNum(rowNum);
             }
-            dataVo.setRowNum(rowNum);
             if (dataVo.getCurrentPage() > dataVo.getPageCount()) {
                 return resultList;
             }

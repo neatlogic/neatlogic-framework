@@ -24,6 +24,8 @@ public interface MqSubscribeMapper {
 
     int checkSubscribeNameIsExists(SubscribeVo subscribeVo);
 
+    int selectSubscribeCountByTopicName(String topicName);
+
     SubscribeVo getSubscribeById(Long id);
 
     SubscribeVo getSubscribeByName(String name);

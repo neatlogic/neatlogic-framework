@@ -20,7 +20,6 @@ import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.exception.mq.MqHandlerNotEnableException;
 import neatlogic.framework.exception.mq.MqHandlerNotFoundException;
 import neatlogic.framework.exception.mq.SubscribeTopicException;
-import neatlogic.framework.exception.mq.TopicNotFoundException;
 import neatlogic.framework.mq.dto.SubscribeVo;
 
 import java.util.ArrayList;
@@ -84,9 +83,9 @@ public final class SubscribeManager {
             throw new MqHandlerNotFoundException(subVo.getHandler());
         }
         if (handler.isEnable()) {
-            if (!TopicFactory.hasTopic(subVo.getTopicName())) {
+            /*if (!TopicFactory.hasTopic(subVo.getTopicName())) {
                 throw new TopicNotFoundException(subVo.getTopicName());
-            }
+            }*/
             //不管是否成功添加，都需要加入activeSubscribeMap，重连机制会从这里取数重连
             if (!activeSubscribeMap.containsKey(TenantContext.get().getTenantUuid())) {
                 activeSubscribeMap.put(TenantContext.get().getTenantUuid(), new ArrayList<>());

@@ -21,8 +21,11 @@ import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.mq.core.IMqHandler;
 import neatlogic.framework.mq.core.MqHandlerFactory;
+import neatlogic.framework.mq.core.TopicFactory;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Objects;
 
 public class TopicVo {
     @EntityField(name = "唯一标识", type = ApiParamType.STRING)
@@ -43,6 +46,23 @@ public class TopicVo {
     private String handlerName;
     @EntityField(name = "是否启用", type = ApiParamType.BOOLEAN)
     private Boolean isEnable;
+    @EntityField(name = "是否系统内置主题", type = ApiParamType.BOOLEAN)
+    private Boolean isEmbed;
+    @EntityField(name = "是否需要配置", type = ApiParamType.BOOLEAN)
+    private Boolean hasConfig;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TopicVo)) return false;
+        TopicVo topicVo = (TopicVo) o;
+        return Objects.equals(name, topicVo.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(name);
+    }
 
     public String getName() {
         return name;
@@ -71,7 +91,7 @@ public class TopicVo {
     public Integer getIsActive() {
         if (isActive != null && isActive.equals(1)) {
             IMqHandler mqHandler = MqHandlerFactory.getMqHandler(handler);
-            if (mqHandler == null || !mqHandler.isEnable()) {
+            if (mqHandler != null && !mqHandler.isEnable()) {
                 return 0;
             }
         }
@@ -135,4 +155,19 @@ public class TopicVo {
     public void setConfigStr(String configStr) {
         this.configStr = configStr;
     }
+
+    public Boolean getIsEmbed() {
+        if (isEmbed == null) {
+            isEmbed = TopicFactory.getTopicByName(this.name) != null;
+        }
+        return isEmbed;
+    }
+
+    public Boolean getHasConfig() {
+        if (hasConfig == null) {
+            hasConfig = TopicFactory.getTopic(this.name) == null || TopicFactory.getTopic(this.name).hasConfig();
+        }
+        return hasConfig;
+    }
+
 }

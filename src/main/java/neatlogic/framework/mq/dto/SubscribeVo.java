@@ -203,9 +203,6 @@ public class SubscribeVo extends BasePageVo {
             if (mqHandler == null || !mqHandler.isEnable()) {
                 return 0;
             }
-            if (!TopicFactory.hasTopic(topicName)) {
-                return 0;
-            }
         }
         return isActive;
     }

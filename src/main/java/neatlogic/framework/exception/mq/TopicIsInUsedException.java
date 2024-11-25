@@ -13,22 +13,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package neatlogic.framework.mq.dao.mapper;
+package neatlogic.framework.exception.mq;
 
-import neatlogic.framework.mq.dto.TopicVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import java.util.List;
-
-public interface MqTopicMapper {
-    List<TopicVo> searchTopic(TopicVo topicVo);
-
-    TopicVo getTopicByName(String name);
-
-    void saveTopicConfig(TopicVo topicVo);
-
-    void saveTopicIsActive(TopicVo topicVo);
-
-    void saveTopic(TopicVo topicVo);
-
-    void deleteTopicByName(String name);
+public class TopicIsInUsedException extends ApiRuntimeException {
+    public TopicIsInUsedException(int count) {
+        super("当前主题存在{0}个订阅，请先删除", count);
+    }
 }

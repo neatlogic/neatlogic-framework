@@ -25,4 +25,6 @@ public interface ITopic<T> {
     String getHandler();
 
     void send(T content);
+
+    Boolean hasConfig();
 }

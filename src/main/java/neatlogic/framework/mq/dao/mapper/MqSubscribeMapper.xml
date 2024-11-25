@@ -24,6 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
           AND id != #{id}
     </select>
 
+    <select id="selectSubscribeCountByTopicName" parameterType="java.lang.String" resultType="int">
+        SELECT count(1) FROM mq_subscribe WHERE topic_name = #{value}
+    </select>
+
     <sql id="searchSubscribeCondition">
         <where>
             <if test="className != null and className != ''">
@@ -52,6 +56,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         name,
         class_name AS className,
         topic_name AS topicName,
+        (select label from mq_topic x where x.name = topic_name) AS topicLabel,
         is_durable AS isDurable,
         description,
         is_active AS isActive,

@@ -44,6 +44,7 @@ public class MatrixDataVo extends BasePageVo {
     private Long filterCiEntityId;
     @Deprecated
     private Long filterCiId;
+    private Boolean distinct;
 
     /**
      * 用于下拉框默认值回显
@@ -238,5 +239,13 @@ public class MatrixDataVo extends BasePageVo {
 
     public void setKeywordColumnUniqueIdentifier(String keywordColumnUniqueIdentifier) {
         this.keywordColumnUniqueIdentifier = keywordColumnUniqueIdentifier;
+    }
+
+    public Boolean getDistinct() {
+        return distinct;
+    }
+
+    public void setDistinct(Boolean distinct) {
+        this.distinct = distinct;
     }
 }

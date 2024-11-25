@@ -209,9 +209,24 @@
     <select id="getDynamicTableDataListCount" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
             resultType="int">
         SELECT
-        COUNT(1)
+        <choose>
+            <when test="distinct">
+                COUNT(distinct
+                <foreach collection="columnList" item="column" separator=",">
+                    `${column}`
+                </foreach>)
+            </when>
+            <otherwise>
+                COUNT(1)
+            </otherwise>
+        </choose>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
+            <if test="notNullColumnList != null and notNullColumnList.size() > 0">
+                <foreach collection="notNullColumnList" item="notColumn" separator="AND">
+                    `${notColumn}` IS NOT NULL
+                </foreach>
+            </if>
             <include refid="searchDynamicTableDataSqlNew"/>
         </where>
     </select>
@@ -219,16 +234,37 @@
     <select id="getDynamicTableDataList" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
             resultType="java.util.LinkedHashMap">
         SELECT
-        `uuid`,
-        <foreach collection="columnList" item="column" separator=",">
-            `${column}`
-        </foreach>
+        <choose>
+            <when test="distinct">
+                distinct
+                <foreach collection="columnList" item="column" separator=",">
+                    `${column}`
+                </foreach>
+            </when>
+            <otherwise>
+                `uuid`,
+                <foreach collection="columnList" item="column" separator=",">
+                    `${column}`
+                </foreach>
+            </otherwise>
+        </choose>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
         <where>
+            <if test="notNullColumnList != null and notNullColumnList.size() > 0">
+                <foreach collection="notNullColumnList" item="notColumn" separator="AND">
+                    `${notColumn}` IS NOT NULL
+                </foreach>
+            </if>
             <include refid="searchDynamicTableDataSqlNew"/>
         </where>
-        ORDER BY `id` DESC
-        <if test="needPage == true">
+        <choose>
+            <when test="distinct">
+            </when>
+            <otherwise>
+                ORDER BY `id` DESC
+            </otherwise>
+        </choose>
+        <if test="needPage">
             LIMIT #{startNum}, #{pageSize}
         </if>
     </select>

@@ -138,6 +138,8 @@ public class Config {
 
     private static int LICENSE_WILL_EXPIRED_NOTIFY_DAY;//license 即将超时提醒天数
 
+    private static String CHANGELOG_JDBC_SOCKETTIME;//changelog jdbc 读取数据时间耗时限制
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -198,6 +200,17 @@ public class Config {
         }
 
         System.setProperty("javax.xml.accessExternalDTD", "all");//解决mapper引入classpath：dtd问题
+
+        if (StringUtils.isNotBlank(System.getProperty("changelogJdbcSocketTime"))) {
+            try {
+                CHANGELOG_JDBC_SOCKETTIME = System.getProperty("changelogJdbcSocketTime");
+            } catch (Exception ex) {
+                CHANGELOG_JDBC_SOCKETTIME = "60000";
+            }
+        } else {
+            CHANGELOG_JDBC_SOCKETTIME = "60000";
+        }
+
     }
 
     public static String NEATLOGIC_HOME() {
@@ -464,6 +477,10 @@ public class Config {
         return LICENSE_WILL_EXPIRED_NOTIFY_DAY;
     }
 
+    public static String CHANGELOG_JDBC_SOCKETTIME() {
+        return CHANGELOG_JDBC_SOCKETTIME;
+    }
+
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -628,6 +645,7 @@ public class Config {
 
             ENABLE_METHOD_TIMING_ASPECT = Boolean.parseBoolean(prop.getProperty("enable.method.timing.aspect", "false"));
             LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));
+
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");
             Set<Class<? extends IConfigListener>> listeners = reflections.getSubTypesOf(IConfigListener.class);

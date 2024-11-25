@@ -1,5 +1,6 @@
 package neatlogic.framework.util;
 
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.config.LocalConfig;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
@@ -65,7 +66,7 @@ public class JdbcUtil {
             // 设置连接超时时间（单位：毫秒）
             props.setProperty("connectTimeout", "5000");
             // 设置socket超时时间
-            props.setProperty("socketTimeout", "10000");
+            props.setProperty("socketTimeout", Config.CHANGELOG_JDBC_SOCKETTIME());
             // 设置最大允许的数据包大小
             props.setProperty("maxAllowedPacket", "67108864"); // 4 MB
             // 设置字符集

@@ -126,78 +126,79 @@
 
     <sql id="searchDynamicTableDataSqlNew">
         <if test="filterList != null and filterList.size() > 0">
+            AND
             <foreach collection="filterList" item="filter" separator="AND">
                 <choose>
                     <when test="filter.expression == 'equal'">
                         <choose>
                             <when test="filter.valueList.size() > 1">
-                                and  `${filter.uuid}` IN
+                                `${filter.uuid}` IN
                                 <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                     #{item}
                                 </foreach>
                             </when>
                             <otherwise>
-                                and  `${filter.uuid}` = #{filter.valueList[0]}
+                                `${filter.uuid}` = #{filter.valueList[0]}
                             </otherwise>
                         </choose>
                     </when>
                     <when test="filter.expression == 'notequal'">
                         <choose>
                             <when test="filter.valueList.size() > 1">
-                                and (`${filter.uuid}` NOT IN
+                                (`${filter.uuid}` NOT IN
                                 <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                     #{item}
                                 </foreach>
                                 OR `${filter.uuid}` IS NULL)
                             </when>
                             <otherwise>
-                                and `${filter.uuid}` != #{filter.valueList[0]}
+                                `${filter.uuid}` != #{filter.valueList[0]}
                             </otherwise>
                         </choose>
                     </when>
                     <when test="filter.expression == 'like'">
                         <choose>
                             <when test="filter.valueList.size() > 1">
-                                and `${filter.uuid}` IN
+                                `${filter.uuid}` IN
                                 <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                     #{item}
                                 </foreach>
                             </when>
                             <otherwise>
-                                and `${filter.uuid}` LIKE CONCAT('%', #{filter.valueList[0]}, '%')
+                                `${filter.uuid}` LIKE CONCAT('%', #{filter.valueList[0]}, '%')
                             </otherwise>
                         </choose>
                     </when>
                     <when test="filter.expression == 'notlike'">
                         <choose>
                             <when test="filter.valueList.size() > 1">
-                                and (`${filter.uuid}` NOT IN
+                                (`${filter.uuid}` NOT IN
                                 <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                     #{item}
                                 </foreach>
                                 OR `${filter.uuid}` IS NULL)
                             </when>
                             <otherwise>
-                                and (`${filter.uuid}` NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR `${filter.uuid}` IS NULL)
+                                (`${filter.uuid}` NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR `${filter.uuid}` IS NULL)
                             </otherwise>
                         </choose>
                     </when>
                     <when test="filter.expression == 'is-null'">
-                        and (`${filter.uuid}` IS NULL OR `${filter.uuid}` = '')
+                        (`${filter.uuid}` IS NULL OR `${filter.uuid}` = '')
                     </when>
                     <when test="filter.expression == 'is-not-null'">
-                        and (`${filter.uuid}` IS NOT NULL AND `${filter.uuid}` != '')
+                        (`${filter.uuid}` IS NOT NULL AND `${filter.uuid}` != '')
                     </when>
                     <otherwise>
                         <choose>
                             <when test="filter.valueList.size() > 1">
-                                and `${filter.uuid}` IN
+                                `${filter.uuid}` IN
                                 <foreach collection="filter.valueList" item="item" open="(" close=")" separator=",">
                                     #{item}
                                 </foreach>
                             </when>
                             <otherwise>
-                                and `${filter.uuid}` = #{filter.valueList[0]}
+                                `${filter.uuid}` = #{filter.valueList[0]}
                             </otherwise>
                         </choose>
                     </otherwise>

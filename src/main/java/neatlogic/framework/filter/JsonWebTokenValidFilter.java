@@ -93,7 +93,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
             HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
             if (!TenantUtil.hasTenant(tenant)) {
-                returnErrorResponseJson(ResponseCode.TENANT_NOTFOUND, response, loginAuth.directUrl(), tenant);
+                returnErrorResponseJson(ResponseCode.TENANT_NOTFOUND, response, loginAuth, tenant);
                 return;
             }
             TenantContext.init();
@@ -126,15 +126,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                             logger.debug("======= getUser succeed: " + userVo.getUuid());
                         } else {
-                            returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth.directUrl(), loginAuth.getType());
+                            returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth, loginAuth.getType());
                             return;
                         }
                     } else {
-                        returnErrorResponseJson(ResponseCode.AUTH_TYPE_NOTFOUND, response, defaultLoginAuth.directUrl(), authType);
+                        returnErrorResponseJson(ResponseCode.AUTH_TYPE_NOTFOUND, response, defaultLoginAuth, authType);
                         return;
                     }
                 } else {
-                    returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth.directUrl(), loginAuth.getType());
+                    returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, loginAuth.getType());
                     return;
                 }
             } else {
@@ -152,7 +152,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             logger.error(ex.getMessage(), ex);
             try {
                 // 不返回跳转地址，直接到显示错误信息页面
-                returnErrorResponseJson(false,ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(), ex.getMessage());
+                returnErrorResponseJson(false,ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -160,7 +160,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
-                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth.directUrl() : defaultLoginAuth.directUrl(), ex.getMessage());
+                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -173,18 +173,19 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      *
      * @param responseCode 异常码
      * @param response     相应
-     * @param directUrl    前端跳转url
+     * @param loginAuth    认证插件
      * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(boolean isRemoveCookie, ResponseCode responseCode, HttpServletResponse response, String directUrl, Object... args) throws Exception {
+    private void returnErrorResponseJson(boolean isRemoveCookie, ResponseCode responseCode, HttpServletResponse response, ILoginAuthHandler loginAuth, Object... args) throws Exception {
         JSONObject redirectObj = new JSONObject();
         String message = responseCode.getMessage(args);
         redirectObj.put("Status", "FAILED");
         redirectObj.put("Message", message);
         logger.debug("======login error:" + message);
         response.setStatus(responseCode.getCode());
-        redirectObj.put("DirectUrl", directUrl);
+        redirectObj.put("DirectUrl", loginAuth.directUrl());
+        redirectObj.put("IsAutoDirect", loginAuth.isAutoDirect());
         if (isRemoveCookie) {
             removeAuthCookie(response);
         }
@@ -197,12 +198,12 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      *
      * @param responseCode 异常码
      * @param response     相应
-     * @param directUrl    前端跳转url
+     * @param loginAuth    认证插件
      * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, String directUrl, Object... args) throws Exception {
-        returnErrorResponseJson(true, responseCode, response, directUrl, args);
+    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, ILoginAuthHandler loginAuth, Object... args) throws Exception {
+        returnErrorResponseJson(true, responseCode, response, loginAuth, args);
     }
 
     /**

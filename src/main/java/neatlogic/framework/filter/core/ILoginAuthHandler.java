@@ -63,4 +63,10 @@ public interface ILoginAuthHandler {
         return true;
     }
 
+    /**
+     * 是否自动跳转url，需要配合directUrl使用
+     */
+    default boolean isAutoDirect() {
+        return true;
+    }
 }

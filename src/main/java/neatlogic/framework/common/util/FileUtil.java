@@ -37,7 +37,7 @@ public class FileUtil {
      *
      * @param tenantUuid  租户uuid
      * @param inputStream 文件流
-     * @param file      文件
+     * @param file        文件
      * @return 附件路径
      * @throws Exception 异常
      */
@@ -78,6 +78,7 @@ public class FileUtil {
         }
         return handler.getData(filePath);
     }
+
 
     /**
      * 删除附件

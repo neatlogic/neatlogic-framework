@@ -39,8 +39,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             NULL COMMENT '${item.label}-${item.name}',
             `${item.id}_hash` char(32) NULL COMMENT '${item.label}-${item.name}哈希值',
         </foreach>
-        `expire_time` timestamp NULL COMMENT '过期时间',
-        `insert_time` timestamp(3) COMMENT '更新时间',
+        `expire_time` timestamp(3) NULL DEFAULT NULL COMMENT '过期时间',
+        `insert_time` timestamp(3) NULL DEFAULT NULL COMMENT '更新时间',
         `id` bigint NOT NULL COMMENT 'id',
         <foreach collection="fieldList" item="item">
             <if test="item.type == 'number' or item.type == 'date' or item.type == 'time' or item.type == 'datetime'">

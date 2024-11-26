@@ -344,7 +344,7 @@
             <choose>
                 <when test="distinct">
                     COUNT(distinct
-                    <foreach collection="columnList" item="column" separator=",">
+                    <foreach collection="notNullColumnList" item="column" separator=",">
                         a.`${column}`
                     </foreach>)
                 </when>

@@ -238,7 +238,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
         JwtVo jwt = userVo.getJwtVo();
         Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
-        if (!UserSessionCache.containsKey(jwt.getTokenHash())) {
+        if (authenticationInfoStr == null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
             if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
                 Date visitTime = userSessionVo.getSessionTime();
@@ -250,19 +250,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     userSessionVo.setAuthInfoStr(authInfo);
                     userSessionMapper.updateUserSession(jwt.getTokenHash());
                     AuthenticationInfoVo authenticationInfo = userSessionVo.getAuthInfo();
-                    UserSessionCache.addItem(jwt.getTokenHash(), JSON.toJSONString(authenticationInfo));
+                    UserSessionCache.addItem(jwt.getTokenHash(), authInfo);
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return false;
                 }
                 userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
             }
         } else {
-            AuthenticationInfoVo authenticationInfoVo;
-            if (authenticationInfoStr == null) {
-                authenticationInfoVo = new AuthenticationInfoVo();
-            } else {
-                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
-            }
+            AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
             UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             return false;
         }

@@ -114,11 +114,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         if (userVo != null && (!Objects.equals(getType(), "default") || (Objects.equals(getType(), "default") && StringUtils.isBlank(userVo.getCookieAuthorization())))) {
             logger.debug("======= myAuth: {} ===== {}", getType(), userVo.getUserId());
             JwtVo jwtVo = new JwtVo();
-            AuthenticationInfoVo authenticationInfoVo = null;
+            AuthenticationInfoVo authenticationInfoVo;
             jwtVo.setToken(getToken(userVo));
             Object authenticationInfo = UserSessionCache.getItem(jwtVo.getTokenHash());
             boolean isNeedLoginPost = false;
-            if (!UserSessionCache.containsKey(jwtVo.getTokenHash())) {
+            if (authenticationInfo == null) {
                 logger.debug("======= tokenHash: {}", jwtVo.getTokenHash());
                 String authInfoHash = null;
                 String authenticationInfoStr = null;
@@ -134,12 +134,10 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 }
                 UserSessionVo userSessionVo = new UserSessionVo(userVo.getUuid(), jwtVo.getToken(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash, authenticationInfoStr);
                 InsertUserSessionThread.addInsertUserSession(userSessionVo);
-                UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr);
+                UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr == null ? "{}" : authenticationInfoStr);
                 isNeedLoginPost = true;
             } else {
-                if (authenticationInfo != null) {
-                    authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
-                }
+                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
             }
             userVo.setJwtVo(jwtVo);
             UserContext.init(userVo, authenticationInfoVo, "+8:00", request, response);

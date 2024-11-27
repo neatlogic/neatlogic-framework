@@ -34,7 +34,6 @@ public interface IFileTypeHandler {
      * 校验附件是否允许删除
      *
      * @param fileVo 附件信息
-     * @return
      */
     default boolean validDeleteFile(FileVo fileVo) {
         return false;

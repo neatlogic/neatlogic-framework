@@ -1,6 +1,6 @@
 package neatlogic.framework.dto;
 
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSON;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
@@ -65,7 +65,7 @@ public class UserSessionVo implements Serializable {
     public AuthenticationInfoVo getAuthInfo() {
         if (authInfo == null) {
             if (StringUtils.isNotBlank(authInfoStr)) {
-                authInfo = JSONObject.toJavaObject(JSONObject.parseObject(authInfoStr), AuthenticationInfoVo.class);
+                authInfo = JSON.toJavaObject(JSON.parseObject(authInfoStr), AuthenticationInfoVo.class);
             } else {
                 authInfo = new AuthenticationInfoVo(userUuid);
             }
@@ -78,6 +78,9 @@ public class UserSessionVo implements Serializable {
     }
 
     public void setAuthInfoStr(String authInfoStr) {
+        if(StringUtils.isBlank(authInfoStr)){
+            authInfoStr = "{}";
+        }
         this.authInfoStr = authInfoStr;
     }
 

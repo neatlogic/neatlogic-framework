@@ -17,10 +17,9 @@
 
 package neatlogic.framework.dto;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import neatlogic.framework.common.constvalue.ApiParamType;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.util.RC4Util;
-import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Random;
@@ -31,11 +30,9 @@ public class ElasticsearchVo {
     private String username;
     private String passwordPlain;
     private String passwordCipher;
-    private String option;
+    private JSONObject config;
+    private String configStr;
 
-    @JSONField(serialize = false)
-    @EntityField(name = "nfd.tenantvo.authmongodb", type = ApiParamType.STRING)
-    private String authConfig;
 
     public ElasticsearchVo() {
 
@@ -57,15 +54,6 @@ public class ElasticsearchVo {
             this.passwordPlain = password.toString();
         }
     }
-
-    public String getOption() {
-        return option;
-    }
-
-    public void setOption(String option) {
-        this.option = option;
-    }
-
 
     public String getTenantUuid() {
         return tenantUuid;
@@ -121,11 +109,29 @@ public class ElasticsearchVo {
         this.host = host;
     }
 
-    public String getAuthConfig() {
-        return authConfig;
+    public JSONObject getConfig() {
+        if (config == null && StringUtils.isNotBlank(configStr)) {
+            try {
+                config = JSON.parseObject(configStr);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return config;
     }
 
-    public void setAuthConfig(String authConfig) {
-        this.authConfig = authConfig;
+    public void setConfig(JSONObject config) {
+        this.config = config;
+    }
+
+    public String getConfigStr() {
+        if (config != null) {
+            configStr = config.toJSONString();
+        }
+        return configStr;
+    }
+
+    public void setConfigStr(String configStr) {
+        this.configStr = configStr;
     }
 }

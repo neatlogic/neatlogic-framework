@@ -212,12 +212,12 @@ public class FileServiceImpl implements IFileCrossoverService {
     public JSONObject readRemoteFile(JSONObject paramObj, Integer serverId) {
         JSONObject resultObj = new JSONObject();
         String host = null;
-        TenantContext.get().setUseDefaultDatasource(true);
+        TenantContext.get().setUseMasterDatabase(true);
         ServerClusterVo serverClusterVo = serverMapper.getServerByServerId(serverId);
         if (serverClusterVo != null) {
             host = serverClusterVo.getHost();
         }
-        TenantContext.get().setUseDefaultDatasource(false);
+        TenantContext.get().setUseMasterDatabase(false);
         if (StringUtils.isBlank(host)) {
             return resultObj;
         }
@@ -288,12 +288,12 @@ public class FileServiceImpl implements IFileCrossoverService {
     @Override
     public void downloadRemoteFile(JSONObject paramObj, Integer serverId, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String host = null;
-        TenantContext.get().setUseDefaultDatasource(true);
+        TenantContext.get().setUseMasterDatabase(true);
         ServerClusterVo serverClusterVo = serverMapper.getServerByServerId(serverId);
         if (serverClusterVo != null) {
             host = serverClusterVo.getHost();
         }
-        TenantContext.get().setUseDefaultDatasource(false);
+        TenantContext.get().setUseMasterDatabase(false);
         if (StringUtils.isBlank(host)) {
             return;
         }

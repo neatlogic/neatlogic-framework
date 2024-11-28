@@ -115,7 +115,7 @@ public class TenantContext implements Serializable {
         if (StringUtils.isNotBlank(tenantUuid)) {
             this.tenantUuid = tenantUuid;
             // 使用master库
-            this.setUseDefaultDatasource(true);
+            this.setUseMasterDatabase(true);
             //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
             List<String> tenantModuleGroupList = new ArrayList<>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
             this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
@@ -127,7 +127,7 @@ public class TenantContext implements Serializable {
                 }
             }
             // 还原回租户库
-            this.setUseDefaultDatasource(false);
+            this.setUseMasterDatabase(false);
             activeModuleMap = new HashMap<>();
             if (activeModuleList != null && activeModuleList.size() > 0) {
                 for (ModuleVo module : activeModuleList) {
@@ -155,7 +155,7 @@ public class TenantContext implements Serializable {
      * 注意：不能在事务场景使用此方法，否则会切库失败
      * @param useDefaultDatasource true 使用neatlogic 库 ，false 还原使用租户库
      */
-    public void setUseDefaultDatasource(Boolean useDefaultDatasource) {
+    public void setUseMasterDatabase(Boolean useDefaultDatasource) {
         this.useDefaultDatasource = useDefaultDatasource;
     }
 

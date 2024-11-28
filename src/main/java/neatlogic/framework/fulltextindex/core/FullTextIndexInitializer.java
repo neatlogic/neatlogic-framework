@@ -60,7 +60,7 @@ public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
                 @Override
                 protected void execute() {
                     for (TenantVo tenantVo : tenantList) {
-                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
                         fullTextIndexSchemaMapper.createFullTextIndexTargetTable(moduleId);
                         fullTextIndexSchemaMapper.createFullTextIndexContentTable(moduleId);
                         fullTextIndexSchemaMapper.createFullTextIndexOffsetTable(moduleId);

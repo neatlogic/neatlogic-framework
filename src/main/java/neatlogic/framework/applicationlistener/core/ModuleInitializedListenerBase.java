@@ -44,7 +44,7 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
     }
 
     /**
-     * 整个应用启动完后执行的操作
+     * 每个模块加载完毕后执行
      *
      * @param context spring applicationContext
      */

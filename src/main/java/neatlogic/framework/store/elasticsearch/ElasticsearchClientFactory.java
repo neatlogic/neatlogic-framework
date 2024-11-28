@@ -21,30 +21,40 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
+import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dao.mapper.ElasticsearchMapper;
 import neatlogic.framework.dto.ElasticsearchVo;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//@RootComponent
-public class ElasticSearchManager {
-    @Resource
-    private ElasticsearchMapper elasticsearchMapper;
+@RootComponent
+public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
+    static Logger logger = LoggerFactory.getLogger(ElasticsearchClientFactory.class);
+    private static ElasticsearchMapper elasticsearchMapper;
+    private static final Map<String, ElasticsearchVo> elasticsearchMap = new HashMap<>();
+
+    @Autowired
+    public ElasticsearchClientFactory(ElasticsearchMapper _elasticsearchMapper) {
+        elasticsearchMapper = _elasticsearchMapper;
+    }
 
     private static final Map<String, ElasticsearchClient> elasticSearchClientMap = new HashMap<>();
 
-    @PostConstruct
-    public void init() {
-        List<ElasticsearchVo> elasticsearchList = elasticsearchMapper.getAllActiveTenantElasticsearch();
-        for (ElasticsearchVo elasticsearch : elasticsearchList) {
-            if (!elasticSearchClientMap.containsKey(elasticsearch.getTenantUuid())) {
+
+    public static ElasticsearchClient getClient() {
+        if (!elasticSearchClientMap.containsKey(TenantContext.get().getTenantUuid())) {
+            ElasticsearchVo elasticsearch = getElasticsearchVo();
+            if (elasticsearch != null) {
                 RestClient restClient = RestClient
                         .builder(HttpHost.create(elasticsearch.getHost()))
                         /*.setDefaultHeaders(new Header[]{
@@ -57,12 +67,31 @@ public class ElasticSearchManager {
 
                 ElasticsearchClient esClient = new ElasticsearchClient(transport);
                 elasticSearchClientMap.put(elasticsearch.getTenantUuid(), esClient);
+
+                List<IElasticsearchIndex> indexList = ElasticsearchIndexFactory.getAllIndex();
+                for (IElasticsearchIndex index : indexList) {
+                    index.createIndex();
+                }
+
             }
         }
+        return elasticSearchClientMap.get(TenantContext.get().getTenantUuid());
     }
 
+    @Override
+    protected void onInitialized(NeatLogicWebApplicationContext context) {
 
-    public static ElasticsearchClient getClient() {
-        return elasticSearchClientMap.get(TenantContext.get().getTenantUuid());
+    }
+
+    public static ElasticsearchVo getElasticsearchVo() {
+        return elasticsearchMap.get(TenantContext.get().getTenantUuid());
+    }
+
+    @Override
+    protected void myInit() {
+        List<ElasticsearchVo> elasticsearchVoList = elasticsearchMapper.getAllTenantElasticsearch();
+        for (ElasticsearchVo elasticsearchVo : elasticsearchVoList) {
+            elasticsearchMap.put(elasticsearchVo.getTenantUuid(), elasticsearchVo);
+        }
     }
 }

@@ -31,12 +31,13 @@
                    `host`     = #{host},
                    `option`   = #{option}
     </insert>
+
     <select id="getAllActiveTenantElasticsearch" resultType="neatlogic.framework.dto.ElasticsearchVo">
         SELECT tenant_uuid AS tenantUuid,
                username,
                `password`  AS passwordCipher,
                `host`,
-               `option`
+               `config`    AS configStr
         FROM elasticsearch a
                  JOIN `tenant` b
                       ON a.tenant_uuid = b.uuid
@@ -48,16 +49,17 @@
                username,
                `password`  AS passwordCipher,
                `host`,
-               `option`
+               `config`    AS configStr
         FROM elasticsearch
     </select>
 
-    <select id="getTenantElasticsearchByTenantUuid" resultType="neatlogic.framework.dto.ElasticsearchVo">
+    <select id="getTenantElasticsearchByTenantUuid" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.ElasticsearchVo">
         SELECT tenant_uuid AS tenantUuid,
                username,
                `password`  AS passwordCipher,
                `host`,
-               `option`
+               `config`    AS configStr
         FROM elasticsearch
         where tenant_uuid = #{value}
     </select>

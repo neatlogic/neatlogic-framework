@@ -294,7 +294,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
         @Override
         protected void execute() {
             // 切换租户数据源
-            TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
+            TenantContext.get().switchTenant(tenantUuid).setUseMasterDatabase(false);
             for (ApiVo apiVo : apiTokenList) {
                 //ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
                 //if (api == null) {

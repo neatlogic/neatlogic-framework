@@ -216,9 +216,9 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {
             System.out.println("⚡" + $.t("common.startloadschedulejob", context.getModuleId()));
             for (TenantVo tenantVo : tenantList) {
-                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(false);
+                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
                 List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseDefaultDatasource(true);
+                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(true);
                 if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
                     CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
                     System.out.println("  ✓" + tenantVo.getName());
@@ -244,7 +244,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             String oldThreadName = Thread.currentThread().getName();
             try {
                 // 切换租户数据源
-                TenantContext.get().switchTenant(tenantUuid).setUseDefaultDatasource(false);
+                TenantContext.get().switchTenant(tenantUuid).setUseMasterDatabase(false);
                 UserContext.init(SystemUser.SYSTEM);
                 for (IJob jobHandler : jobHandlerList) {
                     jobHandler.initJob(tenantUuid);

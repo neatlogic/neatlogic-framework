@@ -73,7 +73,7 @@ public class TenantInitManager extends ModuleInitializedListenerBase {
                 logger.error("租户“" + tenantVo.getName() + "”初始化数据“" + tenantInit.getName() + "”失败：" + ex.getMessage(), ex);
             }
         }
-        TenantContext.get().setUseDefaultDatasource(true);
+        TenantContext.get().setUseMasterDatabase(true);
     }
 
 

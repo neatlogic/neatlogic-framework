@@ -158,7 +158,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             TenantContext.get().switchTenant(tenantVo.getUuid());
             tenantServerMapper.insertTenantServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         }
-        TenantContext.get().setUseDefaultDatasource(true);
+        TenantContext.get().setUseMasterDatabase(true);
     }
 
     @Override

@@ -198,7 +198,7 @@ public class LoginController {
                     tenantMapper.updateTenantVisitTime(tenant);
                     tenantVisitSet.add(tenant);
                 }
-                LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
+                LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo, null);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());
                 response.getWriter().print(returnObj);

@@ -124,7 +124,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 String authenticationInfoStr = null;
                 authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                 jwtVo = buildJwt(userVo, authenticationInfoVo);
-                setResponseAuthCookie(response, request, tenant, jwtVo);
+                setResponseAuthCookie(response, request, tenant, jwtVo, getType());
                 if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
                     authenticationInfoVo.setHeaderSet(null);
                     authenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
@@ -210,8 +210,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @param request  请求
      * @param tenant   租户
      * @param jwtVo    jwt对象
+     * @param authType 需要标记的认证方式
      */
-    public static void setResponseAuthCookie(HttpServletResponse response, HttpServletRequest request, String tenant, JwtVo jwtVo) {
+    public static void setResponseAuthCookie(HttpServletResponse response, HttpServletRequest request, String tenant, JwtVo jwtVo, String authType) {
         Cookie authCookie = new Cookie("neatlogic_authorization", "GZIP_" + jwtVo.getCc());
         authCookie.setPath("/" + tenant);
         String domainName = request.getServerName();
@@ -229,6 +230,19 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         // 允许跨域携带cookie
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setContentType(Config.RESPONSE_TYPE_JSON);
+        // 认证方式cookie
+        if (authType == null || Objects.equals("default", authType)) {
+            // 默认登录无需标记，使其失效
+            Cookie authTypeCookie = new Cookie("neatlogic_login_auth_type", null);
+            authTypeCookie.setPath("/" + tenant);
+            authTypeCookie.setMaxAge(0);
+            response.addCookie(authTypeCookie);
+        } else {
+            // 标记第三方认证方式
+            Cookie authTypeCookie = new Cookie("neatlogic_login_auth_type", authType);
+            authTypeCookie.setPath("/" + tenant);
+            response.addCookie(authTypeCookie);
+        }
     }
 
     @Override

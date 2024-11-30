@@ -17,8 +17,8 @@ package neatlogic.framework.exception.runner;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class RunnerNotFoundByTagentRunnerIdException extends ApiRuntimeException {
-    public RunnerNotFoundByTagentRunnerIdException(Long tagentId, String tagentIp, Long runnerId) {
-        super("nfer.runnernotfoundbytagentrunneridexception.runnernotfoundbytagentrunneridexception",  tagentId,tagentIp, tagentId);
+public class RunnerNotFoundByTagentIdException extends ApiRuntimeException {
+    public RunnerNotFoundByTagentIdException(Long tagentId, String tagentIp) {
+        super("nfer.runnernotfoundbytagentidexception.runnernotfoundbytagentidexception", tagentIp, tagentId);
     }
 }

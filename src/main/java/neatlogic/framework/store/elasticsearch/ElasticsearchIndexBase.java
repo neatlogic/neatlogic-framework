@@ -18,12 +18,25 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.GetIndexResponse;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dto.ElasticsearchVo;
+import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchCreateDocumentException;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T> {
     static Logger logger = LoggerFactory.getLogger(ElasticsearchIndexBase.class);
@@ -66,5 +79,75 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         } catch (Exception e) {
             throw new ElasticSearchCreateDocumentException(e);
         }
+    }
+
+    private static Query buildQuery(Map<String, Object> conditionObj) {
+        // 如果条件为空，使用 match_all
+        if (MapUtils.isEmpty(conditionObj)) {
+            return new Query.Builder()
+                    .matchAll(ma -> ma)
+                    .build();
+        }
+
+        // 构建查询条件列表
+        List<Query> queries = new ArrayList<>();
+        conditionObj.forEach((key, value) -> {
+            if (value != null && StringUtils.isNotBlank(value.toString())) { // 跳过空值
+                queries.add(new Query.Builder()
+                        .match(ma -> ma.field(key).query(FieldValue.of(value)))
+                        .build());
+            }
+        });
+
+        // 构建 bool 查询
+        return new Query.Builder()
+                .bool(b -> b.must(queries))
+                .build();
+    }
+
+    @Override
+    public final IndexResultVo searchDocument(Map<String, Object> conditionObj, Integer currentPage, Integer pageSize) throws IOException {
+
+        // 构建查询
+        Query queryBuilder = buildQuery(conditionObj);
+
+        // 执行搜索
+        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+
+        // 创建搜索请求总数
+        SearchRequest requestCount = new SearchRequest.Builder()
+                .index(this.getIndexName())
+                .query(queryBuilder) // 搜索条件
+                .size(0)      // 设置 size 为 0，仅获取总量
+                .build();
+
+        // 执行搜索
+        SearchResponse<Object> responseCount = client.search(requestCount, Object.class);
+
+        // 获取总量
+        long rowNum = responseCount.hits().total().value();
+        IndexResultVo resultVo = new IndexResultVo();
+        resultVo.setCurrentPage(currentPage);
+        resultVo.setPageSize(pageSize);
+        resultVo.setRowNum((int) rowNum);
+        // 创建搜索请求
+        SearchRequest request = new SearchRequest.Builder()
+                .index(this.getIndexName())
+                .query(queryBuilder)
+                .from(resultVo.getStartNum())
+                .size(resultVo.getPageSize())
+                .build();
+
+
+        SearchResponse<Object> response = client.search(request, Object.class);
+
+        // 提取符合条件的 id 列表
+        List<String> idList = new ArrayList<>();
+        List<Hit<Object>> hits = response.hits().hits();
+        for (Hit<Object> hit : hits) {
+            idList.add(hit.id());
+        }
+        resultVo.setIdList(idList);
+        return resultVo;
     }
 }

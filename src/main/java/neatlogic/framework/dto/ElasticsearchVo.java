@@ -117,6 +117,9 @@ public class ElasticsearchVo {
 
             }
         }
+        if (config == null) {
+            config = new JSONObject();
+        }
         return config;
     }
 

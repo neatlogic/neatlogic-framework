@@ -615,11 +615,14 @@ public class HttpRequestUtil {
                         this.outputStream.flush();
                     }
                 } else {
-                    input = new DataInputStream(connection.getErrorStream());
-                    StringWriter writer = new StringWriter();
-                    InputStreamReader reader = new InputStreamReader(input, this.charset);
-                    IOUtils.copy(reader, writer);
-                    throw new ApiRuntimeException(writer.toString());
+                    InputStream errorStream = connection.getErrorStream();
+                    if (errorStream != null) {
+                        input = new DataInputStream(errorStream);
+                        StringWriter writer = new StringWriter();
+                        InputStreamReader reader = new InputStreamReader(input, this.charset);
+                        IOUtils.copy(reader, writer);
+                        throw new ApiRuntimeException(writer.toString());
+                    }
                 }
             } catch (ApiRuntimeException e) {
                 this.error = e.getMessage();

@@ -15,36 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.store.elasticsearch;
+package neatlogic.framework.dto.elasticsearch;
 
-import neatlogic.framework.dto.elasticsearch.IndexResultVo;
+import neatlogic.framework.common.dto.BasePageVo;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
-public interface IElasticsearchIndex<T> {
-    /*
-    ES中的索引名称
-     */
-    String getIndexName();
+public class IndexResultVo extends BasePageVo {
+    private List<String> idList;
 
-    /*
-    插件名称
-     */
-    String getName();
+    public List<String> getIdList() {
+        return idList;
+    }
 
-    /*
-    创建索引
-     */
-    void createIndex();
-
-    /*
-    创建文档
-     */
-    void createDocument(T targetVo);
-
-    /*
-    搜索文档
-     */
-    IndexResultVo searchDocument(Map<String, Object> conditionObj, Integer currentPage, Integer pageSize) throws IOException;
+    public void setIdList(List<String> idList) {
+        this.idList = idList;
+    }
 }

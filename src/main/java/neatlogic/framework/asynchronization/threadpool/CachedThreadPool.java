@@ -16,29 +16,91 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.asynchronization.threadpool;
 
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
+import neatlogic.framework.dto.healthcheck.ThreadPoolVo;
+import neatlogic.framework.dto.healthcheck.ThreadVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class CachedThreadPool {
     static int cpu = Runtime.getRuntime().availableProcessors();
-    static int queueLen = 100000;
+    //static int queueLen = 100000;
     private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
+    //private static List<ThreadVo> threadList = new ArrayList<>();
+    private static final Map<Long, ThreadVo> threadMap = new ConcurrentHashMap<>();
+    private static final Set<String> threadSet = new HashSet<>();
+    // 创建非阻塞队列
+    private static final ConcurrentLinkedQueue<Runnable> threadQueue = new ConcurrentLinkedQueue<>();
     /*
     主线程池，直接创建线程快速处理任务
      */
     private static final ThreadPoolExecutor mainThreadPool = new ThreadPoolExecutor(0, cpu * 15,
             60L, TimeUnit.SECONDS,
-            new SynchronousQueue<>(), new NeatLogicRejectHandler());
+            new SynchronousQueue<>(), new NeatLogicRejectHandler()) {
+        @Override
+        protected void beforeExecute(Thread t, Runnable r) {
+            super.beforeExecute(t, r);
+            if (r instanceof NeatLogicThread) {
+                NeatLogicThread nt = (NeatLogicThread) r;
+                ThreadVo threadVo = new ThreadVo();
+                threadVo.setId(nt.getId());
+                threadVo.setName(nt.getThreadName() + "#" + nt.getId());
+                threadVo.setPoolName("main");
+                threadVo.setStartTime(new Date());
+                threadMap.put(nt.getId(), threadVo);
+                threadSet.add(nt.getThreadName());
+            }
+        }
+
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            // 任务完成后从 activeTasks 中移除
+            if (r instanceof NeatLogicThread) {
+                NeatLogicThread task = (NeatLogicThread) r;
+                threadMap.remove(task.getId());
+                threadSet.remove(task.getThreadName());
+            }
+            //尝试从队列中拿出任务处理
+            Runnable task = threadQueue.poll();
+            if (task != null) {
+                mainThreadPool.execute(task);
+            }
+        }
+    };
     /*
     备份线程池，当主线程池满了以后启用，队列满了以后开始抛异常并丢弃该任务
      */
-    private static final ThreadPoolExecutor backupThreadPool = new ThreadPoolExecutor(0, cpu * 2,
+    /*private static final ThreadPoolExecutor backupThreadPool = new ThreadPoolExecutor(0, cpu * 2,
             0L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(queueLen), new ThreadPoolExecutor.AbortPolicy());
+            new LinkedBlockingQueue<>(queueLen), new ThreadPoolExecutor.AbortPolicy()) {
+        @Override
+        protected void beforeExecute(Thread t, Runnable r) {
+            super.beforeExecute(t, r);
+            if (r instanceof NeatLogicThread) {
+                NeatLogicThread nt = (NeatLogicThread) r;
+                ThreadVo threadVo = new ThreadVo();
+                threadVo.setId(nt.getId());
+                threadVo.setName(nt.getThreadName() + "#" + nt.getId());
+                threadVo.setPoolName("backup");
+                threadVo.setStartTime(new Date());
+                threadMap.put(nt.getId(), threadVo);
+            }
+        }
+
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            // 任务完成后从 activeTasks 中移除
+            if (r instanceof NeatLogicThread) {
+                NeatLogicThread task = (NeatLogicThread) r;
+                threadMap.remove(task.getId());
+            }
+        }
+    };*/
 
     public static void execute(NeatLogicThread command, CountDownLatch countDownLatch) {
         command.setCountDownLatch(countDownLatch);
@@ -47,16 +109,7 @@ public class CachedThreadPool {
 
     public static void execute(NeatLogicThread command) {
         try {
-            boolean isExists = false;
-            if (command.isUnique() && StringUtils.isNotBlank(command.getThreadName())) {
-                Set<Thread> threadSet = Thread.getAllStackTraces().keySet();
-                for (Thread t : threadSet) {
-                    if (t.getName().equalsIgnoreCase(command.getThreadName())) {
-                        isExists = true;
-                        break;
-                    }
-                }
-            }
+            boolean isExists = command.isUnique() && StringUtils.isNotBlank(command.getThreadName()) && threadSet.contains(command.getThreadName());
             if (!isExists) {
                 mainThreadPool.execute(command);
             } else {
@@ -71,16 +124,29 @@ public class CachedThreadPool {
     static class NeatLogicRejectHandler implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            if (r instanceof NeatLogicThread) {
+            /*if (r instanceof NeatLogicThread) {
                 logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, " + ((NeatLogicThread) r).getThreadName() + " is taking over by backup thread pool(size:" + (cpu * 2) + ").");
             } else {
                 logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, unknown thread is taking over by backup thread pool(size:" + (cpu * 2) + ").");
             }
             backupThreadPool.execute(r);
+             */
+            //进入等待队列
+            threadQueue.offer(r);
         }
     }
 
-    public static int getThreadActiveCount() {
+    /*public static int getThreadActiveCount() {
         return mainThreadPool.getActiveCount();
+    }*/
+
+    public static ThreadPoolVo getStatus() {
+        ThreadPoolVo threadPoolVo = new ThreadPoolVo();
+        List<ThreadVo> threads = new ArrayList<>(threadMap.values());
+        threadPoolVo.setThreadList(threads);
+        threadPoolVo.setMainPoolSize(mainThreadPool.getPoolSize());
+        threadPoolVo.setMainActiveCount(mainThreadPool.getActiveCount());
+        threadPoolVo.setMainQueueSize(threadQueue.size());
+        return threadPoolVo;
     }
 }

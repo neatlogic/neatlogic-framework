@@ -23,6 +23,7 @@ import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.config.ConfigManager;
 import neatlogic.framework.config.FrameworkTenantConfig;
+import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dao.mapper.ThemeMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.ThemeVo;
@@ -59,6 +60,9 @@ public class TenantController {
     @Resource
     private ThemeMapper themeMapper;
 
+    @Resource
+    private TenantMapper tenantMapper;
+
     private void getCommercialModule() {
         Reflections reflections = new Reflections("neatlogic");
         Set<Class<? extends InstantiationAwareBeanPostProcessor>> authClass = reflections.getSubTypesOf(InstantiationAwareBeanPostProcessor.class);
@@ -92,7 +96,7 @@ public class TenantController {
                         isLicenseLegal = false;
                     }
                 }
-                if(!isLicenseLegal) {
+                if (!isLicenseLegal) {
                     response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
                     ReturnJson.error(ResponseCode.LICENSE_INVALID.getMessage(tenant), response);
                 }
@@ -143,5 +147,13 @@ public class TenantController {
             logger.error(e.getMessage(), e);
             throw e;
         }
+    }
+
+
+    @RequestMapping(value = "/get/active/tenant/list")
+    public void listAllActiveTenant(HttpServletResponse response) {
+        JSONObject result = new JSONObject();
+        result.put("tenantList", tenantMapper.getAllActiveTenant());
+        ReturnJson.success(result, response);
     }
 }

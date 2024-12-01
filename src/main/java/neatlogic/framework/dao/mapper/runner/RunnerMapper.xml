@@ -82,6 +82,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <result column="host" property="host"/>
         <result column="port" property="port"/>
         <result column="isDelete" property="isDelete"/>
+        <result column="status" property="status"/>
+        <result column="info" property="info"/>
+        <result column="statusLcd" property="statusLcd"/>
         <collection property="runnerGroupVoList" ofType="neatlogic.framework.dto.runner.RunnerGroupVo">
             <id column="groupId" property="id"/>
             <result column="groupName" property="name"/>
@@ -364,7 +367,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         rg.name AS groupName,
         g.host,
         g.port,
-        g.is_delete AS isDelete
+        g.is_delete AS isDelete,
+        g.status,
+        g.info,
+        g.status_lcd as statusLcd
         from
         (SELECT DISTINCT
         r.id,
@@ -376,7 +382,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         r.auth_type,
         r.host,
         r.port,
-        r.is_delete
+        r.is_delete,
+        r.status,
+        r.info,
+        r.status_lcd
         from runner r
         LEFT JOIN runnergroup_runner rgr on r.`id` = rgr.`runner_id`
         LEFT JOIN runnergroup rg on rg.`id` = rgr.`runnergroup_id`
@@ -624,6 +633,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SET host    = #{runnerHost},
             url     = #{url},
             netty_ip=#{runnerHost};
+    </update>
+    <update id="updateStatusAndInfoByHost">
+        update `runner`
+        set `status` = #{status},
+            `info` = #{info},
+            `status_lcd` = now()
+        where `host` = #{host}
     </update>
 
     <select id="checkRunnerIsUsedByJob" resultType="int">

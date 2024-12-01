@@ -15,11 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dto.runner;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
+import neatlogic.framework.common.constvalue.RunnerStatus;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
@@ -27,6 +29,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -73,7 +76,13 @@ public class RunnerVo extends BasePageVo implements Serializable {
     private Integer isDelete;
     @EntityField(name = "是否过滤runner组", type = ApiParamType.INTEGER)
     private Integer isFilterGroup = 0;
+    @EntityField(name = "状态", type = ApiParamType.STRING)
+    private String status;
+    @EntityField(name = "runner信息", type = ApiParamType.STRING)
+    private String info;
     private List<RunnerAuthVo> runnerAuthList;
+    @EntityField(name = "状态更新时间", type = ApiParamType.STRING)
+    private Date statusLcd;
 
     public Long getId() {
         if (id == null) {
@@ -305,5 +314,40 @@ public class RunnerVo extends BasePageVo implements Serializable {
             }
             return array;
         }
+    }
+
+    public String getStatusText() {
+        return RunnerStatus.getText(status);
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public JSONObject getInfoObj() {
+        if (StringUtils.isNotBlank(info)) {
+            return JSON.parseObject(info);
+        }
+        return null;
+    }
+
+    public Date getStatusLcd() {
+        return statusLcd;
+    }
+
+    public void setStatusLcd(Date statusLcd) {
+        this.statusLcd = statusLcd;
     }
 }

@@ -34,7 +34,8 @@ public class EscapeTransactionJob {
     }
 
     public State execute() {
-        State state = new State();
+
+        EscapeTransactionJob.State state = new EscapeTransactionJob.State();
         if (thread != null) {
             CountDownLatch latch = new CountDownLatch(1);
             CachedThreadPool.execute(new EscapeHandler(latch, thread, state));
@@ -80,9 +81,10 @@ public class EscapeTransactionJob {
     public static class EscapeHandler extends NeatLogicThread {
         private final IEscapeTransaction thread;
         private final CountDownLatch latch;
-        private final State state;
+        private final
+        EscapeTransactionJob.State state;
 
-        public EscapeHandler(CountDownLatch _latch, IEscapeTransaction _thread, State _state) {
+        public EscapeHandler(CountDownLatch _latch, IEscapeTransaction _thread, EscapeTransactionJob.State _state) {
             super("ESCAPE-TRANSACTION-HANDLER");
             thread = _thread;
             latch = _latch;

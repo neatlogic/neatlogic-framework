@@ -37,7 +37,7 @@ import java.util.concurrent.CountDownLatch;
  * @since 2024/6/3 10:31 上午
  **/
 public class BatchIteratorRunner<T> {
-    private final static Logger logger = LoggerFactory.getLogger(BatchIteratorRunner.class);
+    private static final Logger logger = LoggerFactory.getLogger(BatchIteratorRunner.class);
 
     public static class State {
         private boolean isSucceed = false;
@@ -61,7 +61,7 @@ public class BatchIteratorRunner<T> {
         }
 
         public String getExceptionMsg() {
-            if(exception != null){
+            if (exception != null) {
                 return exception.getMessage();
             }
             return null;
@@ -102,10 +102,12 @@ public class BatchIteratorRunner<T> {
         BatchIteratorJob<T> job;
         CountDownLatch latch;
         boolean needTransaction;
-        State state;
+
+        BatchIteratorRunner.State state;
         List<T> rowList = new ArrayList<>();
 
-        public Runner(String _threadName, boolean _needTransaction, Iterator<T> _iterator, BatchIteratorJob<T> _job, CountDownLatch _latch, State _state) {
+        public Runner(String _threadName, boolean _needTransaction, Iterator<T> _iterator, BatchIteratorJob<T> _job, CountDownLatch _latch,
+                      BatchIteratorRunner.State _state) {
             super(_threadName);
             iterator = _iterator;
             job = _job;
@@ -129,7 +131,8 @@ public class BatchIteratorRunner<T> {
             }
         }
 
-        private void executeJob(Iterator<T> item, List<T> rowList, boolean needTransaction, BatchIteratorJob<T> job, State state) {
+        private void executeJob(Iterator<T> item, List<T> rowList, boolean needTransaction, BatchIteratorJob<T> job,
+                                BatchIteratorRunner.State state) {
             TransactionStatus ts = null;
             if (needTransaction) {
                 ts = TransactionUtil.openTx();

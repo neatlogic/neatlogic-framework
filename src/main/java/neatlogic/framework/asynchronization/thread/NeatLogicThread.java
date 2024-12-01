@@ -25,13 +25,24 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.CountDownLatch;
 
 public abstract class NeatLogicThread implements Runnable {
-    private final static Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
+    private static final Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
     protected UserContext userContext;
     protected TenantContext tenantContext;
     protected InputFromContext inputFromContext;
     protected RequestContext requestContext;
     private String threadName;
     private boolean isUnique = false;
+    /* For generating thread ID */
+    private long tid;
+    private static long threadSeqNumber;
+
+    private static synchronized long nextThreadID() {
+        return ++threadSeqNumber;
+    }
+
+    public long getId() {
+        return tid;
+    }
 
     private CountDownLatch countDownLatch;
 
@@ -45,6 +56,7 @@ public abstract class NeatLogicThread implements Runnable {
         userContext = _userContext;
         tenantContext = _tenantContext;
         inputFromContext = InputFromContext.get();
+        tid = nextThreadID();
     }
 
 
@@ -54,6 +66,7 @@ public abstract class NeatLogicThread implements Runnable {
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
         this.threadName = _threadName;
+        tid = nextThreadID();
     }
 
     public NeatLogicThread(String _threadName, boolean _isUnique) {
@@ -63,6 +76,7 @@ public abstract class NeatLogicThread implements Runnable {
         requestContext = RequestContext.get();
         this.threadName = _threadName;
         this.isUnique = _isUnique;
+        tid = nextThreadID();
     }
 
     @Override

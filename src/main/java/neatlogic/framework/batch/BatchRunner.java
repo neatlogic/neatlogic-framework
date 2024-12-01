@@ -104,9 +104,9 @@ public class BatchRunner<T> {
         BatchJob<T> job;
         CountDownLatch latch;
         boolean needTransaction;
-        State state;
+        BatchRunner.State state;
 
-        public Runner(String _threadName, int _index, int _parallel, boolean _needTransaction, List<T> _itemList, BatchJob<T> _job, CountDownLatch _latch, State _state) {
+        public Runner(String _threadName, int _index, int _parallel, boolean _needTransaction, List<T> _itemList, BatchJob<T> _job, CountDownLatch _latch, BatchRunner.State _state) {
             super(_threadName);
             index = _index;
             parallel = _parallel;

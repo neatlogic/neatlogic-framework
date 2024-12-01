@@ -35,7 +35,6 @@
             `${column}`
         </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}`
-        ORDER BY `id` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -86,7 +85,6 @@
         <where>
             <include refid="searchDynamicTableDataSql"/>
         </where>
-        ORDER BY `id` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -118,7 +116,6 @@
             </foreach>
             <include refid="searchDynamicTableDataSql"/>
         </where>
-        ORDER BY `id` DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -258,13 +255,6 @@
             </if>
             <include refid="searchDynamicTableDataSqlNew"/>
         </where>
-        <choose>
-            <when test="distinct">
-            </when>
-            <otherwise>
-                ORDER BY `id` DESC
-            </otherwise>
-        </choose>
         <if test="needPage">
             LIMIT #{startNum}, #{pageSize}
         </if>

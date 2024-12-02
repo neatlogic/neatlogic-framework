@@ -106,8 +106,6 @@ public interface RunnerMapper {
 
     int updateRunnerHost(@Param("runnerHost") String runnerHost, @Param("url") String url);
 
-    void updateStatusAndInfoByHost(@Param("host") String host, @Param("status") String status, @Param("info") String info);
-
     void deleteGroupNetWork(Long id);
 
     void deleteRunnerGroupById(Long id);

@@ -40,9 +40,10 @@ public class CachedThreadPool {
             super.beforeExecute(t, r);
             if (r instanceof NeatLogicThread) {
                 NeatLogicThread nt = (NeatLogicThread) r;
+                nt.setId(t.getId());
                 ThreadVo threadVo = new ThreadVo();
-                threadVo.setId(nt.getId());
-                threadVo.setName(nt.getThreadName() + "#" + nt.getId());
+                threadVo.setId(t.getId());
+                threadVo.setName(nt.getThreadName());
                 threadVo.setPoolName("main");
                 threadVo.setStartTime(new Date());
                 threadVo.setPriority(nt.getPriority());

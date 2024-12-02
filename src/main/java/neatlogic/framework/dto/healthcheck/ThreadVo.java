@@ -26,6 +26,7 @@ public class ThreadVo {
     private long timeCost;
     private String poolName;
     private String status;
+    private int priority;
 
     public Long getId() {
         return id;
@@ -41,6 +42,14 @@ public class ThreadVo {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public String getName() {

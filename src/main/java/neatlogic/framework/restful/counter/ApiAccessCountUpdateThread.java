@@ -30,7 +30,6 @@ import java.util.concurrent.DelayQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @Time:2020年7月17日
  * @ClassName: ApiAccessCountManager
  * @Description: 接口访问次数统计管理类
  */
@@ -41,7 +40,7 @@ public class ApiAccessCountUpdateThread extends NeatLogicThread {
     /**
      * 统计延迟对象，默认初始化一个失效的延迟对象
      **/
-    private volatile static DelayedItem delayedItem = new DelayedItem(true);
+    private static volatile DelayedItem delayedItem = new DelayedItem(true);
     /**
      * 延迟队列
      **/

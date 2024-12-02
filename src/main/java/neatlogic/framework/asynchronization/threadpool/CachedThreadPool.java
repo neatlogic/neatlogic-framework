@@ -27,16 +27,11 @@ import java.util.concurrent.*;
 
 public class CachedThreadPool {
     static int cpu = Runtime.getRuntime().availableProcessors();
-    //static int queueLen = 100000;
     private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
-    //private static List<ThreadVo> threadList = new ArrayList<>();
     private static final Map<Long, ThreadVo> threadMap = new ConcurrentHashMap<>();
     private static final Set<String> threadSet = new HashSet<>();
-    // 创建非阻塞队列
-    private static final ConcurrentLinkedQueue<Runnable> threadQueue = new ConcurrentLinkedQueue<>();
-    /*
-    主线程池，直接创建线程快速处理任务
-     */
+    private static final PriorityBlockingQueue<NeatLogicThread> threadQueue = new PriorityBlockingQueue<>();
+
     private static final ThreadPoolExecutor mainThreadPool = new ThreadPoolExecutor(0, cpu * 15,
             60L, TimeUnit.SECONDS,
             new SynchronousQueue<>(), new NeatLogicRejectHandler()) {
@@ -50,6 +45,7 @@ public class CachedThreadPool {
                 threadVo.setName(nt.getThreadName() + "#" + nt.getId());
                 threadVo.setPoolName("main");
                 threadVo.setStartTime(new Date());
+                threadVo.setPriority(nt.getPriority());
                 threadMap.put(nt.getId(), threadVo);
                 threadSet.add(nt.getThreadName());
             }
@@ -71,36 +67,6 @@ public class CachedThreadPool {
             }
         }
     };
-    /*
-    备份线程池，当主线程池满了以后启用，队列满了以后开始抛异常并丢弃该任务
-     */
-    /*private static final ThreadPoolExecutor backupThreadPool = new ThreadPoolExecutor(0, cpu * 2,
-            0L, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>(queueLen), new ThreadPoolExecutor.AbortPolicy()) {
-        @Override
-        protected void beforeExecute(Thread t, Runnable r) {
-            super.beforeExecute(t, r);
-            if (r instanceof NeatLogicThread) {
-                NeatLogicThread nt = (NeatLogicThread) r;
-                ThreadVo threadVo = new ThreadVo();
-                threadVo.setId(nt.getId());
-                threadVo.setName(nt.getThreadName() + "#" + nt.getId());
-                threadVo.setPoolName("backup");
-                threadVo.setStartTime(new Date());
-                threadMap.put(nt.getId(), threadVo);
-            }
-        }
-
-        @Override
-        protected void afterExecute(Runnable r, Throwable t) {
-            super.afterExecute(r, t);
-            // 任务完成后从 activeTasks 中移除
-            if (r instanceof NeatLogicThread) {
-                NeatLogicThread task = (NeatLogicThread) r;
-                threadMap.remove(task.getId());
-            }
-        }
-    };*/
 
     public static void execute(NeatLogicThread command, CountDownLatch countDownLatch) {
         command.setCountDownLatch(countDownLatch);
@@ -124,21 +90,15 @@ public class CachedThreadPool {
     static class NeatLogicRejectHandler implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            /*if (r instanceof NeatLogicThread) {
-                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, " + ((NeatLogicThread) r).getThreadName() + " is taking over by backup thread pool(size:" + (cpu * 2) + ").");
-            } else {
-                logger.warn("main thread pool(size:" + (cpu * 15) + ") is full, unknown thread is taking over by backup thread pool(size:" + (cpu * 2) + ").");
-            }
-            backupThreadPool.execute(r);
-             */
             //进入等待队列
-            threadQueue.offer(r);
+            if (r instanceof NeatLogicThread) {
+                threadQueue.offer((NeatLogicThread) r);
+            } else {
+                logger.error("线程池已满，非NeatLogicThread子类线程将被抛弃");
+            }
         }
     }
 
-    /*public static int getThreadActiveCount() {
-        return mainThreadPool.getActiveCount();
-    }*/
 
     public static ThreadPoolVo getStatus() {
         ThreadPoolVo threadPoolVo = new ThreadPoolVo();

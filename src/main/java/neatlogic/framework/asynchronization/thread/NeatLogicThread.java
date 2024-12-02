@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 
-public abstract class NeatLogicThread implements Runnable {
+public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicThread> {
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
     protected UserContext userContext;
     protected TenantContext tenantContext;
@@ -35,6 +35,12 @@ public abstract class NeatLogicThread implements Runnable {
     /* For generating thread ID */
     private long tid;
     private static long threadSeqNumber;
+    private int priority = 3;//默认优先级是3，数字越低优先级越高
+
+    @Override
+    public int compareTo(NeatLogicThread other) {
+        return Integer.compare(this.priority, other.priority); // 优先级高的先出队,priority越小代表优先级越高
+    }
 
     private static synchronized long nextThreadID() {
         return ++threadSeqNumber;
@@ -42,6 +48,17 @@ public abstract class NeatLogicThread implements Runnable {
 
     public long getId() {
         return tid;
+    }
+
+    public int getPriority() {
+        if (priority <= 1) {
+            priority = 1;
+        }
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     private CountDownLatch countDownLatch;
@@ -66,6 +83,16 @@ public abstract class NeatLogicThread implements Runnable {
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
         this.threadName = _threadName;
+        tid = nextThreadID();
+    }
+
+    public NeatLogicThread(String _threadName, int priority) {
+        userContext = UserContext.get();
+        tenantContext = TenantContext.get();
+        inputFromContext = InputFromContext.get();
+        requestContext = RequestContext.get();
+        this.threadName = _threadName;
+        this.priority = priority;
         tid = nextThreadID();
     }
 

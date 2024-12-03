@@ -16,33 +16,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.restful.dao.mapper;
 
 import neatlogic.framework.restful.dto.ApiVo;
-import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-
-public interface ApiMapper {
+public interface ApiLongCacheMapper {
 
     ApiVo getApiByToken(String token);
-
-//    List<String> getApiTokenList(ApiVo apiVo);
-
-    List<ApiVo> getAllApi();
-
-    List<ApiVo> getAllApiByModuleId(@Param("moduleIdList") List<String> moduleIdList);
-
-    List<ApiVo> getApiListByTokenList(List<String> tokenList);
-
-    int batchUpdate(ApiVo apiVo);
-
-    int deleteApiByToken(String token);
-
-    int replaceApi(ApiVo apiVo);
-
-    int insertApi(ApiVo apiVo);
-
-    int insertOrUpdateNeedAuditApi(ApiVo apiVo);
-
-//    int updatePasswordByToken(@Param("token")String token,@Param("password")String password);
-
-    int updateApiNeedAuditByToken(String token);
 }

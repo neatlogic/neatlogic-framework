@@ -3,6 +3,7 @@ package neatlogic.framework.restful.core;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -10,14 +11,15 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 
 public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase implements MyJsonStreamApiComponent {
     // private static Logger logger =
     // LoggerFactory.getLogger(JsonStreamApiComponentBase.class);
 
-    @Autowired
-    private ApiMapper apiMapper;
+    @Resource
+    private ApiLongCacheMapper apiLongCacheMapper;
 
 
     public int needAudit() {
@@ -54,7 +56,7 @@ public abstract class JsonStreamApiComponentBase extends ApiValidateAndHelpBase 
             throw e;
         } finally {
             long endTime = System.currentTimeMillis();
-            ApiVo apiConfigVo = apiMapper.getApiByToken(apiVo.getToken());
+            ApiVo apiConfigVo = apiLongCacheMapper.getApiByToken(apiVo.getToken());
             // 如果没有配置，则使用默认配置
             if (apiConfigVo == null) {
                 apiConfigVo = apiVo;

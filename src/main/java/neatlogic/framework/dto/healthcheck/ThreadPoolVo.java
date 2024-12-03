@@ -20,6 +20,7 @@ package neatlogic.framework.dto.healthcheck;
 import neatlogic.framework.common.config.Config;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ThreadPoolVo {
@@ -29,8 +30,18 @@ public class ThreadPoolVo {
     private int backupPoolSize;
     private int mainActiveCount;
     private int backupActiveCount;
-    private List<ThreadVo> threadList;
+    private int maxThreadCount;
+    private List<ThreadTaskVo> threadTaskList = new ArrayList<>();
+    private List<ThreadVo> threadList = new ArrayList<>();
     private int serverId;
+
+    public int getMaxThreadCount() {
+        return maxThreadCount;
+    }
+
+    public void setMaxThreadCount(int maxThreadCount) {
+        this.maxThreadCount = maxThreadCount;
+    }
 
     public int getServerId() {
         return Config.SCHEDULE_SERVER_ID;
@@ -86,14 +97,28 @@ public class ThreadPoolVo {
 
     boolean isSorted = false;
 
+    public List<ThreadTaskVo> getThreadTaskList() {
+        if (CollectionUtils.isNotEmpty(threadTaskList)) {
+            threadTaskList.sort((o1, o2) -> {
+                long s = o1.getStartTime().getTime();
+                long e = o2.getStartTime().getTime();
+                return Long.compare(s, e);
+            });
+        }
+        return threadTaskList;
+    }
+
+    public void setThreadTaskList(List<ThreadTaskVo> threadTaskList) {
+        this.threadTaskList = threadTaskList;
+    }
+
     public List<ThreadVo> getThreadList() {
-        if (CollectionUtils.isNotEmpty(threadList) && !isSorted) {
+        if (CollectionUtils.isNotEmpty(threadList)) {
             threadList.sort((o1, o2) -> {
                 long s = o1.getStartTime().getTime();
                 long e = o2.getStartTime().getTime();
                 return Long.compare(s, e);
             });
-            isSorted = true;
         }
         return threadList;
     }

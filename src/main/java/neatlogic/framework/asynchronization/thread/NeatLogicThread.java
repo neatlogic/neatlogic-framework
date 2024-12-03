@@ -33,7 +33,7 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     private String threadName;
     private boolean isUnique = false;
     /* For generating thread ID */
-    private long tid;
+    private long id;
     private static long threadSeqNumber;
     private int priority = 3;//默认优先级是3，数字越低优先级越高
 
@@ -42,12 +42,13 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         return Integer.compare(this.priority, other.priority); // 优先级高的先出队,priority越小代表优先级越高
     }
 
-    private static synchronized long nextThreadID() {
-        return ++threadSeqNumber;
-    }
 
     public long getId() {
-        return tid;
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public int getPriority() {
@@ -73,7 +74,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         userContext = _userContext;
         tenantContext = _tenantContext;
         inputFromContext = InputFromContext.get();
-        tid = nextThreadID();
     }
 
 
@@ -83,7 +83,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
         this.threadName = _threadName;
-        tid = nextThreadID();
     }
 
     public NeatLogicThread(String _threadName, int priority) {
@@ -93,7 +92,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         requestContext = RequestContext.get();
         this.threadName = _threadName;
         this.priority = priority;
-        tid = nextThreadID();
     }
 
     public NeatLogicThread(String _threadName, boolean _isUnique) {
@@ -103,7 +101,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         requestContext = RequestContext.get();
         this.threadName = _threadName;
         this.isUnique = _isUnique;
-        tid = nextThreadID();
     }
 
     @Override

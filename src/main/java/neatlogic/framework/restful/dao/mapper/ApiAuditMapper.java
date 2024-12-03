@@ -31,11 +31,11 @@ public interface ApiAuditMapper {
 
     List<ApiAuditVo> getApiAuditList(ApiAuditVo apiAuditVo);
 
-    List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
+//    List<ApiVo> getApiVisitTimesListByTokenList(List<String> tokenList);
 
     List<ApiVo> getApiAccessCountByTokenList(List<String> tokenList);
 
-    String getApiAccessCountLockByToken(String token);
+//    String getApiAccessCountLockByToken(String token);
 
     List<ApiAuditVo> searchApiAuditList(ApiAuditVo apiAuditVo);
 
@@ -56,7 +56,7 @@ public interface ApiAuditMapper {
      * @Time:2020年7月15日
      * @Description: 插入接口访问次数
      */
-    int insertApiAccessCount(@Param("token") String token, @Param("count") Integer count);
+    int insertApiAccessCount(@Param("token") String token, @Param("count") long count);
 
     int insertAuditFile(@Param("hash") String hash, @Param("filePath") String filePath);
 
@@ -67,9 +67,7 @@ public interface ApiAuditMapper {
      * @Time:2020年7月15日
      * @Description: 增加接口访问次数
      */
-    int updateApiAccessCount(@Param("token") String token, @Param("count") Integer count);
-
-    int updateApiNeedAuditByToken(String token);
+//    int updateApiAccessCount(@Param("token") String token, @Param("count") Long count);
 
     void deleteAuditByDayBefore(int dayBefore);
 }

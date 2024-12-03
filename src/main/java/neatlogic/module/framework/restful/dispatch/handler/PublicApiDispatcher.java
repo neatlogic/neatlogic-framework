@@ -41,8 +41,8 @@ import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.publicapi.PublicApiComponentFactory;
-import neatlogic.framework.restful.counter.ApiAccessCountUpdateThread;
-import neatlogic.framework.restful.dao.mapper.ApiMapper;
+import neatlogic.framework.restful.counter.ApiAccessCountManager;
+import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
@@ -77,7 +77,7 @@ public class PublicApiDispatcher {
     Logger logger = LoggerFactory.getLogger(PublicApiDispatcher.class);
 
     @Resource
-    private ApiMapper apiMapper;
+    private ApiLongCacheMapper apiLongCacheMapper;
 
 
     @Resource
@@ -131,7 +131,7 @@ public class PublicApiDispatcher {
 
         UserContext.get().setRequest(request);
 
-        ApiVo interfaceVo = apiMapper.getApiByToken(token);
+        ApiVo interfaceVo = apiLongCacheMapper.getApiByToken(token);
         String uri = request.getRequestURI();
         /* 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
         if (interfaceVo == null || (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))
@@ -175,7 +175,7 @@ public class PublicApiDispatcher {
             if (restComponent != null) {
                 if (action.equals("doservice")) {
                     /* 统计接口访问次数 **/
-                    ApiAccessCountUpdateThread.putToken(token);
+                    ApiAccessCountManager.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, response);
                     Long endtime = System.currentTimeMillis();
@@ -198,7 +198,7 @@ public class PublicApiDispatcher {
             if (restComponent != null) {
                 if (action.equals("doservice")) {
                     /* 统计接口访问次数 **/
-                    ApiAccessCountUpdateThread.putToken(token);
+                    ApiAccessCountManager.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
                     Long endtime = System.currentTimeMillis();
@@ -221,7 +221,7 @@ public class PublicApiDispatcher {
             if (restComponent != null) {
                 if (action.equals("doservice")) {
                     /* 统计接口访问次数 **/
-                    ApiAccessCountUpdateThread.putToken(token);
+                    ApiAccessCountManager.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
                     Long endtime = System.currentTimeMillis();

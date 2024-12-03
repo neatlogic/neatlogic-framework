@@ -19,16 +19,37 @@ package neatlogic.framework.dto.healthcheck;
 
 import java.util.Date;
 
-public class ThreadVo {
-    private long id;
+public class ThreadTaskVo {
+    private Long id;
     private String name;
     private Date startTime;
     private long timeCost;
+    private String poolName;
+    private String status;
+    private int priority;
 
-    public ThreadVo(long id, String name) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
         this.id = id;
-        this.name = name;
-        this.startTime = new Date();
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     public String getName() {
@@ -39,13 +60,6 @@ public class ThreadVo {
         this.name = name;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public Date getStartTime() {
         return startTime;
@@ -59,4 +73,12 @@ public class ThreadVo {
         return System.currentTimeMillis() - this.startTime.getTime();
     }
 
+
+    public String getPoolName() {
+        return poolName;
+    }
+
+    public void setPoolName(String poolName) {
+        this.poolName = poolName;
+    }
 }

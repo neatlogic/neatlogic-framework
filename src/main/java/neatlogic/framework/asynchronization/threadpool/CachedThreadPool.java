@@ -17,6 +17,7 @@ package neatlogic.framework.asynchronization.threadpool;
 
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.dto.healthcheck.ThreadPoolVo;
+import neatlogic.framework.dto.healthcheck.ThreadTaskVo;
 import neatlogic.framework.dto.healthcheck.ThreadVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -26,27 +27,48 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class CachedThreadPool {
+    static int rank = 15;
     static int cpu = Runtime.getRuntime().availableProcessors();
     private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
+    private static final Map<Long, ThreadTaskVo> threadTaskMap = new ConcurrentHashMap<>();
     private static final Map<Long, ThreadVo> threadMap = new ConcurrentHashMap<>();
     private static final Set<String> threadSet = new HashSet<>();
     private static final PriorityBlockingQueue<NeatLogicThread> threadQueue = new PriorityBlockingQueue<>();
 
-    private static final ThreadPoolExecutor mainThreadPool = new ThreadPoolExecutor(0, cpu * 15,
+    static class NeatLogicThreadFactory implements ThreadFactory {
+        @Override
+        public Thread newThread(Runnable r) {
+            Thread thread = new Thread(r) {
+                @Override
+                public void run() {
+                    try {
+                        super.run();
+                    } finally {
+                        threadMap.remove(this.getId());
+                    }
+                }
+            };
+            threadMap.put(thread.getId(), new ThreadVo(thread.getId(), thread.getName()));
+            return thread;
+        }
+    }
+
+    private static final ThreadPoolExecutor mainThreadPool = new ThreadPoolExecutor(0, cpu * rank,
             60L, TimeUnit.SECONDS,
-            new SynchronousQueue<>(), new NeatLogicRejectHandler()) {
+            new SynchronousQueue<>(), new NeatLogicThreadFactory(), new NeatLogicRejectHandler()) {
         @Override
         protected void beforeExecute(Thread t, Runnable r) {
             super.beforeExecute(t, r);
             if (r instanceof NeatLogicThread) {
                 NeatLogicThread nt = (NeatLogicThread) r;
-                ThreadVo threadVo = new ThreadVo();
-                threadVo.setId(nt.getId());
-                threadVo.setName(nt.getThreadName() + "#" + nt.getId());
+                nt.setId(t.getId());
+                ThreadTaskVo threadVo = new ThreadTaskVo();
+                threadVo.setId(t.getId());
+                threadVo.setName(nt.getThreadName());
                 threadVo.setPoolName("main");
                 threadVo.setStartTime(new Date());
                 threadVo.setPriority(nt.getPriority());
-                threadMap.put(nt.getId(), threadVo);
+                threadTaskMap.put(nt.getId(), threadVo);
                 threadSet.add(nt.getThreadName());
             }
         }
@@ -54,10 +76,11 @@ public class CachedThreadPool {
         @Override
         protected void afterExecute(Runnable r, Throwable t) {
             super.afterExecute(r, t);
+
             // 任务完成后从 activeTasks 中移除
             if (r instanceof NeatLogicThread) {
                 NeatLogicThread task = (NeatLogicThread) r;
-                threadMap.remove(task.getId());
+                threadTaskMap.remove(task.getId());
                 threadSet.remove(task.getThreadName());
             }
             //尝试从队列中拿出任务处理
@@ -102,8 +125,11 @@ public class CachedThreadPool {
 
     public static ThreadPoolVo getStatus() {
         ThreadPoolVo threadPoolVo = new ThreadPoolVo();
+        List<ThreadTaskVo> threadTasks = new ArrayList<>(threadTaskMap.values());
         List<ThreadVo> threads = new ArrayList<>(threadMap.values());
+        threadPoolVo.setThreadTaskList(threadTasks);
         threadPoolVo.setThreadList(threads);
+        threadPoolVo.setMaxThreadCount(cpu * rank);
         threadPoolVo.setMainPoolSize(mainThreadPool.getPoolSize());
         threadPoolVo.setMainActiveCount(mainThreadPool.getActiveCount());
         threadPoolVo.setMainQueueSize(threadQueue.size());

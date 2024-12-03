@@ -24,7 +24,7 @@ public interface ApiMapper {
 
     ApiVo getApiByToken(String token);
 
-    List<String> getApiTokenList(ApiVo apiVo);
+//    List<String> getApiTokenList(ApiVo apiVo);
 
     List<ApiVo> getAllApi();
 
@@ -42,5 +42,7 @@ public interface ApiMapper {
 
     int insertOrUpdateNeedAuditApi(ApiVo apiVo);
 
-    int updatePasswordByToken(@Param("token")String token,@Param("password")String password);
+//    int updatePasswordByToken(@Param("token")String token,@Param("password")String password);
+
+    int updateApiNeedAuditByToken(String token);
 }

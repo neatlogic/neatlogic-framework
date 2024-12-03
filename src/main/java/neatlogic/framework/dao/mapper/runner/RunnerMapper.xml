@@ -267,7 +267,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM
             runnergroup rg
         where rg.id in
-        <foreach collection="lsist" separator="," open="(" close=")" item="id">
+        <foreach collection="list" separator="," open="(" close=")" item="id">
             #{id}
         </foreach>
     </select>

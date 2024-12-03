@@ -37,7 +37,7 @@ import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.counter.ApiAccessCountUpdateThread;
-import neatlogic.framework.restful.dao.mapper.ApiMapper;
+import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
@@ -75,7 +75,7 @@ public class ApiDispatcher {
     static Logger logger = LoggerFactory.getLogger(ApiDispatcher.class);
 
     @Resource
-    private ApiMapper apiMapper;
+    private ApiLongCacheMapper apiLongCacheMapper;
 
     /*
       给fastJson加载自定义序列化配置，序列化json时返回正确格式
@@ -103,7 +103,7 @@ public class ApiDispatcher {
             paramObj = new JSONObject();
         }
         if (interfaceVo == null) {
-            interfaceVo = apiMapper.getApiByToken(token);
+            interfaceVo = apiLongCacheMapper.getApiByToken(token);
             if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
                 throw new ApiNotFoundException(token);
             }
@@ -122,7 +122,7 @@ public class ApiDispatcher {
             throw new ComponentNotFoundException(interfaceVo.getHandler());
         }
         Double qps = interfaceVo.getQps();
-        ApiVo apiVo = apiMapper.getApiByToken(token);
+        ApiVo apiVo = apiLongCacheMapper.getApiByToken(token);
         if (apiVo != null) {
             qps = apiVo.getQps();
         }

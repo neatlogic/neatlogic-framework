@@ -42,6 +42,7 @@ import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.publicapi.PublicApiComponentFactory;
 import neatlogic.framework.restful.counter.ApiAccessCountUpdateThread;
+import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
@@ -77,7 +78,7 @@ public class PublicApiDispatcher {
     Logger logger = LoggerFactory.getLogger(PublicApiDispatcher.class);
 
     @Resource
-    private ApiMapper apiMapper;
+    private ApiLongCacheMapper apiLongCacheMapper;
 
 
     @Resource
@@ -131,7 +132,7 @@ public class PublicApiDispatcher {
 
         UserContext.get().setRequest(request);
 
-        ApiVo interfaceVo = apiMapper.getApiByToken(token);
+        ApiVo interfaceVo = apiLongCacheMapper.getApiByToken(token);
         String uri = request.getRequestURI();
         /* 如果不是查看帮助接口，则需要校验接口已激活，且此接口对应的handler是public */
         if (interfaceVo == null || (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/")) && !interfaceVo.getIsActive().equals(1))

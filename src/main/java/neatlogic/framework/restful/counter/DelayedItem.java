@@ -25,6 +25,7 @@ import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @Time:2020年7月17日
@@ -43,7 +44,7 @@ public class DelayedItem implements Delayed {
 	/**
 	 * 缓存租户访问记录
 	 **/
-	private final ConcurrentMap<String, ConcurrentMap<String, AtomicInteger>> tenantAccessTokenMap = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ConcurrentMap<String, AtomicLong>> tenantAccessTokenMap = new ConcurrentHashMap<>();
 	/**
 	 * 标记正在往当前延迟对象的缓存tenantAccessTokenMap中写数据的线程数
 	 **/
@@ -88,7 +89,7 @@ public class DelayedItem implements Delayed {
 			}else {
 				String tenantUuid = TenantContext.get().getTenantUuid();
 				/* 从缓存中获取当前租户访问记录 **/
-				ConcurrentMap<String, AtomicInteger> accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
+				ConcurrentMap<String, AtomicLong> accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
 				if (accessTokenCounterMap == null) {
 					/* 初始化某个租户访问记录缓存时，必须加锁，否则会出现多个线程相互覆盖情况 **/
 					synchronized (this) {
@@ -101,13 +102,13 @@ public class DelayedItem implements Delayed {
 				}
 
 				/* 从缓存中获取当前token访问次数 ，并累加1**/
-				AtomicInteger counter = accessTokenCounterMap.get(token);
+				AtomicLong counter = accessTokenCounterMap.get(token);
 				if (counter == null) {
 					/* 初始化某个token访问次数时，必须加锁，否则会出现多个线程相互覆盖情况 **/
 					synchronized (accessTokenCounterMap) {
 						counter = accessTokenCounterMap.get(token);
 						if (counter == null) {
-							accessTokenCounterMap.put(token, new AtomicInteger(1));
+							accessTokenCounterMap.put(token, new AtomicLong(1));
 						} else {
 							counter.incrementAndGet();
 						}
@@ -147,7 +148,7 @@ public class DelayedItem implements Delayed {
 		}
 	}
 
-	public ConcurrentMap<String, ConcurrentMap<String, AtomicInteger>> getTenantAccessTokenMap() {
+	public ConcurrentMap<String, ConcurrentMap<String, AtomicLong>> getTenantAccessTokenMap() {
 		return tenantAccessTokenMap;
 	}
 

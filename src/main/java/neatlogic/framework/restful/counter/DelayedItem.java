@@ -85,7 +85,7 @@ public class DelayedItem implements Delayed {
 			/* 判断延迟对象是否失效 **/
 			if(expired.get()) {
 //				Thread.sleep(1);//测试时使用
-				ApiAccessCountUpdateThread.putToken(token);				
+				ApiAccessCountManager.putToken(token);
 			}else {
 				String tenantUuid = TenantContext.get().getTenantUuid();
 				/* 从缓存中获取当前租户访问记录 **/

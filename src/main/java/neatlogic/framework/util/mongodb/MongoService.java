@@ -52,6 +52,16 @@ public class MongoService {
 
         mongoTemplate.indexOps(collectionName).ensureIndex(index);
         //System.out.println("唯一索引创建成功: id");
+
+
+        Index uniqueIndex = new Index()
+                .named("unique_ip_port")
+                .on("ip", Sort.Direction.ASC)
+                .on("port", Sort.Direction.ASC)
+                .unique();
+
+        mongoTemplate.indexOps(collectionName).ensureIndex(uniqueIndex);
+        //System.out.println("唯一索引 unique_ip_port 创建成功");
     }
 }
 

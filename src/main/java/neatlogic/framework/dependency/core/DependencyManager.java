@@ -92,15 +92,26 @@ public class DependencyManager {
      * @param to    引用者（下游）值（如：服务uuid）
      */
     public static int delete(Class<? extends IDependencyHandler> clazz, Object to) {
+        return delete(clazz, to, null);
+    }
+
+    /**
+     * 删除引用关系
+     *
+     * @param clazz 引用关系处理器类
+     * @param to    引用者（下游）值（如：服务uuid）
+     * @param config 额外数据
+     */
+    public static int delete(Class<? extends IDependencyHandler> clazz, Object to, JSONObject config) {
         IDependencyHandler dependencyHandler = DependencyHandlerFactory.getHandler(clazz.getSimpleName());
         if (to instanceof List) {
             int sum = 0;
             for (Object c : (List) to) {
-                sum += dependencyHandler.delete(c);
+                sum += dependencyHandler.delete(c, config);
             }
             return sum;
         } else {
-            return dependencyHandler.delete(to);
+            return dependencyHandler.delete(to, config);
         }
     }
 

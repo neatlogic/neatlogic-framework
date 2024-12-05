@@ -115,6 +115,11 @@ public abstract class CustomDependencyHandlerBase implements IDependencyHandler 
      */
     @Override
     public int delete(Object to) {
+        return delete(to, null);
+    }
+
+    @Override
+    public int delete(Object to, JSONObject config) {
         return dependencyMapper.deleteDependencyByCaller(getTableName(), getToField(), to);
     }
 

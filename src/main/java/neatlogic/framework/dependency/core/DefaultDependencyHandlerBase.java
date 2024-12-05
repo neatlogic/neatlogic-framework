@@ -81,6 +81,17 @@ public abstract class DefaultDependencyHandlerBase implements IDependencyHandler
      */
     @Override
     public int delete(Object to) {
+        return delete(to, null);
+    }
+
+    /**
+     * 删除引用关系
+     *
+     * @param to 引用者（下游）值（如：服务uuid）
+     * @param config 额外数据
+     */
+    @Override
+    public int delete(Object to, JSONObject config) {
         DependencyVo dependencyVo = new DependencyVo(getHandler(), to.toString());
         return dependencyMapper.deleteDependency(dependencyVo);
     }

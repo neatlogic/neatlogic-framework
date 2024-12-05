@@ -122,11 +122,12 @@ public class FormUtil {
             if (StringUtils.isBlank(matrixUuid)) {
                 return;
             }
+            JSONObject dependencyConfig = new JSONObject();
+            dependencyConfig.put("formUuid", formUuid);
+            dependencyConfig.put("formVersionUuid", formVersionUuid);
+            dependencyConfig.put("sceneUuid", sceneUuid);
+            dependencyConfig.put("uuid", uuid);
             if (isSave) {
-                JSONObject dependencyConfig = new JSONObject();
-                dependencyConfig.put("formUuid", formUuid);
-                dependencyConfig.put("formVersionUuid", formVersionUuid);
-                dependencyConfig.put("sceneUuid", sceneUuid);
                 DependencyManager.insert(Matrix2FormAttributeDependencyHandler.class, matrixUuid, uuid, dependencyConfig);
 
                 dependencyConfig.put("matrixUuid", matrixUuid);
@@ -166,8 +167,8 @@ public class FormUtil {
                     }
                 }
             } else {
-                DependencyManager.delete(Matrix2FormAttributeDependencyHandler.class, uuid);
-                DependencyManager.delete(MatrixAttr2FormAttrDependencyHandler.class, uuid);
+                DependencyManager.delete(Matrix2FormAttributeDependencyHandler.class, uuid, dependencyConfig);
+                DependencyManager.delete(MatrixAttr2FormAttrDependencyHandler.class, uuid, dependencyConfig);
             }
         } else if (Objects.equals(handler, FormHandler.FORMTABLEINPUTER.getHandler())) {
             // 表格输入组件

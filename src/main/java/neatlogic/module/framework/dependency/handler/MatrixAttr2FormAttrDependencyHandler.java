@@ -30,6 +30,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -46,6 +47,16 @@ public class MatrixAttr2FormAttrDependencyHandler extends DefaultDependencyHandl
 
     @Resource
     private FormMapper formMapper;
+
+    @Override
+    public int insert(Object from, Object to, JSONObject config) {
+        return super.insert(from, getGenerateTo(to, config), config);
+    }
+
+    @Override
+    public int delete(Object to, JSONObject config) {
+        return super.delete(getGenerateTo(to, config), config);
+    }
 
     @Override
     protected DependencyInfoVo parse(DependencyVo dependencyVo) {
@@ -90,5 +101,31 @@ public class MatrixAttr2FormAttrDependencyHandler extends DefaultDependencyHandl
     @Override
     public IFromType getFromType() {
         return FrameworkFromType.MATRIXATTR;
+    }
+
+    /**
+     * 由于不同表单或不同版本的属性uuid可能是相同的，所以这里需要重新生成to
+     * @param to
+     * @param config
+     * @return
+     */
+    private String getGenerateTo(Object to, JSONObject config) {
+        if (MapUtils.isNotEmpty(config)) {
+            String str = to.toString();
+            String formUuid = config.getString("formUuid");
+            String formVersionUuid = config.getString("formVersionUuid");
+            String sceneUuid = config.getString("sceneUuid");
+            if (StringUtils.isNotBlank(sceneUuid)) {
+                str += "&" + sceneUuid;
+            }
+            if (StringUtils.isNotBlank(formVersionUuid)) {
+                str += "&" + formVersionUuid;
+            }
+            if (StringUtils.isNotBlank(formUuid)) {
+                str += "&" + formUuid;
+            }
+            return DigestUtils.md5DigestAsHex(str.getBytes());
+        }
+        return to.toString();
     }
 }

@@ -553,6 +553,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         searchVo.setFormVersionUuid(formVersion.getUuid());
         List<FormAttributeVo> formAttributeList = formMapper.getFormAttributeList(searchVo);
         if (StringUtils.isBlank(tag)) {
+            formAttributeList.sort(Comparator.comparing(FormAttributeVo::getLabel));
             return formAttributeList;
         }
         Set<String> tagSet = new HashSet<>();
@@ -562,18 +563,19 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 tagSet.add(formAttributeVo.getTag());
             }
         }
+        List<FormAttributeVo> resultList = new ArrayList<>();
         if (tagSet.contains(tag)) {
-            List<FormAttributeVo> formExtendAttributeList = new ArrayList<>();
             List<FormAttributeVo> list = formMapper.getFormExtendAttributeListByFormUuidAndFormVersionUuid(formUuid, formVersion.getUuid());
             for (FormAttributeVo formAttributeVo : list) {
                 if (Objects.equals(formAttributeVo.getTag(), tag) && formAttributeVo.getParentUuid() == null) {
-                    formExtendAttributeList.add(formAttributeVo);
+                    resultList.add(formAttributeVo);
                 }
             }
-            return formExtendAttributeList;
         } else {
-            return getFormAttributeList(formUuid, formName, tag);
+            resultList = getFormAttributeList(formUuid, formName, tag);
         }
+        resultList.sort(Comparator.comparing(FormAttributeVo::getLabel));
+        return resultList;
     }
 
     @Override

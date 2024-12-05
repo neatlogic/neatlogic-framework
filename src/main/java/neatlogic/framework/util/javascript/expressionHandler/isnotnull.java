@@ -38,7 +38,7 @@ public class isnotnull {
             if (errorList != null) {
                 errorList.add(error);
             } else {
-                logger.error(error.getMessage());
+                logger.warn(error.getMessage());
             }
             return false;
         }

@@ -44,7 +44,7 @@ public class equal {
                     if (errorList != null) {
                         errorList.add(error);
                     } else {
-                        logger.error(error.getMessage());
+                        logger.warn(error.getMessage());
                     }
                     return false;
                 }
@@ -54,7 +54,7 @@ public class equal {
                 if (errorList != null) {
                     errorList.add(error);
                 } else {
-                    logger.error(error.getMessage());
+                    logger.warn(error.getMessage());
                 }
                 return false;
             }
@@ -64,7 +64,7 @@ public class equal {
                 if (errorList != null) {
                     errorList.add(error);
                 } else {
-                    logger.error(error.getMessage());
+                    logger.warn(error.getMessage());
                 }
                 return false;
             } else if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
@@ -72,7 +72,7 @@ public class equal {
                 if (errorList != null) {
                     errorList.add(error);
                 } else {
-                    logger.error(error.getMessage());
+                    logger.warn(error.getMessage());
                 }
                 return false;
             }

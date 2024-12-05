@@ -18,7 +18,7 @@ package neatlogic.framework.asynchronization.thread;
 import java.util.concurrent.Phaser;
 
 public class ModuleInitApplicationListener {
-    private final static Phaser moduleInitPhaser = new Phaser(0);
+    private static final Phaser moduleInitPhaser = new Phaser(0);
 
     public static Phaser getModuleinitphaser() {
         return moduleInitPhaser;

@@ -31,7 +31,6 @@ import java.util.concurrent.CountDownLatch;
  * @Title: BatchRunner
  * @Package neatlogic.framework.batch
  * @Description: 批量处理框架，支持根据列表按照指定并行度并发处理逻辑
- * @Author: chenqiwei
  * @Date: 2021/1/4 9:31 上午
  **/
 public class BatchRunner<T> {
@@ -40,6 +39,8 @@ public class BatchRunner<T> {
     public static class State {
         private boolean isSucceed = false;
         private Exception exception;
+        private boolean isPausing = false;
+        private boolean isPaused = false;
 
         public boolean isSucceed() {
             return isSucceed;
@@ -49,6 +50,21 @@ public class BatchRunner<T> {
             isSucceed = succeed;
         }
 
+        public boolean isPausing() {
+            return isPausing;
+        }
+
+        public void setPausing(boolean pausing) {
+            isPausing = pausing;
+        }
+
+        public boolean isPaused() {
+            return isPaused;
+        }
+
+        public void setPaused(boolean paused) {
+            isPaused = paused;
+        }
 
         public Exception getException() {
             return exception;
@@ -61,12 +77,23 @@ public class BatchRunner<T> {
     }
 
     /**
+     * @param state    执行状态
+     * @param itemList 对象列表
+     * @param parallel 并发度（多少个线程）
+     * @param job      执行函数
+     */
+    public State execute(State state, List<T> itemList, int parallel, BatchJob<T> job, String threadName) {
+        return execute(state, itemList, parallel, false, job, threadName);
+    }
+
+    /**
      * @param itemList 对象列表
      * @param parallel 并发度（多少个线程）
      * @param job      执行函数
      */
     public State execute(List<T> itemList, int parallel, BatchJob<T> job, String threadName) {
-        return execute(itemList, parallel, false, job, threadName);
+        State state = new State();
+        return execute(state, itemList, parallel, false, job, threadName);
     }
 
     /**
@@ -75,8 +102,8 @@ public class BatchRunner<T> {
      * @param needTransaction 每个对象的执行过程是否需要启用事务
      * @param job             执行函数
      */
-    public State execute(List<T> itemList, int parallel, boolean needTransaction, BatchJob<T> job, String threadName) {
-        State state = new State();
+    public State execute(State state, List<T> itemList, int parallel, boolean needTransaction, BatchJob<T> job, String threadName) {
+        //State state = new State();
         if (CollectionUtils.isNotEmpty(itemList)) {
             //状态默认是成功状态，任意线程出现异常则置为失败
             state.setSucceed(true);
@@ -89,6 +116,9 @@ public class BatchRunner<T> {
             }
             try {
                 latch.await();
+                if (state.isPausing()) {
+                    state.setPaused(true);
+                }
                 logger.info("所有批量作业线程已执行完毕");
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
@@ -121,6 +151,10 @@ public class BatchRunner<T> {
         protected void execute() {
             try {
                 for (int i = index; i < itemList.size(); i += parallel) {
+                    //接收到暂停指令直接退出循环
+                    if (state.isPausing) {
+                        break;
+                    }
                     TransactionStatus ts = null;
                     if (needTransaction) {
                         ts = TransactionUtil.openTx();

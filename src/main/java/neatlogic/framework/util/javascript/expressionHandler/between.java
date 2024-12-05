@@ -60,7 +60,7 @@ public class between {
                 if (errorList != null) {
                     errorList.add(error);
                 } else {
-                    logger.error(error.getMessage());
+                    logger.warn(error.getMessage());
                 }
                 return false;
             }
@@ -69,7 +69,7 @@ public class between {
         if (errorList != null) {
             errorList.add(error);
         }
-        logger.error(error.getMessage());
+        logger.warn(error.getMessage());
         return false;
     }
 
@@ -95,7 +95,7 @@ public class between {
                 }
             }
             if (!(transferValue >= transferValueBefore && transferValue <= transferValueAfter)) {
-                logger.error(new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter).getMessage());
+                logger.warn(new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter).getMessage());
                 return false;
             }
             return true;
@@ -130,7 +130,7 @@ public class between {
                         if (errorList != null) {
                             errorList.add(error);
                         }
-                        logger.error(error.getMessage());
+                        logger.warn(error.getMessage());
                         return false;
                     }
                     return true;
@@ -140,7 +140,7 @@ public class between {
                         if (errorList != null) {
                             errorList.add(error);
                         }
-                        logger.error(error.getMessage());
+                        logger.warn(error.getMessage());
                         return false;
                     }
                     return true;
@@ -150,7 +150,7 @@ public class between {
                         if (errorList != null) {
                             errorList.add(error);
                         }
-                        logger.error(error.getMessage());
+                        logger.warn(error.getMessage());
                         return false;
                     }
                     return true;
@@ -158,7 +158,7 @@ public class between {
             } catch (ParseException ignored) {
             }
         }
-        logger.error(new ValueIsIrregularException(prefix).getMessage());
+        logger.warn(new ValueIsIrregularException(prefix).getMessage());
         return false;
     }
 

@@ -17,6 +17,7 @@ package neatlogic.framework.sqlfile;
 
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.ChangelogAuditVo;
+import neatlogic.framework.dto.ExecuteSqlParamVo;
 import neatlogic.framework.dto.TenantModuleDmlSqlVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
@@ -35,9 +36,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -89,9 +88,6 @@ public class ScriptRunnerManager {
                 if (conn != null) {
                     conn.close();
                 }
-                if (runner != null) {
-                    runner.closeConnection();
-                }
             } catch (SQLException e) {
                 logger.error(e.getMessage());
             }
@@ -100,36 +96,18 @@ public class ScriptRunnerManager {
 
     /**
      * 仅执行一次sql，执行过的sql跳过不执行
-     *
-     * @param tenant       租户
-     * @param moduleId     模块id
-     * @param scriptReader 脚本读取
-     * @param isDataDb     是否data库
      */
-    public static void runScriptOnceWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, Boolean isDataDb, String type) throws Exception {
+    public static void runScriptOnceWithJdbc(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
         StringWriter logStrWriter = new StringWriter();
         PrintWriter logWriter = new PrintWriter(logStrWriter);
         StringWriter errStrWriter = new StringWriter();
         PrintWriter errWriter = new PrintWriter(errStrWriter);
-        PreparedStatement sqlMd5Statement = null;
-        ResultSet sqlMd5ResultSet = null;
-        Connection conn = null;
-        Connection neatlogicConn = null;
         ScriptRunner runner = null;
         BufferedReader scriptBufferedReader = null;
         try {
-            List<String> hasRunSqlMd5List = new ArrayList<>();
-            neatlogicConn = JdbcUtil.getNeatlogicConnection();
-            sqlMd5Statement = neatlogicConn.prepareStatement("select sql_uuid from tenant_module_dmlsql where tenant_uuid = ? and `module_id` = ? and `sql_status` = 1");
-            sqlMd5Statement.setString(1, tenant.getUuid());
-            sqlMd5Statement.setString(2, moduleId);
-            sqlMd5ResultSet = sqlMd5Statement.executeQuery();
-            while (sqlMd5ResultSet.next()) {
-                hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_uuid"));
-            }
+            Reader scriptReader = new InputStreamReader(executeSqlParamVo.getResource().getInputStream());
             scriptBufferedReader = new BufferedReader(scriptReader);
-            conn = JdbcUtil.getNeatlogicTenantConnection(tenant, isDataDb);
-            runner = new ScriptRunner(conn);
+            runner = new ScriptRunner(executeSqlParamVo.getNeatlogicTenantConn());
             runner.setLogWriter(logWriter);
             runner.setErrorLogWriter(errWriter);
             runner.setSendFullScript(false);
@@ -141,23 +119,23 @@ public class ScriptRunnerManager {
                 }
                 // 如果没有执行过该sql，则执行
                 String sqlMd5 = Md5Util.encryptMD5(line);
-                if (!hasRunSqlMd5List.contains(sqlMd5)) {
+                if (!executeSqlParamVo.getDmlSqlHashList().contains(sqlMd5)) {
                     runner.runScript(new StringReader(line));
                     TenantModuleDmlSqlVo tenantModuleDmlSqlVo;
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
-                        String error = "  ✖" + tenant.getName() + "·" + moduleId + "." + type + ": " + errStrWriter;
+                        String error = "  ✖" + executeSqlParamVo.getTenant().getName() + "·" + executeSqlParamVo.getModuleId() + "." + executeSqlParamVo.getSqlFile() + ": " + errStrWriter;
                         //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
                         //errStrWriter.getBuffer().setLength(0);
-                        if (StringUtils.isNotBlank(type) && type.endsWith("dml")) {
+                        if (StringUtils.isNotBlank(executeSqlParamVo.getSqlFile()) && executeSqlParamVo.getSqlFile().equals("dml.sql")) {
                             error += I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.failed");
                         }
                         throw new ModuleInitRuntimeException(error);
                     } else {
-                        tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, type);
-                        hasRunSqlMd5List.add(sqlMd5);
+                        tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(executeSqlParamVo.getTenant().getUuid(), executeSqlParamVo.getModuleId(), sqlMd5, executeSqlParamVo.getSqlFile());
+                        executeSqlParamVo.getDmlSqlHashList().add(sqlMd5);
                     }
-                    insertTenantModuleDmlSql(tenantModuleDmlSqlVo);
-                    insertTenantModuleDmlSqlDetail(sqlMd5, line);
+                    insertTenantModuleDmlSql(tenantModuleDmlSqlVo, executeSqlParamVo.getNeatlogicConn());
+                    insertTenantModuleDmlSqlDetail(sqlMd5, line, executeSqlParamVo.getNeatlogicConn());
                 }
             }
         } catch (ModuleInitRuntimeException ex) {
@@ -167,13 +145,6 @@ public class ScriptRunnerManager {
             throw new Exception(ex);
         } finally {
             try {
-                JdbcUtil.closeConnection(conn);
-                JdbcUtil.closeConnection(neatlogicConn);
-                JdbcUtil.closeStatement(sqlMd5Statement);
-                JdbcUtil.closeResultSet(sqlMd5ResultSet);
-                if (runner != null) {
-                    runner.closeConnection();
-                }
                 if (scriptBufferedReader != null) {
                     scriptBufferedReader.close();
                 }
@@ -181,15 +152,6 @@ public class ScriptRunnerManager {
                 logger.error(e.getMessage());
             }
         }
-    }
-
-    /**
-     * 执行neatlogic Changelog sql
-     *
-     * @param scriptReader 脚本读取
-     */
-    public static void runScriptWithJdbc(Reader scriptReader, String version, Connection connection, String sqlFile) throws Exception {
-        runScriptWithJdbc(null, "framework", scriptReader, version, connection, sqlFile, false);
     }
 
     /**
@@ -199,57 +161,30 @@ public class ScriptRunnerManager {
 
     /**
      * 执行sql，并记录changelog
-     *
-     * @param tenant       租户
-     * @param moduleId     模块id
-     * @param scriptReader 脚本读取
      */
-    public static boolean runScriptWithJdbc(TenantVo tenant, String moduleId, Reader scriptReader, String version, Connection conn, String sqlFile, boolean isAll) throws Exception {
-        ScriptRunner runner = null;
-        StringWriter logStrWriter = new StringWriter();
-        PrintWriter logWriter = new PrintWriter(logStrWriter);
+    public static boolean runScriptWithJdbc(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
         StringWriter errStrWriter = new StringWriter();
         PrintWriter errWriter = new PrintWriter(errStrWriter);
-        PreparedStatement sqlMd5Statement = null;
-        Connection neatlogicConn = null;
-        ResultSet sqlMd5ResultSet = null;
+        StringWriter logStrWriter = new StringWriter();
+        PrintWriter logWriter = new PrintWriter(logStrWriter);
         BufferedReader scriptBufferedReader = null;
-        String tenantUuid = tenant == null ? "0" : tenant.getUuid(); //主库用0表示
-        boolean isError = false;
         try {
+            Reader scriptReader = new InputStreamReader(executeSqlParamVo.getResource().getInputStream());
             scriptBufferedReader = new BufferedReader(scriptReader);
-            List<String> hasRunSqlMd5List = new ArrayList<>();
-            neatlogicConn = JdbcUtil.getNeatlogicConnection();
-            sqlMd5Statement = neatlogicConn.prepareStatement("select sql_hash from changelog_audit where tenant_uuid = ? and `module_id` = ? and (`sql_status` = 1 or `ignored` = 1) ");
-            sqlMd5Statement.setString(1, tenantUuid);
-            sqlMd5Statement.setString(2, moduleId);
-            sqlMd5ResultSet = sqlMd5Statement.executeQuery();
-            while (sqlMd5ResultSet.next()) {
-                hasRunSqlMd5List.add(sqlMd5ResultSet.getString("sql_hash"));
-            }
-            runner = new ScriptRunner(conn);
-            runner.setSendFullScript(false);
-            runner.setAutoCommit(true);
-            // 有错误会继续执行
-            runner.setStopOnError(false);
-            // Resources.setCharset(Charset.forName("UTF-8"));
-            runner.setLogWriter(logWriter);
-            runner.setErrorLogWriter(errWriter);
-//            runner.setDelimiter(";");
-            // 语句结束符号
-            String delimiter = ";";
-            runner.setDelimiter(delimiter);
             String line;
             StringBuilder sqlSb = new StringBuilder();
+            executeSqlParamVo.setLogWriter(logWriter);
+            executeSqlParamVo.setErrWriter(errWriter);
+            executeSqlParamVo.setErrStrWriter(errStrWriter);
             while ((line = scriptBufferedReader.readLine()) != null) {
                 if (StringUtils.isBlank(line.trim())) {
                     continue;
                 }
+                //自定义分隔符，如：$$ 兼容存储过程
                 if (line.trim().toLowerCase(Locale.ROOT).startsWith("delimiter")) {
-                    delimiter = line.substring(9).trim();
-                    runner.setDelimiter(delimiter);
+                    executeSqlParamVo.setDelimiter(line.substring(9).trim());
                     continue;
-                } else if (!line.trim().toLowerCase(Locale.ROOT).endsWith(delimiter)) {
+                } else if (!line.trim().toLowerCase(Locale.ROOT).endsWith(executeSqlParamVo.getDelimiter())) {
                     sqlSb.append("\n");
                     sqlSb.append(line);
                     continue;
@@ -257,15 +192,17 @@ public class ScriptRunnerManager {
 
                 sqlSb.append(line);
                 String sql = sqlSb.toString();
-                if (!isAll) {
+                if (!executeSqlParamVo.isAll()) {
                     //清空sql
                     sqlSb.setLength(0);
-                    isError = executeSql(sql, hasRunSqlMd5List, runner, errStrWriter, tenant, moduleId, version, sqlFile, isError);
+                    executeSqlParamVo.setSql(sql);
+                    executeSqlParamVo.setError(executeSql(executeSqlParamVo));
                 }
             }
-            if (isAll) {
+            if (executeSqlParamVo.isAll()) {
                 String sql = sqlSb.toString();
-                isError = executeSql(sql, hasRunSqlMd5List, runner, errStrWriter, tenant, moduleId, version, sqlFile, false);
+                executeSqlParamVo.setSql(sql);
+                executeSqlParamVo.setError(executeSql(executeSqlParamVo));
             }
         } catch (ModuleInitRuntimeException ex) {
             throw new ModuleInitRuntimeException(ex);
@@ -273,72 +210,67 @@ public class ScriptRunnerManager {
             logger.error("通过jdbc执行sql异常: " + ex.getMessage(), ex);
             throw new Exception(ex);
         } finally {
-            try {
-                JdbcUtil.closeConnection(conn);
-                JdbcUtil.closeConnection(neatlogicConn);
-                JdbcUtil.closeStatement(sqlMd5Statement);
-                JdbcUtil.closeResultSet(sqlMd5ResultSet);
-                if (runner != null) {
-                    runner.closeConnection();
-                }
-                if (scriptBufferedReader != null) {
-                    scriptBufferedReader.close();
-                }
-            } catch (Exception e) {
-                logger.error(e.getMessage());
+            if (scriptBufferedReader != null) {
+                scriptBufferedReader.close();
             }
-
         }
-        return isError;
+        return executeSqlParamVo.isError();
+    }
+
+    private static void initRunner(ExecuteSqlParamVo executeSqlParamVo) {
+        ScriptRunner runner = new ScriptRunner(executeSqlParamVo.getConn());
+        runner.setSendFullScript(false);
+        runner.setAutoCommit(true);
+        // 有错误会继续执行
+        runner.setStopOnError(false);
+        // Resources.setCharset(Charset.forName("UTF-8"));
+        runner.setLogWriter(executeSqlParamVo.getLogWriter());
+        runner.setErrorLogWriter(executeSqlParamVo.getErrWriter());
+//            runner.setDelimiter(";");
+        runner.setDelimiter(executeSqlParamVo.getDelimiter());
+        executeSqlParamVo.setRunner(runner);
     }
 
     /**
      * 执行sql
-     *
-     * @param sql              sql
-     * @param hasRunSqlMd5List 执行过的sql md5列表
-     * @param runner           sql执行对象
-     * @param errStrWriter     异常输出writer
-     * @param tenant           租户
-     * @param moduleId         模块id
-     * @param version          版本
-     * @param sqlFile          sql文件名
-     * @param isError          是否异常
      */
-    private static boolean executeSql(String sql, List<String> hasRunSqlMd5List, ScriptRunner runner, StringWriter errStrWriter, TenantVo tenant, String moduleId, String version, String sqlFile, boolean isError) throws Exception {
-        String tenantUuid = tenant == null ? "0" : tenant.getUuid(); //主库用0表示
+    private static boolean executeSql(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
+        String tenantUuid = executeSqlParamVo.getTenant() == null ? "0" : executeSqlParamVo.getTenant().getUuid(); //主库用0表示
         // 如果没有执行过该sql，则执行
-        String sqlHash = Md5Util.encryptMD5(sql);
-        if (!hasRunSqlMd5List.contains(sqlHash)) {
-            runner.runScript(new StringReader(sql));
+        String sqlHash = Md5Util.encryptMD5(executeSqlParamVo.getSql());
+        if (!executeSqlParamVo.getChangelogSqlHashList().contains(sqlHash)) {
+            if (executeSqlParamVo.getRunner() == null) {
+                initRunner(executeSqlParamVo);
+            }
+            executeSqlParamVo.getRunner().runScript(new StringReader(executeSqlParamVo.getSql()));
             ChangelogAuditVo changelogAuditVo;
-            if (StringUtils.isNotBlank(errStrWriter.toString())) {
+            if (StringUtils.isNotBlank(executeSqlParamVo.getErrStrWriter().toString())) {
                 String error;
-                if (tenant == null) {
-                    error = "  ✖" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+                if (executeSqlParamVo.getTenant() == null) {
+                    error = "  ✖" + executeSqlParamVo.getModuleId() + "." + executeSqlParamVo.getVersion() + "·" + executeSqlParamVo.getSqlFile() + ": " + executeSqlParamVo.getErrStrWriter();
                 } else {
-                    error = "  ✖" + tenant.getName() + "·" + moduleId + "." + version + "·" + sqlFile + ": " + errStrWriter;
+                    error = "  ✖" + executeSqlParamVo.getTenant().getName() + "·" + executeSqlParamVo.getModuleId() + "." + executeSqlParamVo.getVersion() + "·" + executeSqlParamVo.getSqlFile() + ": " + executeSqlParamVo.getErrStrWriter();
                 }
                 //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
                 int ignored = 0;
-                if (ignoreKeyList.stream().anyMatch(o -> errStrWriter.toString().toLowerCase(Locale.ROOT).contains(o))) {
+                if (ignoreKeyList.stream().anyMatch(o -> executeSqlParamVo.getErrStrWriter().toString().toLowerCase(Locale.ROOT).contains(o))) {
                     ignored = 1;
                 } else {
                     System.out.println(error);
-                    isError = true;
+                    executeSqlParamVo.setError(true);
                 }
-                changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, error, 0, ignored);
-                insertChangelogAudit(changelogAuditVo);
-                insertChangelogAuditDetail(sqlHash, sql);
-                errStrWriter.getBuffer().setLength(0);
+                changelogAuditVo = new ChangelogAuditVo(tenantUuid, executeSqlParamVo.getModuleId(), sqlHash, executeSqlParamVo.getVersion(), error, 0, ignored);
+                insertChangelogAudit(changelogAuditVo, executeSqlParamVo.getNeatlogicConn());
+                insertChangelogAuditDetail(sqlHash, executeSqlParamVo.getSql(), executeSqlParamVo.getNeatlogicConn());
+                executeSqlParamVo.getErrStrWriter().getBuffer().setLength(0);
             } else {
-                changelogAuditVo = new ChangelogAuditVo(tenantUuid, moduleId, sqlHash, version, 1);
-                hasRunSqlMd5List.add(sqlHash);
-                insertChangelogAudit(changelogAuditVo);
-                insertChangelogAuditDetail(sqlHash, sql);
+                changelogAuditVo = new ChangelogAuditVo(tenantUuid, executeSqlParamVo.getModuleId(), sqlHash, executeSqlParamVo.getVersion(), 1);
+                executeSqlParamVo.getChangelogSqlHashList().add(sqlHash);
+                insertChangelogAudit(changelogAuditVo, executeSqlParamVo.getNeatlogicConn());
+                insertChangelogAuditDetail(sqlHash, executeSqlParamVo.getSql(), executeSqlParamVo.getNeatlogicConn());
             }
         }
-        return isError;
+        return executeSqlParamVo.isError();
     }
 
     /**
@@ -346,8 +278,8 @@ public class ScriptRunnerManager {
      *
      * @param changelogAuditVo changelog记录
      */
-    private static void insertChangelogAudit(ChangelogAuditVo changelogAuditVo) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`error_msg`,`sql_status`,`lcd`,`ignored`) VALUES (?,?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `error_msg` = ?,`sql_status` = ?, `lcd` = now(),`ignored` = ? ")) {
+    private static void insertChangelogAudit(ChangelogAuditVo changelogAuditVo, Connection neatlogicConn) throws Exception {
+        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert into `changelog_audit` (`tenant_uuid`,`module_id`,`sql_hash`,`version`,`error_msg`,`sql_status`,`lcd`,`ignored`) VALUES (?,?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `error_msg` = ?,`sql_status` = ?, `lcd` = now(),`ignored` = ? ")) {
             statement.setString(1, changelogAuditVo.getTenantUuid());
             statement.setString(2, changelogAuditVo.getModuleId());
             statement.setString(3, changelogAuditVo.getSqlHash());
@@ -371,8 +303,8 @@ public class ScriptRunnerManager {
      * @param hash sql的哈希唯一值
      * @param sql  sql语句
      */
-    private static void insertChangelogAuditDetail(String hash, String sql) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `changelog_audit_detail` (`hash`,`sql`) VALUES (?,?) ");) {
+    private static void insertChangelogAuditDetail(String hash, String sql, Connection neatlogicConn) throws Exception {
+        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `changelog_audit_detail` (`hash`,`sql`) VALUES (?,?) ");) {
             statement.setString(1, hash);
             statement.setString(2, sql);
             statement.execute();
@@ -386,8 +318,8 @@ public class ScriptRunnerManager {
      *
      * @param tenantModuleDmlSqlVo dml sql对象
      */
-    private static void insertTenantModuleDmlSql(TenantModuleDmlSqlVo tenantModuleDmlSqlVo) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`) VALUES (?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?")) {
+    private static void insertTenantModuleDmlSql(TenantModuleDmlSqlVo tenantModuleDmlSqlVo, Connection neatlogicConn) throws Exception {
+        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`) VALUES (?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?")) {
             statement.setString(1, tenantModuleDmlSqlVo.getTenantUuid());
             statement.setString(2, tenantModuleDmlSqlVo.getModuleId());
             statement.setString(3, tenantModuleDmlSqlVo.getSqlMd5());
@@ -408,8 +340,8 @@ public class ScriptRunnerManager {
      * @param md5    sql的哈希唯一值
      * @param dmlSql sql语句
      */
-    private static void insertTenantModuleDmlSqlDetail(String md5, String dmlSql) throws Exception {
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection(); PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `tenant_module_dmlsql_detail` (`hash`,`sql`) VALUES (?,?) ")) {
+    private static void insertTenantModuleDmlSqlDetail(String md5, String dmlSql, Connection neatlogicConn) throws Exception {
+        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert ignore into `tenant_module_dmlsql_detail` (`hash`,`sql`) VALUES (?,?) ")) {
             statement.setString(1, md5);
             statement.setString(2, dmlSql);
             statement.execute();

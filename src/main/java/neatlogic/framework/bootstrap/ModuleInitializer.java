@@ -16,9 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.bootstrap;
 
 import neatlogic.framework.asynchronization.thread.ModuleInitApplicationListener;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.ModuleUtil;
-import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
@@ -26,12 +24,8 @@ import neatlogic.framework.util.ChangelogUtil;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.WebApplicationInitializer;
@@ -39,14 +33,10 @@ import org.springframework.web.WebApplicationInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import java.io.File;
-import java.net.URL;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.*;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ModuleInitializer implements WebApplicationInitializer {
@@ -73,11 +63,11 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 "                                                                                                ");
         //生成地址:http://patorjk.com/software/taag/#p=display&v=1&f=ANSI%20Shadow&t=neatlogic%203.0
         ModuleVo module = null;
-        try {
-            List<ModuleVo> moduleListFromServletContext = getModuleListByServletContext(resolver);
-            List<TenantVo> activeTenantList = getAllTenantList();
-            ChangelogUtil.updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
-            ChangelogUtil.initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
+        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection()) {
+            List<ModuleVo> moduleListFromServletContext = ChangelogUtil.getModuleListByServletContext(resolver);
+            List<TenantVo> activeTenantList = ChangelogUtil.getAllTenantList(neatlogicConn);
+            ChangelogUtil.updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext, neatlogicConn);
+            ChangelogUtil.initDmlSql(resolver, activeTenantList, moduleListFromServletContext, neatlogicConn);
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             List<ModuleVo> parentModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() == null).collect(Collectors.toList());
             List<ModuleVo> childModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() != null).collect(Collectors.toList());
@@ -131,117 +121,5 @@ public class ModuleInitializer implements WebApplicationInitializer {
                 System.out.println("  ✖" + module.getId() + "·" + I18nUtils.getStaticMessage(module.getNameWithoutTranslate()));
             }
         }
-    }
-
-    /**
-     * 根据每个模块的servlet context 获取模块列表
-     */
-    private List<ModuleVo> getModuleListByServletContext(ResourcePatternResolver resolver) throws Exception {
-        List<ModuleVo> moduleVoList = new ArrayList<>();
-        Resource[] resources = resolver.getResources("classpath*:neatlogic/**/*-servlet-context.xml");
-        for (Resource resource : resources) {
-            String path = resource.getURL().getPath();
-//            path = path.substring(path.indexOf("!") + 1);
-            path = path.substring(path.lastIndexOf("/neatlogic/") + 1);
-            SAXReader reader = new SAXReader();
-            Document document = reader.read(resource.getURL());
-            Element rootE = document.getRootElement();
-            Element neatlogicE = rootE.element("module");
-            String parent = neatlogicE.attributeValue("parent");
-            boolean isCommercial = false;
-            if (StringUtils.isNotBlank(neatlogicE.attributeValue("isCommercial"))) {
-                isCommercial = Boolean.parseBoolean(neatlogicE.attributeValue("isCommercial"));
-            }
-            String moduleId, moduleName, urlMapping, moduleDescription, version, group, groupName, groupSort, groupDescription;
-            moduleId = neatlogicE.attributeValue("id");
-            moduleName = neatlogicE.attributeValue("name");
-            urlMapping = neatlogicE.attributeValue("urlMapping");
-            moduleDescription = neatlogicE.attributeValue("description");
-            group = neatlogicE.attributeValue("group");
-            groupName = neatlogicE.attributeValue("groupName");
-            groupSort = neatlogicE.attributeValue("groupSort");
-            groupDescription = neatlogicE.attributeValue("groupDescription");
-            ModuleVo moduleVo = new ModuleVo(moduleId, moduleName, urlMapping, moduleDescription, group, groupName, groupSort, groupDescription, path, parent, isCommercial);
-            moduleVoList.add(moduleVo);
-            setVersionAndLastModified(moduleVo);
-        }
-        return moduleVoList;
-    }
-
-    /**
-     * 根据context.xml path 获取 pom.properties path
-     * 并设置模块的版本和最后修改时间
-     */
-    private void setVersionAndLastModified(ModuleVo moduleVo) {
-        // 获取资源的URL
-        String pomPropertiesPath = null;
-        URL resourceUrl = Config.class.getClassLoader().getResource(moduleVo.getPath());
-        if (resourceUrl != null) {
-            try {
-                // 如果资源在JAR文件中，获取JAR文件的URL
-                String jarUrl = resourceUrl.toString().replaceFirst("jar:file:", "").replaceFirst("!.*", "");
-                File jar = new File(jarUrl);
-                if (jar.exists()) {
-                    moduleVo.setLastModified(new Date(jar.lastModified()));
-                }
-                try (JarFile jarFile = new JarFile(jarUrl)) {
-                    Enumeration<JarEntry> entries = jarFile.entries();
-                    while (entries.hasMoreElements()) {
-                        JarEntry entry = entries.nextElement();
-                        String entryName = entry.getName();
-                        if (entryName.endsWith("pom.properties")) {
-                            pomPropertiesPath = entryName;
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-        }
-
-        if (StringUtils.isBlank(pomPropertiesPath)) {
-            pomPropertiesPath = "META-INF/maven/com.neatlogic/neatlogic-" + moduleVo.getId() + "/pom.properties";
-        }
-        moduleVo.setVersion(Config.getProperty(pomPropertiesPath, "version"));
-    }
-
-    /**
-     * 从数据库查询所有激活租户
-     *
-     * @return 激活的租户
-     */
-    private List<TenantVo> getAllTenantList() throws Exception {
-        List<TenantVo> activeTenantList = new ArrayList<>();
-        Connection neatlogicConn = null;
-        PreparedStatement tenantStatement = null;
-        ResultSet tenantResultSet = null;
-        try {
-            neatlogicConn = JdbcUtil.getNeatlogicConnection();
-            String tenantSql = "SELECT a.*,b.* FROM tenant a left join datasource b on a.uuid = b.tenant_uuid where a.is_active =1 ";
-            tenantStatement = neatlogicConn.prepareStatement(tenantSql);
-            tenantResultSet = tenantStatement.executeQuery();
-            while (tenantResultSet.next()) {
-                TenantVo tenantVo = new TenantVo();
-                tenantVo.setUuid(tenantResultSet.getString("uuid"));
-                tenantVo.setName(tenantResultSet.getString("name"));
-                DatasourceVo datasourceVo = new DatasourceVo();
-                datasourceVo.setUrl(tenantResultSet.getString("url"));
-                datasourceVo.setUsername(tenantResultSet.getString("username"));
-                datasourceVo.setPasswordCipher(tenantResultSet.getString("password"));
-                datasourceVo.setDriver(tenantResultSet.getString("driver"));
-                datasourceVo.setHost(tenantResultSet.getString("host"));
-                datasourceVo.setPort(tenantResultSet.getInt("port"));
-                tenantVo.setDatasource(datasourceVo);
-                activeTenantList.add(tenantVo);
-            }
-        } catch (Throwable ex) {
-            logger.error("从数据库查询所有激活租户时发生异常: " + ex.getMessage(), ex);
-            throw new Exception(ex);
-        } finally {
-            JdbcUtil.closeResultSet(tenantResultSet);
-            JdbcUtil.closeStatement(tenantStatement);
-            JdbcUtil.closeConnection(neatlogicConn);
-        }
-        return activeTenantList;
     }
 }

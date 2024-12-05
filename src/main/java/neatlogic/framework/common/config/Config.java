@@ -205,10 +205,10 @@ public class Config {
             try {
                 CHANGELOG_JDBC_SOCKETTIME = System.getProperty("changelogJdbcSocketTime");
             } catch (Exception ex) {
-                CHANGELOG_JDBC_SOCKETTIME = "60000";
+                CHANGELOG_JDBC_SOCKETTIME = "300000";
             }
         } else {
-            CHANGELOG_JDBC_SOCKETTIME = "60000";
+            CHANGELOG_JDBC_SOCKETTIME = "300000";
         }
 
     }

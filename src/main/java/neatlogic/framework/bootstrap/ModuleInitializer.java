@@ -22,6 +22,7 @@ import neatlogic.framework.dto.DatasourceVo;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
+import neatlogic.framework.util.ChangelogUtil;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -75,8 +76,8 @@ public class ModuleInitializer implements WebApplicationInitializer {
         try {
             List<ModuleVo> moduleListFromServletContext = getModuleListByServletContext(resolver);
             List<TenantVo> activeTenantList = getAllTenantList();
-            //ChangelogUtil.updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
-            //ChangelogUtil.initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
+            ChangelogUtil.updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext);
+            ChangelogUtil.initDmlSql(resolver, activeTenantList, moduleListFromServletContext);
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             List<ModuleVo> parentModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() == null).collect(Collectors.toList());
             List<ModuleVo> childModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() != null).collect(Collectors.toList());

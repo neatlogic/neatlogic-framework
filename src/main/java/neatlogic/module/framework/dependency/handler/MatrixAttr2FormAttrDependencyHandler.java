@@ -55,7 +55,11 @@ public class MatrixAttr2FormAttrDependencyHandler extends DefaultDependencyHandl
 
     @Override
     public int delete(Object to, JSONObject config) {
-        return super.delete(getGenerateTo(to, config), config);
+        int count = super.delete(getGenerateTo(to, config), config);
+        if (count == 0) {
+            count = super.delete(to, config);
+        }
+        return count;
     }
 
     @Override
@@ -63,6 +67,7 @@ public class MatrixAttr2FormAttrDependencyHandler extends DefaultDependencyHandl
         JSONObject config = dependencyVo.getConfig();
         if (MapUtils.isNotEmpty(config)) {
             String formVersionUuid = config.getString("formVersionUuid");
+            String uuid = config.getString("uuid");
             if (StringUtils.isNotBlank(formVersionUuid)) {
                 FormVersionVo formVersionVo = formMapper.getFormVersionByUuid(formVersionUuid);
                 if (formVersionVo != null) {
@@ -73,7 +78,7 @@ public class MatrixAttr2FormAttrDependencyHandler extends DefaultDependencyHandl
                         List<FormAttributeVo> formAttributeList = formVersionVo.getFormAttributeList();
                         if (CollectionUtils.isNotEmpty(formAttributeList)) {
                             for (FormAttributeVo formAttributeVo : formAttributeList) {
-                                if (Objects.equals(formAttributeVo.getUuid(), dependencyVo.getTo())) {
+                                if (Objects.equals(formAttributeVo.getUuid(), dependencyVo.getTo()) || Objects.equals(formAttributeVo.getUuid(), uuid)) {
                                     JSONObject dependencyInfoConfig = new JSONObject();
                                     dependencyInfoConfig.put("formUuid", formVo.getUuid());
 //                                    dependencyInfoConfig.put("formName", formVo.getName());

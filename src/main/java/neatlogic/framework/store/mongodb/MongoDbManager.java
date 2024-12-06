@@ -41,9 +41,7 @@ public class MongoDbManager {
         List<MongoDbVo> mongoDbList = mongoDbMapper.getAllActiveTenantMongoDb();
         for (MongoDbVo mongoDbVo : mongoDbList) {
             if (!mongoDbMap.containsKey(mongoDbVo.getTenantUuid())) {
-                MongoClient client = MongoClients.create("mongodb://" + mongoDbVo.getUsername() + ":" + mongoDbVo.getPasswordPlain() + "@" + mongoDbVo.getHost() + "/" + mongoDbVo.getDatabase() + (StringUtils.isNotBlank(mongoDbVo.getOption()) ? "?" + mongoDbVo.getOption() : ""));
-                mongoDbMap.put(mongoDbVo.getTenantUuid(), client);
-                mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
+                addDynamicDataSource(mongoDbVo);
             }
         }
     }

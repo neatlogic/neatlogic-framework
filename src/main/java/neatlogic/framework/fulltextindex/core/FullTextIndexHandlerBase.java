@@ -40,13 +40,13 @@ import org.w3c.tidy.Tidy;
 import javax.annotation.Resource;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler {
     private static final Logger logger = LoggerFactory.getLogger(FullTextIndexHandlerBase.class);
+    private final Map<String, ReentrantLock> lockMap = new ConcurrentHashMap<>();
     static Tidy tidy = new Tidy();
 
     static {
@@ -139,12 +139,27 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                             FullTextIndexWordVo wordVo = fullTextIndexWordMapper.getWordByWord(fieldVo.getWord());
                             if (wordVo != null) {
                                 fieldVo.setWordId(wordVo.getId());
-                                fullTextIndexMapper.replaceIntoField(fieldVo, moduleId);
-                                Set<FullTextIndexOffsetVo> offsetList = fieldVo.getOffsetList();
-                                if (CollectionUtils.isNotEmpty(offsetList)) {
-                                    for (FullTextIndexOffsetVo offsetVo : offsetList) {
-                                        fullTextIndexMapper.insertFieldOffset(offsetVo, moduleId);
+                                //由于fulltextindex_field_xxx有符合索引，这里加锁避免出现死锁
+                                String key = fieldVo.getWordId() + "#" + fieldVo.getTargetId() + "#" + fieldVo.getTargetField(); // 唯一锁标识
+                                ReentrantLock lock = lockMap.computeIfAbsent(key, k -> new ReentrantLock());
+                                lock.lock();
+                                try {
+                                    FullTextIndexFieldWordVo oldFieldVo = fullTextIndexMapper.getFulltextIndexField(fieldVo, moduleId);
+                                    if (oldFieldVo == null) {
+                                        fullTextIndexMapper.insertIndexField(fieldVo, moduleId);
+                                    } else {
+                                        fieldVo.setId(oldFieldVo.getId());
+                                        fullTextIndexMapper.updateIndexField(fieldVo, moduleId);
                                     }
+                                    Set<FullTextIndexOffsetVo> offsetList = fieldVo.getOffsetList();
+                                    if (CollectionUtils.isNotEmpty(offsetList)) {
+                                        for (FullTextIndexOffsetVo offsetVo : offsetList) {
+                                            fullTextIndexMapper.insertFieldOffset(offsetVo, moduleId);
+                                        }
+                                    }
+                                } finally {
+                                    lock.unlock();
+                                    lockMap.remove(key); // 释
                                 }
                             }
                         }
@@ -152,11 +167,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                 }
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
-                if (ex instanceof ApiRuntimeException) {
-                    fullTextIndexTargetVo.setError(((ApiRuntimeException) ex).getMessage());
-                } else {
-                    fullTextIndexTargetVo.setError(ex.getMessage());
-                }
+                fullTextIndexTargetVo.setError(ex.getMessage());
                 fullTextIndexMapper.updateTargetError(fullTextIndexTargetVo);
             }
         }, isSync);

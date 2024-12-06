@@ -76,8 +76,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where target_id = #{targetId}
     </update>
 
-    <insert id="replaceIntoField">
-        INSERT INTO `fulltextindex_field_${moduleId}` (`id`,
+    <select id="getFulltextIndexField"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexFieldWordVo">
+        SELECT id, counter
+        from `fulltextindex_field_${moduleId}`
+        WHERE word_id = #{fieldVo.wordId}
+          AND target_id = #{fieldVo.targetId}
+          AND target_field = #{fieldVo.targetField}
+    </select>
+
+    <update id="updateIndexField">
+        UPDATE `fulltextindex_field_${moduleId}`
+        SET `counter` = #{fieldVo.counter}
+        WHERE id = #{fieldVo.id}
+    </update>
+
+    <insert id="insertIndexField">
+        INSERT IGNORE INTO `fulltextindex_field_${moduleId}` (`id`,
                                                        `word_id`,
                                                        `target_field`,
                                                        `target_id`,
@@ -87,10 +102,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{fieldVo.targetField},
                 #{fieldVo.targetId},
                 #{fieldVo.counter})
-        ON DUPLICATE KEY UPDATE `word_id`      = #{fieldVo.wordId},
-                                `target_field` = #{fieldVo.targetField},
-                                `target_id`    = #{fieldVo.targetId},
-                                `counter`      = #{fieldVo.counter}
     </insert>
 
     <insert id="insertFieldOffset">

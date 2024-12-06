@@ -35,7 +35,11 @@ public class Matrix2FormAttributeDependencyHandler extends DefaultDependencyHand
 
     @Override
     public int delete(Object to, JSONObject config) {
-        return super.delete(getGenerateTo(to, config), config);
+        int count = super.delete(getGenerateTo(to, config), config);
+        if (count == 0) {
+            count = super.delete(to, config);
+        }
+        return count;
     }
 
     @Override
@@ -67,7 +71,10 @@ public class Matrix2FormAttributeDependencyHandler extends DefaultDependencyHand
         String uuid = config.getString("uuid");
         FormAttributeVo formAttribute = FormUtil.getFormAttribute(formVersionVo.getFormConfig(), uuid, sceneUuid);
         if (formAttribute == null) {
-            return null;
+            formAttribute = FormUtil.getFormAttribute(formVersionVo.getFormConfig(), dependencyVo.getTo(), sceneUuid);
+            if (formAttribute == null) {
+                return null;
+            }
         }
         List<String> parentNameList = new ArrayList<>();
         FormAttributeParentVo parent = formAttribute.getParent();

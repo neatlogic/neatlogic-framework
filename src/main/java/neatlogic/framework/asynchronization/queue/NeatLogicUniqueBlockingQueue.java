@@ -40,11 +40,13 @@ public class NeatLogicUniqueBlockingQueue<T> {
         Task<T> task = new Task<>(t);
         // 保证任务唯一性
         if (taskMap.putIfAbsent(task.getUniqueKey(), Boolean.TRUE) == null) {
+            logger.debug("====TagentUpdateInfo-addQueue:" + JSON.toJSONString(task));
             // 如果任务是新任务，放入队列
             boolean added = blockingQueue.offer(task);
             if (!added) {
                 // 如果队列已满，移除任务标记
                 taskMap.remove(task.getUniqueKey());
+                logger.error("Queue is full!");
             }
             return added;
         } else {

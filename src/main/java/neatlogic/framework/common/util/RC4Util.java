@@ -15,9 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.common.util;
 
-public class RC4Util {
+import neatlogic.framework.common.config.Config;
 
-    private static final String KEY = "r3MQiqvyDaEocb4zl8YJ3ebbZcpKoo7E";
+public class RC4Util {
 
     private static final String PRE_TAGENT = "{ENCRYPTED}";
 
@@ -27,7 +27,7 @@ public class RC4Util {
 
     public static String encrypt(final String plaintext) {
         if (!plaintext.startsWith(PRE) && !plaintext.startsWith(PRE_OLD)) {
-            return PRE + byte2HexStr(encrypt(KEY.getBytes(), plaintext.getBytes()));
+            return PRE + byte2HexStr(encrypt(Config.RC4_KEY().getBytes(), plaintext.getBytes()));
         }
         return plaintext;
     }
@@ -35,13 +35,13 @@ public class RC4Util {
     public static String toggle(String ciphertext) {
         if (ciphertext.startsWith(PRE)) {
             ciphertext = ciphertext.substring(5);
-            return new String(decrypt(KEY.getBytes(), hexStr2Bytes(ciphertext)));
+            return new String(decrypt(Config.RC4_KEY().getBytes(), hexStr2Bytes(ciphertext)));
         } else if (ciphertext.startsWith(PRE_OLD)) {
             ciphertext = ciphertext.substring(4);
-            return new String(decrypt(KEY.getBytes(), hexStr2Bytes(ciphertext)));
+            return new String(decrypt(Config.RC4_KEY().getBytes(), hexStr2Bytes(ciphertext)));
         } else if (ciphertext.startsWith(PRE_TAGENT)) {
             ciphertext = ciphertext.substring(11);
-            return new String(decrypt(KEY.getBytes(), hexStr2Bytes(ciphertext)));
+            return new String(decrypt(Config.RC4_KEY().getBytes(), hexStr2Bytes(ciphertext)));
         } else {
             return encrypt(ciphertext);
         }
@@ -57,7 +57,7 @@ public class RC4Util {
         } else {
             return ciphertext;
         }
-        return new String(decrypt(KEY.getBytes(), hexStr2Bytes(ciphertext)));
+        return new String(decrypt(Config.RC4_KEY().getBytes(), hexStr2Bytes(ciphertext)));
     }
 
     /*public static String encrypt(final String key, final String plaintext) {

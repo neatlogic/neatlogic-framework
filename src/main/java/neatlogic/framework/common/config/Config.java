@@ -140,6 +140,8 @@ public class Config {
 
     private static String CHANGELOG_JDBC_SOCKETTIME;//changelog jdbc 读取数据时间耗时限制
 
+    private static String RC4_KEY;//rc4 key
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -480,6 +482,9 @@ public class Config {
     public static String CHANGELOG_JDBC_SOCKETTIME() {
         return CHANGELOG_JDBC_SOCKETTIME;
     }
+    public static String RC4_KEY() {
+        return RC4_KEY;
+    }
 
     public static Properties properties = new Properties();
 
@@ -585,7 +590,6 @@ public class Config {
             HOME_URL = prop.getProperty("home.url");
             MASTER_HOME_URL = prop.getProperty("master.home.url");
             BACK_END_URL = prop.getProperty("back.end.url");
-            JWT_SECRET = prop.getProperty("jwt.secret", "neatlogic#neatlogic$secret");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
@@ -645,6 +649,15 @@ public class Config {
 
             ENABLE_METHOD_TIMING_ASPECT = Boolean.parseBoolean(prop.getProperty("enable.method.timing.aspect", "false"));
             LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));
+
+            RC4_KEY = prop.getProperty("rc4.key", "r3MQiqvyDaEocb4zl8YJ3ebbZcpKoo7E");
+
+            JWT_SECRET = prop.getProperty("jwt.secret");
+            if(StringUtils.isBlank(JWT_SECRET)){
+                System.out.println(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
+                logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
+                System.exit(1);
+            }
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

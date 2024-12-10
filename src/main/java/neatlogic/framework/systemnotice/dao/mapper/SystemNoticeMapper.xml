@@ -377,6 +377,22 @@
         </if>
     </select>
 
+    <select id="getNotIssuedNoticeIdList" resultType="java.lang.Long">
+        SELECT
+            `id`
+        FROM `system_notice`
+        WHERE `status` = 'not_issued'
+          AND `start_time` != NULL
+    </select>
+
+    <select id="getIssuedNoticeIdList" resultType="java.lang.Long">
+        SELECT
+            `id`
+        FROM `system_notice`
+        WHERE `status` = 'issued'
+          AND `end_time` != NULL
+    </select>
+
     <update id="updateSystemNoticeBaseInfo" parameterType="neatlogic.framework.systemnotice.dto.SystemNoticeVo">
         update
         `system_notice`
@@ -434,6 +450,19 @@
         </if>
         where `id` = #{id}
     </update>
+
+    <!--<update id="stopExpiredSystemNotice">
+        update
+        `system_notice`
+        set
+        `status` = 'stopped',
+        `start_time` = null,
+        `end_time` = null,
+        `lcd` = now(3),
+        `lcu` = 'system'
+        where `status` = 'issued'
+          AND `end_time` &lt; NOW(3)
+    </update>-->
 
     <update id="updateSystemNoticeUserReadStatus">
         update
@@ -553,6 +582,24 @@
         </foreach>
     </insert>
 
+    <insert id="insertInsertSystemNoticeUser">
+        INSERT INTO `system_notice_user` (
+            `system_notice_id`,
+            `user_uuid`,
+            `is_read`
+        )
+        SELECT DISTINCT
+            a.`id`, '${userUuid}', 0
+        FROM `system_notice` a
+        JOIN `system_notice_recipient` b ON a.`id` = b.`system_notice_id`
+        WHERE a.`status` = 'issued'
+          AND a.`id` NOT IN (SELECT `system_notice_id` FROM `system_notice_user` WHERE `user_uuid` = #{userUuid}
+          AND b.`uuid` IN
+        <foreach collection="uuidList" item="uuid" open="(" close=")" separator=",">
+            #{uuid}
+        </foreach>
+    </insert>
+
     <delete id="deleteSystemNoticeById" parameterType="java.lang.Long">
         delete
         from `system_notice`
@@ -574,6 +621,17 @@
         <foreach collection="noticeIdList" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
+    </delete>
+
+    <!--<delete id="deleteInvalidSystemNoticeUserByUserUuid" parameterType="java.lang.String">
+        DELETE a FROM `system_notice_user` a
+        LEFT JOIN `system_notice` b ON a.`system_notice_id` = b.`id`
+        WHERE b.`id`IS NULL
+        AND `user_uuid` = #{value}
+    </delete>-->
+
+    <delete id="deleteSystemNoticeUserByNoticeId" parameterType="java.lang.Long">
+        DELETE FROM `system_notice_user` WHERE `system_notice_id` = #{value}
     </delete>
 
 </mapper>

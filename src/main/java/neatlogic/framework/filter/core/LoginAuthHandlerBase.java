@@ -141,6 +141,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             }
             userVo.setJwtVo(jwtVo);
             UserContext.init(userVo, authenticationInfoVo, "+8:00", request, response);
+            //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
+            if(StringUtils.isBlank(userVo.getCookieAuthorization())) {
+                jwtVo = buildJwt(userVo, authenticationInfoVo);
+                setResponseAuthCookie(response, request, tenant, jwtVo);
+            }
             if (isNeedLoginPost) {
                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                     loginPostProcessor.loginAfterInitialization();

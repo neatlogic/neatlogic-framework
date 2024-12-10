@@ -140,8 +140,6 @@ public class Config {
 
     private static String CHANGELOG_JDBC_SOCKETTIME;//changelog jdbc 读取数据时间耗时限制
 
-    private static String RC4_KEY;//rc4 key
-
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -482,9 +480,6 @@ public class Config {
     public static String CHANGELOG_JDBC_SOCKETTIME() {
         return CHANGELOG_JDBC_SOCKETTIME;
     }
-    public static String RC4_KEY() {
-        return RC4_KEY;
-    }
 
     public static Properties properties = new Properties();
 
@@ -634,7 +629,7 @@ public class Config {
             //LICENSE_PK = prop.getProperty("license.pk");
             LICENSE = prop.getProperty("license");
             MAINTENANCE = prop.getProperty("maintenance", "administrator");
-            MAINTENANCE_PASSWORD = prop.getProperty("maintenance.password", "RC4:68b72d0a4d801e4148b8a50419f0dc3e0f04");
+            MAINTENANCE_PASSWORD = prop.getProperty("maintenance.password");
 
             DIRECT_URL = prop.getProperty("direct.url");
             SSO_TICKET_KEY = prop.getProperty("sso.ticket.key");
@@ -649,8 +644,6 @@ public class Config {
 
             ENABLE_METHOD_TIMING_ASPECT = Boolean.parseBoolean(prop.getProperty("enable.method.timing.aspect", "false"));
             LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));
-
-            RC4_KEY = prop.getProperty("rc4.key", "r3MQiqvyDaEocb4zl8YJ3ebbZcpKoo7E");
 
             JWT_SECRET = prop.getProperty("jwt.secret");
             if(StringUtils.isBlank(JWT_SECRET)){

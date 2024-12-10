@@ -69,4 +69,11 @@ public interface ILoginAuthHandler {
     default boolean isAutoDirect() {
         return true;
     }
+
+    /**
+     * 是否需要补充cookie
+     */
+    default boolean isNeedCookie() {
+        return true;
+    }
 }

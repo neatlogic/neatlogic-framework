@@ -135,4 +135,9 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         }
         return null;
     }
+
+    @Override
+    public boolean isNeedCookie() {
+        return false;
+    }
 }

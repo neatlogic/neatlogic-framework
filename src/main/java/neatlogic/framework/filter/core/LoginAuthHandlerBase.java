@@ -124,7 +124,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 String authenticationInfoStr = null;
                 authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
                 jwtVo = buildJwt(userVo, authenticationInfoVo);
-                setResponseAuthCookie(response, request, tenant, jwtVo);
+                if (isNeedCookie()) {
+                    setResponseAuthCookie(response, request, tenant, jwtVo);
+                }
                 if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
                     authenticationInfoVo.setHeaderSet(null);
                     authenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
@@ -142,7 +144,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             userVo.setJwtVo(jwtVo);
             UserContext.init(userVo, authenticationInfoVo, "+8:00", request, response);
             //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
-            if(StringUtils.isBlank(userVo.getCookieAuthorization())) {
+            if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
                 jwtVo = buildJwt(userVo, authenticationInfoVo);
                 setResponseAuthCookie(response, request, tenant, jwtVo);
             }

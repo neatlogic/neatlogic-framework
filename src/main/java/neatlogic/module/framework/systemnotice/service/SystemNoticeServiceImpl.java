@@ -18,6 +18,7 @@
 package neatlogic.module.framework.systemnotice.service;
 
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.common.config.Config;
@@ -28,11 +29,17 @@ import neatlogic.framework.common.util.PageUtil;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
+import neatlogic.framework.scheduler.core.IJob;
+import neatlogic.framework.scheduler.core.SchedulerManager;
+import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.service.UserService;
 import neatlogic.framework.systemnotice.dao.mapper.SystemNoticeMapper;
 import neatlogic.framework.systemnotice.dto.SystemNoticeRecipientVo;
 import neatlogic.framework.systemnotice.dto.SystemNoticeUserVo;
 import neatlogic.framework.systemnotice.dto.SystemNoticeVo;
+import neatlogic.framework.systemnotice.service.ISystemNoticeCrossoverService;
+import neatlogic.module.framework.systemnotice.schedule.StopSystemNoticeJob;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -50,7 +57,7 @@ import java.util.stream.Collectors;
  * @Date: 2021/1/20 11:02
  **/
 @Service
-public class SystemNoticeServiceImpl implements SystemNoticeService{
+public class SystemNoticeServiceImpl implements SystemNoticeService, ISystemNoticeCrossoverService {
 
     @Autowired
     private SystemNoticeMapper systemNoticeMapper;
@@ -65,6 +72,9 @@ public class SystemNoticeServiceImpl implements SystemNoticeService{
     private UserSessionMapper userSessionMapper;
 
     @Resource
+    private SchedulerManager schedulerManager;
+
+    @Resource
     private UserService userService;
 
     @Override
@@ -74,10 +84,10 @@ public class SystemNoticeServiceImpl implements SystemNoticeService{
         /** 获取system_notice_user中，因公告被删除而残留的记录 **/
         noticeIdList.addAll(systemNoticeMapper.getNotExistsNoticeIdListFromNoticeUserByUserUuid(UserContext.get().getUserUuid(true)));
         /** 获取system_notice_user中，因更改公告通知对象而残留的记录  **/
-        noticeIdList.addAll(systemNoticeMapper.getNotInNoticeScopeNoticeIdListByUserUuid(recipientUuidList,UserContext.get().getUserUuid(true)));
+        noticeIdList.addAll(systemNoticeMapper.getNotInNoticeScopeNoticeIdListByUserUuid(recipientUuidList, UserContext.get().getUserUuid(true)));
         /** 清理掉上述两种记录 **/
-        if(CollectionUtils.isNotEmpty(noticeIdList)){
-            systemNoticeMapper.deleteSystemNoticeUserByUserUuid(UserContext.get().getUserUuid(true),noticeIdList);
+        if (CollectionUtils.isNotEmpty(noticeIdList)) {
+            systemNoticeMapper.deleteSystemNoticeUserByUserUuid(UserContext.get().getUserUuid(true), noticeIdList);
         }
     }
 
@@ -123,8 +133,8 @@ public class SystemNoticeServiceImpl implements SystemNoticeService{
                 systemNoticeMapper.updateSystemNoticeStatus(vo);
                 currentUserNoticeList.add(new SystemNoticeUserVo(vo.getId(), UserContext.get().getUserUuid(true)));
                 /** 如果没有忽略已读，那么更改is_read为0 **/
-                if(vo.getIgnoreRead() != null && vo.getIgnoreRead() == 0){
-                    systemNoticeMapper.updateSystemNoticeUserReadStatus(vo.getId(),UserContext.get().getUserUuid(true),0);
+                if (vo.getIgnoreRead() != null && vo.getIgnoreRead() == 0) {
+                    systemNoticeMapper.updateSystemNoticeUserReadStatus(vo.getId(), UserContext.get().getUserUuid(true), 0);
                 }
             }
             /** 发送给当前用户 **/
@@ -210,10 +220,23 @@ public class SystemNoticeServiceImpl implements SystemNoticeService{
                 }
             }
         }
+        if (vo.getEndTime() != null) {
+            IJob jobHandler = SchedulerManager.getHandler(StopSystemNoticeJob.class.getName());
+            if (jobHandler == null) {
+                throw new ScheduleHandlerNotFoundException(StopSystemNoticeJob.class.getName());
+            }
+            String tenantUuid = TenantContext.get().getTenantUuid();
+            JobObject jobObject = new JobObject.Builder(vo.getId().toString(), jobHandler.getGroupName(), jobHandler.getClassName(), tenantUuid)
+                    .withBeginTime(vo.getEndTime())
+                    .withIntervalInSeconds(60 * 60)
+                    .withRepeatCount(0)
+                    .build();
+            schedulerManager.loadJob(jobObject);
+        }
         return true;
     }
 
-    private List<String> getRecipientUuidList(){
+    private List<String> getRecipientUuidList() {
         List<String> uuidList = new ArrayList<>();
         uuidList.add(UserContext.get().getUserUuid(true));
         uuidList.add(UserType.ALL.getValue());

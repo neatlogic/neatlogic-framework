@@ -593,7 +593,7 @@
         FROM `system_notice` a
         JOIN `system_notice_recipient` b ON a.`id` = b.`system_notice_id`
         WHERE a.`status` = 'issued'
-          AND a.`id` NOT IN (SELECT `system_notice_id` FROM `system_notice_user` WHERE `user_uuid` = #{userUuid}
+          AND a.`id` NOT IN (SELECT `system_notice_id` FROM `system_notice_user` WHERE `user_uuid` = #{userUuid})
           AND b.`uuid` IN
         <foreach collection="uuidList" item="uuid" open="(" close=")" separator=",">
             #{uuid}

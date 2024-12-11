@@ -22,6 +22,8 @@ import java.util.Set;
 
 public interface UserService {
 
+    List<String> getUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidList(List<String> userUuidList, List<String> teamUuidList, List<String> roleUuidList);
+
     /**
      * @Description: 根据用户uuid集合与分组uuid集合查询激活的用户uuid
      * @Author: laiwt

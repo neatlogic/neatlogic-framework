@@ -82,6 +82,10 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeVo> searchNoticeHistoryListByUserUuid(@Param("noticeVo") SystemNoticeVo vo,@Param("userUuid") String userUuid);
 
+    List<Long> getNotIssuedNoticeIdList();
+
+    List<Long> getIssuedNoticeIdList();
+
     public int updateSystemNoticeBaseInfo(SystemNoticeVo vo);
 
     public int updateSystemNoticeIssueInfo(SystemNoticeVo vo);
@@ -89,6 +93,8 @@ public interface SystemNoticeMapper {
     public int updateSystemNoticeStatus(SystemNoticeVo vo);
 
     public int stopSystemNoticeById(SystemNoticeVo vo);
+
+//    public int stopExpiredSystemNotice();
 
     public int updateSystemNoticeUserReadStatus(@Param("noticeId") Long noticeId, @Param("userUuid") String userUuid,@Param("isRead") Integer isRead);
 
@@ -104,6 +110,8 @@ public interface SystemNoticeMapper {
 
     public int batchInsertSystemNoticeUser(List<SystemNoticeUserVo> recipientUserList);
 
+    int insertInsertSystemNoticeUser(@Param("userUuid") String userUuid, @Param("uuidList") List<String> uuidList);
+
     public int deleteSystemNoticeById(Long id);
 
     public int deleteRecipientByNoticeId(Long id);
@@ -118,4 +126,7 @@ public interface SystemNoticeMapper {
     public int deleteSystemNoticeUserByUserUuid(@Param("userUuid") String uuid,@Param("noticeIdList") Set<Long> noticeIdList);
 
 
+//    int deleteInvalidSystemNoticeUserByUserUuid(String userUuid);
+
+    int deleteSystemNoticeUserByNoticeId(Long noticeId);
 }

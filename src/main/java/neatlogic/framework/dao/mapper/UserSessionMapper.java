@@ -49,6 +49,11 @@ public interface UserSessionMapper {
             @Param("pageSize") Integer pageSize
     );
 
+    List<String> getOnlineUserUuidListByUserUuidListAndGreaterThanSessionTime(
+            @Param("userUuidList") List<String> userUuidList,
+            @Param("sessionTime") Date sessionTime
+    );
+
     int getUserSessionCountByDate(String limitDate);
 
     int insertUserSession(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfoHash") String authInfoHash);

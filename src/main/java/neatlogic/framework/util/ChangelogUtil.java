@@ -240,7 +240,7 @@ public class ChangelogUtil {
                     Resource[] dmlResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleVo.getId() + "/**/sqlscript/dml.sql");
                     for (Resource resource : dmlResources) {
                         List<String> tenantDmlSqlList = allActiveTenantDmlSqlHashMap.get(tenantVo.getUuid());
-                        if(CollectionUtils.isEmpty(tenantDmlSqlList)){
+                        if (CollectionUtils.isEmpty(tenantDmlSqlList)) {
                             tenantDmlSqlList = new ArrayList<>();
                         }
                         ExecuteSqlParamVo executeSqlParamVo = new ExecuteSqlParamVo(tenantVo, moduleVo.getId(), resource, tenantDmlSqlList, tenantConnection, neatlogicConn, false);
@@ -424,6 +424,9 @@ public class ChangelogUtil {
                 Map<String, String> moduleVersionMap = tenantModuleVersionMap.get(tenant.getUuid());
                 if (tenantModuleVersionMap.containsKey(tenant.getUuid())) {
                     List<String> tenantChangelogSqlHashList = allActiveTenantChangelogSqlHashMap.get(tenant.getUuid());
+                    if (tenantChangelogSqlHashList == null) {
+                        tenantChangelogSqlHashList = new ArrayList<>();
+                    }
                     for (ModuleVo moduleVo : moduleVoList) {
                         String moduleId = moduleVo.getId();
 

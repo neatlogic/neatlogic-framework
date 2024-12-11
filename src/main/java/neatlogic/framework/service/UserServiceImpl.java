@@ -56,6 +56,55 @@ public class UserServiceImpl implements UserService {
     @Resource
     private UserSessionService userSessionService;
 
+    @Override
+    public List<String> getUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidList(List<String> userUuidList, List<String> teamUuidList, List<String> roleUuidList) {
+        Set<String> resultSet = new HashSet<>();
+        if (CollectionUtils.isNotEmpty(userUuidList)) {
+            resultSet.addAll(userUuidList);
+        }
+        if (CollectionUtils.isNotEmpty(teamUuidList)) {
+            List<String> list = userMapper.getUserUuidListByTeamUuidList(teamUuidList);
+            if (CollectionUtils.isNotEmpty(list)) {
+                resultSet.addAll(list);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(roleUuidList)) {
+            Set<String> userUuidSet = new HashSet<>();
+            {
+                List<String> list = userMapper.getUserUuidListByRoleUuidList(roleUuidList);
+                userUuidSet.addAll(list);
+            }
+            Set<String> teamUuidSet = new HashSet<>();
+            List<RoleTeamVo> roleTeamList = roleMapper.getRoleTeamListByRoleUuidList(roleUuidList);
+            for (RoleTeamVo roleTeamVo : roleTeamList) {
+                String teamUuid = roleTeamVo.getTeamUuid();
+                if (Objects.equals(roleTeamVo.getCheckedChildren(), 1)) {
+                    TeamVo teamVo = teamMapper.getTeamByUuid(teamUuid);
+                    if (teamVo != null) {
+                        teamUuidSet.add(teamUuid);
+                        List<String> list = teamMapper.getChildrenUuidListByLeftRightCode(teamVo.getLft(), teamVo.getRht());
+                        teamUuidSet.addAll(list);
+                    }
+                } else {
+                    teamUuidSet.add(teamUuid);
+                }
+                if (teamUuidSet.size() >= 100) {
+                    userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
+                    userUuidSet.addAll(userUuidList);
+                    teamUuidSet.clear();
+                }
+            }
+            if (CollectionUtils.isNotEmpty(teamUuidSet)) {
+                userUuidList = userMapper.getUserUuidListByTeamUuidList(new ArrayList<>(teamUuidSet));
+                userUuidSet.addAll(userUuidList);
+            }
+            if (CollectionUtils.isNotEmpty(userUuidSet)) {
+                resultSet.addAll(userUuidSet);
+            }
+        }
+        return userMapper.getUserUuidListByUuidListAndIsActive(new ArrayList<>(resultSet), 1);
+    }
+
     /**
      * @Description: 根据用户uuid集合与分组uuid集合查询激活的用户uuid
      * @Author: laiwt
@@ -65,20 +114,21 @@ public class UserServiceImpl implements UserService {
      **/
     @Override
     public Set<String> getUserUuidSetByUserUuidListAndTeamUuidList(List<String> userUuidList, List<String> teamUuidList) {
-        Set<String> uuidList = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(userUuidList)) {
-            List<String> existUserUuidList = userMapper.getUserUuidListByUuidListAndIsActive(userUuidList, 1);
-            if (CollectionUtils.isNotEmpty(existUserUuidList)) {
-                uuidList.addAll(new HashSet<>(existUserUuidList));
-            }
-        }
-        if (CollectionUtils.isNotEmpty(teamUuidList)) {
-            List<String> list = userMapper.getUserUuidListByTeamUuidList(teamUuidList);
-            if (CollectionUtils.isNotEmpty(list)) {
-                uuidList.addAll(new HashSet<>(list));
-            }
-        }
-        return uuidList;
+//        Set<String> uuidList = new HashSet<>();
+//        if (CollectionUtils.isNotEmpty(userUuidList)) {
+//            List<String> existUserUuidList = userMapper.getUserUuidListByUuidListAndIsActive(userUuidList, 1);
+//            if (CollectionUtils.isNotEmpty(existUserUuidList)) {
+//                uuidList.addAll(new HashSet<>(existUserUuidList));
+//            }
+//        }
+//        if (CollectionUtils.isNotEmpty(teamUuidList)) {
+//            List<String> list = userMapper.getUserUuidListByTeamUuidList(teamUuidList);
+//            if (CollectionUtils.isNotEmpty(list)) {
+//                uuidList.addAll(new HashSet<>(list));
+//            }
+//        }
+        List<String> uuidList = getUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidList(userUuidList, teamUuidList, null);
+        return new HashSet<>(uuidList);
     }
 
     @Override

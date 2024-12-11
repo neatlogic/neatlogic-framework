@@ -121,6 +121,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </if>
     </select>
 
+    <select id="getOnlineUserUuidListByUserUuidListAndGreaterThanSessionTime"
+            resultType="java.lang.String">
+        SELECT
+        `user_uuid`
+        FROM  `user_session`
+        WHERE `visit_time` &gt; #{sessionTime}
+        AND `user_uuid` IN
+        <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+            #{userUuid}
+        </foreach>
+    </select>
+
     <select id="getAllOnlineUserCount" parameterType="java.util.Date" resultType="int">
         SELECT count(1)
         FROM `user` a

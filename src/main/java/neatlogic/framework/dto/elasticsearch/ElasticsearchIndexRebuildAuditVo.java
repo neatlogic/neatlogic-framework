@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package neatlogic.framework.fulltextindex.dto.fulltextindex;
+package neatlogic.framework.dto.elasticsearch;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.config.Config;
@@ -25,7 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Date;
 import java.util.List;
 
-public class FullTextIndexRebuildAuditVo {
+public class ElasticsearchIndexRebuildAuditVo {
     @EntityField(name = "类型", type = ApiParamType.STRING)
     private String type;
     @EntityField(name = "类型名称", type = ApiParamType.STRING)
@@ -46,8 +46,6 @@ public class FullTextIndexRebuildAuditVo {
     private String error;
     @EntityField(name = "索引数量", type = ApiParamType.INTEGER)
     private Integer indexCount;
-    @EntityField(name = "处理器", type = ApiParamType.STRING)
-    private String handler;
     @JSONField(serialize = false)
     private List<String> typeList;//用于搜索条件，精确查询某些类型
 
@@ -81,14 +79,6 @@ public class FullTextIndexRebuildAuditVo {
 
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
-    }
-
-    public String getHandler() {
-        return handler;
-    }
-
-    public void setHandler(String handler) {
-        this.handler = handler;
     }
 
     public Date getEndTime() {

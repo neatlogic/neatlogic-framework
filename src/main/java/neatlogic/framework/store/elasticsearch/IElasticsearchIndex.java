@@ -17,10 +17,8 @@
 
 package neatlogic.framework.store.elasticsearch;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
-
-import java.io.IOException;
-import java.util.Map;
 
 public interface IElasticsearchIndex<T> {
     /*
@@ -29,9 +27,14 @@ public interface IElasticsearchIndex<T> {
     String getIndexName();
 
     /*
-    插件名称
+    插件唯一标识
      */
     String getName();
+
+    /*
+    插件名称
+     */
+    String getLabel();
 
     /*
     创建索引
@@ -39,12 +42,41 @@ public interface IElasticsearchIndex<T> {
     void createIndex();
 
     /*
+    删除索引
+     */
+    void deleteIndex();
+
+    /*
     创建文档
      */
     void createDocument(T targetVo);
 
     /*
+    获取文档数量
+     */
+    int getDocumentCount();
+
+    /*
+    删除文档
+     */
+    void deleteDocument(T targetVo);
+
+    /*
+    获取文档
+     */
+    T getDocument(T targetVo);
+    /*
+    创建查询
+     */
+    Query buildQuery(T targetVo);
+
+    /*
+    重建所有文档
+     */
+    void rebuildDocument(boolean isAll);
+
+    /*
     搜索文档
      */
-    IndexResultVo searchDocument(Map<String, Object> conditionObj, Integer currentPage, Integer pageSize) throws IOException;
+    IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize);
 }

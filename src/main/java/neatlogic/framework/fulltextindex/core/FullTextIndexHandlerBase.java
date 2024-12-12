@@ -25,6 +25,7 @@ import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMap
 import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexWordMapper;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.*;
 import neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo;
+import neatlogic.framework.fulltextindex.enums.FullTextIndexHandlerType;
 import neatlogic.framework.fulltextindex.enums.Status;
 import neatlogic.framework.healthcheck.dao.mapper.DatabaseFragmentMapper;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
@@ -275,6 +276,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         auditVo.setType(type);
         auditVo.setEditor(UserContext.get().getUserUuid(true));
         auditVo.setStatus(Status.DOING.getValue());
+        auditVo.setHandler(FullTextIndexHandlerType.DATABASE.getValue());
         fullTextIndexRebuildAuditMapper.insertFullTextIndexRebuildAudit(auditVo);
 
         if (isRebuildAll) {
@@ -304,12 +306,10 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         protected void execute() {
             try {
                 myRebuildIndex(fullTextIndexTypeVo);
+            } catch (ApiRuntimeException ex) {
+                auditVo.setError(ex.getMessage());
             } catch (Exception ex) {
-                if (ex instanceof ApiRuntimeException) {
-                    auditVo.setError(((ApiRuntimeException) ex).getMessage());
-                } else {
-                    auditVo.setError(ExceptionUtils.getStackTrace(ex));
-                }
+                auditVo.setError(ExceptionUtils.getStackTrace(ex));
             }
             auditVo.setStatus(Status.DONE.getValue());
             fullTextIndexRebuildAuditMapper.updateFullTextIndexRebuildAuditStatus(auditVo);

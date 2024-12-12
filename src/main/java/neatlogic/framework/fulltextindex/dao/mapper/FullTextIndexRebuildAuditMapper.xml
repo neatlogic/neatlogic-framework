@@ -19,9 +19,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="searchFullTextIndexRebuildAudit"
             parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo"
             resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
-        select type, status, start_time as startTime, end_time as endTime, editor, server_id as serverId
+        select type, status, handler, start_time as startTime, end_time as endTime, editor, server_id as serverId
         from fulltextindex_rebuild_audit
         <where>
+            <if test="handler != null and handler != ''">
+                and handler = #{handler}
+            </if>
             <if test="typeList != null and typeList.size() > 0">
                 and type in
                 <foreach collection="typeList" item="item" open="(" close=")" separator=",">#{item}</foreach>
@@ -43,13 +46,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <if test="status == 'done'">
             ,end_time = now(3)
         </if>
-        where type = #{type}
+        where type = #{type} and handler = #{handler}
     </update>
 
     <insert id="insertFullTextIndexRebuildAudit"
             parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
-        insert into fulltextindex_rebuild_audit (type, status, start_time, editor, server_id)
-        values (#{type}, #{status}, now(3), #{editor}, #{serverId})
+        insert into fulltextindex_rebuild_audit (type, status, handler, start_time, editor, server_id)
+        values (#{type}, #{status}, #{handler}, now(3), #{editor}, #{serverId})
         ON DUPLICATE KEY UPDATE `start_time` = now(3),
                                 `status`     = #{status},
                                 `end_time`   = null,

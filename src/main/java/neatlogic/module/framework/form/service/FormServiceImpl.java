@@ -221,14 +221,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             }
         } else {// 其他，如动态数据源
             String matrixUuid = configObj.getString("matrixUuid");
-            if (StringUtils.isBlank(matrixUuid)) {
-                return resultObj;
-            }
             JSONObject mappingObj = configObj.getJSONObject("mapping");
-            if (MapUtils.isEmpty(mappingObj)) {
-                return resultObj;
-            }
-            ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
             if (dataObj instanceof JSONArray) {
                 JSONArray valueArray = (JSONArray) dataObj;
                 if (CollectionUtils.isNotEmpty(valueArray)) {
@@ -249,7 +242,11 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                         } else {
                             String value = obj.toString();
                             valueList.add(value);
-                            String text = getText(matrixUuid, mapping, value);
+                            String text = null;
+                            if (StringUtils.isBlank(matrixUuid) && MapUtils.isNotEmpty(mappingObj)) {
+                                ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
+                                text = getText(matrixUuid, mapping, value);
+                            }
                             if (text != null) {
                                 textList.add(text);
                             } else {
@@ -273,7 +270,11 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
             } else {
                 String value = dataObj.toString();
                 valueList.add(value);
-                String text = getText(matrixUuid, mapping, value);
+                String text = null;
+                if (StringUtils.isBlank(matrixUuid) && MapUtils.isNotEmpty(mappingObj)) {
+                    ValueTextVo mapping = mappingObj.toJavaObject(ValueTextVo.class);
+                    text = getText(matrixUuid, mapping, value);
+                }
                 if (text != null) {
                     textList.add(text);
                 } else {

@@ -92,21 +92,26 @@ public class WechatNotifyHandler extends NotifyHandlerBase {
 
     private void sendWechat(NotifyVo notifyVo) {
         Set<UserVo> toUserSet = new HashSet<>();
-        if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
-            List<UserVo> userVoList = userMapper.getUserByUserUuidList(notifyVo.getToUserUuidList());
+//        if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
+//            List<UserVo> userVoList = userMapper.getUserByUserUuidList(notifyVo.getToUserUuidList());
+//            toUserSet.addAll(userVoList);
+//        }
+//        if (CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList())) {
+//            for (String teamId : notifyVo.getToTeamUuidList()) {
+//                List<UserVo> userVoList = userMapper.getActiveUserByTeamId(teamId);
+//                toUserSet.addAll(userVoList);
+//            }
+//        }
+//        if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
+//            for (String roleUuid : notifyVo.getToRoleUuidList()) {
+//                List<UserVo> userVoList = userService.getUserListByRoleUuid(roleUuid);
+//                toUserSet.addAll(userVoList);
+//            }
+//        }
+        List<String> userUuidList = userService.getUserUuidListByUserUuidListAndTeamUuidListAndRoleUuidList(notifyVo.getToUserUuidList(), notifyVo.getToTeamUuidList(), notifyVo.getToRoleUuidList());
+        if (CollectionUtils.isNotEmpty(userUuidList)) {
+            List<UserVo> userVoList = userMapper.getUserByUserUuidList(userUuidList);
             toUserSet.addAll(userVoList);
-        }
-        if (CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList())) {
-            for (String teamId : notifyVo.getToTeamUuidList()) {
-                List<UserVo> userVoList = userMapper.getActiveUserByTeamId(teamId);
-                toUserSet.addAll(userVoList);
-            }
-        }
-        if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
-            for (String roleUuid : notifyVo.getToRoleUuidList()) {
-                List<UserVo> userVoList = userService.getUserListByRoleUuid(roleUuid);
-                toUserSet.addAll(userVoList);
-            }
         }
         if (CollectionUtils.isEmpty(toUserSet)) {
             throw new NotifyNoReceiverException();

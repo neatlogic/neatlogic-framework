@@ -381,7 +381,7 @@
         SELECT
             `id`
         FROM `system_notice`
-        WHERE `status` = 'not_issued'
+        WHERE `status` IN ('not_issued', 'stopped')
           AND `start_time` != NULL
     </select>
 

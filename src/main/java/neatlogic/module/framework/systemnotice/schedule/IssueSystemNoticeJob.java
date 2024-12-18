@@ -52,7 +52,8 @@ public class IssueSystemNoticeJob extends JobBase {
         TenantContext.get().switchTenant(tenantUuid);
         Long noticeId = Long.valueOf(jobObject.getJobName());
         SystemNoticeVo systemNotice = systemNoticeMapper.getSystemNoticeById(noticeId);
-        if (systemNotice != null && Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.NOTISSUED.getValue()) && systemNotice.getStartTime() != null) {
+        if (systemNotice != null && systemNotice.getStartTime() != null
+                && (Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.NOTISSUED.getValue()) || Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.STOPPED.getValue()))) {
             JobObject.Builder newJobObjectBuilder = new JobObject.Builder(noticeId.toString(), this.getGroupName(), this.getClassName(), TenantContext.get().getTenantUuid())
                     .withBeginTime(systemNotice.getStartTime())
                     .withIntervalInSeconds(60 * 60)
@@ -77,7 +78,8 @@ public class IssueSystemNoticeJob extends JobBase {
     protected Boolean isMyHealthy(JobObject jobObject) {
         Long noticeId = Long.valueOf(jobObject.getJobName());
         SystemNoticeVo systemNotice = systemNoticeMapper.getSystemNoticeById(noticeId);
-        if (systemNotice != null && Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.NOTISSUED.getValue()) && systemNotice.getStartTime() != null) {
+        if (systemNotice != null && systemNotice.getStartTime() != null
+                && (Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.NOTISSUED.getValue()) || Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.STOPPED.getValue()))) {
             return true;
         }
         return false;
@@ -87,7 +89,8 @@ public class IssueSystemNoticeJob extends JobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception {
         Long noticeId = Long.valueOf(jobObject.getJobName());
         SystemNoticeVo systemNotice = systemNoticeMapper.getSystemNoticeById(noticeId);
-        if (systemNotice != null && Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.NOTISSUED.getValue()) && systemNotice.getStartTime() != null) {
+        if (systemNotice != null && systemNotice.getStartTime() != null
+                && (Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.NOTISSUED.getValue()) || Objects.equals(systemNotice.getStatus(), SystemNoticeVo.Status.STOPPED.getValue()))) {
             systemNoticeService.issueSystemNotice(systemNotice);
             systemNotice.setStatus(SystemNoticeVo.Status.ISSUED.getValue());
             systemNotice.setIssueTime(systemNotice.getStartTime());

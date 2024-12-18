@@ -207,8 +207,10 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                 .build();
 
         IndexResultVo resultVo = new IndexResultVo();
-        resultVo.setCurrentPage(currentPage);
-        resultVo.setPageSize(pageSize);
+        if (this.needPage(targetVo)) {
+            resultVo.setCurrentPage(currentPage);
+            resultVo.setPageSize(pageSize);
+        }
         try {
             // 执行搜索
             SearchResponse<Object> responseCount = client.search(requestCount, Object.class);
@@ -219,12 +221,15 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
             resultVo.setRowNum((int) rowNum);
             // 创建搜索请求
-            SearchRequest request = new SearchRequest.Builder()
+            SearchRequest.Builder builder = new SearchRequest.Builder()
                     .index(this.getIndexName())
-                    .query(queryBuilder)
-                    .from(resultVo.getStartNum())
-                    .size(resultVo.getPageSize())
-                    .build();
+                    .query(queryBuilder);
+            if (this.needPage(targetVo)) {
+                builder.from(resultVo.getStartNum())
+                        .size(resultVo.getPageSize());
+            }
+
+            SearchRequest request = builder.build();
 
 
             SearchResponse<Object> response = client.search(request, Object.class);

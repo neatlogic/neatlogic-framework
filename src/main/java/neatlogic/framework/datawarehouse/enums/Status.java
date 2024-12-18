@@ -16,18 +16,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.datawarehouse.enums;
 
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 public enum Status {
-    DOING("doing", new I18n("同步数据中")),
-    DONE("done", new I18n("同步完成")),
-    ABORTED("aborted", new I18n("同步已中止")),
-    FAILED("failed", new I18n("同步失败"));
+    DOING("doing", "同步数据中"),
+    DONE("done", "同步完成"),
+    ABORTED("aborted", "同步已中止"),
+    FAILED("failed", "同步失败");
 
     private final String value;
-    private final I18n text;
+    private final String text;
 
-    Status(String _value, I18n _text) {
+    Status(String _value, String _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -37,7 +36,7 @@ public enum Status {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
 

@@ -197,7 +197,6 @@ public class AfterTransactionJob<T> {
 
     /*
      * @Description:
-     * @Author: chenqiwei
      * @Date: 2021/1/7 4:06 下午
      * @Params: [参数, 事务提交后回调函数, 事务结束后回调函数（回滚也会触发）]
      * @Returns: void
@@ -218,7 +217,7 @@ public class AfterTransactionJob<T> {
             }
             if (completed != null) {
                 if (!isSync) {
-                    CachedThreadPool.execute(new NeatLogicThread(this.threadName + "COMPLETED") {
+                    CachedThreadPool.execute(new NeatLogicThread(this.threadName + "-COMPLETED") {
                         @Override
                         protected void execute() {
                             completed.execute(t);
@@ -260,7 +259,7 @@ public class AfterTransactionJob<T> {
                         if (completed != null) {
                             Set<T> tList = THREADLOCAL.get();
                             if (commited != null) {
-                                CachedThreadPool.execute(new NeatLogicThread(threadName + "COMPLETED") {
+                                CachedThreadPool.execute(new NeatLogicThread(threadName + "-COMPLETED") {
                                     @Override
                                     protected void execute() {
                                         for (T t : tList) {

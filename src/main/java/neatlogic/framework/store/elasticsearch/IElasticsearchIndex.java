@@ -65,10 +65,18 @@ public interface IElasticsearchIndex<T> {
     获取文档
      */
     T getDocument(T targetVo);
+
     /*
     创建查询
      */
     Query buildQuery(T targetVo);
+
+    /*
+    判断是否需要分页
+     */
+    default Boolean needPage(T targetVo) {
+        return true;
+    }
 
     /*
     重建所有文档

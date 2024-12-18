@@ -32,9 +32,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +55,49 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
 
     public static final Map<String, Object> dbConfigMap = new HashMap<>();
 
+    /**
+     * 、
+     * 更新本地config.properties属性值
+     *
+     * @param filePath 配置路径
+     * @param key      属性key
+     * @param newValue 属性新值
+     * @throws IOException 异常
+     */
+    public static void updatePropertyLocal(String filePath, String key, String newValue) throws IOException {
+        File file = new File(filePath);
+        StringBuilder updatedContent = new StringBuilder();
+
+        // 逐行读取文件内容
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Files.newInputStream(file.toPath()), StandardCharsets.UTF_8))) {
+            String line;
+            boolean keyUpdated = false;
+
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("=");
+                if (parts.length == 2 && Objects.equals(parts[0].trim(), key)) {
+                    // 替换目标属性值
+                    updatedContent.append(key).append("=").append(newValue).append("\n");
+                    keyUpdated = true;
+                } else {
+                    // 保留其他行
+                    updatedContent.append(line).append("\n");
+                }
+
+            }
+
+            if (!keyUpdated) {
+                System.out.println("Key not found: " + key);
+            } else {
+                // 写回文件
+                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(file.toPath()), StandardCharsets.UTF_8))) {
+                    writer.write(updatedContent.toString());
+                }
+            }
+        }
+
+    }
+
     static {
         Properties prop = new Properties();
         String configInfo = null;
@@ -62,10 +105,11 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             Properties properties = new Properties();
             String serverAddr = System.getProperty("nacos.home");
             String namespace = System.getProperty("nacos.namespace");
+            ConfigService configService = null;
             if (StringUtils.isNotBlank(serverAddr) && StringUtils.isNotBlank(namespace)) {
                 properties.put("serverAddr", System.getProperty("nacos.home"));
                 properties.put("namespace", System.getProperty("nacos.namespace"));
-                ConfigService configService = NacosFactory.createConfigService(properties);
+                configService = NacosFactory.createConfigService(properties);
                 configInfo = configService.getConfig("config", "neatlogic.framework", 3000);
                 if (StringUtils.isNotBlank(configInfo)) {
                     prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
@@ -89,7 +133,31 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             dbConfigMap.put("db.driverClassName", prop.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
             dbConfigMap.put("db.url", prop.getProperty("db.url", "jdbc:mysql://localhost:3306/neatlogic?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
             dbConfigMap.put("db.username", prop.getProperty("db.username", "username"));
-            dbConfigMap.put("db.password", RC4Util.decrypt(prop.getProperty("db.password", "password")));
+            String dbPassword = prop.getProperty("db.password", "password");
+            //加密dbPassword
+            if (Boolean.FALSE.equals(RC4Util.isEncrypt(dbPassword))) {
+                String dbPasswordChipper = RC4Util.encrypt(dbPassword);
+                boolean isPublishOk;
+                if (Objects.equals(propertiesFrom, "Nacos")) {
+                    assert configInfo != null;
+                    String updatedConfig = configInfo.replaceAll("(?m)^db\\.password\\s*=\\s*.*$", "db.password=" + dbPasswordChipper);
+                    isPublishOk = configService.publishConfig("config", "neatlogic.framework", updatedConfig);
+                } else {
+                    // 保存到文件
+                    String filePath = Objects.requireNonNull(LocalConfig.class.getClassLoader()
+                            .getResource(CONFIG_FILE)).getPath();
+                    updatePropertyLocal(filePath, "db.password", dbPasswordChipper);
+                    isPublishOk = true;
+                }
+                if (isPublishOk) {
+                    System.out.println("  ✓db.password加密配置更新成功！");
+                } else {
+                    System.out.println("  ✖db.password加密配置更新失败！");
+                }
+            } else {
+                dbPassword = RC4Util.decrypt(dbPassword);
+            }
+            dbConfigMap.put("db.password", dbPassword);
             dbConfigMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
 
             Integer datasourceConnectTimeout = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));

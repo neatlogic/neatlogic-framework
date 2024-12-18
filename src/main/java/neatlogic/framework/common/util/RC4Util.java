@@ -25,6 +25,10 @@ public class RC4Util {
 
     public static final String PRE = "{RC4}";
 
+    public static Boolean isEncrypt(String ciphertext) {
+        return ciphertext.startsWith(PRE) || ciphertext.startsWith(PRE_OLD) || ciphertext.startsWith(PRE_TAGENT);
+    }
+
     public static String encrypt(final String plaintext) {
         if (!plaintext.startsWith(PRE) && !plaintext.startsWith(PRE_OLD)) {
             return PRE + byte2HexStr(encrypt(KEY.getBytes(), plaintext.getBytes()));

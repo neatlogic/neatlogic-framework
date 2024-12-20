@@ -29,7 +29,7 @@ import java.util.List;
 
 public class JavascriptUtil {
     private static final ThreadLocal<List<ApiRuntimeException>> instance = new ThreadLocal<>();
-
+    private static int MAX_CACHE_SIZE = 10;
 
     static class CacheItem {
 
@@ -54,10 +54,8 @@ public class JavascriptUtil {
 
     }
 
-    // private static final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
     private static final ThreadLocal<List<CacheItem>> engineCache = new ThreadLocal<>();
 
-    //private static final ScriptEngineManager sem = new ScriptEngineManager();
     private static final NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 
     public static ScriptEngine getEngine(ScriptClassFilter classFilter, String... options) {
@@ -101,8 +99,8 @@ public class JavascriptUtil {
                 item = new CacheItem(script);
             }
             engineList.add(item);
-            if (engineList.size() > 10) {
-                engineList.remove(10);
+            if (engineList.size() > MAX_CACHE_SIZE) {
+                engineList.remove(MAX_CACHE_SIZE);
             }
         } else {
             item = new CacheItem(script);
@@ -111,13 +109,12 @@ public class JavascriptUtil {
         return item.getCompiledScript();
     }
 
-    public static String transform(Object paramObj, String script) throws ScriptException, NoSuchMethodException {
+    public static String transform(Object paramObj, String script) throws ScriptException {
         return transform(paramObj, script, null);
     }
 
     public static Object runScript(JSONObject paramObj, String script) throws ScriptException {
-        CompiledScript compiledScript;
-        compiledScript = getCompiledScript("function run(){" + script + ";}run();", true);
+        CompiledScript compiledScript = getCompiledScript("function run(){" + script + ";}run();", true);
         Bindings params = new SimpleBindings();
         if (MapUtils.isNotEmpty(paramObj)) {
             params.putAll(paramObj);
@@ -132,32 +129,27 @@ public class JavascriptUtil {
      * @param expression 表达式
      * @return 执行结果
      */
-    public static boolean runExpression(JSONObject paramObj, String expression, List<ApiRuntimeException> errorList) throws ScriptException, NoSuchMethodException {
-        //处理is-null和is-not-null两种表达式
+    public static boolean runExpression(JSONObject paramObj, String expression, List<ApiRuntimeException> errorList) throws ScriptException {
         expression = expression.replace("-", "");
-        //ScriptEngine se = getEngine("-strict");
-        ScriptEngine se = getEngine(new ScriptClassFilter("neatlogic.framework.util.javascript.expressionHandler."));
-        //ScriptEngine se = sem.getEngineByName("nashorn");
+        Bindings params = new SimpleBindings();
         if (MapUtils.isNotEmpty(paramObj)) {
-            for (String key : paramObj.keySet()) {
-                se.put(key, paramObj.get(key));
-            }
+            params.putAll(paramObj);
         }
-        String script = "function run(){\n" + "return " + expression + ";\n" + "}\n";
-        script += "function calculate(expression, dataValue, conditionValue, label){\n";
+        String script = "function calculate(expression, dataValue, conditionValue, label){\n";
         script += "var calculateClass = Java.type('neatlogic.framework.util.javascript.expressionHandler.'+ expression); \n";
         script += "var result = calculateClass.calculate(dataValue, conditionValue, label);\n";
         script += "return result;\n";
         script += "}\n";
-        se.eval(script);
+        script += expression + ";";
+
+        CompiledScript compiledScript = getCompiledScript(script, true);
+
         //由于表达式不能直接抛异常，创建threadlocal传递errorList
         if (errorList != null) {
             instance.set(errorList);
         }
         try {
-            //System.out.println(script);
-            Invocable invocableEngine = (Invocable) se;
-            Object rv = invocableEngine.invokeFunction("run");
+            Object rv = compiledScript.eval(params);
             if (rv != null) {
                 return Boolean.parseBoolean(rv.toString());
             }
@@ -177,7 +169,7 @@ public class JavascriptUtil {
      * @return 执行结果
      */
     public static boolean runExpression(JSONObject paramObj, String expression) throws
-            ScriptException, NoSuchMethodException {
+            ScriptException {
         return runExpression(paramObj, expression, null);
     }
 
@@ -247,7 +239,7 @@ public class JavascriptUtil {
     }
 
     public static String transform(Object paramObj, String script, StringWriter sw) throws
-            ScriptException, NoSuchMethodException {
+            ScriptException {
         if (StringUtils.isBlank(script)) {
             if (paramObj != null) {
                 return JSON.toJSONString(paramObj);

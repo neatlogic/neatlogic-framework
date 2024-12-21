@@ -17,6 +17,7 @@ package neatlogic.module.framework.notify.handler;
 
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.common.util.FileUtil;
+import neatlogic.framework.common.util.StringUtil;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.file.dto.FileVo;
@@ -41,15 +42,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.*;
 
-/**
- * @program: neatlogic
- * @description:
- * @create: 2019-12-09 15:34
- **/
 @Component
 public class EmailNotifyHandler extends NotifyHandlerBase {
 
-    private static Logger logger = LoggerFactory.getLogger(EmailNotifyHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(EmailNotifyHandler.class);
 
     @Resource
     private UserMapper userMapper;
@@ -119,7 +115,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
             if (StringUtils.isNotBlank(user.getEmail())) {
                 toEmailSet.add(user.getEmail());
             } else {
-                logger.error("接收对象用户：”" + user.getUserName() + "(" + user.getUserId() + ")”没有设置邮箱地址");
+                logger.error("接收对象用户：”{}({})”没有设置邮箱地址", user.getUserName(), user.getUserId());
             }
         }
         if (CollectionUtils.isEmpty(toEmailSet)) {
@@ -149,14 +145,10 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
                 String.join(",", toEmailSet),
                 null,
                 attachmentMap
-                );
+        );
     }
 
     private String clearStringHTML(String sourceContent) {
-        String content = "";
-        if (sourceContent != null) {
-            content = sourceContent.replaceAll("</?[^>]+>", "");
-        }
-        return content;
+        return StringUtil.removeHtml(sourceContent);
     }
 }

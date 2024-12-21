@@ -227,6 +227,8 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
             if (this.needPage(targetVo)) {
                 builder.from(resultVo.getStartNum())
                         .size(resultVo.getPageSize());
+            } else {
+                builder.size(99);
             }
 
             SearchRequest request = builder.build();

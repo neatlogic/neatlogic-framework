@@ -32,8 +32,6 @@ public enum FrameworkFromType implements IFromType {
     FORMSCENE("formscene", new I18n("表单场景")),
     FORMATTR("formattr", new I18n("表单属性")),
     INTEGRATION("integration", new I18n("集成")),
-    CMDBCI("cmdbci", new I18n("cmdb模型")),
-    CMDBCIATTR("cmdbciattr", new I18n("cmdb模型属性")),
     WORKTIME("worktime", new I18n("服务窗口")),
     NOTIFY_POLICY("notifypolicy", new I18n("通知策略"));
 

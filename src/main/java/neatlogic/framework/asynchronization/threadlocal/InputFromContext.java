@@ -24,7 +24,7 @@ import java.io.Serializable;
 public class InputFromContext implements Serializable {
     private static final long serialVersionUID = -5732345436786224L;
     @JSONField(serialize = false)
-    private final transient static ThreadLocal<InputFromContext> instance = new ThreadLocal<>();
+    private static final ThreadLocal<InputFromContext> instance = new ThreadLocal<>();
     private InputFrom inputFrom;
 
     public static void init(InputFrom inputFrom) {

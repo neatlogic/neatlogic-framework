@@ -52,6 +52,11 @@ public interface IElasticsearchIndex<T> {
     void createDocument(T targetVo);
 
     /*
+    根据目标id创建文档
+     */
+    void createDocument(Long targetId);
+
+    /*
     获取文档数量
      */
     int getDocumentCount();

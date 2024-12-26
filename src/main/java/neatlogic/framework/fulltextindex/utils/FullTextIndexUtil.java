@@ -54,7 +54,7 @@ public class FullTextIndexUtil {
     public static void addWord(String... words) {
         if (words != null && words.length > 0) {
             List<String> wordList = Arrays.asList(words);
-            wordList.removeIf(StringUtils::isBlank);
+            wordList.removeIf(word -> word == null || StringUtils.isBlank(word));
             if (CollectionUtils.isNotEmpty(wordList)) {
                 Set<String> newWordList = new HashSet<>();
                 for (String word : wordList) {

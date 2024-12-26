@@ -153,9 +153,16 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     protected abstract void myCreateDocument(T targetVo);
 
+    protected abstract void myCreateDocument(Long targetId);
+
     @Override
     public final void createDocument(T targetVo) {
         this.myCreateDocument(targetVo);
+    }
+
+    @Override
+    public final void createDocument(Long targetId) {
+        this.myCreateDocument(targetId);
     }
 
     @Override

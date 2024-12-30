@@ -18,6 +18,7 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.CountRequest;
 import co.elastic.clients.elasticsearch.core.CountResponse;
@@ -228,9 +229,18 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
             resultVo.setRowNum((int) rowNum);
             // 创建搜索请求
+            // 添加排序条件
             SearchRequest.Builder builder = new SearchRequest.Builder()
                     .index(this.getIndexName())
                     .query(queryBuilder);
+
+            builder.sort(s -> s
+                    .field(f -> f
+                            .field("alertTime") // 按 alertTime 排序
+                            .order(SortOrder.Desc) // 倒序排列
+                    )
+            );
+
             if (this.needPage(targetVo)) {
                 builder.from(resultVo.getStartNum())
                         .size(resultVo.getPageSize());

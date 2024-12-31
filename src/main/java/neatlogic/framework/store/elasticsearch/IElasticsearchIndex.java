@@ -18,6 +18,7 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 
 public interface IElasticsearchIndex<T> {
@@ -50,6 +51,11 @@ public interface IElasticsearchIndex<T> {
     创建文档
      */
     void createDocument(T targetVo);
+
+    /**
+     * 修改文档某些属性
+     */
+    void updateDocument(Long targetId, JSONObject jsonObj);
 
     /*
     根据目标id创建文档

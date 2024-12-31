@@ -20,13 +20,11 @@ package neatlogic.framework.store.elasticsearch;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.elasticsearch.core.CountRequest;
-import co.elastic.clients.elasticsearch.core.CountResponse;
-import co.elastic.clients.elasticsearch.core.SearchRequest;
-import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.GetIndexResponse;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -46,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T> {
     static Logger logger = LoggerFactory.getLogger(ElasticsearchIndexBase.class);
@@ -57,9 +56,27 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }
 
     @Override
+    public final void updateDocument(Long targetId, JSONObject jsonObj) {
+        //myUpdateDocument(targetId, jsonObj);
+        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+        UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
+                .index(getIndexName())                   // 索引名称
+                .id(targetId.toString())          // 文档 ID
+                .doc(jsonObj)                            // 需要更新的字段
+                .build();
+        try {
+            client.update(updateRequest, Object.class);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+
+    @Override
     public final T getDocument(T target) {
         return myGetDocument(target);
     }
+
 
     protected abstract T myGetDocument(T target);
 
@@ -155,6 +172,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     protected abstract void myCreateDocument(T targetVo);
 
     protected abstract void myCreateDocument(Long targetId);
+
 
     @Override
     public final void createDocument(T targetVo) {

@@ -156,8 +156,10 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                 try {
                     myRebuildDocument(isAll);
                 } catch (ApiRuntimeException ex) {
+                    logger.error(ex.getMessage(), ex);
                     auditVo.setError(ex.getMessage());
                 } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
                     auditVo.setError(ExceptionUtils.getStackTrace(ex));
                 }
                 auditVo.setStatus(Status.DONE.getValue());

@@ -93,7 +93,6 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
                 for (IElasticsearchIndex index : indexList) {
                     index.createIndex();
                 }
-
             }
         }
         return elasticSearchClientMap.get(TenantContext.get().getTenantUuid());

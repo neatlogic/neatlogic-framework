@@ -21,18 +21,28 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import co.elastic.clients.util.ContentType;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dao.mapper.ElasticsearchMapper;
 import neatlogic.framework.dto.ElasticsearchVo;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,12 +65,23 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
         if (!elasticSearchClientMap.containsKey(TenantContext.get().getTenantUuid())) {
             ElasticsearchVo elasticsearch = getElasticsearchVo();
             if (elasticsearch != null) {
+                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                if (StringUtils.isNotBlank(elasticsearch.getUsername()) && StringUtils.isNotBlank(elasticsearch.getPasswordPlain())) {
+                    credentialsProvider.setCredentials(AuthScope.ANY,
+                            new UsernamePasswordCredentials(elasticsearch.getUsername(), elasticsearch.getPasswordPlain()));
+                }
                 RestClient restClient = RestClient
                         .builder(HttpHost.create(elasticsearch.getHost()))
-                        /*.setDefaultHeaders(new Header[]{
-                                new BasicHeader("Authorization", "ApiKey " + elasticsearch.getPasswordPlain())
-                        })*/
-                        .build();
+                        .setHttpClientConfigCallback(httpClientBuilder -> {
+                            httpClientBuilder.disableAuthCaching();
+                            httpClientBuilder.setDefaultHeaders(Collections.singletonList(
+                                    new BasicHeader(
+                                            HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
+                            httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
+                                    (response, context) ->
+                                            response.addHeader("X-Elastic-Product", "Elasticsearch"));
+                            return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                        }).build();
 
                 ElasticsearchTransport transport = new RestClientTransport(
                         restClient, new JacksonJsonpMapper());

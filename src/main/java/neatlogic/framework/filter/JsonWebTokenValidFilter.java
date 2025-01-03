@@ -259,6 +259,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
         } else {
             AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
+            authenticationInfoVo.setUserUuid(userVo.getUuid());
             UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             return false;
         }

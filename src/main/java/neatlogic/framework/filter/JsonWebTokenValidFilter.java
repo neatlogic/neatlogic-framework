@@ -250,6 +250,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     userSessionVo.setAuthInfoStr(authInfo);
                     userSessionMapper.updateUserSession(jwt.getTokenHash());
                     AuthenticationInfoVo authenticationInfo = userSessionVo.getAuthInfo();
+                    authenticationInfo.setUserUuid(userVo.getUuid());
                     UserSessionCache.addItem(jwt.getTokenHash(), authInfo);
                     UserContext.init(userVo, authenticationInfo, timezone, request, response);
                     return false;

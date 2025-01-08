@@ -160,7 +160,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
-                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
+                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getClass().getName()+":"+ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);

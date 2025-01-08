@@ -66,10 +66,14 @@ public enum ResponseCode {
     }
 
     public String getMessage(Object... args) throws Exception {
-        if (args != null && args.length > 0) {
-            return ((ApiRuntimeException) ex.getConstructor(String.class).newInstance(args)).getMessage();
-        } else {
-            return ((ApiRuntimeException) ex.newInstance()).getMessage();
+        if(ApiRuntimeException.class.isAssignableFrom(ex)) {
+            if (args != null && args.length > 0) {
+                return ((ApiRuntimeException) ex.getConstructor(String.class).newInstance(args)).getMessage();
+            } else {
+                return ((ApiRuntimeException) ex.newInstance()).getMessage();
+            }
+        }else{
+            return args[0].toString();
         }
     }
 }

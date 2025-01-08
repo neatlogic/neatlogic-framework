@@ -167,7 +167,7 @@ public class EmailUtil {
                 logger.info("邮件发送成功");
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
-                throw new EmailSendException();
+                throw new EmailSendException(ex);
             }
         } else {
             throw new EmailServerNotFoundException();
@@ -263,7 +263,7 @@ public class EmailUtil {
                 logger.info("邮件发送成功");
             } catch (Exception ex) {
                 logger.error(ex.getMessage(), ex);
-                throw new EmailSendException();
+                throw new EmailSendException(ex);
             }
         } else {
             throw new EmailServerNotFoundException();

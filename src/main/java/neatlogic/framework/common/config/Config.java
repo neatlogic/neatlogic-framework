@@ -128,8 +128,6 @@ public class Config {
 
     private static String LDAP_USER_DN;//ldap userDn格式
 
-    private static String AUTOEXEC_TOKEN;// autoexec用户的token
-
     private static String FILE_HANDLER;//文件处理器
 
     private static boolean ENABLE_METHOD_TIMING_ASPECT;// 启动方法执行耗时日志
@@ -461,10 +459,6 @@ public class Config {
         return LDAP_USER_DN;
     }
 
-    public static String AUTOEXEC_TOKEN() {
-        return AUTOEXEC_TOKEN;
-    }
-
     public static boolean ENABLE_METHOD_TIMING_ASPECT() {
         return ENABLE_METHOD_TIMING_ASPECT;
     }
@@ -639,8 +633,6 @@ public class Config {
 
             LDAP_SERVER_URL = prop.getProperty("ldap.server.url", "");
             LDAP_USER_DN = prop.getProperty("ldap.user.dn", "");
-
-            AUTOEXEC_TOKEN = prop.getProperty("autoexec.token", "499922b4317c251c2ce525f7b83e3d94");
 
             ENABLE_METHOD_TIMING_ASPECT = Boolean.parseBoolean(prop.getProperty("enable.method.timing.aspect", "false"));
             LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));

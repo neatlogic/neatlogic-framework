@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
@@ -26,16 +25,13 @@ import neatlogic.framework.util.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
-
 /**
  * @ClassName: SystemUser
  * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser {
     SYSTEM("system", "system", new I18n("系统")),
-    ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户")),
-    AUTOEXEC("autoexec", "autoexec", new I18n("自动化用户"));
+    ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户"));
 
     private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
 
@@ -69,9 +65,6 @@ public enum SystemUser {
     }
 
     public String getToken() {
-        if (Objects.equals(userId, AUTOEXEC.getUserId())) {
-            return Config.AUTOEXEC_TOKEN();
-        }
         return null;
     }
 

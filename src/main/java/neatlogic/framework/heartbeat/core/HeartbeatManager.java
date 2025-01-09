@@ -22,7 +22,7 @@ import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.heartbeat.dao.mapper.ServerMapper;

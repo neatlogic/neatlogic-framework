@@ -24,7 +24,7 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.common.constvalue.ResponseCode;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;

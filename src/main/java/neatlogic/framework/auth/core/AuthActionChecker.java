@@ -19,7 +19,7 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
@@ -107,7 +107,7 @@ public class AuthActionChecker {
             return true;
         }
         //系统用户无需鉴权
-        if (SystemUser.getUserVoByUser(userUuid) != null) {
+        if (SystemUserFactory.getUserVoByUser(userUuid) != null) {
             return true;
         }
         //超级管理员无需鉴权

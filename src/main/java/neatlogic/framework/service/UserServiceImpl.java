@@ -18,7 +18,7 @@ package neatlogic.framework.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.GroupSearch;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.*;
@@ -252,7 +252,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String getUserTokenByUser(String user) {
-        String token = SystemUser.getUserTokenByUser(user);
+        String token = SystemUserFactory.getUserTokenByUser(user);
         if (StringUtils.isBlank(token)) {
             token = userMapper.getUserTokenByUser(user);
         }
@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserVo getUserByUser(String user) {
-        UserVo userVo = SystemUser.getUserVoByUser(user);
+        UserVo userVo = SystemUserFactory.getUserVoByUser(user);
         if (userVo == null) {
             userVo = userMapper.getUserByUser(user);
         }

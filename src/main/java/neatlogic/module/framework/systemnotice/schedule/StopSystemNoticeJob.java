@@ -18,7 +18,7 @@
 package neatlogic.module.framework.systemnotice.schedule;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.systemnotice.dao.mapper.SystemNoticeMapper;

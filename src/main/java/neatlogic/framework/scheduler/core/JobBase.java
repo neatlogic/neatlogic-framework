@@ -20,7 +20,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.InputFrom;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.scheduler.annotation.Param;

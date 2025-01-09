@@ -1,19 +1,21 @@
-/*Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+/*
+ * Copyright (C) 2025  深圳极向量科技有限公司 All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-
-package neatlogic.framework.common.constvalue;
+package neatlogic.framework.common.constvalue.systemuser;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dto.AuthenticationInfoVo;
@@ -25,11 +27,14 @@ import neatlogic.framework.util.I18n;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @ClassName: SystemUser
  * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
-public enum SystemUser {
+public enum SystemUser implements ISystemUser {
     SYSTEM("system", "system", new I18n("系统")),
     ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户"));
 
@@ -48,26 +53,32 @@ public enum SystemUser {
         this.authenticationInfoVo = new AuthenticationInfoVo(userUuid);
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public String getUserUuid() {
         return userUuid;
     }
 
+    @Override
     public String getUserName() {
         return $.t(userName.toString());
     }
 
+    @Override
     public String getTimezone() {
         return timezone;
     }
 
+    @Override
     public String getToken() {
         return null;
     }
 
+    @Override
     public UserVo getUserVo() {
         UserVo userVo = new UserVo();
         userVo.setUuid(userUuid);
@@ -86,6 +97,7 @@ public enum SystemUser {
         return userVo;
     }
 
+    @Override
     public UserVo getUserVo(Boolean isNeedJwt) {
         UserVo userVo = new UserVo();
         userVo.setUuid(userUuid);
@@ -106,34 +118,13 @@ public enum SystemUser {
         return userVo;
     }
 
+    @Override
     public AuthenticationInfoVo getAuthenticationInfoVo() {
         return authenticationInfoVo;
     }
 
-    public static String getUserName(String userUuid) {
-        for (SystemUser user : values()) {
-            if (user.getUserUuid().equals(userUuid)) {
-                return user.getUserName();
-            }
-        }
-        return "";
-    }
-
-    public static UserVo getUserVoByUser(String user) {
-        for (SystemUser systemUser : values()) {
-            if (systemUser.getUserUuid().equals(user) || systemUser.getUserId().equals(user)) {
-                return systemUser.getUserVo();
-            }
-        }
-        return null;
-    }
-
-    public static String getUserTokenByUser(String user) {
-        for (SystemUser systemUser : values()) {
-            if (systemUser.getUserUuid().equals(user) || systemUser.getUserId().equals(user)) {
-                return systemUser.getToken();
-            }
-        }
-        return null;
+    @Override
+    public List<ISystemUser> getSystemUserList() {
+        return Arrays.asList(values());
     }
 }

@@ -24,7 +24,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ResponseCode;
-import neatlogic.framework.common.constvalue.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dto.FieldValidResultVo;

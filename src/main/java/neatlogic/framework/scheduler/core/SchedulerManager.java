@@ -134,10 +134,10 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                         ssb = ssb.repeatForever();
                     }
                     triggerBuilder.withSchedule(ssb);
-                } else {
-                    return null;
-                }
+                } /*else {
 
+                    return null;
+                }*/
                 Date startTime = jobObject.getBeginTime();
                 if (startTime != null && startTime.after(new Date())) {
                     triggerBuilder.startAt(startTime);

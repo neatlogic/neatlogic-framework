@@ -31,7 +31,8 @@ public enum InputFrom implements IEnum {
     CRON("cron", "common.schedule"),
     AUTOEXEC("autoexec", "nfcc.inputfrom.autocollect"),
     RELATIVE("relative", "nfcc.inputfrom.relative"),
-    DIAGRAN("diagram", "term.diagram.name");
+    DIAGRAN("diagram", "term.diagram.name"),
+    MQ("mq", "消息队列");
 
     private final String value;
     private final String text;

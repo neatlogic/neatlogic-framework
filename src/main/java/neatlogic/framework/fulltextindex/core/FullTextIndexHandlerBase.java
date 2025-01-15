@@ -75,10 +75,6 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     /*
      * @Description: 返回模块名，mybatis拦截器需要根据模块名自动选择合适表，要注意编写的正确性
-     * @Author: chenqiwei
-     * @Date: 2021/3/1 5:09 下午
-     * @Params: []
-     * @Returns: java.lang.String
      **/
     protected abstract String getModuleId();
 
@@ -140,7 +136,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                             FullTextIndexWordVo wordVo = fullTextIndexWordMapper.getWordByWord(fieldVo.getWord());
                             if (wordVo != null) {
                                 fieldVo.setWordId(wordVo.getId());
-                                //由于fulltextindex_field_xxx有符合索引，这里加锁避免出现死锁
+                                //由于fulltextindex_field_xxx有复合索引，这里加锁避免出现死锁
                                 String key = fieldVo.getWordId() + "#" + fieldVo.getTargetId() + "#" + fieldVo.getTargetField(); // 唯一锁标识
                                 ReentrantLock lock = lockMap.computeIfAbsent(key, k -> new ReentrantLock());
                                 lock.lock();
@@ -287,7 +283,9 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
             databaseFragmentMapper.truncateTable(TenantContext.get().getDbName(), "fulltextindex_field_" + fullTextIndexTypeVo.getModuleId());
             databaseFragmentMapper.truncateTable(TenantContext.get().getDbName(), "fulltextindex_offset_" + fullTextIndexTypeVo.getModuleId());
             databaseFragmentMapper.truncateTable(TenantContext.get().getDbName(), "fulltextindex_content_" + fullTextIndexTypeVo.getModuleId());
-
+        } else {
+            //删除target存在，但field不存在的数据，方便重建
+            fullTextIndexMapper.clearEmptyFullTextField(fullTextIndexTypeVo);
         }
         CachedThreadPool.execute(new RebuildRunner(fullTextIndexTypeVo, auditVo));
     }

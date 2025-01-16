@@ -286,6 +286,8 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         } else {
             //删除target存在，但field不存在的数据，方便重建
             fullTextIndexMapper.clearEmptyFullTextField(fullTextIndexTypeVo);
+            //清理有异常的索引
+            fullTextIndexMapper.clearErrorFullTextTarget(fullTextIndexTypeVo);
         }
         CachedThreadPool.execute(new RebuildRunner(fullTextIndexTypeVo, auditVo));
     }

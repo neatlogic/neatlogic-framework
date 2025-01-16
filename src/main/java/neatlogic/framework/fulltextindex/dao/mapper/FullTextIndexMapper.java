@@ -47,5 +47,7 @@ public interface FullTextIndexMapper {
 
     void clearEmptyFullTextField(FullTextIndexTypeVo fullTextIndexTypeVo);
 
+    void clearErrorFullTextTarget(FullTextIndexTypeVo fullTextIndexTypeVo);
+
     void deleteFullTextIndexByTargetIdAndType(@Param("fullTextIndexVo") FullTextIndexVo fullTextIndexVo, @Param("moduleId") String moduleId);
 }

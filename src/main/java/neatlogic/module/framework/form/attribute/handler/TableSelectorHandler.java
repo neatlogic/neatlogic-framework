@@ -687,12 +687,21 @@ public class TableSelectorHandler extends FormHandlerBase {
             if (dataObj.isEmpty()) {
                 throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field, "{}");
             }
+            String uuid = dataObj.getString("uuid");
             String key1 = dataObj.getString("key");
             if (key1 == null) {
-                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key");
+                if (StringUtils.isBlank(uuid)) {
+                    throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key");
+                } else {
+                    key1 = uuid;
+                }
             }
             if (StringUtils.isBlank(key1)) {
-                throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key", key1);
+                if (StringUtils.isBlank(uuid)) {
+                    throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key", key1);
+                } else {
+                    key1 = uuid;
+                }
             }
             String label = dataObj.getString("label");
             if (label == null) {

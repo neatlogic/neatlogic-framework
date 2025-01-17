@@ -47,12 +47,12 @@ public class ApiAuditThread extends NeatLogicThread {
     private String getLogPath(String tenant, String logPath) {
         String logFilePath = "";
         if (StringUtils.isBlank(logPath)) {
-            logFilePath = Config.DATA_HOME() + File.separator + "apiaudit" + File.separator + tenant + File.separator;
+            logFilePath = Config.AUDIT_HOME() + File.separator + "apiaudit" + File.separator + tenant + File.separator;
         } else {
             if (logPath.startsWith(File.separator)) {
                 logFilePath = logPath + File.separator + tenant + File.separator;
             } else {
-                logFilePath = Config.DATA_HOME() + File.separator + logPath + File.separator + tenant + File.separator;
+                logFilePath = Config.AUDIT_HOME() + File.separator + logPath + File.separator + tenant + File.separator;
             }
         }
         return logFilePath;

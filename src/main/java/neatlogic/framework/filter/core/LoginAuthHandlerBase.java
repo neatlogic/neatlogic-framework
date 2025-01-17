@@ -106,7 +106,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         //如果userVo没有uuid则这个user不合法，直接置null
         if (userVo != null && StringUtils.isBlank(userVo.getUuid())) {
             if (!Objects.equals(getType(), "default")) {
-                logger.error("{} return userVo invalid!! userVo must include uuid", getType());
+                logger.debug("{} return userVo invalid!! userVo must include uuid", getType());
             }
             userVo = null;
         }

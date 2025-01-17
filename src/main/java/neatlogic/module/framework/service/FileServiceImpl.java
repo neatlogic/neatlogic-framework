@@ -162,7 +162,7 @@ public class FileServiceImpl implements IFileCrossoverService {
 
     @Override
     public JSONObject readLocalFile(String path, int startIndex, int offset) {
-        String dataHome = Config.DATA_HOME() + TenantContext.get().getTenantUuid();
+        String dataHome = Config.AUDIT_HOME()+ TenantContext.get().getTenantUuid();
         String prefix = "${home}";
         if (path.startsWith(prefix)) {
             path = path.substring(prefix.length());
@@ -246,7 +246,7 @@ public class FileServiceImpl implements IFileCrossoverService {
 
     @Override
     public void downloadLocalFile(String path, int startIndex, int offset, HttpServletResponse response) {
-        String dataHome = Config.DATA_HOME() + TenantContext.get().getTenantUuid();
+        String dataHome = Config.AUDIT_HOME() + TenantContext.get().getTenantUuid();
         String prefix = "${home}";
         if (path.startsWith(prefix)) {
             path = path.substring(prefix.length());

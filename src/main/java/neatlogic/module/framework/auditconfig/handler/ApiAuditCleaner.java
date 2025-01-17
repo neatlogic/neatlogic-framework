@@ -54,7 +54,7 @@ public class ApiAuditCleaner extends AuditCleanerBase {
 
     @Override
     protected void myClean(int dayBefore) {
-        String directoryPath = Config.DATA_HOME() + TenantContext.get().getTenantUuid() + File.separator + AuditType.API_AUDIT.getType();
+        String directoryPath = Config.AUDIT_HOME() + TenantContext.get().getTenantUuid() + File.separator + AuditType.API_AUDIT.getType();
         File dir = new File(directoryPath);
         if (dir.exists()) {
             File[] listFiles = dir.listFiles();

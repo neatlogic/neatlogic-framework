@@ -64,6 +64,7 @@ public class Config {
     private static Integer DATASOURCE_IDLE_TIMEOUT;//此属性控制允许连接在池中处于空闲状态的最长时间
     private static Long DATASOURCE_KEEPALIVE_TIME;//此属性控制允许连接在池中心跳时间，不能比DATASOURCE_MAX_LIFETIME大
     private static String DATA_HOME;// 存储文件路径
+    private static String AUDIT_HOME;// 审计日志存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
     private static int SERVER_HEARTBEAT_THRESHOLD;// 心跳失败上限次数
     private static int MQ_SUBSCRIBE_RECONNECT_PERIOD;//MQ连接重试间隔
@@ -301,6 +302,16 @@ public class Config {
             DATA_HOME += File.separator;
         }
         return DATA_HOME;
+    }
+
+    public static String AUDIT_HOME() {
+        if (AUDIT_HOME == null) {
+            AUDIT_HOME = DATA_HOME();
+        }
+        if (!AUDIT_HOME.endsWith(File.separator)) {
+            AUDIT_HOME += File.separator;
+        }
+        return AUDIT_HOME;
     }
 
     public static int SERVER_HEARTBEAT_RATE() {
@@ -573,6 +584,7 @@ public class Config {
                 System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
             }
             DATA_HOME = prop.getProperty("data.home", "/app/data");
+            AUDIT_HOME = prop.getProperty("audit.home");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
             MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "5"));

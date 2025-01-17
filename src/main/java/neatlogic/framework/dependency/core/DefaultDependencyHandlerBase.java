@@ -130,11 +130,11 @@ public abstract class DefaultDependencyHandlerBase implements IDependencyHandler
     /**
      * 查询引用次数
      *
-     * @param to 被引用者（上游）值（如：服务时间窗口uuid）
+     * @param from 被引用者（上游）值（如：服务时间窗口uuid）
      */
     @Override
-    public int getDependencyCount(Object to) {
-        return dependencyMapper.getDependencyCountByFrom(to, getHandler());
+    public int getDependencyCount(Object from) {
+        return dependencyMapper.getDependencyCountByFrom(from, getHandler());
     }
 
     public List<Map<Object, Integer>> getBatchDependencyCount(Object fromList) {

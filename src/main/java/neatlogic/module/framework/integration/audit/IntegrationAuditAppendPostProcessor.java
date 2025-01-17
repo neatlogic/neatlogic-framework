@@ -40,7 +40,7 @@ public class IntegrationAuditAppendPostProcessor implements Consumer<IEvent>, IC
     public void accept(IEvent event) {
         JSONObject data = event.getData();
         String path = data.getString("path");
-        String dataHome = Config.DATA_HOME() + TenantContext.get().getTenantUuid();
+        String dataHome = Config.AUDIT_HOME() + TenantContext.get().getTenantUuid();
         File file = new File(dataHome);
         dataHome = file.getPath();
         if (path.startsWith(dataHome)) {

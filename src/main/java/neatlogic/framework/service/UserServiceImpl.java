@@ -102,7 +102,10 @@ public class UserServiceImpl implements UserService {
                 resultSet.addAll(userUuidSet);
             }
         }
-        return userMapper.getUserUuidListByUuidListAndIsActive(new ArrayList<>(resultSet), 1);
+        if (CollectionUtils.isNotEmpty(resultSet)) {
+            return userMapper.getUserUuidListByUuidListAndIsActive(new ArrayList<>(resultSet), 1);
+        }
+        return new ArrayList<>();
     }
 
     /**

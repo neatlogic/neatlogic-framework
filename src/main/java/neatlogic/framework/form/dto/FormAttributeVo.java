@@ -357,7 +357,7 @@ public class FormAttributeVo implements Serializable {
     }
 
     public String getConfigStr() {
-        if (configStr == null && config != null) {
+        if (config != null) {
             configStr = config.toJSONString();
         }
         return configStr;

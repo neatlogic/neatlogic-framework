@@ -694,6 +694,7 @@ public class TableSelectorHandler extends FormHandlerBase {
                     throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key");
                 } else {
                     key1 = uuid;
+                    dataObj.put("key", key1);
                 }
             }
             if (StringUtils.isBlank(key1)) {
@@ -701,6 +702,7 @@ public class TableSelectorHandler extends FormHandlerBase {
                     throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, field + ".key", key1);
                 } else {
                     key1 = uuid;
+                    dataObj.put("key", key1);
                 }
             }
             String label = dataObj.getString("label");

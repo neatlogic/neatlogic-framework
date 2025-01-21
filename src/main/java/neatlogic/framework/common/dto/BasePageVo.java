@@ -116,6 +116,13 @@ public class BasePageVo implements Serializable {
         this.needPage = needPage;
     }
 
+    public List<String> getWordList() {
+        if (StringUtils.isNotBlank(this.getKeyword())) {
+            return FullTextIndexUtil.sliceKeyword(this.getKeyword());
+        }
+        return null;
+    }
+
     public Integer[] getPageRange() {
         return pageRange;
     }

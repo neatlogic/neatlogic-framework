@@ -36,6 +36,7 @@ public class TableResultUtil {
             returnObj.put("pageCount", vo.getPageCount());
             returnObj.put("rowNum", vo.getRowNum());
             returnObj.put("currentPage", vo.getCurrentPage());
+            returnObj.put("wordList", vo.getWordList());
         }
         returnObj.put("theadList", theadList);
         returnObj.put("tbodyList", tbodyList);
@@ -53,6 +54,7 @@ public class TableResultUtil {
         returnObj.put("startPage", vo.getStartPage());
         returnObj.put("endPage", vo.getEndPage());
         returnObj.put("currentPage", vo.getCurrentPage());
+        returnObj.put("wordList", vo.getWordList());
         returnObj.put("theadList", theadList);
         returnObj.put("tbodyList", tbodyList);
         return returnObj;

@@ -64,12 +64,12 @@ public class IpSlicer implements IFullTextSlicer {
             String[] segments = ip.split("\\.");
             String part1 = segments[0] + "." + segments[1];
             String part2 = segments[0] + "." + segments[1] + "." + segments[2];
-            String part3 = segments[0] + "." + segments[1] + "." + segments[2] + "." + segments[3];
+            //String part3 = segments[0] + "." + segments[1] + "." + segments[2] + "." + segments[3];
 
             // 添加到结果列表
             ipParts.add(part1);
             ipParts.add(part2);
-            ipParts.add(part3);
+            //ipParts.add(part3);
         }
 
         return ipParts;

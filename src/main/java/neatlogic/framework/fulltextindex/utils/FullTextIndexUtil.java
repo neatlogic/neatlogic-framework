@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 
 public class FullTextIndexUtil {
     static Logger logger = LoggerFactory.getLogger(FullTextIndexUtil.class);
-    private static final Analyzer smartAnalyzer = new IKAnalyzer(false);//分词细一点
+    private static final Analyzer smartAnalyzer = new IKAnalyzer(true);//分词细一点
     //private static final Analyzer termAnalyzer = new IKAnalyzer(true);//分词粗一点
 
     static {
@@ -135,8 +135,8 @@ public class FullTextIndexUtil {
             if (StringUtils.isNotBlank(keyword)) {
                 try {
                     //需要处理掉.才进行分词，否则想AA.BB.CC这种文本分词器无法识别
-                    String cleanKeyword = keyword.replace(".", " ");
-                    Reader reader = new StringReader(cleanKeyword);
+                    //String cleanKeyword = keyword.replace(".", " ");
+                    Reader reader = new StringReader(keyword);
                     TokenStream stream = smartAnalyzer.tokenStream(null, reader);
                     CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
                     stream.reset();
@@ -185,9 +185,9 @@ public class FullTextIndexUtil {
             content = content.replace("_", "");
             content = content.replace("-", "");
             //需要处理掉.才进行分词，否则想AA.BB.CC这种文本分词器无法识别
-            String cleanContent = content.replace(".", " ");
+            //String cleanContent = content.replace(".", " ");
 
-            Reader smartReader = new StringReader(cleanContent);
+            Reader smartReader = new StringReader(content);
 
             TokenStream smartStream = smartAnalyzer.tokenStream(null, smartReader);
             CharTermAttribute smartTerm = smartStream.addAttribute(CharTermAttribute.class);

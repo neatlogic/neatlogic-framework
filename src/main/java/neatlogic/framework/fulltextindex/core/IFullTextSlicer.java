@@ -26,4 +26,6 @@ public interface IFullTextSlicer {
 
 
     void sliceWord(List<FullTextIndexWordOffsetVo> wordList, String content);
+
+    void sliceKeyword(List<String> wordList, String keyword);
 }

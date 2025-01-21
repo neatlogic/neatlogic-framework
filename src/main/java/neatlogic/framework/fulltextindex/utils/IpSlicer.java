@@ -51,6 +51,28 @@ public class IpSlicer implements IFullTextSlicer {
         return ipParts;
     }
 
+    private static List<String> extractIPString(String keyword) {
+        List<String> ipParts = new ArrayList<>();
+        String ipPattern = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";
+        Pattern pattern = Pattern.compile(ipPattern);
+        Matcher matcher = pattern.matcher(keyword);
+
+        while (matcher.find()) {
+            String ip = matcher.group();
+
+            // 生成各部分IP段
+            String[] segments = ip.split("\\.");
+            String part1 = segments[0] + "." + segments[1];
+            String part2 = segments[0] + "." + segments[1] + "." + segments[2];
+
+            // 添加到结果列表
+            ipParts.add(part1);
+            ipParts.add(part2);
+        }
+
+        return ipParts;
+    }
+
 
     @Override
     public String getType() {
@@ -63,6 +85,18 @@ public class IpSlicer implements IFullTextSlicer {
         List<FullTextIndexWordOffsetVo> ipParts = extractIP(content);
         if (CollectionUtils.isNotEmpty(ipParts)) {
             for (FullTextIndexWordOffsetVo ipPart : ipParts) {
+                if (!wordList.contains(ipPart)) {
+                    wordList.add(ipPart);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void sliceKeyword(List<String> wordList, String keyword) {
+        List<String> ipParts = extractIPString(keyword);
+        if (CollectionUtils.isNotEmpty(ipParts)) {
+            for (String ipPart : ipParts) {
                 if (!wordList.contains(ipPart)) {
                     wordList.add(ipPart);
                 }

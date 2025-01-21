@@ -40,8 +40,8 @@ import java.util.regex.Pattern;
 
 public class FullTextIndexUtil {
     static Logger logger = LoggerFactory.getLogger(FullTextIndexUtil.class);
-    private static final Analyzer smartAnalyzer = new IKAnalyzer(true);//分词细一点
-    private static final Analyzer termAnalyzer = new IKAnalyzer(true);//分词粗一点
+    private static final Analyzer smartAnalyzer = new IKAnalyzer(false);//分词细一点
+    //private static final Analyzer termAnalyzer = new IKAnalyzer(true);//分词粗一点
 
     static {
         //初始化字典，便于后面动态增加词
@@ -140,12 +140,20 @@ public class FullTextIndexUtil {
                     stream.reset();
                     while (stream.incrementToken()) {
                         String w = term.toString();
-                        if (!wordList.contains(w)) {
+                        if (StringUtils.isNotBlank(w) && !wordList.contains(w)) {
                             wordList.add(w);
                         }
                     }
                     stream.end();
                     stream.close();
+
+                    //额外的分词器
+                    List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
+                    if (CollectionUtils.isNotEmpty(slicerList)) {
+                        for (IFullTextSlicer slicer : slicerList) {
+                            slicer.sliceKeyword(wordList, keyword);
+                        }
+                    }
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
                 }
@@ -169,34 +177,22 @@ public class FullTextIndexUtil {
             content = content.replace("-", "");
 
             Reader smartReader = new StringReader(content);
-            //先用智能分词处理一次
-            TokenStream smartStream = smartAnalyzer.tokenStream("", smartReader);
+
+            TokenStream smartStream = smartAnalyzer.tokenStream(null, smartReader);
             CharTermAttribute smartTerm = smartStream.addAttribute(CharTermAttribute.class);
             OffsetAttribute smartOffset = smartStream.addAttribute(OffsetAttribute.class);// 位置数据
             TypeAttribute smartType = smartStream.addAttribute(TypeAttribute.class);
             smartStream.reset();
             while (smartStream.incrementToken()) {
-                wordList.add(new FullTextIndexWordOffsetVo(smartTerm.toString(), smartType.type(), smartOffset.startOffset(), smartOffset.endOffset()));
+                String w = smartTerm.toString();
+                if (StringUtils.isNotBlank(w)) {
+                    wordList.add(new FullTextIndexWordOffsetVo(w, smartType.type(), smartOffset.startOffset(), smartOffset.endOffset()));
+                }
             }
 
             smartStream.end();
             smartStream.close();
 
-            //再用词组分词处理一次
-            Reader termReader = new StringReader(content);
-            TokenStream termStream = termAnalyzer.tokenStream("", termReader);
-            CharTermAttribute termTerm = termStream.addAttribute(CharTermAttribute.class);
-            OffsetAttribute termOffset = termStream.addAttribute(OffsetAttribute.class);// 位置数据
-            TypeAttribute termType = termStream.addAttribute(TypeAttribute.class);
-            termStream.reset();
-            while (termStream.incrementToken()) {
-                FullTextIndexWordOffsetVo wordOffsetVo = new FullTextIndexWordOffsetVo(termTerm.toString(), termType.type(), termOffset.startOffset(), termOffset.endOffset());
-                if (!wordList.contains(wordOffsetVo)) {
-                    wordList.add(wordOffsetVo);
-                }
-            }
-            termStream.end();
-            termStream.close();
 
             //额外的分词器
             List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
@@ -211,11 +207,11 @@ public class FullTextIndexUtil {
 
     public static void main(String[] arg) throws IOException, NoSuchFieldException, IllegalAccessException {
         Dictionary dictionary = Dictionary.getSingleton();
-        dictionary.addWords(new ArrayList<String>() {{
-            this.add("OBS华为云");
-        }});
+        /*dictionary.addWords(new ArrayList<String>() {{
+            this.add("OBS-ABC华为云");
+        }});*/
 
-        String content = "OBS华为云";
+        String content = "192.168.0.10";
         List<FullTextIndexWordOffsetVo> list = sliceWord(content);
         for (FullTextIndexWordOffsetVo vo : list) {
             System.out.println("s:" + vo.getStart() + " e:" + vo.getEnd() + " w:" + vo.getWord() + " t:" + vo.getType());

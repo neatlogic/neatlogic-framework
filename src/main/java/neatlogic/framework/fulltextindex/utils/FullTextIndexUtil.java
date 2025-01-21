@@ -134,14 +134,22 @@ public class FullTextIndexUtil {
             }
             if (StringUtils.isNotBlank(keyword)) {
                 try {
-                    Reader reader = new StringReader(keyword);
+                    //需要处理掉.才进行分词，否则想AA.BB.CC这种文本分词器无法识别
+                    String cleanKeyword = keyword.replace(".", " ");
+                    Reader reader = new StringReader(cleanKeyword);
                     TokenStream stream = smartAnalyzer.tokenStream(null, reader);
                     CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
                     stream.reset();
                     while (stream.incrementToken()) {
                         String w = term.toString();
-                        if (StringUtils.isNotBlank(w) && !wordList.contains(w)) {
-                            wordList.add(w);
+                        if (StringUtils.isNotBlank(w)) {
+                            if (w.length() <= 200) {
+                                if (!wordList.contains(w)) {
+                                    wordList.add(w);
+                                }
+                            } else {
+                                logger.warn("分词结果长度超过200，内容：{}", w);
+                            }
                         }
                     }
                     stream.end();
@@ -162,6 +170,7 @@ public class FullTextIndexUtil {
         return wordList;
     }
 
+
     /**
      * 对原始文本进行分词，用于创建索引
      *
@@ -175,8 +184,10 @@ public class FullTextIndexUtil {
             //碰到-或_，统一去掉，当成一个词处理
             content = content.replace("_", "");
             content = content.replace("-", "");
+            //需要处理掉.才进行分词，否则想AA.BB.CC这种文本分词器无法识别
+            String cleanContent = content.replace(".", " ");
 
-            Reader smartReader = new StringReader(content);
+            Reader smartReader = new StringReader(cleanContent);
 
             TokenStream smartStream = smartAnalyzer.tokenStream(null, smartReader);
             CharTermAttribute smartTerm = smartStream.addAttribute(CharTermAttribute.class);
@@ -210,11 +221,15 @@ public class FullTextIndexUtil {
         /*dictionary.addWords(new ArrayList<String>() {{
             this.add("OBS-ABC华为云");
         }});*/
-
-        String content = "192.168.0.10";
-        List<FullTextIndexWordOffsetVo> list = sliceWord(content);
+        String content = "192.168.0.1";
+        //String content = "AABB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE";
+        /*List<FullTextIndexWordOffsetVo> list = sliceWord(content);
         for (FullTextIndexWordOffsetVo vo : list) {
             System.out.println("s:" + vo.getStart() + " e:" + vo.getEnd() + " w:" + vo.getWord() + " t:" + vo.getType());
+        }*/
+        List<String> list2 = sliceKeyword(content);
+        for (String str : list2) {
+            System.out.println("#" + str);
         }
 
 

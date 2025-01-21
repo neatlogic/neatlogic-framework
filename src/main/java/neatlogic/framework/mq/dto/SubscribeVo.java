@@ -15,14 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.mq.dto;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
-import neatlogic.framework.mq.core.IMqHandler;
-import neatlogic.framework.mq.core.MqHandlerFactory;
-import neatlogic.framework.mq.core.TopicFactory;
+import neatlogic.framework.mq.core.*;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +33,8 @@ public class SubscribeVo extends BasePageVo {
     private String name;
     @EntityField(name = "处理类名", type = ApiParamType.STRING)
     private String className;
+    @EntityField(name = "处理器唯一标识", type = ApiParamType.STRING)
+    private String subscribeHandlerName;
     @EntityField(name = "主题唯一标识", type = ApiParamType.STRING)
     private String topicName;
     @EntityField(name = "主题名称", type = ApiParamType.STRING)
@@ -75,6 +76,20 @@ public class SubscribeVo extends BasePageVo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getSubscribeHandlerName() {
+        if (StringUtils.isNotBlank(className)) {
+            ISubscribeHandler handler = SubscribeHandlerFactory.getHandler(className);
+            if (handler != null) {
+                return handler.getName();
+            }
+        }
+        return subscribeHandlerName;
+    }
+
+    public void setSubscribeHandlerName(String subscribeHandlerName) {
+        this.subscribeHandlerName = subscribeHandlerName;
     }
 
     public Long getId() {
@@ -220,6 +235,13 @@ public class SubscribeVo extends BasePageVo {
     }
 
     public JSONObject getConfig() {
+        if (config == null && StringUtils.isNotBlank(configStr)) {
+            try {
+                config = JSON.parseObject(configStr);
+            } catch (Exception ignored) {
+
+            }
+        }
         return config;
     }
 
@@ -228,6 +250,9 @@ public class SubscribeVo extends BasePageVo {
     }
 
     public String getConfigStr() {
+        if (config != null) {
+            configStr = config.toString();
+        }
         return configStr;
     }
 

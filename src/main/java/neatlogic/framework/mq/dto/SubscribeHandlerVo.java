@@ -18,9 +18,19 @@ package neatlogic.framework.mq.dto;
 public class SubscribeHandlerVo {
     private String name;
     private String className;
+    private String label;
 
-    public SubscribeHandlerVo(String _name, String _className) {
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public SubscribeHandlerVo(String _name, String _label, String _className) {
         name = _name;
+        label = _label;
         className = _className;
     }
 

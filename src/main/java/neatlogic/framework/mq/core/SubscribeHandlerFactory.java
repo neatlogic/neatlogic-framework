@@ -48,7 +48,7 @@ public class SubscribeHandlerFactory extends ModuleInitializedListenerBase imple
         for (Map.Entry<String, ISubscribeHandler> entry : myMap.entrySet()) {
             ISubscribeHandler component = entry.getValue();
             componentMap.put(component.getClassName(), component);
-            subscribeHandlerVoList.add(new SubscribeHandlerVo(component.getName(), component.getClassName()));
+            subscribeHandlerVoList.add(new SubscribeHandlerVo(component.getName(), component.getLabel(), component.getClassName()));
         }
     }
 

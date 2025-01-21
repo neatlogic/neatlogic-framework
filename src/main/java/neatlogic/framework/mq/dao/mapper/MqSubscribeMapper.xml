@@ -125,7 +125,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{description},
                 #{isActive},
                 #{error},
-                #{configStr},
+                #{configStr,typeHandler=CompressHandler},
                 #{serverId},
                 #{handler})
     </insert>
@@ -137,7 +137,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             description = #{description},
             is_active   = #{isActive},
             error       = #{error},
-            config      = #{configStr},
+            config      = #{configStr,typeHandler=CompressHandler},
             server_id   = #{serverId}
         WHERE id = #{id}
     </update>

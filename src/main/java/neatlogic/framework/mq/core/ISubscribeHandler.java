@@ -20,6 +20,7 @@ import neatlogic.framework.mq.dto.SubscribeVo;
 public interface ISubscribeHandler {
     String getName();
 
+    String getLabel();
     //void onMessage(TextMessage m, Session session, String topicName, String subscribeName, String tenantUuid);
 
     //void onMessage(String message, String topicName, String subscribeName, String tenantUuid);

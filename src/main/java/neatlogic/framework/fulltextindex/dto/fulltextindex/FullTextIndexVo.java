@@ -73,12 +73,13 @@ public class FullTextIndexVo {
 
     public List<FullTextIndexContentVo> getContentList() {
         List<FullTextIndexContentVo> contentList = new ArrayList<>();
-        for (String field : fieldContentMap.keySet()) {
+        for (Map.Entry<String, WordVo> entry : fieldContentMap.entrySet()) {
+            String field = entry.getKey();
             FullTextIndexContentVo contentVo = new FullTextIndexContentVo();
             contentVo.setTargetId(this.getTargetId());
             contentVo.setTargetType(this.getTargetType());
             contentVo.setTargetField(field);
-            contentVo.setContent(fieldContentMap.get(field).getContent());
+            contentVo.setContent(entry.getValue().getContent());
             contentList.add(contentVo);
         }
         return contentList;
@@ -87,14 +88,15 @@ public class FullTextIndexVo {
     public List<FullTextIndexWordVo> getWordList() {
         Set<FullTextIndexWordVo> wordList = new HashSet<>();
         if (MapUtils.isNotEmpty(fieldContentMap)) {
-            for (String field : fieldContentMap.keySet()) {
+            for (Map.Entry<String, WordVo> entry : fieldContentMap.entrySet()) {
+                String field = entry.getKey();
                 try {
                     if (!wordOffsetMap.containsKey(field)) {
                         if (fieldContentMap.get(field).getNeedSliceWord()) {
-                            wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
+                            wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(entry.getValue().getContent()));
                         } else {
                             List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
-                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptMD5(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptMD5(entry.getValue().getContent()), "MD5", 0, entry.getValue().getContent().length() - 1));
                             wordOffsetMap.put(field, wordTmpList);
                         }
                     }
@@ -116,14 +118,15 @@ public class FullTextIndexVo {
     public List<FullTextIndexFieldWordVo> getFieldList() {
         Map<String, FullTextIndexFieldWordVo> fieldCountMap = new HashMap<>();
         if (MapUtils.isNotEmpty(fieldContentMap)) {
-            for (String field : fieldContentMap.keySet()) {
+            for (Map.Entry<String, WordVo> entry : fieldContentMap.entrySet()) {
+                String field = entry.getKey();
                 try {
                     if (!wordOffsetMap.containsKey(field)) {
-                        if (fieldContentMap.get(field).getNeedSliceWord()) {
-                            wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(fieldContentMap.get(field).getContent()));
+                        if (entry.getValue().getNeedSliceWord()) {
+                            wordOffsetMap.put(field, FullTextIndexUtil.sliceWord(entry.getValue().getContent()));
                         } else {
                             List<FullTextIndexWordOffsetVo> wordTmpList = new ArrayList<>();
-                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptMD5(fieldContentMap.get(field).getContent()), "MD5", 0, fieldContentMap.get(field).getContent().length() - 1));
+                            wordTmpList.add(new FullTextIndexWordOffsetVo(Md5Util.encryptMD5(entry.getValue().getContent()), "MD5", 0, entry.getValue().getContent().length() - 1));
                             wordOffsetMap.put(field, wordTmpList);
                         }
                     }

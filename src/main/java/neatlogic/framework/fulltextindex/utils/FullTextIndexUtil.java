@@ -34,7 +34,10 @@ import org.wltea.analyzer.lucene.IKAnalyzer;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,8 +56,12 @@ public class FullTextIndexUtil {
     //添加词进字典
     public static void addWord(String... words) {
         if (words != null && words.length > 0) {
-            List<String> wordList = Arrays.asList(words);
-            wordList.removeIf(word -> word == null || StringUtils.isBlank(word));
+            List<String> wordList = new ArrayList<>();
+            for (String word : words) {
+                if(StringUtils.isNotBlank(word)) {
+                    wordList.add(word);
+                }
+            }
             if (CollectionUtils.isNotEmpty(wordList)) {
                 Set<String> newWordList = new HashSet<>();
                 for (String word : wordList) {
@@ -184,7 +191,7 @@ public class FullTextIndexUtil {
             //碰到-或_，统一去掉，当成一个词处理
             content = content.replace("_", "");
             content = content.replace("-", "");
-            //需要处理掉.才进行分词，否则想AA.BB.CC这种文本分词器无法识别
+            //需要处理掉.才进行分词，否则像AA.BB.CC这种文本分词器无法识别
             //String cleanContent = content.replace(".", " ");
 
             Reader smartReader = new StringReader(content);

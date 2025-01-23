@@ -25,8 +25,7 @@ public interface IFullTextIndexHandler {
     /**
      * 初始化专有名词入字典
      */
-    default <T> void initialTerms(T param) {
-    }
+    <T> void initialTerms(T param);
 
 
     /**

@@ -170,6 +170,18 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         }, isSync);
     }
 
+    /**
+     * 初始化专有名词入字典
+     */
+    public final <T> void initialTerms(T param) {
+        AfterTransactionJob<T> job = new AfterTransactionJob<>("FULLTEXTINDEX-INITIAL-TERMS");
+        job.execute(param, this::myInitialTerms);
+    }
+
+    protected <T> void myInitialTerms(T param) {
+
+    }
+
     @Override
     public final void createIndex(Long targetId) {
         createIndex(targetId, false);

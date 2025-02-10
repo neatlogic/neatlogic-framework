@@ -620,7 +620,7 @@ public class Config {
             NEW_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("new.message.expired.day", "7"));
             HISTORY_MESSAGE_EXPIRED_DAY = Integer.parseInt(prop.getProperty("history.message.expired.day", "15"));
             SQLRUNNER_QUERY_TIMEOUT = Integer.parseInt(prop.getProperty("sqlrunner.query.timeout", "30"));
-            ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "false"));
+            ENABLE_GZIP = Boolean.parseBoolean(prop.getProperty("gzip.enable", "true"));
             PUBLIC_API_AUTH_USERNAME = prop.getProperty("public.api.auth.username", "neatlogic");
             PUBLIC_API_AUTH_PASSWORD = prop.getProperty("public.api.auth.password", "x15wDEzSbBL6tV1W");
             RUNNER_CONTEXT = prop.getProperty("runner.context", "/autoexecrunner");

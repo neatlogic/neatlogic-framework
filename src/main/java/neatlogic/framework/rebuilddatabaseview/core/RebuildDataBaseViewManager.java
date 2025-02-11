@@ -19,9 +19,12 @@ import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBas
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.dao.mapper.SchemaMapper;
 import neatlogic.framework.dto.module.ModuleGroupVo;
+import neatlogic.framework.transaction.core.EscapeTransactionJob;
 import org.apache.commons.collections4.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.*;
 
 @RootComponent
@@ -29,6 +32,12 @@ public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
 
     private final static Map<String, List<IRebuildDataBaseView>> moduleGroup2HandlerListMap = new HashMap<>();
 
+    private static SchemaMapper schemaMapper;
+
+    @Resource
+    public void setSchemaMapper(SchemaMapper _schemaMapper) {
+        schemaMapper = _schemaMapper;
+    }
     @Override
     protected void onInitialized(NeatLogicWebApplicationContext context) {
         Map<String, IRebuildDataBaseView> myMap = context.getBeansOfType(IRebuildDataBaseView.class);
@@ -50,7 +59,18 @@ public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
         }
         list.sort(Comparator.comparing(IRebuildDataBaseView::getSort));
         for (IRebuildDataBaseView rebuildDataBaseView : list) {
-            resultList.addAll(rebuildDataBaseView.execute());
+            List<ViewStatusInfo> viewStatusInfoList = rebuildDataBaseView.execute();
+            EscapeTransactionJob.State s = new EscapeTransactionJob(() -> {
+                for (ViewStatusInfo viewStatusInfo : viewStatusInfoList) {
+                    if (Objects.equals(viewStatusInfo.getStatus(), ViewStatusInfo.Status.FAILURE.toString())) {
+                        String tableType = schemaMapper.checkTableOrViewIsExists(TenantContext.get().getDataDbName(), viewStatusInfo.getName());
+                        if (Objects.equals(tableType, "VIEW")) {
+                            schemaMapper.deleteView(TenantContext.get().getDataDbName() + "." + viewStatusInfo.getName());
+                        }
+                    }
+                }
+            }).execute();
+            resultList.addAll(viewStatusInfoList);
         }
         return resultList;
     }

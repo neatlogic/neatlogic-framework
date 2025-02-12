@@ -46,7 +46,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
     private final Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
 
     // 记录服务器启动时间
-    private final static Date START_TIME = new Date();
+    private static final Date START_TIME = new Date();
 
     @Resource
     private ServerMapper serverMapper;

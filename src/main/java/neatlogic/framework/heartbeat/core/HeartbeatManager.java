@@ -118,7 +118,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                 }
             }
         };
-        heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE(), Config.SERVER_HEARTBEAT_RATE(), TimeUnit.MINUTES);
+        runnable.setNeedAwaitAdvance(false);
+        heartbeatService.scheduleAtFixedRate(runnable, Config.SERVER_HEARTBEAT_RATE(), Config.SERVER_HEARTBEAT_RATE(), TimeUnit.SECONDS);
     }
 
     /**

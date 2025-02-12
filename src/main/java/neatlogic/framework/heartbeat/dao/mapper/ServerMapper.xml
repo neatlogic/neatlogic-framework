@@ -56,7 +56,9 @@
 
 	<update id="updateServerHeartbeatTimeByServerId" parameterType="java.lang.Integer">
 		UPDATE `server_status`
-		SET `heartbeat_time` = NOW(3)
+		SET
+			`status` = 'startup',
+		    `heartbeat_time` = NOW(3)
 		WHERE `server_id` = #{value}
 	</update>
 

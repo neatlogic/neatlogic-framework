@@ -37,6 +37,8 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     private static long threadSeqNumber;
     private int priority = 3;//默认优先级是3，数字越低优先级越高
 
+    private boolean needAwaitAdvance = true;// 是否需要等待所有模块加载完成后再任务
+
     @Override
     public int compareTo(NeatLogicThread other) {
         return Integer.compare(this.priority, other.priority); // 优先级高的先出队,priority越小代表优先级越高
@@ -114,8 +116,10 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
             if (StringUtils.isNotBlank(threadName)) {
                 Thread.currentThread().setName(threadName);
             }
-            /* 等待所有模块加载完成后，phaser将会变成1，线程才开始执行 **/
-            ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
+            if (needAwaitAdvance) {
+                /* 等待所有模块加载完成后，phaser将会变成1，线程才开始执行 **/
+                ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
+            }
             execute();
             Thread.currentThread().setName(oldThreadName);
         } catch (ApiRuntimeException ex) {
@@ -173,5 +177,13 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
 
     public void setCountDownLatch(CountDownLatch countDownLatch) {
         this.countDownLatch = countDownLatch;
+    }
+
+    public boolean isNeedAwaitAdvance() {
+        return needAwaitAdvance;
+    }
+
+    public void setNeedAwaitAdvance(boolean needAwaitAdvance) {
+        this.needAwaitAdvance = needAwaitAdvance;
     }
 }

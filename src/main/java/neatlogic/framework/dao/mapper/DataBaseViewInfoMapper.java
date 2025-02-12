@@ -22,4 +22,6 @@ public interface DataBaseViewInfoMapper {
     DataBaseViewInfoVo getDataBaseViewInfoByViewName(String viewName);
 
     int insertDataBaseViewInfo(DataBaseViewInfoVo dataBaseViewInfoVo);
+
+    int deleteDataBaseViewInfo();
 }

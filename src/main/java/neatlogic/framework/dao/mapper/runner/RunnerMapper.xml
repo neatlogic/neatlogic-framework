@@ -714,6 +714,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where rm.id = #{value}
     </select>
 
+    <select id="getRunnerMapByRunnerName" resultType="neatlogic.framework.dto.runner.RunnerMapVo">
+        SELECT p.`id`            AS id,
+               p.`name`          AS name,
+               p.`url`           AS url,
+               p.`access_key`    AS accessKey,
+               p.`access_secret` AS accessSecret,
+               p.`auth_type`     AS authType,
+               p.is_delete       AS isDelete,
+               p.`host`,
+               p.`port`,
+               rm.id             as runnerMapId
+        FROM runner p
+                 left join runner_map rm on p.id = rm.runner_id
+        where p.name = #{value}
+    </select>
+
     <select id="getRunnerListByIdSet" resultType="neatlogic.framework.dto.runner.RunnerVo">
         SELECT `id`,
         `name`,

@@ -46,6 +46,8 @@ public interface RunnerMapper {
 
     RunnerMapVo getRunnerMapByRunnerMapId(Long runnerId);
 
+    RunnerMapVo getRunnerMapByRunnerName(String runnerName);
+
     List<RunnerVo> searchRunner(RunnerVo runnerVo);
 
     List<RunnerVo> getRunnerListByIdSet(@Param("runnerIdSet") Set<Long> runnerIdSet);

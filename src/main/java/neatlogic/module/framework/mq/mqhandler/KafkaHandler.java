@@ -119,7 +119,7 @@ public class KafkaHandler implements IMqHandler {
                         acknowledgment.acknowledge();
                     }
                 } catch (Exception ex) {
-                    logger.error("Error processing Kafka message", ex);
+                    logger.error(ex.getMessage(), ex);
                 }
             });
 

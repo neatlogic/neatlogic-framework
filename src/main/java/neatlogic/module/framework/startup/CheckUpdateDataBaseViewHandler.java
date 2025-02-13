@@ -33,7 +33,7 @@ public class CheckUpdateDataBaseViewHandler extends StartupBase {
 
     @Override
     public int executeForCurrentTenant() {
-        RebuildDataBaseViewManager.execute();
+        RebuildDataBaseViewManager.createViewIfNotExists();
         return 0;
     }
 }

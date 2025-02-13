@@ -27,7 +27,17 @@ public interface IRebuildDataBaseView {
 
     String getDescription();
 
-    List<ViewStatusInfo> execute();
+    /**
+     * 只有视图不存在时才创建视图
+     * @return
+     */
+    List<ViewStatusInfo> createViewIfNotExists();
+
+    /**
+     * 如果视图存在则删除，重新创建视图
+     * @return
+     */
+    List<ViewStatusInfo> createOrReplaceView();
 
     int getSort();
 }

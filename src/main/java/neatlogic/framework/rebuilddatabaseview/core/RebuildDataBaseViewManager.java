@@ -46,8 +46,11 @@ public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
             moduleGroup2HandlerListMap.computeIfAbsent(context.getGroup(), key -> new ArrayList<>()).add(bean);
         }
     }
-
-    public static List<ViewStatusInfo> execute() {
+    /**
+     * 只有视图不存在时才创建视图
+     * @return
+     */
+    public static List<ViewStatusInfo> createViewIfNotExists() {
         List<ViewStatusInfo> resultList = new ArrayList<>();
         List<IRebuildDataBaseView> list = new ArrayList<>();
         List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
@@ -59,7 +62,28 @@ public class RebuildDataBaseViewManager extends ModuleInitializedListenerBase {
         }
         list.sort(Comparator.comparing(IRebuildDataBaseView::getSort));
         for (IRebuildDataBaseView rebuildDataBaseView : list) {
-            List<ViewStatusInfo> viewStatusInfoList = rebuildDataBaseView.execute();
+            resultList.addAll(rebuildDataBaseView.createViewIfNotExists());
+        }
+        return resultList;
+    }
+
+    /**
+     * 如果视图存在则删除，重新创建视图
+     * @return
+     */
+    public static List<ViewStatusInfo> createOrReplaceView() {
+        List<ViewStatusInfo> resultList = new ArrayList<>();
+        List<IRebuildDataBaseView> list = new ArrayList<>();
+        List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
+        for (ModuleGroupVo moduleGroupVo : activeModuleGroupList) {
+            List<IRebuildDataBaseView> handlerList = moduleGroup2HandlerListMap.get(moduleGroupVo.getGroup());
+            if (CollectionUtils.isNotEmpty(handlerList)) {
+                list.addAll(handlerList);
+            }
+        }
+        list.sort(Comparator.comparing(IRebuildDataBaseView::getSort));
+        for (IRebuildDataBaseView rebuildDataBaseView : list) {
+            List<ViewStatusInfo> viewStatusInfoList = rebuildDataBaseView.createOrReplaceView();
             EscapeTransactionJob.State s = new EscapeTransactionJob(() -> {
                 for (ViewStatusInfo viewStatusInfo : viewStatusInfoList) {
                     if (Objects.equals(viewStatusInfo.getStatus(), ViewStatusInfo.Status.FAILURE.toString())) {

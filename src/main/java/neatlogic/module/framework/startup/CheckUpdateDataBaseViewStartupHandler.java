@@ -20,7 +20,7 @@ import neatlogic.framework.startup.StartupBase;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CheckUpdateDataBaseViewHandler extends StartupBase {
+public class CheckUpdateDataBaseViewStartupHandler extends StartupBase {
     @Override
     public String getName() {
         return "nmfs.checkupdatedatabaseviewhandler.getname";
@@ -33,7 +33,7 @@ public class CheckUpdateDataBaseViewHandler extends StartupBase {
 
     @Override
     public int executeForCurrentTenant() {
-        RebuildDataBaseViewManager.execute();
+        RebuildDataBaseViewManager.createViewIfNotExists();
         return 0;
     }
 }

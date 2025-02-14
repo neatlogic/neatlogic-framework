@@ -15,7 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.matrix.rebuilddatabaseview.handler;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.dao.mapper.SchemaMapper;
 import neatlogic.framework.matrix.constvalue.MatrixType;
 import neatlogic.framework.matrix.core.MatrixDataSourceHandlerFactory;
 import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
@@ -31,6 +33,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -38,6 +41,8 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
 
     @Resource
     private MatrixMapper matrixMapper;
+    @Resource
+    private SchemaMapper schemaMapper;
 
     @Override
     public String getDescription() {
@@ -45,40 +50,80 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
     }
 
     @Override
-    public List<ViewStatusInfo> execute() {
+    public List<ViewStatusInfo> createViewIfNotExists() {
         List<ViewStatusInfo> resultList = new ArrayList<>();
         int rowNum = matrixMapper.getMatrixViewCount();
-        if (rowNum == 0) {
-            return resultList;
-        }
-        ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler(MatrixType.VIEW.getValue());
-        BasePageVo searchVo = new BasePageVo();
-        searchVo.setRowNum(rowNum);
-        searchVo.setPageSize(100);
-        int pageCount = searchVo.getPageCount();
-        for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
-            searchVo.setCurrentPage(currentPage);
-            List<MatrixViewVo> matrixViewList = matrixMapper.getMatrixViewList(searchVo);
-            if (CollectionUtils.isEmpty(matrixViewList)) {
-                continue;
-            }
-            List<String> uuidList = matrixViewList.stream().map(MatrixViewVo::getMatrixUuid).collect(Collectors.toList());
-            List<MatrixVo> matrixList = matrixMapper.getMatrixListByUuidList(uuidList);
-            Map<String, String> uuidToNameMap = matrixList.stream().collect(Collectors.toMap(MatrixVo::getUuid, MatrixVo::getName));
-            for (MatrixViewVo matrixViewVo : matrixViewList) {
-                String matrixUuid = matrixViewVo.getMatrixUuid();
-                String matrixName = uuidToNameMap.get(matrixUuid);
-                ViewStatusInfo viewStatusInfo = new ViewStatusInfo();
-                viewStatusInfo.setName("matrix_" + matrixUuid);
-                viewStatusInfo.setLabel(matrixName);
-                try {
-                    viewDataSourceHandler.buildView(matrixUuid, matrixName, matrixViewVo.getXml());
-                    viewStatusInfo.setStatus(ViewStatusInfo.Status.SUCCESS.toString());
-                } catch (Exception e) {
-                    viewStatusInfo.setStatus(ViewStatusInfo.Status.FAILURE.toString());
-                    viewStatusInfo.setError(e.getMessage());
+        if (rowNum > 0) {
+            ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler(MatrixType.VIEW.getValue());
+            BasePageVo searchVo = new BasePageVo();
+            searchVo.setRowNum(rowNum);
+            searchVo.setPageSize(100);
+            int pageCount = searchVo.getPageCount();
+            for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                searchVo.setCurrentPage(currentPage);
+                List<MatrixViewVo> matrixViewList = matrixMapper.getMatrixViewList(searchVo);
+                if (CollectionUtils.isNotEmpty(matrixViewList)) {
+                    List<String> uuidList = matrixViewList.stream().map(MatrixViewVo::getMatrixUuid).collect(Collectors.toList());
+                    List<MatrixVo> matrixList = matrixMapper.getMatrixListByUuidList(uuidList);
+                    Map<String, String> uuidToNameMap = matrixList.stream().collect(Collectors.toMap(MatrixVo::getUuid, MatrixVo::getName));
+                    for (MatrixViewVo matrixViewVo : matrixViewList) {
+                        String matrixUuid = matrixViewVo.getMatrixUuid();
+                        String tableType = schemaMapper.checkTableOrViewIsExists(TenantContext.get().getDataDbName(), "matrix_" + matrixUuid);
+                        if (Objects.equals(tableType, "VIEW")) {
+                            continue;
+                        }
+                        String matrixName = uuidToNameMap.get(matrixUuid);
+                        ViewStatusInfo viewStatusInfo = new ViewStatusInfo();
+                        viewStatusInfo.setName("matrix_" + matrixUuid);
+                        viewStatusInfo.setLabel(matrixName);
+                        try {
+                            viewDataSourceHandler.buildView(matrixUuid, matrixName, matrixViewVo.getXml());
+                            viewStatusInfo.setStatus(ViewStatusInfo.Status.SUCCESS.toString());
+                        } catch (Exception e) {
+                            viewStatusInfo.setStatus(ViewStatusInfo.Status.FAILURE.toString());
+                            viewStatusInfo.setError(e.getMessage());
+                        }
+                        resultList.add(viewStatusInfo);
+                    }
                 }
-                resultList.add(viewStatusInfo);
+            }
+        }
+        return resultList;
+    }
+
+    @Override
+    public List<ViewStatusInfo> createOrReplaceView() {
+        List<ViewStatusInfo> resultList = new ArrayList<>();
+        int rowNum = matrixMapper.getMatrixViewCount();
+        if (rowNum > 0) {
+            ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler(MatrixType.VIEW.getValue());
+            BasePageVo searchVo = new BasePageVo();
+            searchVo.setRowNum(rowNum);
+            searchVo.setPageSize(100);
+            int pageCount = searchVo.getPageCount();
+            for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
+                searchVo.setCurrentPage(currentPage);
+                List<MatrixViewVo> matrixViewList = matrixMapper.getMatrixViewList(searchVo);
+                if (CollectionUtils.isNotEmpty(matrixViewList)) {
+                    List<String> uuidList = matrixViewList.stream().map(MatrixViewVo::getMatrixUuid).collect(Collectors.toList());
+                    List<MatrixVo> matrixList = matrixMapper.getMatrixListByUuidList(uuidList);
+                    Map<String, String> uuidToNameMap = matrixList.stream().collect(Collectors.toMap(MatrixVo::getUuid, MatrixVo::getName));
+                    for (MatrixViewVo matrixViewVo : matrixViewList) {
+                        String matrixUuid = matrixViewVo.getMatrixUuid();
+                        String matrixName = uuidToNameMap.get(matrixUuid);
+                        ViewStatusInfo viewStatusInfo = new ViewStatusInfo();
+                        viewStatusInfo.setName("matrix_" + matrixUuid);
+                        viewStatusInfo.setLabel(matrixName);
+                        try {
+                            viewDataSourceHandler.buildView(matrixUuid, matrixName, matrixViewVo.getXml());
+                            viewStatusInfo.setStatus(ViewStatusInfo.Status.SUCCESS.toString());
+                        } catch (Exception e) {
+                            viewStatusInfo.setStatus(ViewStatusInfo.Status.FAILURE.toString());
+                            viewStatusInfo.setError(e.getMessage());
+                        }
+                        resultList.add(viewStatusInfo);
+                    }
+                }
             }
         }
         return resultList;

@@ -152,14 +152,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             useCache="false">
         select
         COUNT(1)
-        from `api_audit` LEFT JOIN `user`
-        on `api_audit`.`user_uuid` = `user`.`uuid`
+        from `api_audit`
         <where>
             <if test="userUuid != null and userUuid != ''">
-                and `api_audit`.`user_uuid` = #{userUuid}
+                and `user_uuid` = #{userUuid}
             </if>
             <if test="tokenList != null and tokenList.size() > 0">
-                AND `api_audit`.`token` IN
+                AND `token` IN
                 <foreach collection="tokenList" item="token" open="(" separator="," close=")">
                     #{token}
                 </foreach>
@@ -174,14 +173,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 and `ip` LIKE CONCAT('%', #{ip}, '%')
             </if>
         </where>
-        <choose>
-            <when test="orderType == 'desc' or orderType == ''">
-                order by `start_time` desc
-            </when>
-            <otherwise>
-                order by `start_time`
-            </otherwise>
-        </choose>
     </select>
 
     <select id="searchApiAuditForExport" parameterType="neatlogic.framework.restful.dto.ApiAuditVo"

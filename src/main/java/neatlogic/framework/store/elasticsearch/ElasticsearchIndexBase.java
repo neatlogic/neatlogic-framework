@@ -18,7 +18,6 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -168,6 +167,9 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         });
     }
 
+    //排序
+    protected abstract void mySortQuery(SearchRequest.Builder builder);
+
     protected abstract void myRebuildDocument(boolean isAll);
 
 
@@ -254,12 +256,8 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                     .index(this.getIndexName())
                     .query(queryBuilder);
 
-            builder.sort(s -> s
-                    .field(f -> f
-                            .field("alertTime") // 按 alertTime 排序
-                            .order(SortOrder.Desc) // 倒序排列
-                    )
-            );
+            //排序
+            this.mySortQuery(builder);
 
             if (this.needPage(targetVo)) {
                 builder.from(resultVo.getStartNum())

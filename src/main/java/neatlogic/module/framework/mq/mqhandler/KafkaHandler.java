@@ -105,10 +105,7 @@ public class KafkaHandler implements IMqHandler {
                 NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
                 adminClient.createTopics(Collections.singleton(newTopic)).all().get();
             }
-            // KafkaConsumerFactory
             DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
-
-            // Container properties
             ContainerProperties containerProperties = new ContainerProperties(topicName);
             subVo.setTenantUuid(TenantContext.get().getTenantUuid());
             containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
@@ -123,11 +120,9 @@ public class KafkaHandler implements IMqHandler {
                 }
             });
 
-            // Create ConcurrentMessageListenerContainer
             ConcurrentMessageListenerContainer<String, String> container =
                     new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
 
-            // Start container
             containerMap.put(subVo.getId(), container);
 
             try {
@@ -142,8 +137,14 @@ public class KafkaHandler implements IMqHandler {
 
     @Override
     public void reconnect(SubscribeVo subscribeVo) throws SubscribeTopicException, ExecutionException, InterruptedException {
-        this.destroy(subscribeVo);
-        this.create(subscribeVo);
+        MessageListenerContainer container = containerMap.get(subscribeVo.getId());
+        if (container != null) {
+            if (!container.isRunning()) {
+                container.destroy();
+                containerMap.remove(subscribeVo.getId());
+                this.create(subscribeVo);
+            }
+        }
     }
 
     @Override
@@ -156,7 +157,7 @@ public class KafkaHandler implements IMqHandler {
     public void destroy(SubscribeVo subscribeVo) {
         MessageListenerContainer container = containerMap.get(subscribeVo.getId());
         if (container != null) {
-            if (container.isRunning()) {
+            if (!container.isRunning()) {
                 container.stop();
             }
             container.destroy();

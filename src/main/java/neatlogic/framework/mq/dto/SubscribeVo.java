@@ -213,7 +213,7 @@ public class SubscribeVo extends BasePageVo {
     }
 
     public Integer getIsActive() {
-        if (isActive != null && isActive.equals(1)) {
+        if (isActive != null && isActive.equals(1) && StringUtils.isNotBlank(handler)) {
             IMqHandler mqHandler = MqHandlerFactory.getMqHandler(handler);
             if (mqHandler == null || !mqHandler.isEnable()) {
                 return 0;

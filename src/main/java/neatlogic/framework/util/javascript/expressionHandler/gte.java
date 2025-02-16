@@ -43,6 +43,10 @@ public class gte {
                     errorList.add(new ValueIsIrregularException(prefix));
                     return false;
                 }
+                if (d == null) {
+                    errorList.add(new ConditionIsIrregularException(prefix));
+                    return false;
+                }
                 for (int j = 0; j < conditionValueList.size(); j++) {
                     Double c;
                     try {
@@ -51,6 +55,7 @@ public class gte {
                         errorList.add(new ConditionIsIrregularException(prefix));
                         return false;
                     }
+
                     if (d < c) {
                         errorList.add(new ValueIsNotGteException(prefix, d, c));
                         return false;

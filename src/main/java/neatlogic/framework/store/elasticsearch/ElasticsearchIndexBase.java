@@ -167,8 +167,11 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         });
     }
 
-    //排序
+    //创建自定义排序排序
     protected abstract void mySortQuery(SearchRequest.Builder builder);
+
+    //创建自定义查询
+    protected abstract Query myBuildQuery(T targetVo);
 
     protected abstract void myRebuildDocument(boolean isAll);
 
@@ -224,7 +227,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     public final IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize) {
 
         // 构建查询
-        Query queryBuilder = this.buildQuery(targetVo);
+        Query queryBuilder = this.myBuildQuery(targetVo);
 
         // 执行搜索
         ElasticsearchClient client = ElasticsearchClientFactory.getClient();

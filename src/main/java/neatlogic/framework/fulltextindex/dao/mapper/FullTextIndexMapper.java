@@ -31,6 +31,7 @@ public interface FullTextIndexMapper {
 
     void updateTargetError(FullTextIndexTargetVo fullTextIndexTargetVo);
 
+
     void insertIndexField(@Param("fieldVo") FullTextIndexFieldWordVo fieldVo, @Param("moduleId") String moduleId);
 
     void updateIndexField(@Param("fieldVo") FullTextIndexFieldWordVo fieldVo, @Param("moduleId") String moduleId);

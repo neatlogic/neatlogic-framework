@@ -58,7 +58,7 @@ public class FullTextIndexUtil {
         if (words != null && words.length > 0) {
             List<String> wordList = new ArrayList<>();
             for (String word : words) {
-                if(StringUtils.isNotBlank(word)) {
+                if (StringUtils.isNotBlank(word)) {
                     wordList.add(word);
                 }
             }
@@ -163,12 +163,12 @@ public class FullTextIndexUtil {
                     stream.close();
 
                     //额外的分词器
-                    List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
+                    /*List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
                     if (CollectionUtils.isNotEmpty(slicerList)) {
                         for (IFullTextSlicer slicer : slicerList) {
                             slicer.sliceKeyword(wordList, keyword);
                         }
-                    }
+                    }*/
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
                 }
@@ -191,8 +191,6 @@ public class FullTextIndexUtil {
             //碰到-或_，统一去掉，当成一个词处理
             content = content.replace("_", "");
             content = content.replace("-", "");
-            //需要处理掉.才进行分词，否则像AA.BB.CC这种文本分词器无法识别
-            //String cleanContent = content.replace(".", " ");
 
             Reader smartReader = new StringReader(content);
 

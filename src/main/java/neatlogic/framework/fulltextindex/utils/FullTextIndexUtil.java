@@ -162,6 +162,7 @@ public class FullTextIndexUtil {
                     stream.end();
                     stream.close();
 
+                    //搜索时假如输入IP，大概率是需要对IP进行精确匹配，因此不需要再调动额外分词器
                     //额外的分词器
                     /*List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
                     if (CollectionUtils.isNotEmpty(slicerList)) {

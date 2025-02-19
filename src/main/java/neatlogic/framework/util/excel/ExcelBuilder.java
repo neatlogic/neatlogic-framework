@@ -293,10 +293,17 @@ public class ExcelBuilder {
                             Cell cell = row.createCell(j);
                             makeupBody(cell);
                             SheetBuilder.DataCell dataCell = dataMap.get(column);
-                            cell.setCellValue(dataMap.get(column) == null ? null : dataCell.getValue().toString());
-                            //设置跨行跨列
-                            if (dataCell.getColspan() > 0 || dataCell.getRowspan() > 0) {
-                                sheet.addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex() + dataCell.getRowspan(), cell.getColumnIndex(), cell.getColumnIndex() + dataCell.getColspan()));
+                            if (dataCell != null) {
+                                Object value = dataCell.getValue();
+                                if (value != null) {
+                                    cell.setCellValue(value.toString());
+                                } else {
+                                    cell.setCellValue(StringUtils.EMPTY);
+                                }
+                                //设置跨行跨列
+                                if (dataCell.getColspan() > 0 || dataCell.getRowspan() > 0) {
+                                    sheet.addMergedRegion(new CellRangeAddress(cell.getRowIndex(), cell.getRowIndex() + dataCell.getRowspan(), cell.getColumnIndex(), cell.getColumnIndex() + dataCell.getColspan()));
+                                }
                             }
                             j++;
                         }

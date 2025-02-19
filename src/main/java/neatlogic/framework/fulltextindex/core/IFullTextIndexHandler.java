@@ -19,6 +19,10 @@ package neatlogic.framework.fulltextindex.core;
 import neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo;
 
 public interface IFullTextIndexHandler {
+    //是否需要在全文检索中保存内容
+    default boolean needSaveContent() {
+        return false;
+    }
 
     IFullTextIndexType getType();
 

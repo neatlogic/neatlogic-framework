@@ -85,6 +85,10 @@ public class FullTextIndexVo {
         return contentList;
     }
 
+    public int getWordSum() {
+        return getWordList().size();
+    }
+
     public List<FullTextIndexWordVo> getWordList() {
         Set<FullTextIndexWordVo> wordList = new HashSet<>();
         if (MapUtils.isNotEmpty(fieldContentMap)) {

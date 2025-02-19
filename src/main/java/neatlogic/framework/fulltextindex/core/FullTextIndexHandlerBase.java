@@ -120,11 +120,13 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                     }
                 }
 
-                //写入内容表
-                List<FullTextIndexContentVo> contentList = fullTextIndexVo.getContentList();
-                if (CollectionUtils.isNotEmpty(contentList)) {
-                    for (FullTextIndexContentVo contentVo : contentList) {
-                        fullTextIndexMapper.insertContent(contentVo, moduleId);
+                //写入内容表,需要保存原内容需要手动打开开关，默认都是关闭
+                if (this.needSaveContent()) {
+                    List<FullTextIndexContentVo> contentList = fullTextIndexVo.getContentList();
+                    if (CollectionUtils.isNotEmpty(contentList)) {
+                        for (FullTextIndexContentVo contentVo : contentList) {
+                            fullTextIndexMapper.insertContent(contentVo, moduleId);
+                        }
                     }
                 }
 

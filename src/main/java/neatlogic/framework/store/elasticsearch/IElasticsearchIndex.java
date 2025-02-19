@@ -17,7 +17,6 @@
 
 package neatlogic.framework.store.elasticsearch;
 
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 
@@ -77,10 +76,7 @@ public interface IElasticsearchIndex<T> {
      */
     T getDocument(T targetVo);
 
-    /*
-    创建查询
-     */
-    Query buildQuery(T targetVo);
+
 
     /*
     判断是否需要分页

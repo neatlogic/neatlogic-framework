@@ -93,10 +93,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertIndexField">
         INSERT IGNORE INTO `fulltextindex_field_${moduleId}` (`id`,
-                                                       `word_id`,
-                                                       `target_field`,
-                                                       `target_id`,
-                                                       `counter`)
+                                                              `word_id`,
+                                                              `target_field`,
+                                                              `target_id`,
+                                                              `counter`)
         VALUES (#{fieldVo.id},
                 #{fieldVo.wordId},
                 #{fieldVo.targetField},
@@ -125,15 +125,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         ON DUPLICATE KEY UPDATE `content` = #{contentVo.content,typeHandler=CompressHandler}
     </insert>
 
-    <delete id="clearEmptyFullTextField" parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo">
-        DELETE a FROM fulltextindex_target_${moduleId} a WHERE NOT EXISTS (
-            SELECT 1
-            FROM fulltextindex_field_${moduleId} b
-            WHERE b.target_id = a.target_id
-        )
+    <delete id="clearEmptyFullTextField"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo">
+        DELETE a
+        FROM fulltextindex_target_${moduleId} a
+        WHERE NOT EXISTS (SELECT 1
+                          FROM fulltextindex_field_${moduleId} b
+                          WHERE b.target_id = a.target_id)
     </delete>
 
-    <delete id="clearErrorFullTextTarget" parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo">
+    <delete id="clearErrorFullTextTarget"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo">
         DELETE a,b
         FROM fulltextindex_target_${moduleId} a
                  JOIN fulltextindex_field_${moduleId} b ON a.target_id = b.target_id

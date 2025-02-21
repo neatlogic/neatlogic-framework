@@ -23,10 +23,11 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class AfterTransactionJob<T> {
@@ -53,7 +54,18 @@ public class AfterTransactionJob<T> {
      * @param committed 提交时执行主体
      */
     public void execute(T t, ICommitted<T> committed) {
-        execute(t, committed, null, false);
+        execute(t, committed, null, false, null);
+    }
+
+    /**
+     * 异步执行
+     *
+     * @param t         对象
+     * @param committed 提交时执行主体
+     * @param lock      顺序所
+     */
+    public void execute(T t, ICommitted<T> committed, Semaphore lock) {
+        execute(t, committed, null, false, lock);
     }
 
 
@@ -65,7 +77,7 @@ public class AfterTransactionJob<T> {
      * @param completed 完成时执行主体
      */
     public void execute(T t, ICommitted<T> committed, ICompleted<T> completed) {
-        execute(t, committed, completed, false);
+        execute(t, committed, completed, false, null);
     }
 
     /**
@@ -76,7 +88,18 @@ public class AfterTransactionJob<T> {
      * @param isSync   是否同步执行
      */
     public void execute(T t, ICommitted<T> commited, boolean isSync) {
-        execute(t, commited, null, isSync);
+        execute(t, commited, null, isSync, null);
+    }
+
+    /**
+     * 控制异步还是同步执行
+     *
+     * @param t        对象
+     * @param commited 提交时执行
+     * @param isSync   是否同步执行
+     */
+    public void execute(T t, ICommitted<T> commited, boolean isSync, Semaphore lock) {
+        execute(t, commited, null, isSync, lock);
     }
 
     /**
@@ -100,7 +123,7 @@ public class AfterTransactionJob<T> {
         } else {
             Set<NeatLogicThread> tList = T_THREADLOCAL.get();
             if (tList == null) {
-                tList = new HashSet<>();
+                tList = new LinkedHashSet<>();
                 T_THREADLOCAL.set(tList);
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
@@ -140,7 +163,7 @@ public class AfterTransactionJob<T> {
     /**
      * 事务提交或完成后按顺序执行线程任务
      *
-     * @param t 线程任务
+     * @param t     线程任务
      * @param event 事务时间，提交或完成
      */
     public void executeInOrder(NeatLogicThread t, EVENT event) {
@@ -181,7 +204,7 @@ public class AfterTransactionJob<T> {
                                 CachedThreadPool.execute(t, latch);
                                 if (i < tList.size() - 1) {
                                     try {
-                                        boolean flag = latch.await(1, TimeUnit.MINUTES);
+                                        latch.await(1, TimeUnit.MINUTES);
                                     } catch (InterruptedException e) {
                                         logger.error(e.getMessage(), e);
                                     }
@@ -201,7 +224,7 @@ public class AfterTransactionJob<T> {
      * @Params: [参数, 事务提交后回调函数, 事务结束后回调函数（回滚也会触发）]
      * @Returns: void
      **/
-    public synchronized void execute(T t, ICommitted<T> commited, ICompleted<T> completed, boolean isSync) {
+    public synchronized void execute(T t, ICommitted<T> commited, ICompleted<T> completed, boolean isSync, Semaphore lock) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             if (commited != null) {
                 if (!isSync) {
@@ -210,7 +233,7 @@ public class AfterTransactionJob<T> {
                         protected void execute() {
                             commited.execute(t);
                         }
-                    });
+                    }, lock);
                 } else {
                     commited.execute(t);
                 }
@@ -222,7 +245,7 @@ public class AfterTransactionJob<T> {
                         protected void execute() {
                             completed.execute(t);
                         }
-                    });
+                    }, lock);
                 } else {
                     completed.execute(t);
                 }
@@ -230,7 +253,7 @@ public class AfterTransactionJob<T> {
         } else {
             Set<T> tList = THREADLOCAL.get();
             if (tList == null) {
-                tList = new HashSet<>();
+                tList = new LinkedHashSet<>();
                 THREADLOCAL.set(tList);
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
@@ -245,7 +268,7 @@ public class AfterTransactionJob<T> {
                                             commited.execute(t);
                                         }
                                     }
-                                });
+                                }, lock);
                             } else {
                                 for (T t : tList) {
                                     commited.execute(t);
@@ -266,7 +289,7 @@ public class AfterTransactionJob<T> {
                                             completed.execute(t);
                                         }
                                     }
-                                });
+                                }, lock);
                             } else {
                                 for (T t : tList) {
                                     completed.execute(t);

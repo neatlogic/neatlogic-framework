@@ -16,6 +16,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper">
+    <select id="getFullTextIndexRebuildAudit"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">
+        select type,
+               status,
+               handler,
+               start_time as startTime,
+               end_time   as endTime,
+               editor,
+               server_id  as serverId
+        from fulltextindex_rebuild_audit
+        where type = #{type}
+          and handler = #{handler}
+    </select>
+
     <select id="searchFullTextIndexRebuildAudit"
             parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo"
             resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo">

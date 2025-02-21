@@ -20,6 +20,8 @@ import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildA
 import java.util.List;
 
 public interface FullTextIndexRebuildAuditMapper {
+    FullTextIndexRebuildAuditVo getFullTextIndexRebuildAudit(FullTextIndexRebuildAuditVo fullTextIndexRebuildAudit);
+
     List<FullTextIndexRebuildAuditVo> searchFullTextIndexRebuildAudit(FullTextIndexRebuildAuditVo fullTextIndexRebuildAuditVo);
 
     void updateFullTextIndexRebuildAuditStatus(FullTextIndexRebuildAuditVo fullTextIndexRebuildAuditVo);

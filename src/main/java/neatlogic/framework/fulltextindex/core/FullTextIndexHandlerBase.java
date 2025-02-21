@@ -43,6 +43,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler {
@@ -86,6 +87,9 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), moduleId));
     }
 
+    protected final void createIndex(Long targetId, boolean isSync) {
+        createIndex(targetId, isSync, null);
+    }
 
     /**
      * 给重建索引使用的方法，以同步方式执行索引创建
@@ -93,10 +97,11 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
      * @param targetId 目标id
      * @param isSync   是否同步
      */
-    protected final void createIndex(Long targetId, boolean isSync) {
+    protected final void createIndex(Long targetId, boolean isSync, Semaphore lock) {
         AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>("FULLTEXTINDEX-CREATE-" + this.getType().getType().toUpperCase(Locale.ROOT) + "-" + targetId);
         String moduleId = this.getModuleId();
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> {
+            //System.out.println("创建索引");
             //删除索引
             fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo, moduleId);
 
@@ -140,8 +145,8 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                                 fieldVo.setWordId(wordVo.getId());
                                 //由于fulltextindex_field_xxx有复合索引，这里加锁避免出现死锁
                                 String key = fieldVo.getWordId() + "#" + fieldVo.getTargetId() + "#" + fieldVo.getTargetField(); // 唯一锁标识
-                                ReentrantLock lock = lockMap.computeIfAbsent(key, k -> new ReentrantLock());
-                                lock.lock();
+                                ReentrantLock tmpLock = lockMap.computeIfAbsent(key, k -> new ReentrantLock());
+                                tmpLock.lock();
                                 try {
                                     FullTextIndexFieldWordVo oldFieldVo = fullTextIndexMapper.getFulltextIndexField(fieldVo, moduleId);
                                     if (oldFieldVo == null) {
@@ -157,7 +162,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                                         }
                                     }
                                 } finally {
-                                    lock.unlock();
+                                    tmpLock.unlock();
                                     lockMap.remove(key); // 释
                                 }
                             }
@@ -169,7 +174,7 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
                 fullTextIndexTargetVo.setError(ex.getMessage());
                 fullTextIndexMapper.updateTargetError(fullTextIndexTargetVo);
             }
-        }, isSync);
+        }, isSync, lock);
     }
 
     /**
@@ -186,7 +191,13 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     @Override
     public final void createIndex(Long targetId) {
-        createIndex(targetId, false);
+        createIndex(targetId, false, null);
+    }
+
+    @Override
+    public final void createIndex(Long targetId, Semaphore lock) {
+        //System.out.println("重建索引开始");
+        createIndex(targetId, false, lock);
     }
 
     protected abstract void myCreateIndex(FullTextIndexVo fullTextIndexVo);
@@ -282,11 +293,18 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
 
     public final void rebuildIndex(String type, Boolean isRebuildAll) {
         FullTextIndexTypeVo fullTextIndexTypeVo = FullTextIndexHandlerFactory.getTypeByName(type);
+
         FullTextIndexRebuildAuditVo auditVo = new FullTextIndexRebuildAuditVo();
         auditVo.setType(type);
         auditVo.setEditor(UserContext.get().getUserUuid(true));
         auditVo.setStatus(Status.DOING.getValue());
         auditVo.setHandler(FullTextIndexHandlerType.DATABASE.getValue());
+
+        FullTextIndexRebuildAuditVo checkAuditVo = fullTextIndexRebuildAuditMapper.getFullTextIndexRebuildAudit(auditVo);
+        if (checkAuditVo != null && Objects.equals(checkAuditVo.getStatus(), Status.DOING.getValue())) {
+            return;
+        }
+
         fullTextIndexRebuildAuditMapper.insertFullTextIndexRebuildAudit(auditVo);
 
         if (isRebuildAll) {

@@ -96,6 +96,11 @@ public class CachedThreadPool {
         execute(command);
     }
 
+    public static void execute(NeatLogicThread command, Semaphore lock) {
+        command.setLock(lock);
+        execute(command);
+    }
+
     public static void execute(NeatLogicThread command) {
         try {
             boolean isExists = command.isUnique() && StringUtils.isNotBlank(command.getThreadName()) && threadSet.contains(command.getThreadName());

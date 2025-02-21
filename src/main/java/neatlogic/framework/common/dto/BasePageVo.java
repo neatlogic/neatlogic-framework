@@ -53,6 +53,8 @@ public class BasePageVo implements Serializable {
     @JSONField(serialize = false)
     private String keyword;
     @JSONField(serialize = false)
+    private Long keywordId;//尝试将keyword转成id，成功后用来匹配id
+    @JSONField(serialize = false)
     private List<String> keywordList;
     @EntityField(name = "总条数", type = ApiParamType.INTEGER)
     @JSONField(serialize = false)
@@ -83,6 +85,18 @@ public class BasePageVo implements Serializable {
 
     public BasePageVo() {
     }
+
+    public Long getKeywordId() {
+        if (StringUtils.isNotBlank(keyword)) {
+            try {
+                keywordId = Long.parseLong(keyword);
+            } catch (NumberFormatException ignored) {
+
+            }
+        }
+        return keywordId;
+    }
+
 
     public int getMaxPageSize() {
         return maxPageSize;

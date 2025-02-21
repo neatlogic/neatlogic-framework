@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicThread> {
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
@@ -34,9 +35,9 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     private boolean isUnique = false;
     /* For generating thread ID */
     private long id;
-    private static long threadSeqNumber;
     private int priority = 3;//默认优先级是3，数字越低优先级越高
-
+    private Semaphore lock;//用于hold住其他异步线程，控制两个异步线程的先后顺序
+    private CountDownLatch countDownLatch;//用于hold住主线程，这里只需要countdown，不需要等待
     private boolean needAwaitAdvance = true;// 是否需要等待所有模块加载完成后再任务
 
     @Override
@@ -44,6 +45,13 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         return Integer.compare(this.priority, other.priority); // 优先级高的先出队,priority越小代表优先级越高
     }
 
+    public Semaphore getLock() {
+        return lock;
+    }
+
+    public void setLock(Semaphore lock) {
+        this.lock = lock;
+    }
 
     public long getId() {
         return id;
@@ -64,7 +72,7 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         this.priority = priority;
     }
 
-    private CountDownLatch countDownLatch;
+
 
     /*public NeatLogicThread() {
         userContext = UserContext.get();
@@ -120,6 +128,11 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
                 /* 等待所有模块加载完成后，phaser将会变成1，线程才开始执行 **/
                 ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
             }
+            if (this.lock != null) {
+                //System.out.println(this.getThreadName() + "尝试获取锁" + this.lock);
+                lock.acquire();
+                //System.out.println(this.getThreadName() + "成功获取锁" + this.lock);
+            }
             execute();
             Thread.currentThread().setName(oldThreadName);
         } catch (ApiRuntimeException ex) {
@@ -127,6 +140,10 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
+            if (this.lock != null) {
+                lock.release();
+                //System.out.println(this.getThreadName() + "成功释放锁" + this.lock);
+            }
             if (countDownLatch != null) {
                 countDownLatch.countDown();
             }

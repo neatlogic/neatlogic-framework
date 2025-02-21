@@ -18,6 +18,8 @@ package neatlogic.framework.fulltextindex.core;
 
 import neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo;
 
+import java.util.concurrent.Semaphore;
+
 public interface IFullTextIndexHandler {
     //是否需要在全文检索中保存内容
     default boolean needSaveContent() {
@@ -46,6 +48,8 @@ public interface IFullTextIndexHandler {
      * @Returns: void
      **/
     void createIndex(Long targetId);
+
+    void createIndex(Long targetId, Semaphore lock);
 
     /*
      * @Description: 删除索引

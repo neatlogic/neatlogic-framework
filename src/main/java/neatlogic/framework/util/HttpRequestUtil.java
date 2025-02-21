@@ -20,10 +20,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import neatlogic.framework.exception.httprequest.HttpMethodIrregularException;
-import neatlogic.framework.file.core.FileStorageMediumFactory;
-import neatlogic.framework.file.core.IFileStorageHandler;
 import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.integration.authentication.core.AuthenticateHandlerFactory;
 import neatlogic.framework.integration.authentication.core.IAuthenticateHandler;
@@ -187,6 +184,28 @@ public class HttpRequestUtil {
         return input;
     }
 
+    public static class FormDataVo{
+        private String type;
+
+        private Object value;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public Object getValue() {
+            return value;
+        }
+
+        public void setValue(Object value) {
+            this.value = value;
+        }
+    }
+
     static {
         OutputStreamHandlerMap.put(ContentType.CONTENT_TYPE_APPLICATION_JSON, (out, _this) -> {
             if (StringUtils.isNotBlank(_this.payload)) {
@@ -212,46 +231,27 @@ public class HttpRequestUtil {
 
         OutputStreamHandlerMap.put(ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA, (out, _this) -> {
             StringBuilder dataBuilder = new StringBuilder("\r\n");
-            String endBoundary = "\r\n--" + FORM_DATA_BOUNDARY + "--\r\n";
             // strParams 1:key 2:value
             if (MapUtils.isNotEmpty(_this.formData)) {
                 Set<String> keySet = _this.formData.keySet();
                 for (String key : keySet) {
-                    String value = _this.formData.getString(key);
-                    dataBuilder.append("Content-Disposition: form-data; name=").append(key).append("\r\n").append("\r\n").append(value).append("\r\n").append("--").append(FORM_DATA_BOUNDARY).append("\r\n");
+                    String type = StringUtils.EMPTY;
+                    Object value = _this.formData.get(key);
+                    if(value instanceof FormDataVo){
+                        FormDataVo formDataVo = (FormDataVo) value;
+                        value = formDataVo.getValue();
+                        type = formDataVo.type;
+                    }
+                    dataBuilder.append("Content-Disposition: form-data; name=").append(key).append("\r\n");
+                    if(StringUtils.isNotBlank(type)){
+                        dataBuilder.append(type).append("\r\n");
+                    }
+                    dataBuilder.append("\r\n").append("\r\n").append(value).append("\r\n").append("--").append(FORM_DATA_BOUNDARY).append("--");
                 }
             }
             String boundaryMessage = dataBuilder.toString();
 
             out.write(("--" + FORM_DATA_BOUNDARY + boundaryMessage).getBytes(_this.charset));
-
-            dataBuilder = new StringBuilder();
-            if (CollectionUtils.isNotEmpty(_this.fileList)) {
-                for (int i = 0, num = _this.fileList.size(); i < num; i++) {
-                    FileVo fileVo = _this.fileList.get(i);
-                    String prefix = fileVo.getPath().split(":")[0];
-                    IFileStorageHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
-                    if (handler == null) {
-                        throw new FileStorageMediumHandlerNotFoundException(prefix);
-                    }
-                    String fileName = fileVo.getName();
-                    dataBuilder.append("Content-Disposition: form-data; name=").append(fileName).append("; filename=").append(fileName).append("\r\n").append("Content-Type:multipart/form-data ").append("\r\n\r\n");
-
-                    out.write(dataBuilder.toString().getBytes(_this.charset));
-                    // 开始写文件
-                    DataInputStream in = new DataInputStream(handler.getData(fileVo.getPath()));
-                    int bytes;
-                    byte[] bufferOut = new byte[1024 * 5];
-                    while ((bytes = in.read(bufferOut)) != -1) {
-                        out.write(bufferOut, 0, bytes);
-                    }
-                    if (i < num - 1) {
-                        out.write(endBoundary.getBytes(_this.charset));
-                    }
-                    in.close();
-                }
-            }
-            out.write(endBoundary.getBytes(StandardCharsets.UTF_8));
         });
 
         OutputStreamHandlerMap.put(ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM, (out, _this) -> {

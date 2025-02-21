@@ -123,6 +123,7 @@ public class AfterTransactionJob<T> {
         } else {
             Set<NeatLogicThread> tList = T_THREADLOCAL.get();
             if (tList == null) {
+                //需要使用LinkedHashSet保证执行顺序
                 tList = new LinkedHashSet<>();
                 T_THREADLOCAL.set(tList);
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

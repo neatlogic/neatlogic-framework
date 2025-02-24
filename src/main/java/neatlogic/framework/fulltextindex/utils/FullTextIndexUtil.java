@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FullTextIndexUtil {
     static Logger logger = LoggerFactory.getLogger(FullTextIndexUtil.class);
@@ -51,7 +49,7 @@ public class FullTextIndexUtil {
         Dictionary.initial(DefaultConfig.getInstance());
     }
 
-    private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+    //private static final Pattern pattern = Pattern.compile("\"([^\"]+?)\"", Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
 
     //添加词进字典
     public static void addWord(String... words) {
@@ -65,10 +63,10 @@ public class FullTextIndexUtil {
             if (CollectionUtils.isNotEmpty(wordList)) {
                 Set<String> newWordList = new HashSet<>();
                 for (String word : wordList) {
-                    word = word.replace("_", "");
-                    word = word.replace("-", "");
-                    String[] newwords = word.split("\\s+");
-                    for (String w : newwords) {
+                    //word = word.replace("_", "");
+                    //word = word.replace("-", "");
+                    String[] newWords = word.split("\\s+");
+                    for (String w : newWords) {
                         if (StringUtils.isNotBlank(w) && StringUtils.isNotBlank(w.trim())) {
                             if (w.trim().length() <= 200) {
                                 newWordList.add(w.trim());
@@ -89,8 +87,8 @@ public class FullTextIndexUtil {
             if (CollectionUtils.isNotEmpty(wordList)) {
                 Set<String> newWordList = new HashSet<>();
                 for (String word : wordList) {
-                    word = word.replace("_", "");
-                    word = word.replace("-", "");
+                    //word = word.replace("_", "");
+                    //word = word.replace("-", "");
                     String[] words = word.split("\\s+");
                     for (String w : words) {
                         if (StringUtils.isNotBlank(w) && StringUtils.isNotBlank(w.trim())) {
@@ -118,11 +116,11 @@ public class FullTextIndexUtil {
 
         if (StringUtils.isNotBlank(keyword)) {
             //碰到-或_，统一去掉，当成一个词处理
-            keyword = keyword.replace("_", "");
-            keyword = keyword.replace("-", "");
+            //keyword = keyword.replace("_", "");
+            //keyword = keyword.replace("-", "");
 
             //转换所有双引号为半角双引号
-            keyword = keyword.replace("'", "\"");
+            /*keyword = keyword.replace("'", "\"");
             keyword = keyword.replace("“", "\"");
             keyword = keyword.replace("”", "\"");
 
@@ -138,11 +136,9 @@ public class FullTextIndexUtil {
                 }
                 matcher.appendTail(temp);
                 keyword = temp.toString();
-            }
+            }*/
             if (StringUtils.isNotBlank(keyword)) {
                 try {
-                    //需要处理掉.才进行分词，否则想AA.BB.CC这种文本分词器无法识别
-                    //String cleanKeyword = keyword.replace(".", " ");
                     Reader reader = new StringReader(keyword);
                     TokenStream stream = smartAnalyzer.tokenStream(null, reader);
                     CharTermAttribute term = stream.addAttribute(CharTermAttribute.class);
@@ -150,13 +146,13 @@ public class FullTextIndexUtil {
                     while (stream.incrementToken()) {
                         String w = term.toString();
                         if (StringUtils.isNotBlank(w)) {
-                            if (w.length() <= 200) {
-                                if (!wordList.contains(w)) {
-                                    wordList.add(w);
-                                }
-                            } else {
-                                logger.warn("分词结果长度超过200，内容：{}", w);
+                            //if (w.length() <= 200) {
+                            if (!wordList.contains(w)) {
+                                wordList.add(w);
                             }
+                            // } else {
+                            //    logger.warn("分词结果长度超过200，内容：{}", w);
+                            //}
                         }
                     }
                     stream.end();
@@ -190,8 +186,8 @@ public class FullTextIndexUtil {
         List<FullTextIndexWordOffsetVo> wordList = new ArrayList<>();
         if (StringUtils.isNotBlank(content)) {
             //碰到-或_，统一去掉，当成一个词处理
-            content = content.replace("_", "");
-            content = content.replace("-", "");
+            //content = content.replace("_", "");
+            //content = content.replace("-", "");
 
             Reader smartReader = new StringReader(content);
 
@@ -227,15 +223,19 @@ public class FullTextIndexUtil {
         /*dictionary.addWords(new ArrayList<String>() {{
             this.add("OBS-ABC华为云");
         }});*/
-        String content = "192.168.0.1";
+        String content = "hello_world";
         //String content = "AABB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE";
         /*List<FullTextIndexWordOffsetVo> list = sliceWord(content);
         for (FullTextIndexWordOffsetVo vo : list) {
             System.out.println("s:" + vo.getStart() + " e:" + vo.getEnd() + " w:" + vo.getWord() + " t:" + vo.getType());
         }*/
         List<String> list2 = sliceKeyword(content);
-        for (String str : list2) {
+        List<FullTextIndexWordOffsetVo> wordList = sliceWord(content);
+        /*for (String str : list2) {
             System.out.println("#" + str);
+        }*/
+        for (FullTextIndexWordOffsetVo vo : wordList) {
+            System.out.println(vo.getWord());
         }
 
 

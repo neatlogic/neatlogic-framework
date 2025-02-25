@@ -167,6 +167,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             Integer datasourceMinimumIdle = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "20"));
             Integer datasourceValidationTimeout = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "5000"));
             Integer datasourceIdleTimeout = Integer.parseInt(prop.getProperty("datasource.idle.timeout", "600000"));
+            Integer datasourceLeakDetectionThreshold = Integer.parseInt(prop.getProperty("datasource.leakDetectionThreshold", "10000"));
             dbConfigMap.put("datasource.connect.timeout", datasourceConnectTimeout);
             dbConfigMap.put("datasource.maximum.pool.size", datasourceMaximumPoolSize);
             dbConfigMap.put("datasource.keepalive.time", datasourceKeepaliveTime);
@@ -174,6 +175,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
             dbConfigMap.put("datasource.minimum.idle", datasourceMinimumIdle);
             dbConfigMap.put("datasource.validation.timeout", datasourceValidationTimeout);
             dbConfigMap.put("datasource.idle.timeout", datasourceIdleTimeout);
+            dbConfigMap.put("datasource.leakDetectionThreshold", datasourceLeakDetectionThreshold);
 //            dbConfigMap.put("conn.validationQuery", prop.getProperty("conn.validationQuery", "select 1"));
 //            dbConfigMap.put("conn.testOnBorrow", prop.getProperty("conn.testOnBorrow", "true"));
 //            dbConfigMap.put("conn.maxIdle", prop.getProperty("conn.maxIdle", "16"));

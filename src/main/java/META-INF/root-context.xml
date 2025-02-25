@@ -68,6 +68,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <property name="keepaliveTime">
             <value>${datasource.keepalive.time}</value>
         </property>
+        <property name="leakDetectionThreshold">
+            <value>${datasource.leakDetectionThreshold}</value>
+        </property>
     </bean>
 
     <!-- 配置需要在rootComponent前加载 -->

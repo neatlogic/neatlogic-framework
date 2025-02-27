@@ -104,7 +104,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                a.`user_info`      as userInfo,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
-        WHERE a.`user_id` = #{value}
+        WHERE a.`user_id` = #{value} limit 1
     </select>
 
     <select id="getUserByUserUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"

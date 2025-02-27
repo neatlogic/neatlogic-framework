@@ -90,7 +90,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                d.prop_name,
                d.prop_value,
                d.id as prop_id
-        FROM `schedule_job` a LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+        FROM `schedule_job` a
+                 LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
         WHERE `handler` = #{value}
     </select>
 
@@ -294,15 +295,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
           AND `job_group` = #{jobGroup}
     </select>-->
 
-    <select id="getJobLastExecAuditStartTime"  resultType="java.lang.String">
-        SELECT
-            DATE_FORMAT(a.`start_time`,'%Y-%m-%d %H:%i:%s')
-        FROM
-            `schedule_job_audit` a
+    <select id="getJobLastExecAuditStartTime" resultType="java.lang.String">
+        SELECT DATE_FORMAT(a.`start_time`, '%Y-%m-%d %H:%i:%s')
+        FROM `schedule_job_audit` a
         WHERE a.job_uuid = #{jobUuid}
           AND a.`status` = #{status}
         ORDER BY a.end_time DESC
         LIMIT 1
+    </select>
+
+    <select id="getJobData" parameterType="neatlogic.framework.scheduler.dto.JobDataVo"
+            resultType="neatlogic.framework.scheduler.dto.JobDataVo">
+        select job_uuid as jobUuid,
+        data_name as name,
+        data_value as value
+        from schedule_job_data
+        where job_uuid = #{jobUuid}
+        <if test="name != null and name != ''">
+            and data_name = #{name}
+        </if>
     </select>
 
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
@@ -330,7 +341,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             last_finish_time = #{lastFinishTime},
             last_fire_time   = #{lastFireTime},
             exec_count       = #{execCount},
-            `lcd` = NOW()
+            `lcd`            = NOW()
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
     </update>
@@ -338,7 +349,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <update id="updateJobNextFireTime" parameterType="neatlogic.framework.scheduler.dto.JobStatusVo">
         UPDATE schedule_job_status
         SET next_fire_time = #{nextFireTime},
-            `lcd` = NOW()
+            `lcd`          = NOW()
         WHERE job_name = #{jobName}
           and job_group = #{jobGroup}
     </update>
@@ -364,6 +375,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SET `lock`=#{lock}
         WHERE `server_id` = #{serverId}
     </update>
+
+    <insert id="saveJobData" parameterType="neatlogic.framework.scheduler.dto.JobDataVo">
+        insert into schedule_job_data
+            (job_uuid, data_name, data_value)
+        values (#{jobUuid}, #{name}, #{value})
+        ON DUPLICATE KEY UPDATE data_value = #{value}
+    </insert>
 
     <insert id="insertJobAuditDetail">
         INSERT IGNORE

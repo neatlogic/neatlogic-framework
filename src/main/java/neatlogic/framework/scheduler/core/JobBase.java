@@ -31,6 +31,7 @@ import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.scheduler.exception.ScheduleIllegalParameterException;
 import neatlogic.framework.scheduler.exception.ScheduleParamNotExistsException;
 import neatlogic.framework.transaction.util.TransactionUtil;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.quartz.JobDetail;
@@ -107,6 +108,31 @@ public abstract class JobBase implements IJob {
             transactionUtil.commitTx(ts);
         }
         return jobLockVo;
+    }
+
+    protected List<JobDataVo> getJobData(String jobUuid) {
+        JobDataVo jobDataVo = new JobDataVo();
+        jobDataVo.setJobUuid(jobUuid);
+        return schedulerMapper.getJobData(jobDataVo);
+    }
+
+    protected JobDataVo getJobData(String jobUuid, String name) {
+        JobDataVo jobDataVo = new JobDataVo();
+        jobDataVo.setJobUuid(jobUuid);
+        jobDataVo.setName(name);
+        List<JobDataVo> dataList = schedulerMapper.getJobData(jobDataVo);
+        if (CollectionUtils.isNotEmpty(dataList)) {
+            return dataList.get(0);
+        }
+        return null;
+    }
+
+    protected void saveJobData(String jobUuid, String name, String value) {
+        JobDataVo jobDataVo = new JobDataVo();
+        jobDataVo.setJobUuid(jobUuid);
+        jobDataVo.setName(name);
+        jobDataVo.setValue(value);
+        schedulerMapper.saveJobData(jobDataVo);
     }
 
     private void updateJobLockAndStatus(JobLockVo jobLockVo, JobStatusVo jobStatusVo) {

@@ -48,7 +48,10 @@ public interface SchedulerMapper {
 
     List<JobLockVo> getJobLockByServerId(Integer serverId);
 
-    String getJobLastExecAuditStartTime(@Param("jobUuid") String jobUuid , @Param("status") String status);
+    String getJobLastExecAuditStartTime(@Param("jobUuid") String jobUuid, @Param("status") String status);
+
+    List<JobDataVo> getJobData(JobDataVo jobDataVo);
+
 
     int checkJobNameIsExists(JobVo job);
 
@@ -79,6 +82,8 @@ public interface SchedulerMapper {
     int insertJobAudit(JobAuditVo scheduleJobAudit);
 
     int insertJobLock(JobLockVo jobLock);
+
+    void saveJobData(JobDataVo jobDataVo);
 
     int insertJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
 

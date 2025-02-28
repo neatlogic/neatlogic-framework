@@ -362,17 +362,15 @@
         <choose>
             <when test="distinct">
                 MAX(a.`sort`),
-                <foreach collection="columnList" item="column" separator=",">
-                    a.`${column}`
-                </foreach>
             </when>
             <otherwise>
                 a.`uuid`,
-                <foreach collection="columnList" item="column" separator=",">
-                    a.`${column}`
-                </foreach>
+                a.`sort`,
             </otherwise>
         </choose>
+        <foreach collection="columnList" item="column" separator=",">
+            a.`${column}`
+        </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
         <if test="distinct">

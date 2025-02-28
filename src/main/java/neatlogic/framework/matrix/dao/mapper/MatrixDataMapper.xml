@@ -361,27 +361,34 @@
         SELECT
         <choose>
             <when test="distinct">
-                distinct
-                <foreach collection="columnList" item="column" separator=",">
-                    a.`${column}`
-                </foreach>
+                MAX(a.`sort`) AS `maxSort`,
             </when>
             <otherwise>
                 a.`uuid`,
-                <foreach collection="columnList" item="column" separator=",">
-                    a.`${column}`
-                </foreach>
+                a.`sort`,
             </otherwise>
         </choose>
+        <foreach collection="columnList" item="column" separator=",">
+            a.`${column}`
+        </foreach>
         FROM `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` a
         <include refid="searchDynamicTableDataListSql"/>
-        <choose>
-            <when test="distinct">
-            </when>
-            <otherwise>
-                ORDER BY a.`sort` DESC
-            </otherwise>
-        </choose>
+        <if test="distinct">
+        GROUP BY
+            <foreach collection="columnList" item="column" separator=",">
+                a.`${column}`
+            </foreach>
+        </if>
+        <trim prefix="ORDER BY" suffixOverrides=",">
+            <choose>
+                <when test="distinct">
+                    MAX(a.`sort`) DESC
+                </when>
+                <otherwise>
+                    a.`sort` DESC
+                </otherwise>
+            </choose>
+        </trim>
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>

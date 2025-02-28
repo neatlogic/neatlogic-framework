@@ -43,6 +43,7 @@ public class SheetBuilder {
     private Sheet sheet;
     private Workbook workbook;
     private ExcelBuilder excelBuilder;
+    private Integer lastRowNum;
     private final Map<String, String[]> validationMap = new HashMap<>();
     private CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
 
@@ -230,7 +231,9 @@ public class SheetBuilder {
 
     public void addDataCell(Map<String, DataCell> dataMap) {
         if (this.sheet != null && workbook != null && excelBuilder != null) {
-            int lastRowNum = this.sheet.getLastRowNum();
+            if (lastRowNum == null) {
+                lastRowNum = this.sheet.getLastRowNum();
+            }
             lastRowNum++;
             Row row = sheet.createRow(lastRowNum);
             int j = 0;

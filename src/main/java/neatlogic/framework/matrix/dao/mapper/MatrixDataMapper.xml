@@ -361,7 +361,7 @@
         SELECT
         <choose>
             <when test="distinct">
-                MAX(a.`sort`),
+                MAX(a.`sort`) AS `maxSort`,
             </when>
             <otherwise>
                 a.`uuid`,

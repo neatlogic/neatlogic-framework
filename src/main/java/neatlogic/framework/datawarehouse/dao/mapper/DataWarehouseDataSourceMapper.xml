@@ -44,7 +44,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <result column="description" property="description"/>
         <result column="cronExpression" property="cronExpression"/>
         <result column="mode" property="mode"/>
-        <result column="xml" property="xml"/>
+        <result column="xml" property="xml" typeHandler="CompressHandler"/>
         <result column="moduleId" property="moduleId"/>
         <result column="status" property="status"/>
         <result column="expireCount" property="expireCount"/>

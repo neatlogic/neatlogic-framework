@@ -74,7 +74,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         server.setHeartbeatRate(Config.SERVER_HEARTBEAT_RATE());
         server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
         serverMapper.insertServer(server);
-        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
+//        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
             Thread t = new Thread(r);
             t.setDaemon(true);
@@ -111,8 +111,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                         }
                     }
                     serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
-                    serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
-                    insertTenantServerRunTime();
+//                    serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
+//                    insertTenantServerRunTime();
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 }

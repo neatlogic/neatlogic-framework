@@ -89,7 +89,7 @@ public class KafkaHandler implements IMqHandler {
         }
         String topicName = subVo.getTopicName();
         String clientName = subVo.getName();
-        topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
+        //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
         clientName = clientName.toLowerCase();
         String tenantUuid = TenantContext.get().getTenantUuid();
 
@@ -167,7 +167,7 @@ public class KafkaHandler implements IMqHandler {
 
     @Override
     public void send(String topicName, String content) {
-        topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
+        //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
         try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
             ProducerRecord<String, String> record = new ProducerRecord<>(topicName, content);
             producer.send(record);

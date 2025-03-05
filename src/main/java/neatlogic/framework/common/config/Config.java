@@ -139,6 +139,8 @@ public class Config {
 
     private static String CHANGELOG_JDBC_SOCKETTIME;//changelog jdbc 读取数据时间耗时限制
 
+    private static int DATACONVERSION_THREAD_MAXIMUM_SIZE;//数据转换步骤并发数，默认为1
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -486,6 +488,9 @@ public class Config {
         return CHANGELOG_JDBC_SOCKETTIME;
     }
 
+    public static int DATACONVERSION_THREAD_MAXIMUM_SIZE() {
+        return DATACONVERSION_THREAD_MAXIMUM_SIZE;
+    }
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -655,6 +660,8 @@ public class Config {
                 logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 System.exit(1);
             }
+
+            DATACONVERSION_THREAD_MAXIMUM_SIZE = Integer.parseInt(prop.getProperty("dataconversion.thread.maximum.size", "1"));
 
             //处理其他配置
             Reflections reflections = new Reflections("neatlogic");

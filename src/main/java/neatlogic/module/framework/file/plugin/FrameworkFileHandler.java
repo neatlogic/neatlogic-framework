@@ -13,7 +13,7 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package neatlogic.framework.systemnotice.file;
+package neatlogic.module.framework.file.plugin;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.file.core.FileTypeHandlerBase;
@@ -21,7 +21,7 @@ import neatlogic.framework.file.dto.FileVo;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SystemNoticeFileHandler extends FileTypeHandlerBase {
+public class FrameworkFileHandler extends FileTypeHandlerBase {
 
 
     @Override
@@ -47,7 +47,7 @@ public class SystemNoticeFileHandler extends FileTypeHandlerBase {
 
     @Override
     public String getName() {
-        return "SYSTEM_NOTICE";
+        return "FRAMEWORK";
     }
 
 }

@@ -42,7 +42,7 @@ public class NotifyPolicyUtil {
     private static final Logger logger = LoggerFactory.getLogger(NotifyPolicyUtil.class);
 
     /**
-     * @param notifyPolicyVo       通知策略信息
+     * @param notifyPolicyVo     通知策略信息
      * @param paramMappingList   引用通知策略时参数映射
      * @param notifyTriggerType  触发类型
      * @param conditionParamData 条件参数数据
@@ -50,8 +50,6 @@ public class NotifyPolicyUtil {
      * @param fileList           可能存在的文件列表
      * @param notifyAuditMessage 通知审计信息
      * @return void
-     * @Author: linbq
-     * @Time:2020年7月2日
      * @Description: 执行通知策略
      */
     public static void execute(
@@ -100,11 +98,11 @@ public class NotifyPolicyUtil {
         List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
         Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
         for (NotifyTriggerNotifyVo notifyObj : notifyList) {
-            /** 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
+            /* 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
             ConditionConfigVo conditionConfig = notifyObj.getConditionConfig();
             List<ConditionGroupVo> conditionGroupList = conditionConfig.getConditionGroupList();
             if (CollectionUtils.isNotEmpty(conditionGroupList)) {
-                /** 参数映射 **/
+                /* 参数映射 **/
                 if (CollectionUtils.isNotEmpty(paramMappingList)) {
                     for (ParamMappingVo paramMappingVo : paramMappingList) {
                         if ("constant".equals(paramMappingVo.getType())) {
@@ -139,12 +137,12 @@ public class NotifyPolicyUtil {
                 String notifyHandler = actionObj.getNotifyHandler();
                 INotifyHandler handler = NotifyHandlerFactory.getHandler(notifyHandler);
                 if (handler == null) {
-                    logger.error("通知处理器：'" + notifyHandler + "'不存在");
+                    logger.error("通知处理器：'{}'不存在", notifyHandler);
                     continue;
                 }
                 NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
 
-                /** 设置通知模板 **/
+                /* 设置通知模板 **/
                 Long templateId = actionObj.getTemplateId();
                 if (templateId != null) {
                     NotifyTemplateVo notifyTemplateVo = templateMap.get(templateId);
@@ -155,14 +153,14 @@ public class NotifyPolicyUtil {
                 }
                 templateParamData.put("notifyTriggerType", notifyTriggerType.getText());
                 notifyBuilder.addAllData(templateParamData);
-                /** 参数映射 **/
+                /* 参数映射 **/
                 if (CollectionUtils.isNotEmpty(paramMappingList)) {
                     for (ParamMappingVo paramMappingVo : paramMappingList) {
-                        /** 临时增加逻辑 默认参数不能自定义值 **/
+                        /* 临时增加逻辑 默认参数不能自定义值 **/
                         if (templateParamData.containsKey(paramMappingVo.getName())) {
                             continue;
                         }
-                        /** end **/
+                        /* end **/
                         if ("constant".equals(paramMappingVo.getType())) {
                             notifyBuilder.addData(paramMappingVo.getName(), paramMappingVo.getValue());
                         } else if (Objects.equals(paramMappingVo.getName(),
@@ -180,9 +178,9 @@ public class NotifyPolicyUtil {
                         }
                     }
                 }
-                /** 注入结束 **/
+                /* 注入结束 **/
 
-                /** 设置正常接收人 **/
+                /* 设置正常接收人 **/
                 for (String receiver : receiverList) {
                     String[] split = receiver.split("#");
                     if (GroupSearch.USER.getValue().equals(split[0])) {
@@ -228,14 +226,15 @@ public class NotifyPolicyUtil {
 
     /**
      * 通过logback将通知审计输出到notifyAudit.log文件中
-     * @param policyHandlerName 通知策略处理器名
-     * @param notifyPolicyName 通知策略名
-     * @param triggerType 触发点
-     * @param notifyHandlerName 通知类型
+     *
+     * @param policyHandlerName  通知策略处理器名
+     * @param notifyPolicyName   通知策略名
+     * @param triggerType        触发点
+     * @param notifyHandlerName  通知类型
      * @param isSentSuccessfully 是否发送成功
-     * @param title 邮件标题
+     * @param title              邮件标题
      * @param notifyAuditMessage 通知审计信息
-     * @param notifyVo 通知信息
+     * @param notifyVo           通知信息
      */
     private static void audit(
             String policyHandlerName,

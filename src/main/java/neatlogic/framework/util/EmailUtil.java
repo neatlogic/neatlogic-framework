@@ -189,8 +189,10 @@ public class EmailUtil {
             Properties props = new Properties();
             props.setProperty("mail.smtp.host", mailServerVo.getHost());
             props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
-            props.put("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
-            props.put("mail.smtp.auth", "true");
+            props.setProperty("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
+            props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
+            props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.setProperty("mail.smtp.auth", "true");
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {

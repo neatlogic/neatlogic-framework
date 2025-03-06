@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.ConditionParamContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.constvalue.GroupSearch;
@@ -25,21 +26,51 @@ import neatlogic.framework.dto.condition.ConditionGroupVo;
 import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.message.core.IMessageHandler;
 import neatlogic.framework.notify.core.*;
+import neatlogic.framework.notify.dao.mapper.NotifyMapper;
 import neatlogic.framework.notify.dto.*;
 import neatlogic.framework.notify.exception.NotifyPolicyNotFoundException;
+import neatlogic.framework.transaction.core.AfterTransactionJob;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Component
 public class NotifyPolicyUtil {
+    private static NotifyMapper notifyMapper;
+
+    @Autowired
+    public void setNotifyMapper(NotifyMapper _notifyMapper) {
+        notifyMapper = _notifyMapper;
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(NotifyPolicyUtil.class);
+
+    public static void executeAsync(Class<? extends INotifyPolicyHandler> handler, INotifyTriggerType notifyTriggerType, Object callerData) {
+        AfterTransactionJob<Object> job = new AfterTransactionJob<>("NOTIFY-TRIGGER-THREAD");
+        job.execute(new NeatLogicThread("NOTIFY-THREAD") {
+            @Override
+            protected void execute() {
+                NotifyPolicyVo policyVo = notifyMapper.getDefaultNotifyPolicyByHandler(handler.getName());
+                if (policyVo != null) {
+                    try {
+                        NotifyPolicyUtil.execute(handler.getSimpleName(), notifyTriggerType, null
+                                , policyVo, null, null, null
+                                , callerData, null, null);
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        });
+    }
 
     /**
      * @param notifyPolicyVo     通知策略信息
@@ -64,6 +95,7 @@ public class NotifyPolicyUtil {
             List<FileVo> fileList,
             String notifyAuditMessage
     ) throws Exception {
+
         NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
         if (policyConfig == null) {
             return;
@@ -92,11 +124,17 @@ public class NotifyPolicyUtil {
         }
         List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
         List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
-        /* 注入流程作业信息 不够将来再补充 **/
-        JSONObject templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData, notifyTriggerType);
-        /* 模板列表 **/
+        JSONObject templateParamData;
+        if (policyHandler.needConvertData()) {
+            //新方式，用一个实现类处理完所需数据
+            templateParamData = policyHandler.convertData(callerData, notifyTriggerType);
+        } else {
+            /* 注入流程作业信息 不够将来再补充 **/
+            templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData, notifyTriggerType);
+            /* 模板列表 **/
+        }
         List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
-        Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
+        Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(NotifyTemplateVo::getId, e -> e));
         for (NotifyTriggerNotifyVo notifyObj : notifyList) {
             /* 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
             ConditionConfigVo conditionConfig = notifyObj.getConditionConfig();
@@ -189,7 +227,7 @@ public class NotifyPolicyUtil {
                         notifyBuilder.addTeamUuid(split[1]);
                     } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
                         notifyBuilder.addRoleUuid(split[1]);
-                    } else {
+                    } else if (MapUtils.isNotEmpty(receiverMap)) {
                         List<NotifyReceiverVo> notifyReceiverList = receiverMap.get(split[1]);
                         if (CollectionUtils.isNotEmpty(notifyReceiverList)) {
                             for (NotifyReceiverVo notifyReceiverVo : notifyReceiverList) {
@@ -204,7 +242,7 @@ public class NotifyPolicyUtil {
                                 }
                             }
                         } else {
-                            logger.debug("触发点：”" + notifyTriggerType + "“的接收对象：“" + receiver + "”找不到对应的用户、组、角色等数据");
+                            logger.debug("触发点：”{}“的接收对象：“{}”找不到对应的用户、组、角色等数据", notifyTriggerType, receiver);
                         }
                     }
                 }
@@ -274,21 +312,21 @@ public class NotifyPolicyUtil {
         stringBuilder.append("\n");
 
         if (CollectionUtils.isNotEmpty(notifyVo.getToUserUuidList())) {
-            stringBuilder.append("用户：" + String.join(",", notifyVo.getToUserUuidList()));
+            stringBuilder.append("用户：").append(String.join(",", notifyVo.getToUserUuidList()));
             stringBuilder.append("\n");
         }
         if (CollectionUtils.isNotEmpty(notifyVo.getToTeamUuidList())) {
-            stringBuilder.append("用户组：" + String.join(",", notifyVo.getToTeamUuidList()));
+            stringBuilder.append("用户组：").append(String.join(",", notifyVo.getToTeamUuidList()));
             stringBuilder.append("\n");
         }
         if (CollectionUtils.isNotEmpty(notifyVo.getToRoleUuidList())) {
-            stringBuilder.append("角色：" + String.join(",", notifyVo.getToRoleUuidList()));
+            stringBuilder.append("角色：").append(String.join(",", notifyVo.getToRoleUuidList()));
             stringBuilder.append("\n");
         }
 
         List<String> actualRecipientList = notifyVo.getActualRecipientList();
         if (CollectionUtils.isNotEmpty(actualRecipientList)) {
-            stringBuilder.append("实际接收对象：" + String.join(",", notifyVo.getActualRecipientList()));
+            stringBuilder.append("实际接收对象：").append(String.join(",", notifyVo.getActualRecipientList()));
             stringBuilder.append("\n");
         }
         String error = notifyVo.getError();

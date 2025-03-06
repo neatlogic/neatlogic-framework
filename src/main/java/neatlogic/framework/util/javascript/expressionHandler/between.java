@@ -26,7 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -190,44 +191,39 @@ public class between {
         return false;
     }
 
-    private static boolean isDate(String value) {
+
+    private static boolean isValid(String value, String[] patterns) {
         if (StringUtils.isNotBlank(value)) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-                sdf.format(value);
-                return true;
-            } catch (Exception ex) {
-                return false;
+            for (String pattern : patterns) {
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                    LocalDate.parse(value, formatter);
+                    return true;
+                } catch (Exception ex) {
+                }
             }
+
         }
         return false;
+    }
+
+    private static boolean isDate(String value) {
+        String[] patterns = {"yyyy-MM-dd", "yyyy-M-dd", "yyyy-M-d", "yyyy-MM-d"};
+        return isValid(value, patterns);
     }
 
 
     private static boolean isTime(String value) {
-        if (StringUtils.isNotBlank(value)) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            try {
-                sdf.format(value);
-                return true;
-            } catch (Exception ex) {
-                return false;
-            }
-        }
-        return false;
+        String[] patterns = {"HH:mm:ss", "HH:mm", "HH", "mm:ss"};
+        return isValid(value, patterns);
     }
 
     private static boolean isDateTime(String value) {
-        if (StringUtils.isNotBlank(value)) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            try {
-                sdf.format(value);
-                return true;
-            } catch (Exception ex) {
-                return false;
-            }
-        }
-        return false;
+        String[] patterns = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH",
+                "yyyy-M-dd HH:mm:ss", "yyyy-M-dd HH:mm", "yyyy-M-dd HH",
+                "yyyy-M-d HH:mm:ss", "yyyy-M-d HH:mm", "yyyy-M-d HH",
+                "yyyy-MM-d HH:mm:ss", "yyyy-MM-d HH:mm", "yyyy-MM-d HH"};
+        return isValid(value, patterns);
     }
 
 }

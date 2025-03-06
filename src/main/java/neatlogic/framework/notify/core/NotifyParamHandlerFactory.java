@@ -34,7 +34,7 @@ import java.util.Map;
 @RootComponent
 public class NotifyParamHandlerFactory extends ModuleInitializedListenerBase {
 
-    private Logger logger = LoggerFactory.getLogger(NotifyParamHandlerFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(NotifyParamHandlerFactory.class);
     private static final Map<String, INotifyParamHandler> map = new HashMap<>();
 
     public static INotifyParamHandler getHandler(String handler) {
@@ -61,7 +61,7 @@ public class NotifyParamHandlerFactory extends ModuleInitializedListenerBase {
             String value = paramHandler.getValue();
             if (StringUtils.isNotEmpty(value)) {
                 if (map.containsKey(value)) {
-                    logger.error("INotifyParamHandler '" + paramHandler.getClass().getSimpleName()+ "(" + value + ")' repeat");
+                    logger.error("INotifyParamHandler '{}({})' repeat", paramHandler.getClass().getSimpleName(), value);
                     System.exit(1);
                 }
                 map.put(value, paramHandler);

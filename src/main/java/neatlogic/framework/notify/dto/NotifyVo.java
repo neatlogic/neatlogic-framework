@@ -17,11 +17,11 @@ public class NotifyVo {
     /**
      * 触发点
      */
-    private INotifyTriggerType triggerType;
+    private final INotifyTriggerType triggerType;
     /**
      * 通知策略处理器
      */
-    private String notifyPolicyHandler;
+    private final String notifyPolicyHandler;
     /**
      * 邮件标题
      */
@@ -29,7 +29,7 @@ public class NotifyVo {
     /**
      * 邮件标题模板
      */
-    private String templateTitle;
+    private final String templateTitle;
     /**
      * 邮件内容
      */
@@ -37,11 +37,11 @@ public class NotifyVo {
     /**
      * 邮件内容模板
      */
-    private String templateContent;
+    private final String templateContent;
     /**
      * 附件列表
      */
-    private List<FileVo> fileList;
+    private final List<FileVo> fileList;
     /**
      * 发送者
      */
@@ -53,7 +53,7 @@ public class NotifyVo {
     /**
      * 用于FreeMarker替换的变量数据
      */
-    private JSONObject data;
+    private final JSONObject data;
     /**
      * 消息处理器和接收者信息
      */
@@ -247,11 +247,11 @@ public class NotifyVo {
         // 可选参数
         private String templateContent;
         private String templateTitle;
-        private JSONObject data = new JSONObject();
-        private List<FileVo> fileList = new ArrayList<>();
-        private List<String> toUserUuidList = new ArrayList<>();
-        private List<String> toTeamUuidList = new ArrayList<>();
-        private List<String> toRoleUuidList = new ArrayList<>();
+        private final JSONObject data = new JSONObject();
+        private final List<FileVo> fileList = new ArrayList<>();
+        private final List<String> toUserUuidList = new ArrayList<>();
+        private final List<String> toTeamUuidList = new ArrayList<>();
+        private final List<String> toRoleUuidList = new ArrayList<>();
 
         private INotifyTriggerType triggerType;
         private Class<? extends IMessageHandler> messageHandlerClass;
@@ -340,10 +340,10 @@ public class NotifyVo {
 
     public static class MessageHandlerAndRecipientVo {
 
-        private Class<? extends IMessageHandler> messageHandlerClass;
-        private List<String> toUserUuidList;
-        private List<String> toTeamUuidList;
-        private List<String> toRoleUuidList;
+        private final Class<? extends IMessageHandler> messageHandlerClass;
+        private final List<String> toUserUuidList;
+        private final List<String> toTeamUuidList;
+        private final List<String> toRoleUuidList;
 
         public MessageHandlerAndRecipientVo(Builder builder) {
             this.messageHandlerClass = builder.messageHandlerClass;

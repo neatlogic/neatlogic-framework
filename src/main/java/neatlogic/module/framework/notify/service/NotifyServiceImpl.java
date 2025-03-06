@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.notify.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.module.ModuleGroupVo;
@@ -115,7 +116,7 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
         if (MapUtils.isEmpty(notifyPolicyConfig)) {
             return null;
         }
-        InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo = JSONObject.toJavaObject(notifyPolicyConfig, InvokeNotifyPolicyConfigVo.class);
+        InvokeNotifyPolicyConfigVo invokeNotifyPolicyConfigVo = JSON.toJavaObject(notifyPolicyConfig, InvokeNotifyPolicyConfigVo.class);
         return regulateNotifyPolicyConfig(invokeNotifyPolicyConfigVo);
     }
 

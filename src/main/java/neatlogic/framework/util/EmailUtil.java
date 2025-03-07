@@ -260,7 +260,7 @@ public class EmailUtil {
                 logger.info("邮件标题：{}", title);
                 logger.info("发送日期：{}", new Date());
                 logger.info("邮件内容：{}", content);
-                logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat));
+//                logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat));
                 Transport.send(msg);
                 logger.info("邮件发送成功");
             } catch (Exception ex) {

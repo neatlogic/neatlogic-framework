@@ -140,15 +140,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <bean id="JsonWebTokenValidFilter" class="neatlogic.framework.filter.JsonWebTokenValidFilter"></bean>
 
-    <!--mongoDb-->
-    <bean id="mongoDbFactory" class="neatlogic.framework.store.mongodb.NeatLogicMongoDbFactory">
-        <constructor-arg name="connectionString" value="${mongo.url}"/>
-    </bean>
-
-    <bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
-        <constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
-    </bean>
-
     <!--ActiveMQ Artemis-->
     <bean id="jmsConnectionFactory" class="org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory">
         <property name="brokerURL">

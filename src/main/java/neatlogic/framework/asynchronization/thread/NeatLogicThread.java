@@ -30,6 +30,7 @@ import java.util.concurrent.Semaphore;
 public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicThread> {
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
     protected UserContext userContext;
+    protected MongodbSessionContext mongodbSessionContext;
     private String tenantUuid;
     private List<ModuleVo> activeModuleList;
     protected InputFromContext inputFromContext;
@@ -97,6 +98,7 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
+        mongodbSessionContext = MongodbSessionContext.get();
         this.threadName = _threadName;
     }
 
@@ -106,6 +108,7 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
+        mongodbSessionContext = MongodbSessionContext.get();
         this.threadName = _threadName;
         this.priority = priority;
     }
@@ -116,6 +119,7 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
+        mongodbSessionContext = MongodbSessionContext.get();
         this.threadName = _threadName;
         this.isUnique = _isUnique;
     }

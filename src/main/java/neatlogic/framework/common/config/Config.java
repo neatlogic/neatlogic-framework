@@ -75,11 +75,6 @@ public class Config {
     private static int LOGIN_CAPTCHA_EXPIRED_TIME; //验证码超时时间(秒)
     private static int LOGIN_FAILED_TIMES_CAPTCHA; //设置需要验证码的登录错误次数
 
-    private static String MONGO_HOST;
-    private static String MONGO_PASSWORD;
-    private static String MONGO_USERNAME;
-    private static String MONGO_DATABASE;
-
     private static String JMS_URL;
 
     private static String KAFKA_URL;
@@ -267,22 +262,6 @@ public class Config {
 
     public static Integer DATASOURCE_IDLE_TIMEOUT() {
         return DATASOURCE_IDLE_TIMEOUT;
-    }
-
-    public static String MONGO_HOST() {
-        return MONGO_HOST;
-    }
-
-    public static String MONGO_PASSWORD() {
-        return MONGO_PASSWORD;
-    }
-
-    public static String MONGO_DATABASE() {
-        return MONGO_DATABASE;
-    }
-
-    public static String MONGO_USERNAME() {
-        return MONGO_USERNAME;
     }
 
     public static String JMS_URL() {
@@ -605,10 +584,6 @@ public class Config {
             DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
-            MONGO_HOST = prop.getProperty("mongo.host", "localhost:27017");
-            MONGO_USERNAME = prop.getProperty("mongo.username", "root");
-            MONGO_PASSWORD = prop.getProperty("mongo.password", "root");
-            MONGO_DATABASE = prop.getProperty("mongo.database", "neatlogic");
 
             JMS_URL = prop.getProperty("jms.url"/*, "tcp://localhost:61616"*/);
             KAFKA_URL = prop.getProperty("kafka.url"/*, "localhost:9092"*/);

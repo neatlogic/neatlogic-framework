@@ -224,6 +224,30 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }*/
 
     @Override
+    public final long searchDocumentCount(T targetVo) {
+        // 构建查询
+        Query queryBuilder = this.myBuildQuery(targetVo);
+
+        // 执行搜索
+        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+
+        // 创建搜索请求总数
+        SearchRequest requestCount = new SearchRequest.Builder()
+                .index(this.getIndexName())
+                .query(queryBuilder) // 搜索条件
+                .size(0)      // 设置 size 为 0，仅获取总量
+                .build();
+
+        try {
+            SearchResponse<Object> responseCount = client.search(requestCount, Object.class);
+            return responseCount.hits().total().value();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return 0;
+        }
+    }
+
+    @Override
     public final IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize) {
 
         // 构建查询
@@ -266,7 +290,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                 builder.from(resultVo.getStartNum())
                         .size(resultVo.getPageSize());
             } else {
-                builder.size(99);
+                builder.size(100);
             }
 
             SearchRequest request = builder.build();

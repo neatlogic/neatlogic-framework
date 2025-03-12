@@ -90,8 +90,10 @@ public interface IElasticsearchIndex<T> {
      */
     void rebuildDocument(boolean isAll);
 
+    long searchDocumentCount(T targetVo);
+
     /*
-    搜索文档
-     */
+        搜索文档
+         */
     IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize);
 }

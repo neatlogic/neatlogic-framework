@@ -138,7 +138,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             is_active   = #{isActive},
             error       = #{error},
             config      = #{configStr,typeHandler=CompressHandler},
-            server_id   = #{serverId}
+            server_id   = #{serverId},
+            topic_name  = #{topicName},
+            name        = #{name}
         WHERE id = #{id}
     </update>
 

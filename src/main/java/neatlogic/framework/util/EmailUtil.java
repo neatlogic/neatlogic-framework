@@ -82,8 +82,10 @@ public class EmailUtil {
             Properties props = new Properties();
             props.setProperty("mail.smtp.host", mailServerVo.getHost());
             props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
-            props.put("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
-            props.put("mail.smtp.auth", "true");
+            props.setProperty("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
+            //props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
+            //props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.setProperty("mail.smtp.auth", "true");
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
@@ -153,16 +155,18 @@ public class EmailUtil {
             msg.setContent(multipart);
             /* 发送邮件 */
             try {
-                logger.info("邮件会话属性：{}", JSON.toJSONString(props));
-                logger.info("邮件服务器身份验证账号：{}", mailServerVo.getUserName());
-                logger.info("邮件服务器身份验证密码：{}", mailServerVo.getPassword());
-                logger.info("发送方名称：{}", mailServerVo.getName());
-                logger.info("发送方地址：{}", mailServerVo.getUserName());
-                logger.info("接收方地址：{}", to);
-                logger.info("邮件标题：{}", title);
-                logger.info("发送日期：{}", new Date());
-                logger.info("邮件内容：{}", content);
-                logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat));
+                if (logger.isInfoEnabled()) {
+                    logger.info("邮件会话属性：{}", JSON.toJSONString(props));
+                    logger.info("邮件服务器身份验证账号：{}", mailServerVo.getUserName());
+                    logger.info("邮件服务器身份验证密码：{}", mailServerVo.getPassword());
+                    logger.info("发送方名称：{}", mailServerVo.getName());
+                    logger.info("发送方地址：{}", mailServerVo.getUserName());
+                    logger.info("接收方地址：{}", to);
+                    logger.info("邮件标题：{}", title);
+                    logger.info("发送日期：{}", new Date());
+                    logger.info("邮件内容：{}", content);
+                    logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat, SerializerFeature.IgnoreErrorGetter));
+                }
                 Transport.send(msg);
                 logger.info("邮件发送成功");
             } catch (Exception ex) {
@@ -190,8 +194,8 @@ public class EmailUtil {
             props.setProperty("mail.smtp.host", mailServerVo.getHost());
             props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
             props.setProperty("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
-            props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
-            props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            //props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
+            //props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             props.setProperty("mail.smtp.auth", "true");
             Session session = Session.getInstance(props, new Authenticator() {
                 @Override
@@ -251,15 +255,17 @@ public class EmailUtil {
             msg.setContent(multipart);
             /* 发送邮件 */
             try {
-                logger.info("邮件会话属性：{}", JSON.toJSONString(props));
-                logger.info("邮件服务器身份验证账号：{}", mailServerVo.getUserName());
-                logger.info("邮件服务器身份验证密码：{}", mailServerVo.getPassword());
-                logger.info("发送方名称：{}", mailServerVo.getName());
-                logger.info("发送方地址：{}", mailServerVo.getUserName());
-                logger.info("接收方地址：{}", to);
-                logger.info("邮件标题：{}", title);
-                logger.info("发送日期：{}", new Date());
-                logger.info("邮件内容：{}", content);
+                if (logger.isInfoEnabled()) {
+                    logger.info("邮件会话属性：{}", JSON.toJSONString(props));
+                    logger.info("邮件服务器身份验证账号：{}", mailServerVo.getUserName());
+                    logger.info("邮件服务器身份验证密码：{}", mailServerVo.getPassword());
+                    logger.info("发送方名称：{}", mailServerVo.getName());
+                    logger.info("发送方地址：{}", mailServerVo.getUserName());
+                    logger.info("接收方地址：{}", to);
+                    logger.info("邮件标题：{}", title);
+                    logger.info("发送日期：{}", new Date());
+                    logger.info("邮件内容：{}", content);
+                }
 //                logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat));
                 Transport.send(msg);
                 logger.info("邮件发送成功");

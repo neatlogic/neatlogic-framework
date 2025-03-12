@@ -43,6 +43,9 @@ public class ThreadlocalClearListener implements ServletRequestListener {
         if (LicensePolicyContext.get() != null) {
             LicensePolicyContext.get().release();
         }
+        if (MongodbSessionContext.get() != null) {
+            MongodbSessionContext.get().release();
+        }
         CacheContext.release();
     }
 

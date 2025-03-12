@@ -15,12 +15,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.store.mongodb;
 
+import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dao.mapper.MongoDbMapper;
 import neatlogic.framework.dto.MongoDbVo;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -47,7 +49,17 @@ public class MongoDbManager {
     }
 
     public static void addDynamicDataSource(MongoDbVo mongoDbVo) {
-        MongoClient client = MongoClients.create("mongodb://" + mongoDbVo.getUsername() + ":" + mongoDbVo.getPasswordPlain() + "@" + mongoDbVo.getHost() + "/" + mongoDbVo.getDatabase() + (StringUtils.isNotBlank(mongoDbVo.getOption()) ? "?" + mongoDbVo.getOption() : ""));
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(new ConnectionString("mongodb://"
+                        + mongoDbVo.getUsername() + ":"
+                        + mongoDbVo.getPasswordPlain() + "@"
+                        + mongoDbVo.getHost() + "/"
+                        + mongoDbVo.getDatabase() + "?"
+                        + mongoDbVo.getOption()))
+                .writeConcern(WriteConcern.MAJORITY)  // 添加这一行
+                .build();
+        MongoClient client = MongoClients.create(settings);
+
         mongoDbMap.put(mongoDbVo.getTenantUuid(), client);
         mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
     }

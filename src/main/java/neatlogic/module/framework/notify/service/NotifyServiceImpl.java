@@ -77,11 +77,12 @@ public class NotifyServiceImpl implements NotifyService, INotifyServiceCrossover
             if (invokeNotifyPolicyConfigVo.getPolicyId() != null) {
                 notifyPolicyVo = notifyMapper.getNotifyPolicyById(invokeNotifyPolicyConfigVo.getPolicyId());
             }
-        } else {
-            if (invokeNotifyPolicyConfigVo.getHandler() != null) {
-                notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(invokeNotifyPolicyConfigVo.getHandler());
-            }
         }
+//        else {
+//            if (invokeNotifyPolicyConfigVo.getHandler() != null) {
+//                notifyPolicyVo = notifyMapper.getDefaultNotifyPolicyByHandler(invokeNotifyPolicyConfigVo.getHandler());
+//            }
+//        }
         if (notifyPolicyVo == null) {
             invokeNotifyPolicyConfigVo.setPolicyId(null);
             invokeNotifyPolicyConfigVo.setPolicyName(null);

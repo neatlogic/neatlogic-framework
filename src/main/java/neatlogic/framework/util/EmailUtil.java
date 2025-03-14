@@ -86,12 +86,18 @@ public class EmailUtil {
             //props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
             //props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             props.setProperty("mail.smtp.auth", "true");
-            Session session = Session.getInstance(props, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
-                }
-            });
+            Session session;
+            if (StringUtils.isNotBlank(mailServerVo.getUserName()) && StringUtils.isNotBlank(mailServerVo.getPassword())) {
+                session = Session.getInstance(props, new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
+                    }
+                });
+            } else {
+                props.put("mail.smtp.auth", "false");
+                session = Session.getInstance(props);
+            }
 
             MimeMessage msg = new MimeMessage(session);
             if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
@@ -197,12 +203,18 @@ public class EmailUtil {
             //props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
             //props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
             props.setProperty("mail.smtp.auth", "true");
-            Session session = Session.getInstance(props, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
-                }
-            });
+            Session session;
+            if (StringUtils.isNotBlank(mailServerVo.getUserName()) && StringUtils.isNotBlank(mailServerVo.getPassword())) {
+                session = Session.getInstance(props, new Authenticator() {
+                    @Override
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
+                    }
+                });
+            } else {
+                props.put("mail.smtp.auth", "false");
+                session = Session.getInstance(props);
+            }
 
             MimeMessage msg = new MimeMessage(session);
             if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {

@@ -29,6 +29,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.dto.ElasticsearchVo;
+import neatlogic.framework.dto.elasticsearch.IndexResultHighlightVo;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchDeleteIndexException;
@@ -36,6 +37,7 @@ import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMap
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo;
 import neatlogic.framework.fulltextindex.enums.FullTextIndexHandlerType;
 import neatlogic.framework.fulltextindex.enums.Status;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,6 +172,9 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     //创建自定义排序排序
     protected abstract void mySortQuery(SearchRequest.Builder builder);
 
+    //创建自定义高亮
+    protected abstract void myHighlight(SearchRequest.Builder builder);
+
     //创建自定义查询
     protected abstract Query myBuildQuery(T targetVo);
 
@@ -257,11 +262,14 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         ElasticsearchClient client = ElasticsearchClientFactory.getClient();
 
         // 创建搜索请求总数
-        SearchRequest requestCount = new SearchRequest.Builder()
+        SearchRequest.Builder requestCountBuilder = new SearchRequest.Builder()
                 .index(this.getIndexName())
-                .query(queryBuilder) // 搜索条件
-                .size(0)      // 设置 size 为 0，仅获取总量
-                .build();
+                .size(0);      // 设置 size 为 0，仅获取总量
+        if (queryBuilder != null) {
+            requestCountBuilder.query(queryBuilder);
+        }
+
+        SearchRequest requestCount = requestCountBuilder.build();
 
         IndexResultVo resultVo = new IndexResultVo();
         if (this.needPage(targetVo)) {
@@ -274,14 +282,18 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
             // 获取总量
             long rowNum = responseCount.hits().total().value();
-
-
             resultVo.setRowNum((int) rowNum);
-            // 创建搜索请求
+
             // 添加排序条件
             SearchRequest.Builder builder = new SearchRequest.Builder()
-                    .index(this.getIndexName())
-                    .query(queryBuilder);
+                    .index(this.getIndexName());
+
+            if (queryBuilder != null) {
+                builder.query(queryBuilder);
+            }
+
+            //高亮
+            this.myHighlight(builder);
 
             //排序
             this.mySortQuery(builder);
@@ -300,10 +312,19 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
             // 提取符合条件的 id 列表
             List<String> idList = new ArrayList<>();
+            List<IndexResultHighlightVo> highlightList = new ArrayList<>();
             List<Hit<Object>> hits = response.hits().hits();
             for (Hit<Object> hit : hits) {
                 idList.add(hit.id());
+                Map<String, List<String>> hm = hit.highlight();
+                if (MapUtils.isNotEmpty(hm)) {
+                    IndexResultHighlightVo highlightVo = new IndexResultHighlightVo();
+                    highlightVo.setId(hit.id());
+                    highlightVo.setHighlightMap(hm);
+                    highlightList.add(highlightVo);
+                }
             }
+            resultVo.setHighlightList(highlightList);
             resultVo.setIdList(idList);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

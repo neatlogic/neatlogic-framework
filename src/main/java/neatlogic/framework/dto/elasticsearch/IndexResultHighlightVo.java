@@ -17,27 +17,27 @@
 
 package neatlogic.framework.dto.elasticsearch;
 
-import neatlogic.framework.common.dto.BasePageVo;
-
+import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
-public class IndexResultVo extends BasePageVo {
-    private List<String> idList;
-    private List<IndexResultHighlightVo> highlightList;
+public class IndexResultHighlightVo implements Serializable {
+    private String id;
+    private Map<String, List<String>> highlightMap;
 
-    public List<String> getIdList() {
-        return idList;
+    public String getId() {
+        return id;
     }
 
-    public void setIdList(List<String> idList) {
-        this.idList = idList;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public List<IndexResultHighlightVo> getHighlightList() {
-        return highlightList;
+    public Map<String, List<String>> getHighlightMap() {
+        return highlightMap;
     }
 
-    public void setHighlightList(List<IndexResultHighlightVo> highlightList) {
-        this.highlightList = highlightList;
+    public void setHighlightMap(Map<String, List<String>> highlightMap) {
+        this.highlightMap = highlightMap;
     }
 }

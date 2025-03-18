@@ -184,7 +184,7 @@ public class HttpRequestUtil {
         return input;
     }
 
-    public static class FormDataVo{
+    public static class FormDataVo {
         private String type;
 
         private Object value;
@@ -237,13 +237,13 @@ public class HttpRequestUtil {
                 for (String key : keySet) {
                     String type = StringUtils.EMPTY;
                     Object value = _this.formData.get(key);
-                    if(value instanceof FormDataVo){
+                    if (value instanceof FormDataVo) {
                         FormDataVo formDataVo = (FormDataVo) value;
                         value = formDataVo.getValue();
                         type = formDataVo.type;
                     }
                     dataBuilder.append("Content-Disposition: form-data; name=").append(key).append("\r\n");
-                    if(StringUtils.isNotBlank(type)){
+                    if (StringUtils.isNotBlank(type)) {
                         dataBuilder.append(type).append("\r\n");
                     }
                     dataBuilder.append("\r\n").append("\r\n").append(value).append("\r\n").append("--").append(FORM_DATA_BOUNDARY).append("--");
@@ -646,6 +646,13 @@ public class HttpRequestUtil {
                 IOUtils.closeQuietly(input); // 关闭输入流
                 IOUtils.closeQuietly(this.outputStream); // 关闭输出流
             }
+        }
+
+        if (StringUtils.isNotBlank(this.error)) {
+            this.error = String.format("connect failed! url:%s, errorMsg:%s", this.url, this.error);
+        }
+        if (StringUtils.isNotBlank(this.errorMsg)) {
+            this.errorMsg = String.format("connect failed! url:%s, errorMsg:%s", this.url, this.errorMsg);
         }
         return this;
     }

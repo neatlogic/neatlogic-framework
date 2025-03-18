@@ -18,6 +18,7 @@ package neatlogic.framework.asynchronization.threadlocal;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
@@ -129,11 +130,11 @@ public class UserContext implements Serializable {
         return init(userVo, authenticationInfoVo, timezone, null, null);
     }
 
-    public static UserContext init(SystemUser systemUser) {
+    public static UserContext init(ISystemUser systemUser) {
         return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone(), null, null);
     }
 
-    public static UserContext init(SystemUser systemUser, HttpServletRequest request, HttpServletResponse response) {
+    public static UserContext init(ISystemUser systemUser, HttpServletRequest request, HttpServletResponse response) {
         return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone(), request, response);
     }
 

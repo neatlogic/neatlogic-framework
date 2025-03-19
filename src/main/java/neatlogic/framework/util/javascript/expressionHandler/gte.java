@@ -55,7 +55,6 @@ public class gte {
                         errorList.add(new ConditionIsIrregularException(prefix));
                         return false;
                     }
-
                     if (d < c) {
                         errorList.add(new ValueIsNotGteException(prefix, d, c));
                         return false;

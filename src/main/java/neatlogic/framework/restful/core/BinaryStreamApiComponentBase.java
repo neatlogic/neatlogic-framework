@@ -5,12 +5,10 @@ import neatlogic.framework.common.constvalue.CacheControlType;
 import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
-import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -18,8 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBase implements MyBinaryStreamApiComponent {
-    // private static Logger logger =
-    // LoggerFactory.getLogger(BinaryStreamApiComponentBase.class);
 
     @Resource
     private ApiLongCacheMapper apiLongCacheMapper;
@@ -47,7 +43,8 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
                 }
                 result = method.invoke(proxy, paramObj, request, response);
 
-            } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
+            } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException |
+                     SecurityException ex) {
                 validApi(this.getClass(), paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 //设置Cache-Control，如果下载失败会在ApiDispatcher最后清除这个header
@@ -58,7 +55,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
                 result = myDoService(paramObj, request, response);
 
             } catch (Exception ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
+                if (ex.getCause() instanceof ApiRuntimeException) {
                     throw new ApiRuntimeException(ex.getCause().getMessage(), ex.getCause());
                 } else {
                     throw ex;

@@ -43,6 +43,10 @@ public class lte {
                     errorList.add(new ValueIsIrregularException(prefix));
                     return false;
                 }
+                if (d == null) {
+                    errorList.add(new ConditionIsIrregularException(prefix));
+                    return false;
+                }
                 for (int j = 0; j < conditionValueList.size(); j++) {
                     Double c;
                     try {

@@ -23,13 +23,10 @@ import neatlogic.framework.exception.util.javascript.ValueIsNotGtException;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class gt {
-    private static final Logger logger = LoggerFactory.getLogger(gt.class);
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
@@ -41,6 +38,10 @@ public class gt {
                     d = dataValueList.getDouble(i);
                 } catch (Exception e) {
                     errorList.add(new ValueIsIrregularException(prefix));
+                    return false;
+                }
+                if (d == null) {
+                    errorList.add(new ConditionIsIrregularException(prefix));
                     return false;
                 }
                 for (int j = 0; j < conditionValueList.size(); j++) {

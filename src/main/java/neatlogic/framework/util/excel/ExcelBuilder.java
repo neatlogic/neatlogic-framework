@@ -24,7 +24,9 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 public class ExcelBuilder {
@@ -201,11 +203,19 @@ public class ExcelBuilder {
         if (this.workbook == null) {
             try {
                 this.workbook = (Workbook) (Class.forName(workbookClass.getName()).newInstance());
+                if (SXSSFWorkbook.class.isAssignableFrom(workbookClass)) {
+                    // SXSSFWorkbook 需要传递 rowAccessWindowSize 参数
+                    Constructor<? extends Workbook> constructor = workbookClass.getConstructor(int.class);
+                    this.workbook = constructor.newInstance(1000); // 设置缓存 1000 行
+                } else {
+                    // 其他 Workbook 类型（如 XSSFWorkbook）使用无参构造
+                    this.workbook = workbookClass.getDeclaredConstructor().newInstance();
+                }
             } catch (Exception e) {
                 throw new UnableToCreateWorkbookException(workbookClass.getSimpleName(), e.getMessage());
             }
         }
-        if (!this.workbook.getClass().getSimpleName().equals(workbookClass.getSimpleName())) {
+        if (!this.workbook.getClass().isAssignableFrom(workbookClass)) {
             throw new WorkbookTypeIsIncorrectException(workbookClass.getSimpleName(), workbook.getClass().getSimpleName());
         }
 

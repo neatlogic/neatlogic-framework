@@ -43,8 +43,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
                 }
                 result = method.invoke(proxy, paramObj, request, response);
 
-            } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException |
-                     SecurityException ex) {
+            } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException ex) {
                 validApi(this.getClass(), paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 validIsReSubmit(this.getClass(), apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
                 //设置Cache-Control，如果下载失败会在ApiDispatcher最后清除这个header

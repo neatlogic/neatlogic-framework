@@ -212,18 +212,18 @@ public class FullTextIndexVo {
 
         public WordVo(String content) {
             //处理掉下划线和中划线
-            if (StringUtils.isNotBlank(content)) {
+           /*if (StringUtils.isNotBlank(content)) {
                 content = content.replace("-", "");
                 content = content.replace("_", "");
-            }
+            }*/
             this.content = content;
         }
 
         public WordVo(Boolean isNeedSliceWord, String content) {
-            if (StringUtils.isNotBlank(content)) {
+            /*if (StringUtils.isNotBlank(content)) {
                 content = content.replace("-", "");
                 content = content.replace("_", "");
-            }
+            }*/
             this.isNeedSliceWord = isNeedSliceWord;
             this.content = content;
         }

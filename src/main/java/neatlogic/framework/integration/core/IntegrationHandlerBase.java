@@ -128,6 +128,9 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         JSONObject outputConfig = config.getJSONObject("output");
         JSONObject paramObj = config.getJSONObject("param");
         JSONObject requestParamObj = integrationVo.getParamObj();
+        if (otherConfig == null) {
+            otherConfig = new JSONObject();
+        }
 		/*
 		  校验请求参数开始
 		 */
@@ -249,16 +252,22 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             }
 
             // 设置head
+            boolean hasContentType = false;
             if (headConfig != null) {
                 for (int i = 0; i < headConfig.size(); i++) {
                     JSONObject item = headConfig.getJSONObject(i);
                     String key = item.getString("key");
                     String value = item.getString("value");
                     connection.setRequestProperty(key, value);
+                    if (key.equalsIgnoreCase("Content-Type")) {
+                        hasContentType = true;
+                    }
                 }
             }
             // 设置默认header
-            connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            if (!hasContentType) {
+                connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
+            }
             connection.connect();
         } catch (Exception e) {
             String errorMsg = (e instanceof ApiRuntimeException) ? ((ApiRuntimeException) e).getMessage() : e.getMessage();
@@ -271,9 +280,12 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
             if (connection.getDoOutput()) {
                 try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                    out.write(inputParam.getBytes(StandardCharsets.UTF_8));
+                    if (!otherConfig.containsKey("chartset")) {
+                        out.write(inputParam.getBytes(StandardCharsets.UTF_8));
+                    } else {
+                        out.write(inputParam.getBytes(otherConfig.getString("chartset")));
+                    }
                     out.flush();
-                    // out.writeBytes(content);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     resultVo.appendError(e.getMessage());
@@ -291,9 +303,17 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                  */
                 InputStreamReader reader;
                 if (String.valueOf(code).startsWith("2")) {
-                    reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
+                    if (!otherConfig.containsKey("chartset")) {
+                        reader = new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8);
+                    } else {
+                        reader = new InputStreamReader(connection.getInputStream(), otherConfig.getString("chartset"));
+                    }
                 } else {
-                    reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
+                    if (!otherConfig.containsKey("chartset")) {
+                        reader = new InputStreamReader(connection.getErrorStream(), StandardCharsets.UTF_8);
+                    } else {
+                        reader = new InputStreamReader(connection.getErrorStream(), otherConfig.getString("chartset"));
+                    }
                 }
                 StringWriter writer = new StringWriter();
                 IOUtils.copy(reader, writer);

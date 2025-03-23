@@ -18,6 +18,7 @@
 package neatlogic.framework.asynchronization.queue;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -36,10 +37,14 @@ public class NeatLogicBlockingQueue<T> {
     public T take() throws InterruptedException {
         Task<T> task = blockingQueue.take();
         TenantContext tenantContext = TenantContext.get();
+        UserContext userContext = task.getUserContext();
         if (tenantContext != null) {
             tenantContext.switchTenant(task.getTenantUuid());
         } else {
             TenantContext.init(task.getTenantUuid());
+        }
+        if (userContext != null) {
+            UserContext.init(userContext);
         }
         return task.getT();
     }
@@ -47,14 +52,22 @@ public class NeatLogicBlockingQueue<T> {
     private static class Task<T> {
         private final T t;
         private final String tenantUuid;
+        private UserContext userContext;
 
         public Task(T t) {
             this.t = t;
             this.tenantUuid = TenantContext.get().getTenantUuid();
+            if (UserContext.get() != null) {
+                this.userContext = UserContext.get().copy();
+            }
         }
 
         public T getT() {
             return t;
+        }
+
+        public UserContext getUserContext() {
+            return userContext;
         }
 
         public String getTenantUuid() {

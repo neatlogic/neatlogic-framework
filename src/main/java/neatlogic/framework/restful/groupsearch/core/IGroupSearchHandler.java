@@ -30,12 +30,22 @@ public interface IGroupSearchHandler {
 
     /**
      * 是否受总数限制
-     *
-     * @return
      */
     Boolean isLimit();
 
+    /**
+     * 搜索用户时触发
+     *
+     * @param groupSearchVo 关键字
+     * @return 用户列表
+     */
     List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo);
 
+    /**
+     * 回显用户选择控件时触发
+     *
+     * @param groupSearchVo 关键字
+     * @return 用户列表
+     */
     List<GroupSearchOptionVo> reload(GroupSearchVo groupSearchVo);
 }

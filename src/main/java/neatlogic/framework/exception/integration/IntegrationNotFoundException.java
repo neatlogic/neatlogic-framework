@@ -10,10 +10,10 @@ public class IntegrationNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = 1061691150909475176L;
 
     public IntegrationNotFoundException(String uuid) {
-        super("找不到集成配置：{0}", uuid);
+        super("集成“{0}”不存在", uuid);
     }
 
     public IntegrationNotFoundException(List<String> uuidList) {
-        super("找不到集成配置：{0}", StringUtils.join(uuidList));
+        super("集成“{0}”不存在", StringUtils.join(uuidList));
     }
 }

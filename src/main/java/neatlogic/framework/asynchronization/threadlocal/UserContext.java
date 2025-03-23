@@ -38,7 +38,7 @@ import java.util.List;
 public class UserContext implements Serializable {
     private static final long serialVersionUID = -578199115176786224L;
     @JSONField(serialize = false)
-    private final transient static ThreadLocal<UserContext> instance = new ThreadLocal<UserContext>();
+    private static final ThreadLocal<UserContext> instance = new ThreadLocal<>();
     @JSONField(serialize = false)
     private transient HttpServletRequest request;
     @JSONField(serialize = false)
@@ -57,26 +57,33 @@ public class UserContext implements Serializable {
 
     private JwtVo jwtVo;
 
+    public UserContext copy() {
+        UserContext userContext = new UserContext();
+        userContext.setRequest(request);
+        userContext.setToken(token);
+        if (authenticationInfoVo != null) {
+            userContext.setAuthenticationInfoVo(authenticationInfoVo.copy());
+        }
+        userContext.setIsSuperAdmin(isSuperAdmin);
+        userContext.setTenant(tenant);
+        userContext.setUserName(userName);
+        userContext.setUserId(userId);
+        userContext.setUserUuid(userUuid);
+        userContext.setTimezone(timezone);
+        userContext.setTokenHash(tokenHash);
+        return userContext;
+    }
+
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
         if (_userContext != null) {
-            context.setUserId(_userContext.getUserId());
-            context.setUserUuid(_userContext.getUserUuid());
-            context.setUserName(_userContext.getUserName());
-            context.setTenant(_userContext.getTenant());
-            context.setTimezone(_userContext.getTimezone());
-            context.setToken(_userContext.getToken());
-            // context.setRequest(_userContext.getRequest());
-            // context.setResponse(_userContext.getResponse());
-            context.setAuthenticationInfoVo(_userContext.getAuthenticationInfoVo());
-            context.setJwtVo(_userContext.getJwtVo());
-            context.setIsSuperAdmin(_userContext.getIsSuperAdmin());
+            context = _userContext.copy();
         }
         instance.set(context);
         return context;
     }
 
-    public static UserContext init(JSONObject jsonObj, String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
+    public static UserContext init_bak(JSONObject jsonObj, String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
         UserContext context = new UserContext();
         context.setUserId(jsonObj.getString("userid"));
         context.setUserUuid(jsonObj.getString("useruuid"));
@@ -171,7 +178,7 @@ public class UserContext implements Serializable {
     }
 
     public String getUserId(boolean need) {
-        if (StringUtils.isBlank(userId)) {
+        if (need && StringUtils.isBlank(userId)) {
             throw new NoUserException();
         }
         return userId;
@@ -186,7 +193,7 @@ public class UserContext implements Serializable {
     }
 
     public String getUserUuid(boolean need) {
-        if (StringUtils.isBlank(userUuid)) {
+        if (need && StringUtils.isBlank(userUuid)) {
             //throw new NoUserException();
             return SystemUser.SYSTEM.getUserUuid();
         }

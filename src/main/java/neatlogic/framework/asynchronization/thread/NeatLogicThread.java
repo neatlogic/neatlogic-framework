@@ -31,8 +31,8 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
     protected UserContext userContext;
     protected MongodbSessionContext mongodbSessionContext;
-    private String tenantUuid;
-    private List<ModuleVo> activeModuleList;
+    private final String tenantUuid;
+    private final List<ModuleVo> activeModuleList;
     protected InputFromContext inputFromContext;
     protected RequestContext requestContext;
     private String threadName;
@@ -84,16 +84,21 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         inputFromContext = InputFromContext.get();
     }*/
 
-    public NeatLogicThread(UserContext _userContext, TenantContext _tenantContext) {
-        userContext = _userContext;
+    /*public NeatLogicThread(UserContext _userContext, TenantContext _tenantContext) {
+        if (_userContext != null) {
+            userContext = _userContext.copy();
+        }
         tenantUuid = _tenantContext.getTenantUuid();
         activeModuleList = _tenantContext.getActiveModuleList();
         inputFromContext = InputFromContext.get();
-    }
+    }*/
 
 
     public NeatLogicThread(String _threadName) {
-        userContext = UserContext.get();
+        UserContext tmp = UserContext.get();
+        if (tmp != null) {
+            userContext = tmp.copy();
+        }
         tenantUuid = TenantContext.get().getTenantUuid();
         activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
@@ -103,7 +108,10 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     }
 
     public NeatLogicThread(String _threadName, int priority) {
-        userContext = UserContext.get();
+        UserContext tmp = UserContext.get();
+        if (tmp != null) {
+            userContext = tmp.copy();
+        }
         tenantUuid = TenantContext.get().getTenantUuid();
         activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();

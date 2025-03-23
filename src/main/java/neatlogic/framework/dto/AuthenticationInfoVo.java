@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.Set;
  * @author linbq
  * @since 2021/8/2 20:19
  **/
-public class AuthenticationInfoVo {
+public class AuthenticationInfoVo implements Serializable {
     private String userUuid;
     private final List<String> userUuidList = new ArrayList<>();
     private final List<String> teamUuidList = new ArrayList<>();
@@ -36,6 +37,15 @@ public class AuthenticationInfoVo {
     private Set<String> headerSet = new HashSet<>(); //使用到的header
     private JSONObject originHeader = new JSONObject(); //原始请求的header
 
+    public AuthenticationInfoVo copy() {
+        AuthenticationInfoVo vo = new AuthenticationInfoVo();
+        vo.userUuid = this.userUuid;
+        vo.userUuidList.addAll(userUuidList);
+        vo.teamUuidList.addAll(teamUuidList);
+        vo.roleUuidList.addAll(roleUuidList);
+        vo.headerSet.addAll(headerSet);
+        return vo;
+    }
 
     public boolean validUser(List<String> userUuidList) {
         return userUuidList.contains(userUuid);

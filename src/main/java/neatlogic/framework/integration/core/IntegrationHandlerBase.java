@@ -23,7 +23,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.type.ParamIrregularException;
 import neatlogic.framework.exception.type.ParamNotExistsException;
 import neatlogic.framework.exception.type.ParamTransferException;
@@ -46,6 +45,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -242,7 +242,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             // 设置超时时间
             connection.setConnectTimeout(0);
             connection.setReadTimeout(0);
-            if (otherConfig != null) {
+            if (MapUtils.isNotEmpty(otherConfig)) {
                 if (otherConfig.containsKey("connectTimeout")) {
                     connection.setConnectTimeout(otherConfig.getIntValue("connectTimeout"));
                 }
@@ -270,7 +270,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             }
             connection.connect();
         } catch (Exception e) {
-            String errorMsg = (e instanceof ApiRuntimeException) ? ((ApiRuntimeException) e).getMessage() : e.getMessage();
+            String errorMsg = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
             logger.error(e.getMessage(), e);
             integrationAuditVo.appendError(errorMsg);
             resultVo.appendError(errorMsg);

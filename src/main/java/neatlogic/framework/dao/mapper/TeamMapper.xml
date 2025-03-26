@@ -806,12 +806,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </insert>
 
     <update id="updateTeamNameByUuid" parameterType="neatlogic.framework.dto.TeamVo">
-        UPDATE `team` SET
-        <if test="level != null and level != ''">
-            `level` = #{level},
-        </if>
-        `name` = #{name},
-        `lcd` = NOW()
+        UPDATE `team`
+        SET `level` = #{level},
+            `name`  = #{name},
+            `lcd`   = NOW()
         WHERE `uuid` = #{uuid}
     </update>
 

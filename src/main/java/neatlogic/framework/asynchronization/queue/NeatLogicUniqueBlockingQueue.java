@@ -60,7 +60,12 @@ public class NeatLogicUniqueBlockingQueue<T> {
     public T take() throws InterruptedException {
         Task<T> task = blockingQueue.take(); // 阻塞式获取任务
         taskMap.remove(task.getUniqueKey()); // 移除已处理任务的唯一标记
-        TenantContext.init().switchTenant(task.getTenantUuid());
+        TenantContext tenantContext = TenantContext.get();
+        if (tenantContext != null) {
+            tenantContext.switchTenant(task.getTenantUuid());
+        } else {
+            TenantContext.init(task.getTenantUuid());
+        }
         return task.getT();
     }
 

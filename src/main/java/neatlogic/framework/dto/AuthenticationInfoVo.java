@@ -43,7 +43,9 @@ public class AuthenticationInfoVo implements Serializable {
         vo.userUuidList.addAll(userUuidList);
         vo.teamUuidList.addAll(teamUuidList);
         vo.roleUuidList.addAll(roleUuidList);
-        vo.headerSet.addAll(headerSet);
+        if (CollectionUtils.isNotEmpty(headerSet)) {
+            vo.headerSet.addAll(headerSet);
+        }
         return vo;
     }
 
@@ -85,7 +87,9 @@ public class AuthenticationInfoVo implements Serializable {
         this.userUuid = userUuid;
         this.teamUuidList.addAll(teamUuidList);
         this.roleUuidList.addAll(roleUuidList);
-        this.headerSet.addAll(headerSet);
+        if (CollectionUtils.isNotEmpty(headerSet)) {
+            this.headerSet.addAll(headerSet);
+        }
         this.originHeader = originHeader;
     }
 
@@ -93,7 +97,9 @@ public class AuthenticationInfoVo implements Serializable {
         this.userUuidList.addAll(userUuidList);
         this.teamUuidList.addAll(teamUuidList);
         this.roleUuidList.addAll(roleUuidList);
-        this.headerSet.addAll(headerSet);
+        if (CollectionUtils.isNotEmpty(headerSet)) {
+            this.headerSet.addAll(headerSet);
+        }
     }
 
     public String getUserUuid() {

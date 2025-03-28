@@ -101,6 +101,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                a.`phone`,
                a.`pinyin`,
                a.`is_active`      as isActive,
+               a.`is_delete`      as isDelete,
                a.`user_info`      as userInfo,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a

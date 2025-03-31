@@ -21,10 +21,15 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
 import neatlogic.framework.matrix.core.MatrixAttrTypeBase;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+import neatlogic.framework.util.TimeUtil;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -36,7 +41,24 @@ public class MatrixDataAttrTypeHandler extends MatrixAttrTypeBase {
 
     @Override
     public void getTextByValue(MatrixAttributeVo matrixAttribute, Object valueObj, JSONObject resultObj) {
-        resultObj.put("text", valueObj.toString());
+        String newValue = null;
+        JSONObject config = matrixAttribute.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            String format = config.getString("format");
+            if (StringUtils.isBlank(format)) {
+                format = TimeUtil.YYYY_MM_DD_HH_MM_SS;
+            }
+            String styleType = config.getString("styleType");
+            if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
+                if ("|".equals(styleType)) {
+                    styleType = "";
+                }
+                format = format.replace("-", styleType);
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+            newValue = simpleDateFormat.format(valueObj);
+        }
+        resultObj.put("text", newValue);
     }
 
     @Override

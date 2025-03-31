@@ -324,8 +324,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
-                resultVo.appendError("failed\n" + e.getMessage());
-                integrationAuditVo.appendError("failed\n" + e.getMessage());
+                resultVo.appendError(e.getMessage());
+                integrationAuditVo.appendError(e.getMessage());
                 integrationAuditVo.setStatus("failed");
             }
             boolean hasTransferred = false;

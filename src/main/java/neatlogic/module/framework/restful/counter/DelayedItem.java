@@ -1,19 +1,21 @@
-/*Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+/*
+ * Copyright (C) 2025  深圳极向量科技有限公司 All Rights Reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-
-package neatlogic.framework.restful.counter;
+package neatlogic.module.framework.restful.counter;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import org.slf4j.Logger;
@@ -77,16 +79,14 @@ public class DelayedItem implements Delayed {
 		return delayTime - System.currentTimeMillis();
 	}
 
-	public void putToken(String token) {
-		try {
-			/* 写数据前加1**/
-			writingDataThreadNum.incrementAndGet();
-//			Thread.sleep(1);//测试时使用
-			/* 判断延迟对象是否失效 **/
-			if(expired.get()) {
+	public boolean putToken(String token) {
+		if(expired.get()) {
+			return false;
+		}else {
+			try {
+				/* 写数据前加1**/
+				writingDataThreadNum.incrementAndGet();
 //				Thread.sleep(1);//测试时使用
-				ApiAccessCountManager.putToken(token);
-			}else {
 				String tenantUuid = TenantContext.get().getTenantUuid();
 				/* 从缓存中获取当前租户访问记录 **/
 				ConcurrentMap<String, AtomicLong> accessTokenCounterMap = tenantAccessTokenMap.get(tenantUuid);
@@ -117,34 +117,35 @@ public class DelayedItem implements Delayed {
 //					Thread.sleep(1);//测试时使用
 					counter.incrementAndGet();
 				}
-			}
-			
-		}catch(Exception e) {
-			logger.error(e.getMessage(), e);
-		}finally {
+
+			}catch(Exception e) {
+				logger.error(e.getMessage(), e);
+			}finally {
 //			try {
 //				Thread.sleep(1);//测试时使用
 //			} catch (InterruptedException e) {
 //				e.printStackTrace();
 //			}
-			if(writingDataThreadNum.decrementAndGet() <= 0) {
+				if(writingDataThreadNum.decrementAndGet() <= 0) {
 //				try {
 //					Thread.sleep(1);//测试时使用
 //				} catch (InterruptedException e) {
 //					e.printStackTrace();
 //				}
-				if(expired.get()) {
+					if(expired.get()) {
 //					try {
 //						Thread.sleep(1);//测试时使用
 //					} catch (InterruptedException e) {
 //						e.printStackTrace();
 //					}
-					/* 如果当前延迟对象已失效且没有线程往延迟对象写数据，就唤醒lock对象monitor的wait set中的线程，只有一个 **/
-					synchronized(lock) {
-						lock.notify();
+						/* 如果当前延迟对象已失效且没有线程往延迟对象写数据，就唤醒lock对象monitor的wait set中的线程，只有一个 **/
+						synchronized(lock) {
+							lock.notify();
+						}
 					}
 				}
-			}		
+			}
+			return true;
 		}
 	}
 

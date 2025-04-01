@@ -41,13 +41,13 @@ import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.publicapi.PublicApiComponentFactory;
-import neatlogic.framework.restful.counter.ApiAccessCountManager;
 import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.module.framework.restful.counter.ApiAccessCountService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -78,6 +78,9 @@ public class PublicApiDispatcher {
 
     @Resource
     private ApiLongCacheMapper apiLongCacheMapper;
+
+    @Resource
+    private ApiAccessCountService apiAccessCountService;
 
 
     @Resource
@@ -175,7 +178,7 @@ public class PublicApiDispatcher {
             if (restComponent != null) {
                 if (action.equals("doservice")) {
                     /* 统计接口访问次数 **/
-                    ApiAccessCountManager.putToken(token);
+                    apiAccessCountService.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, response);
                     Long endtime = System.currentTimeMillis();
@@ -198,7 +201,7 @@ public class PublicApiDispatcher {
             if (restComponent != null) {
                 if (action.equals("doservice")) {
                     /* 统计接口访问次数 **/
-                    ApiAccessCountManager.putToken(token);
+                    apiAccessCountService.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
                     Long endtime = System.currentTimeMillis();
@@ -221,7 +224,7 @@ public class PublicApiDispatcher {
             if (restComponent != null) {
                 if (action.equals("doservice")) {
                     /* 统计接口访问次数 **/
-                    ApiAccessCountManager.putToken(token);
+                    apiAccessCountService.putToken(token);
                     Long starttime = System.currentTimeMillis();
                     Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
                     Long endtime = System.currentTimeMillis();

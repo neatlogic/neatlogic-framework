@@ -38,7 +38,6 @@ import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import neatlogic.framework.restful.counter.ApiAccessCountManager;
 import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
@@ -46,6 +45,7 @@ import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.AnonymousApiTokenUtil;
+import neatlogic.module.framework.restful.counter.ApiAccessCountService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -75,6 +75,9 @@ public class AnonymousApiDispatcher {
 
     @Resource
     private ApiLongCacheMapper apiLongCacheMapper;
+
+    @Resource
+    private ApiAccessCountService apiAccessCountService;
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
@@ -136,7 +139,7 @@ public class AnonymousApiDispatcher {
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
-                        ApiAccessCountManager.putToken(token);
+                        apiAccessCountService.putToken(token);
                         Long startTime = System.currentTimeMillis();
                         Object returnV = restComponent.doService(interfaceVo, paramObj, response);
                         Long endTime = System.currentTimeMillis();
@@ -163,7 +166,7 @@ public class AnonymousApiDispatcher {
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
-                        ApiAccessCountManager.putToken(token);
+                        apiAccessCountService.putToken(token);
                         Long starttime = System.currentTimeMillis();
                         Object returnV = restComponent.doService(interfaceVo, paramObj, new JSONReader(new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8)));
                         Long endtime = System.currentTimeMillis();
@@ -190,7 +193,7 @@ public class AnonymousApiDispatcher {
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
-                        ApiAccessCountManager.putToken(token);
+                        apiAccessCountService.putToken(token);
                         Long starttime = System.currentTimeMillis();
                         Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
                         Long endtime = System.currentTimeMillis();
@@ -217,7 +220,7 @@ public class AnonymousApiDispatcher {
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
-                        ApiAccessCountManager.putToken(token);
+                        apiAccessCountService.putToken(token);
                         Long starttime = System.currentTimeMillis();
                         Object returnV = restComponent.doService(interfaceVo, paramObj.getString("payload"), response);
                         Long endtime = System.currentTimeMillis();

@@ -1,10 +1,10 @@
 package neatlogic.framework.matrix.dto;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @program: neatlogic
@@ -19,8 +19,12 @@ public class MatrixColumnVo {
 	private List<String> defaultValue;
 	private boolean isFilterList;
 	@JSONField(serialize = false)
-	private String value;
+	private Object value;
     public MatrixColumnVo() {
+	}
+	public MatrixColumnVo(String column, Object value) {
+		this.column = column;
+		this.value = value;
 	}
 
 	public MatrixColumnVo(String column, String value) {
@@ -41,14 +45,14 @@ public class MatrixColumnVo {
         this.column = column;
     }
 
-    public String getValue() {
+    public Object getValue() {
     	if(value == null && CollectionUtils.isNotEmpty(valueList)) {
     		value = valueList.get(0);
     	}
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 

@@ -42,14 +42,22 @@
     </insert>
 
     <update id="createMatrixDynamicTable">
-        CREATE table `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` (
-        `id` bigint(20) NOT NULL AUTO_INCREMENT,
-        `uuid` char(32) NOT NULL,
+        CREATE TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` (
+        `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+        `uuid` CHAR(32) NOT NULL,
         <foreach collection="attributeList" item="attribute" separator="," index="index">
-            `${attribute.uuid}` varchar(100) DEFAULT NULL
+            <choose>
+                <when test="attribute.type == 'date'">
+                    `${attribute.uuid}` TIMESTAMP DEFAULT NULL
+                </when>
+                <otherwise>
+                    `${attribute.uuid}` VARCHAR (100) DEFAULT NULL
+                </otherwise>
+            </choose>
+
         </foreach>
         ,
-        `sort` int(11) NOT NULL,
+        `sort` INT(11) NOT NULL,
         PRIMARY KEY (`uuid`),
         KEY `id`(`id`)
         )ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci
@@ -61,7 +69,11 @@
     </update>
 
     <update id="addMatrixDynamicTableColumn">
-        ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` ADD COLUMN `${columnName}` VARCHAR (100)
+        ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` ADD COLUMN `${columnName}` VARCHAR (100) NULL
+    </update>
+
+    <update id="addMatrixDynamicTableDateColumn">
+        ALTER TABLE `@{DATA_SCHEMA}`.`matrix_${matrixUuid}` ADD COLUMN `${columnName}` TIMESTAMP NULL
     </update>
 
     <update id="addMatrixDynamicTableColumnSort">

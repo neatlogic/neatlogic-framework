@@ -33,6 +33,7 @@ import neatlogic.framework.matrix.dto.*;
 import neatlogic.framework.matrix.exception.*;
 import neatlogic.framework.util.ExcelUtil;
 import neatlogic.framework.util.TableResultUtil;
+import neatlogic.framework.util.TimeUtil;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.framework.util.excel.ExcelPagedRowIterator;
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,6 +49,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -407,7 +409,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 //删除数据
                 //调整表
                 List<String> oldAttributeUuidList = oldMatrixAttributeList.stream().map(MatrixAttributeVo::getUuid).collect(Collectors.toList());
-                List<String> addAttributeUuidList = new ArrayList<>();
+                List<MatrixAttributeVo> addAttributeList = new ArrayList<>();
                 List<String> existedAttributeUuidList = new ArrayList<>();
                 for (MatrixAttributeVo attributeVo : attributeVoList) {
                     attributeVo.setMatrixUuid(matrixUuid);
@@ -417,13 +419,17 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     } else {
                         //过滤新增属性uuid
                         attributeMapper.insertMatrixAttribute(attributeVo);
-                        addAttributeUuidList.add(attributeVo.getUuid());
+                        addAttributeList.add(attributeVo);
                     }
                 }
 
                 //添加新增字段
-                for (String attributeUuid : addAttributeUuidList) {
-                    attributeMapper.addMatrixDynamicTableColumn(attributeUuid, matrixUuid);
+                for (MatrixAttributeVo attributeVo : addAttributeList) {
+                    if (Objects.equals(attributeVo.getType(), MatrixAttributeType.DATE.getValue())) {
+                        attributeMapper.addMatrixDynamicTableDateColumn(attributeVo.getUuid(), matrixUuid);
+                    } else {
+                        attributeMapper.addMatrixDynamicTableColumn(attributeVo.getUuid(), matrixUuid);
+                    }
                 }
                 //找出需要删除的属性uuid列表
                 oldAttributeUuidList.removeAll(existedAttributeUuidList);
@@ -577,6 +583,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             // 遍历过滤条件列表dataVo.getFilterList()，补充type字段值，即条件类型
             List<MatrixFilterVo> filterList = dataVo.getFilterList();
             if (CollectionUtils.isNotEmpty(filterList)) {
+                SimpleDateFormat generalFormat = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
                 for (MatrixFilterVo filterVo : filterList) {
                     MatrixAttributeVo matrixAttributeVo = matrixAttributeMap.get(filterVo.getUuid());
                     if (matrixAttributeVo != null) {
@@ -591,10 +598,34 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 }
                                 filterVo.setValueList(valueList);
                             }
+                        } else if (Objects.equals(MatrixAttributeType.DATE.getValue(), matrixAttributeVo.getType())) {
+                            JSONObject config = matrixAttributeVo.getConfig();
+                            if (MapUtils.isNotEmpty(config)) {
+                                String format = config.getString("format");
+                                if (StringUtils.isBlank(format)) {
+                                    format = TimeUtil.YYYY_MM_DD_HH_MM_SS;
+                                }
+                                String styleType = config.getString("styleType");
+                                if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
+                                    if ("|".equals(styleType)) {
+                                        styleType = "";
+                                    }
+                                    format = format.replace("-", styleType);
+                                }
+                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+                                List<String> valueList = new ArrayList<>();
+                                for (String value : filterVo.getValueList()) {
+                                    try {
+                                        Date date = simpleDateFormat.parse(value);
+                                        valueList.add(generalFormat.format(date));
+                                    } catch (ParseException e) {
+                                        valueList.add(value);
+                                    }
+                                }
+                                filterVo.setValueList(valueList);
+                            }
                         } else {
-//                            if (StringUtils.isBlank(filterVo.getType())) {
                             filterVo.setType(matrixAttributeVo.getType());
-//                            }
                         }
                     }
                 }
@@ -676,18 +707,42 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         boolean hasData = false;
         List<MatrixColumnVo> rowData = new ArrayList<>();
         for (MatrixAttributeVo matrixAttributeVo : attributeList) {
+            Object newValue = null;
             String value = rowDataObj.getString(matrixAttributeVo.getUuid());
             if (StringUtils.isNotBlank(value)) {
                 hasData = true;
                 if (MatrixAttributeType.USER.getValue().equals(matrixAttributeVo.getType())) {
-                    value = value.split("#")[1];
+                    newValue = value.split("#")[1];
                 } else if (MatrixAttributeType.TEAM.getValue().equals(matrixAttributeVo.getType())) {
-                    value = value.split("#")[1];
+                    newValue = value.split("#")[1];
                 } else if (MatrixAttributeType.ROLE.getValue().equals(matrixAttributeVo.getType())) {
-                    value = value.split("#")[1];
+                    newValue = value.split("#")[1];
+                } else if (MatrixAttributeType.DATE.getValue().equals(matrixAttributeVo.getType())) {
+                    JSONObject config = matrixAttributeVo.getConfig();
+                    if (MapUtils.isNotEmpty(config)) {
+                        String format = config.getString("format");
+                        if (StringUtils.isBlank(format)) {
+                            format = TimeUtil.YYYY_MM_DD_HH_MM_SS;
+                        }
+                        String styleType = config.getString("styleType");
+                        if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
+                            if ("|".equals(styleType)) {
+                                styleType = "";
+                            }
+                            format = format.replace("-", styleType);
+                        }
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+                        try {
+                            newValue = simpleDateFormat.parse(value);
+                        } catch (ParseException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else {
+                    newValue = value;
                 }
             }
-            rowData.add(new MatrixColumnVo(matrixAttributeVo.getUuid(), value));
+            rowData.add(new MatrixColumnVo(matrixAttributeVo.getUuid(), newValue));
         }
         String uuidValue = rowDataObj.getString("uuid");
         if (uuidValue == null) {

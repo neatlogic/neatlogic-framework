@@ -34,6 +34,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.annotation.Resource;
@@ -152,7 +153,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             logger.error(ex.getMessage(), ex);
             try {
                 // 不返回跳转地址，直接到显示错误信息页面
-                returnErrorResponseJson(false,ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
+                returnErrorResponseJson(false,ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -160,7 +161,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
-                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getClass().getName()+":"+ex.getMessage());
+                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getClass().getName()+":"+ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -177,7 +178,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(boolean isRemoveCookie, ResponseCode responseCode, HttpServletResponse response, ILoginAuthHandler loginAuth, Object... args) throws Exception {
+    private void returnErrorResponseJson(boolean isRemoveCookie, ResponseCode responseCode, HttpServletResponse response, ILoginAuthHandler loginAuth, Exception ex, Object... args) throws Exception {
         JSONObject redirectObj = new JSONObject();
         String message = responseCode.getMessage(args);
         redirectObj.put("Status", "FAILED");
@@ -186,6 +187,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         response.setStatus(responseCode.getCode());
         redirectObj.put("DirectUrl", loginAuth.directUrl());
         redirectObj.put("IsAutoDirect", loginAuth.isAutoDirect());
+        if (ex != null) {
+            redirectObj.put("stackTrace", ExceptionUtils.getStackFrames(ex));
+        }
         if (isRemoveCookie) {
             removeAuthCookie(response);
         }
@@ -203,7 +207,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @throws IOException 异常
      */
     private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, ILoginAuthHandler loginAuth, Object... args) throws Exception {
-        returnErrorResponseJson(true, responseCode, response, loginAuth, args);
+        returnErrorResponseJson(true, responseCode, response, loginAuth, null, args);
     }
 
     /**
@@ -215,7 +219,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @throws IOException 异常
      */
     private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, boolean isRemoveCookie, Object... args) throws Exception {
-        returnErrorResponseJson(isRemoveCookie, responseCode, response, null, args);
+        returnErrorResponseJson(isRemoveCookie, responseCode, response, null, null, args);
     }
 
     /**

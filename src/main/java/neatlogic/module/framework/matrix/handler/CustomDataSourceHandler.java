@@ -737,6 +737,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                         } catch (ParseException e) {
                             throw new RuntimeException(e);
                         }
+                    } else {
+                        newValue = value;
                     }
                 } else {
                     newValue = value;

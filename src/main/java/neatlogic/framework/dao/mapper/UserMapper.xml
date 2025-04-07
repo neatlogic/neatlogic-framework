@@ -834,7 +834,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `id`,
         `uuid`,
         `user_name` as `userName`,
-        `user_id` as `userId`
+        `user_id` as `userId`,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active` AS isActive
         FROM `user`
         WHERE
         `is_active` = 1

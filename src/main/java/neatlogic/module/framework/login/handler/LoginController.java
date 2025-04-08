@@ -182,7 +182,6 @@ public class LoginController {
                 String authenticationInfoStr = null;
                 String authInfoHash = null;
                 if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
-                    authenticationInfoVo.setHeaderSet(null);
                     authenticationInfoStr = JSON.toJSONString(authenticationInfoVo);
                     if (StringUtils.isNotBlank(authenticationInfoStr)) {
                         authInfoHash = Md5Util.encryptMD5(authenticationInfoStr);

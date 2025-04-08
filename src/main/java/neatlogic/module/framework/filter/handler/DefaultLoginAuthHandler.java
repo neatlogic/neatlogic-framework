@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.filter.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.JwtVo;
@@ -113,7 +114,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                         String result = Base64.getUrlEncoder().encodeToString(rawHmac);
                         if (result.equals(jwtParts[2])) {
                             String jwtBody = new String(Base64.getUrlDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8);
-                            JSONObject jwtBodyObj = JSONObject.parseObject(jwtBody);
+                            JSONObject jwtBodyObj = JSON.parseObject(jwtBody);
                             //防止header中的租户和token不一致
                             if(!Objects.equals(request.getHeader("tenant"),jwtBodyObj.getString("tenant"))){
                                 throw new TenantInvalidException(request.getHeader("tenant"));

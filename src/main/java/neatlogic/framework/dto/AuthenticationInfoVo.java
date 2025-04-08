@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
@@ -34,7 +35,8 @@ public class AuthenticationInfoVo implements Serializable {
     private final List<String> userUuidList = new ArrayList<>();
     private final List<String> teamUuidList = new ArrayList<>();
     private final List<String> roleUuidList = new ArrayList<>();
-    private Set<String> headerSet = new HashSet<>(); //使用到的header
+    @JSONField(serialize = false)
+    private final Set<String> headerSet = new HashSet<>(); //使用到的header
     private JSONObject originHeader = new JSONObject(); //原始请求的header
 
     public AuthenticationInfoVo copy() {
@@ -124,10 +126,6 @@ public class AuthenticationInfoVo implements Serializable {
 
     public Set<String> getHeaderSet() {
         return headerSet;
-    }
-
-    public void setHeaderSet(Set<String> headerSet) {
-        this.headerSet = headerSet;
     }
 
     public JSONObject getOriginHeader() {

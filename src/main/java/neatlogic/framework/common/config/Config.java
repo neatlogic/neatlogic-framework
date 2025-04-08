@@ -527,17 +527,42 @@ public class Config {
 //        }
     }
 
+    public boolean readProperties(Properties prop) {
+        try {
+            String propertiesString = configService.getConfig("config", "neatlogic.framework", 3000);
+            if (StringUtils.isNotBlank(propertiesString)) {
+                prop.load(new InputStreamReader(new ByteArrayInputStream(propertiesString.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos"));
+                return true;
+            } else {
+                // 如果从nacos中读不出配置，则使用本地配置文件配置
+                prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
+                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
+                return false;
+            }
+        } catch (NacosException | IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
     @PostConstruct
     public void init() {
         try {
             initConfigFile();
-            String propertiesString = configService.getConfig("config", "neatlogic.framework", 3000);
-            loadNacosProperties(propertiesString);
-            if (StringUtils.isNotBlank(propertiesString)) {
+            Properties prop = new Properties();
+            boolean flag = readProperties(prop);
+            if (flag) {
                 configService.addListener("config", "neatlogic.framework", new Listener() {
                     @Override
                     public void receiveConfigInfo(String configInfo) {
-                        loadNacosProperties(configInfo);
+                        Properties properties = new Properties();
+                        try {
+                            properties.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                        } catch (IOException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                        loadNacosProperties(properties);
                     }
 
                     @Override
@@ -546,22 +571,14 @@ public class Config {
                     }
                 });
             }
+            loadNacosProperties(prop);
         } catch (NacosException e) {
             logger.error(e.getMessage(), e);
         }
     }
 
-    private static void loadNacosProperties(String configInfo) {
+    public static void loadNacosProperties(Properties prop) {
         try {
-            Properties prop = new Properties();
-            if (StringUtils.isNotBlank(configInfo)) {
-                prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
-                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos"));
-            } else {
-                // 如果从nacos中读不出配置，则使用本地配置文件配置
-                prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
-                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
-            }
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             AUDIT_HOME = prop.getProperty("audit.home");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
@@ -644,7 +661,7 @@ public class Config {
                 }
             }
             properties = prop;
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
     }

@@ -791,7 +791,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </insert>
 
     <insert id="insertTeamUser" parameterType="neatlogic.framework.dto.TeamUserVo">
-        INSERT INTO `user_team` (`team_uuid`,
+        INSERT ignore INTO `user_team` (`team_uuid`,
                                  `user_uuid`)
         VALUES (#{teamUuid},
                 #{userUuid})

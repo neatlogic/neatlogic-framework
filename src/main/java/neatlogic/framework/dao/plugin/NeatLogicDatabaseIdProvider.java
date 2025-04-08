@@ -49,12 +49,8 @@ public class NeatLogicDatabaseIdProvider implements DatabaseIdProvider {
             DatabaseMetaData metaData = con.getMetaData();
             String databaseProductName = metaData.getDatabaseProductName();
             if (Objects.equals(databaseProductName, DatabaseVendor.MYSQL.getName())) {
-                Statement statement = null;
-                ResultSet resultSet = null;
-                try {
-                    statement = con.createStatement();
-                    resultSet = statement.executeQuery("SELECT @@version");
-                    while (resultSet.next()) {
+                try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery("SELECT @@version")) {
+                    if (resultSet.next()) {
                         String databaseProductVersion = resultSet.getString(1);
                         if (databaseProductVersion.contains(DatabaseVendor.TIDB.getName())) {// 8.0.11-TiDB-v7.4.0
                             vendor = DatabaseVendor.TIDB;
@@ -63,17 +59,9 @@ public class NeatLogicDatabaseIdProvider implements DatabaseIdProvider {
                         } else {
                             vendor = DatabaseVendor.MYSQL;
                         }
-                        break;
                     }
                 } catch (Exception e) {
                     LogHolder.log.error(e.getMessage(), e);
-                } finally {
-                    if (resultSet != null) {
-                        resultSet.close();
-                    }
-                    if (statement != null) {
-                        statement.close();
-                    }
                 }
             }
             return vendor;

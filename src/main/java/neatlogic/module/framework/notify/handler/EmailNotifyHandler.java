@@ -142,7 +142,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
         EmailUtil.sendEmailWithFile(
                 clearStringHTML(notifyVo.getTitle()),
                 notifyVo.getContent(),
-                String.join(",", toEmailSet),
+                new ArrayList<>(toEmailSet),
                 null,
                 attachmentMap
         );

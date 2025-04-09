@@ -1,7 +1,6 @@
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.common.constvalue.MimeType;
 import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.MailServerVo;
@@ -43,7 +42,14 @@ public class EmailUtil {
      * @param to      收件人
      */
     public static void sendEmailWithFile(String title, String content, String to) throws MessagingException, IOException {
-        sendEmailWithFile(title, content, to, null, null);
+        List<String> toList = new ArrayList<>();
+        if (to.contains(",")) {
+            String[] split = to.split(",");
+            toList.addAll(Arrays.asList(split));
+        } else {
+            toList.add(to);
+        }
+        sendEmailWithFile(title, content, toList, null, null);
     }
 
     /**
@@ -54,7 +60,14 @@ public class EmailUtil {
      * @param to      收件人
      */
     public static void sendEmailWithFileWithMailServer(String title, String content, String to, MailServerVo mailServerVo) throws MessagingException, IOException {
-        sendEmailWithFile(title, content, to, null, null, mailServerVo);
+        List<String> toList = new ArrayList<>();
+        if (to.contains(",")) {
+            String[] split = to.split(",");
+            toList.addAll(Arrays.asList(split));
+        } else {
+            toList.add(to);
+        }
+        sendEmailWithFile(title, content, toList, null, null, mailServerVo);
     }
 
 
@@ -73,7 +86,21 @@ public class EmailUtil {
             throw new EmailServerNotFoundException();
         }
         MailServerVo mailServerVo = JSON.parseObject(config, MailServerVo.class);
-        sendEmailWithFile(title, content, to, cc, attachmentMap, mailServerVo);
+        List<String> toList = new ArrayList<>();
+        if (to.contains(",")) {
+            String[] split = to.split(",");
+            toList.addAll(Arrays.asList(split));
+        } else {
+            toList.add(to);
+        }
+        List<String> ccList = new ArrayList<>();
+        if (cc.contains(",")) {
+            String[] split = cc.split(",");
+            ccList.addAll(Arrays.asList(split));
+        } else {
+            ccList.add(cc);
+        }
+        sendEmailWithFile(title, content, toList, ccList, attachmentMap, mailServerVo);
     }
 
     public static void sendEmailWithFile(String title, String content, List<String> to, List<String> cc, Map<String, InputStream> attachmentMap, MailServerVo mailServerVo) throws IOException, MessagingException {
@@ -171,119 +198,20 @@ public class EmailUtil {
                     logger.info("邮件标题：{}", title);
                     logger.info("发送日期：{}", new Date());
                     logger.info("邮件内容：{}", content);
-                    logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat, SerializerFeature.IgnoreErrorGetter));
                 }
                 Transport.send(msg);
                 logger.info("邮件发送成功");
             } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
-                throw new EmailSendException(ex);
-            }
-        } else {
-            throw new EmailServerNotFoundException();
-        }
-    }
-
-    /**
-     * 发送带附件的邮件
-     *
-     * @param title         邮件标题
-     * @param content       邮件正文
-     * @param to            收件人
-     * @param cc            抄送人
-     * @param attachmentMap 附件(key:文件名;value:流)，根据附件名后缀自动匹配MimeType，如果没有后缀名或未匹配到MimeType，则默认为application/octet-stream
-     */
-    public static void sendEmailWithFile(String title, String content, String to, String cc, Map<String, InputStream> attachmentMap, MailServerVo mailServerVo) throws MessagingException, IOException {
-        if (mailServerVo != null && StringUtils.isNotBlank(mailServerVo.getHost()) && mailServerVo.getPort() != null) {
-            /* 开启邮箱服务器连接会话 */
-            Properties props = new Properties();
-            props.setProperty("mail.smtp.host", mailServerVo.getHost());
-            props.setProperty("mail.smtp.port", mailServerVo.getPort().toString());
-            props.setProperty("mail.smtp.ssl.enable", mailServerVo.getSslEnable());
-            //props.setProperty("mail.smtp.ssl.protocols", "TLSv1.2");
-            //props.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-            props.setProperty("mail.smtp.auth", "true");
-            Session session;
-            if (StringUtils.isNotBlank(mailServerVo.getUserName()) && StringUtils.isNotBlank(mailServerVo.getPassword())) {
-                session = Session.getInstance(props, new Authenticator() {
-                    @Override
-                    protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
+                List<String> list = new ArrayList<>();
+                Address[] allRecipients = msg.getAllRecipients();
+                for (Address address : allRecipients) {
+                    if (address instanceof InternetAddress) {
+                        list.add(((InternetAddress) address).getAddress());
                     }
-                });
-            } else {
-                props.put("mail.smtp.auth", "false");
-                session = Session.getInstance(props);
-            }
-
-            MimeMessage msg = new MimeMessage(session);
-            if (StringUtils.isNotBlank(mailServerVo.getFromAddress())) {
-                msg.setFrom(new InternetAddress(mailServerVo.getFromAddress(), mailServerVo.getName()));
-            }
-            /* 设置收件人 */
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
-            /* 设置抄送人 */
-            if (StringUtils.isNotBlank(cc)) {
-                msg.setRecipients(Message.RecipientType.CC, InternetAddress.parse(cc, false));
-            }
-            /* 设置邮件标题 */
-            msg.setSubject(title);
-            msg.setSentDate(new Date());
-
-            MimeMultipart multipart = new MimeMultipart();
-            /* 设置邮件正文 */
-            //if (StringUtils.isNotBlank(content)) { //注释掉，否则content 为空时发邮件会异常
-            content = "<html>" +
-                    "<head>" +
-                    "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">" +
-                    "<style type=\"text/css\">" +
-                    "</style>" +
-                    "</head><body>" +
-                    content +
-                    "</body></html>";
-            MimeBodyPart text = new MimeBodyPart();
-            text.setContent(content, "text/html;charset=UTF-8");
-            multipart.addBodyPart(text);
-            //}
-            /* 设置附件 */
-            if (MapUtils.isNotEmpty(attachmentMap)) {
-                for (Map.Entry<String, InputStream> entry : attachmentMap.entrySet()) {
-                    MimeType mimeType = null;
-                    String key = entry.getKey();
-                    if (key.contains(".")) {
-                        mimeType = MimeType.getMimeType(key.substring(key.lastIndexOf(".")));
-                    }
-                    if (mimeType == null) {
-                        mimeType = MimeType.STREAM;
-                    }
-                    MimeBodyPart messageBodyPart = new MimeBodyPart();
-                    DataSource dataSource = new ByteArrayDataSource(entry.getValue(), mimeType.getValue());
-                    DataHandler dataHandler = new DataHandler(dataSource);
-                    messageBodyPart.setDataHandler(dataHandler);
-                    messageBodyPart.setFileName(MimeUtility.encodeText(key));
-                    multipart.addBodyPart(messageBodyPart);
                 }
-            }
-            msg.setContent(multipart);
-            /* 发送邮件 */
-            try {
-                if (logger.isInfoEnabled()) {
-                    logger.info("邮件会话属性：{}", JSON.toJSONString(props));
-                    logger.info("邮件服务器身份验证账号：{}", mailServerVo.getUserName());
-                    logger.info("邮件服务器身份验证密码：{}", mailServerVo.getPassword());
-                    logger.info("发送方名称：{}", mailServerVo.getName());
-                    logger.info("发送方地址：{}", mailServerVo.getUserName());
-                    logger.info("接收方地址：{}", to);
-                    logger.info("邮件标题：{}", title);
-                    logger.info("发送日期：{}", new Date());
-                    logger.info("邮件内容：{}", content);
-                }
-//                logger.info("邮件MimeMessage封装对象：{}", JSON.toJSONString(msg, SerializerFeature.PrettyFormat));
-                Transport.send(msg);
-                logger.info("邮件发送成功");
-            } catch (Exception ex) {
-                logger.error(ex.getMessage(), ex);
-                throw new EmailSendException(ex);
+                String allRecipientStr = String.join(",", list);
+                logger.error(ex.getMessage() + "，所有收件人：" + allRecipientStr, ex);
+                throw new EmailSendException(ex.getMessage(), allRecipientStr);
             }
         } else {
             throw new EmailServerNotFoundException();
@@ -304,6 +232,20 @@ public class EmailUtil {
     }
 
     public static void sendHtmlEmail(String title, String content, String to, String cc) throws MessagingException, IOException {
-        sendEmailWithFile(title, content, to, cc, null);
+        List<String> toList = new ArrayList<>();
+        if (to.contains(",")) {
+            String[] split = to.split(",");
+            toList.addAll(Arrays.asList(split));
+        } else {
+            toList.add(to);
+        }
+        List<String> ccList = new ArrayList<>();
+        if (cc.contains(",")) {
+            String[] split = cc.split(",");
+            ccList.addAll(Arrays.asList(split));
+        } else {
+            ccList.add(cc);
+        }
+        sendEmailWithFile(title, content, toList, ccList, null);
     }
 }

@@ -28,7 +28,6 @@ import neatlogic.framework.message.core.IMessageHandler;
 import neatlogic.framework.notify.core.*;
 import neatlogic.framework.notify.dao.mapper.NotifyMapper;
 import neatlogic.framework.notify.dto.*;
-import neatlogic.framework.notify.exception.NotifyPolicyNotFoundException;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -95,169 +95,183 @@ public class NotifyPolicyUtil {
             List<FileVo> fileList,
             String notifyAuditMessage
     ) throws Exception {
-
-        NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
-        if (policyConfig == null) {
-            return;
-        }
-        NotifyTriggerVo triggerVo = null;
-        /* 触发动作列表 **/
-        List<NotifyTriggerVo> triggerList = policyConfig.getTriggerList();
-        for (NotifyTriggerVo trigger : triggerList) {
-            /* 找到要触发类型对应的信息 **/
-            if (notifyTriggerType.getTrigger().equals(trigger.getTrigger())) {
-                triggerVo = trigger;
-                break;
-            }
-        }
-        if (triggerVo == null) {
-            return;
-        }
-        /* 通知列表 **/
-        List<NotifyTriggerNotifyVo> notifyList = triggerVo.getNotifyList();
-        if (CollectionUtils.isEmpty(notifyList)) {
-            return;
-        }
-        INotifyPolicyHandler policyHandler = NotifyPolicyHandlerFactory.getHandler(notifyPolicyHandler);
-        if (policyHandler == null) {
-            throw new NotifyPolicyNotFoundException(notifyPolicyHandler);
-        }
-        List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
-        List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
-        JSONObject templateParamData;
-        if (policyHandler.needConvertData()) {
-            //新方式，用一个实现类处理完所需数据
-            templateParamData = policyHandler.convertData(callerData, notifyTriggerType);
-        } else {
-            /* 注入流程作业信息 不够将来再补充 **/
-            templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData, notifyTriggerType);
-            /* 模板列表 **/
-        }
-        List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
-        Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(NotifyTemplateVo::getId, e -> e));
-        for (NotifyTriggerNotifyVo notifyObj : notifyList) {
-            /* 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
-            ConditionConfigVo conditionConfig = notifyObj.getConditionConfig();
-            List<ConditionGroupVo> conditionGroupList = conditionConfig.getConditionGroupList();
-            if (CollectionUtils.isNotEmpty(conditionGroupList)) {
-                /* 参数映射 **/
-                if (CollectionUtils.isNotEmpty(paramMappingList)) {
-                    for (ParamMappingVo paramMappingVo : paramMappingList) {
-                        if ("constant".equals(paramMappingVo.getType())) {
-                            conditionParamData.put(paramMappingVo.getName(), paramMappingVo.getValue());
+        List<String> notifyAuditList = new ArrayList<>();
+        try {
+            INotifyPolicyHandler policyHandler = NotifyPolicyHandlerFactory.getHandler(notifyPolicyHandler);
+            if (policyHandler != null) {
+                NotifyPolicyConfigVo policyConfig = notifyPolicyVo.getConfig();
+                if (policyConfig != null) {
+                    NotifyTriggerVo triggerVo = null;
+                    /* 触发动作列表 **/
+                    List<NotifyTriggerVo> triggerList = policyConfig.getTriggerList();
+                    for (NotifyTriggerVo trigger : triggerList) {
+                        /* 找到要触发类型对应的信息 **/
+                        if (notifyTriggerType.getTrigger().equals(trigger.getTrigger())) {
+                            triggerVo = trigger;
+                            break;
                         }
                     }
-                }
-
-                try {
-                    ConditionParamContext.init(conditionParamData);
-                    /* 解析条件表达式，生成javascript脚本，如(true&&false)&&(false||true)||(false||true) **/
-                    String script = conditionConfig.buildScript();
-                    // System.out.println(script);
-                    /* 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
-                    if (!RunScriptUtil.runScript(script)) {
-                        continue;
-                    }
-                } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
-                } finally {
-                    ConditionParamContext.get().release();
-                }
-            }
-            /* 通知动作列表 **/
-            List<NotifyActionVo> actionList = notifyObj.getActionList();
-            for (NotifyActionVo actionObj : actionList) {
-                /* 接收人列表 **/
-                List<String> receiverList = actionObj.getReceiverList();
-                if (CollectionUtils.isEmpty(receiverList)) {
-                    continue;
-                }
-                String notifyHandler = actionObj.getNotifyHandler();
-                INotifyHandler handler = NotifyHandlerFactory.getHandler(notifyHandler);
-                if (handler == null) {
-                    logger.error("通知处理器：'{}'不存在", notifyHandler);
-                    continue;
-                }
-                NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
-
-                /* 设置通知模板 **/
-                Long templateId = actionObj.getTemplateId();
-                if (templateId != null) {
-                    NotifyTemplateVo notifyTemplateVo = templateMap.get(templateId);
-                    if (notifyTemplateVo != null) {
-                        notifyBuilder.withContentTemplate(notifyTemplateVo.getContent());
-                        notifyBuilder.withTitleTemplate(notifyTemplateVo.getTitle());
-                    }
-                }
-                templateParamData.put("notifyTriggerType", notifyTriggerType.getText());
-                notifyBuilder.addAllData(templateParamData);
-                /* 参数映射 **/
-                if (CollectionUtils.isNotEmpty(paramMappingList)) {
-                    for (ParamMappingVo paramMappingVo : paramMappingList) {
-                        /* 临时增加逻辑 默认参数不能自定义值 **/
-                        if (templateParamData.containsKey(paramMappingVo.getName())) {
-                            continue;
-                        }
-                        /* end **/
-                        if ("constant".equals(paramMappingVo.getType())) {
-                            notifyBuilder.addData(paramMappingVo.getName(), paramMappingVo.getValue());
-                        } else if (Objects.equals(paramMappingVo.getName(),
-                                paramMappingVo.getValue())) {
-                            if (!templateParamData.containsKey(paramMappingVo.getValue())) {
-                                logger.debug(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
-                            }
-                        } else {
-                            Object processFieldValue = templateParamData.get(paramMappingVo.getValue());
-                            if (processFieldValue != null) {
-                                notifyBuilder.addData(paramMappingVo.getName(), processFieldValue);
+                    if (triggerVo != null) {
+                        /* 通知列表 **/
+                        List<NotifyTriggerNotifyVo> notifyList = triggerVo.getNotifyList();
+                        if (CollectionUtils.isNotEmpty(notifyList)) {
+                            List<ConditionParamVo> paramList = policyHandler.getSystemParamList();
+                            List<String> paramNameList = paramList.stream().map(ConditionParamVo::getName).collect(Collectors.toList());
+                            JSONObject templateParamData;
+                            if (policyHandler.needConvertData()) {
+                                //新方式，用一个实现类处理完所需数据
+                                templateParamData = policyHandler.convertData(callerData, notifyTriggerType);
                             } else {
-                                logger.debug(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                /* 注入流程作业信息 不够将来再补充 **/
+                                templateParamData = NotifyParamHandlerFactory.getData(paramNameList, callerData, notifyTriggerType);
+                                /* 模板列表 **/
                             }
-                        }
-                    }
-                }
-                /* 注入结束 **/
+                            List<NotifyTemplateVo> templateList = policyConfig.getTemplateList();
+                            Map<Long, NotifyTemplateVo> templateMap = templateList.stream().collect(Collectors.toMap(NotifyTemplateVo::getId, e -> e));
+                            for (NotifyTriggerNotifyVo notifyObj : notifyList) {
+                                /* 条件表达式配置信息，当表达式结果为true时，才发送通知 **/
+                                ConditionConfigVo conditionConfig = notifyObj.getConditionConfig();
+                                List<ConditionGroupVo> conditionGroupList = conditionConfig.getConditionGroupList();
+                                if (CollectionUtils.isNotEmpty(conditionGroupList)) {
+                                    /* 参数映射 **/
+                                    if (CollectionUtils.isNotEmpty(paramMappingList)) {
+                                        for (ParamMappingVo paramMappingVo : paramMappingList) {
+                                            if ("constant".equals(paramMappingVo.getType())) {
+                                                conditionParamData.put(paramMappingVo.getName(), paramMappingVo.getValue());
+                                            }
+                                        }
+                                    }
 
-                /* 设置正常接收人 **/
-                for (String receiver : receiverList) {
-                    String[] split = receiver.split("#");
-                    if (GroupSearch.USER.getValue().equals(split[0])) {
-                        notifyBuilder.addUserUuid(split[1]);
-                    } else if (GroupSearch.TEAM.getValue().equals(split[0])) {
-                        notifyBuilder.addTeamUuid(split[1]);
-                    } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
-                        notifyBuilder.addRoleUuid(split[1]);
-                    } else if (MapUtils.isNotEmpty(receiverMap)) {
-                        List<NotifyReceiverVo> notifyReceiverList = receiverMap.get(split[1]);
-                        if (CollectionUtils.isNotEmpty(notifyReceiverList)) {
-                            for (NotifyReceiverVo notifyReceiverVo : notifyReceiverList) {
-                                if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
-                                    notifyBuilder.addUserUuid(notifyReceiverVo.getUuid());
-                                } else if (GroupSearch.TEAM.getValue()
-                                        .equals(notifyReceiverVo.getType())) {
-                                    notifyBuilder.addTeamUuid(notifyReceiverVo.getUuid());
-                                } else if (GroupSearch.ROLE.getValue()
-                                        .equals(notifyReceiverVo.getType())) {
-                                    notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
+                                    try {
+                                        ConditionParamContext.init(conditionParamData);
+                                        /* 解析条件表达式，生成javascript脚本，如(true&&false)&&(false||true)||(false||true) **/
+                                        String script = conditionConfig.buildScript();
+                                        // System.out.println(script);
+                                        /* 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
+                                        if (!RunScriptUtil.runScript(script)) {
+                                            notifyAuditList.add(notifyAuditMessage + " 通知设置ID为" + notifyObj.getId() + "的通知条件判断结果为false，不触发通知");
+                                            continue;
+                                        }
+                                    } catch (Exception e) {
+                                        logger.error(e.getMessage(), e);
+                                    } finally {
+                                        ConditionParamContext.get().release();
+                                    }
+                                }
+                                /* 通知动作列表 **/
+                                List<NotifyActionVo> actionList = notifyObj.getActionList();
+                                for (NotifyActionVo actionObj : actionList) {
+                                    String notifyHandler = actionObj.getNotifyHandler();
+                                    INotifyHandler handler = NotifyHandlerFactory.getHandler(notifyHandler);
+                                    if (handler != null) {
+                                        NotifyVo.Builder notifyBuilder = new NotifyVo.Builder(notifyTriggerType, newsHandlerClass, notifyPolicyHandler);
+                                        /* 设置通知模板 **/
+                                        Long templateId = actionObj.getTemplateId();
+                                        if (templateId != null) {
+                                            NotifyTemplateVo notifyTemplateVo = templateMap.get(templateId);
+                                            if (notifyTemplateVo != null) {
+                                                notifyBuilder.withContentTemplate(notifyTemplateVo.getContent());
+                                                notifyBuilder.withTitleTemplate(notifyTemplateVo.getTitle());
+                                            }
+                                        }
+                                        templateParamData.put("notifyTriggerType", notifyTriggerType.getText());
+                                        notifyBuilder.addAllData(templateParamData);
+                                        /* 参数映射 **/
+                                        if (CollectionUtils.isNotEmpty(paramMappingList)) {
+                                            for (ParamMappingVo paramMappingVo : paramMappingList) {
+                                                /* 临时增加逻辑 默认参数不能自定义值 **/
+                                                if (templateParamData.containsKey(paramMappingVo.getName())) {
+                                                    continue;
+                                                }
+                                                /* end **/
+                                                if ("constant".equals(paramMappingVo.getType())) {
+                                                    notifyBuilder.addData(paramMappingVo.getName(), paramMappingVo.getValue());
+                                                } else if (Objects.equals(paramMappingVo.getName(),
+                                                        paramMappingVo.getValue())) {
+                                                    if (!templateParamData.containsKey(paramMappingVo.getValue())) {
+                                                        logger.debug(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                                    }
+                                                } else {
+                                                    Object processFieldValue = templateParamData.get(paramMappingVo.getValue());
+                                                    if (processFieldValue != null) {
+                                                        notifyBuilder.addData(paramMappingVo.getName(), processFieldValue);
+                                                    } else {
+                                                        logger.debug(TenantContext.get().getTenantUuid() + "-没有找到参数'" + paramMappingVo.getValue() + "'信息");
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        /* 注入结束 **/
+
+                                        /* 设置正常接收人 **/
+                                        /* 接收人列表 **/
+                                        List<String> receiverList = actionObj.getReceiverList();
+                                        if (CollectionUtils.isNotEmpty(receiverList)) {
+                                            for (String receiver : receiverList) {
+                                                String[] split = receiver.split("#");
+                                                if (GroupSearch.USER.getValue().equals(split[0])) {
+                                                    notifyBuilder.addUserUuid(split[1]);
+                                                } else if (GroupSearch.TEAM.getValue().equals(split[0])) {
+                                                    notifyBuilder.addTeamUuid(split[1]);
+                                                } else if (GroupSearch.ROLE.getValue().equals(split[0])) {
+                                                    notifyBuilder.addRoleUuid(split[1]);
+                                                } else if (MapUtils.isNotEmpty(receiverMap)) {
+                                                    List<NotifyReceiverVo> notifyReceiverList = receiverMap.get(split[1]);
+                                                    if (CollectionUtils.isNotEmpty(notifyReceiverList)) {
+                                                        for (NotifyReceiverVo notifyReceiverVo : notifyReceiverList) {
+                                                            if (GroupSearch.USER.getValue().equals(notifyReceiverVo.getType())) {
+                                                                notifyBuilder.addUserUuid(notifyReceiverVo.getUuid());
+                                                            } else if (GroupSearch.TEAM.getValue()
+                                                                    .equals(notifyReceiverVo.getType())) {
+                                                                notifyBuilder.addTeamUuid(notifyReceiverVo.getUuid());
+                                                            } else if (GroupSearch.ROLE.getValue()
+                                                                    .equals(notifyReceiverVo.getType())) {
+                                                                notifyBuilder.addRoleUuid(notifyReceiverVo.getUuid());
+                                                            }
+                                                        }
+                                                    } else {
+                                                        logger.debug("触发点：”{}“的接收对象：“{}”找不到对应的用户、组、角色等数据", notifyTriggerType, receiver);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        notifyBuilder.addFileList(fileList);
+                                        NotifyVo notifyVo = notifyBuilder.build();
+                                        /* 通知出现异常时，防止循环调用本方法 */
+                                        if (callerData instanceof NotifyVo) {
+                                            notifyVo.setIsSendExceptionNotify(((NotifyVo) callerData).getIsSendExceptionNotify());
+                                        }
+                                        /* 发送通知 */
+                                        notifyVo.setCallerData(callerData);
+                                        notifyVo.setCallerMessageHandlerClass(newsHandlerClass);
+                                        notifyVo.setCallerNotifyPolicyVo(notifyPolicyVo);
+                                        boolean isSentSuccessfully = handler.execute(notifyVo);
+                                        audit($.t(policyHandler.getName()), notifyPolicyVo.getName(), notifyTriggerType.getText(), handler.getName(), isSentSuccessfully, notifyVo.getTitle(), notifyAuditMessage, notifyVo);
+                                    } else {
+                                        notifyAuditList.add(notifyAuditMessage + " 通知处理器：" + notifyObj.getId() + "不存在，不触发通知");
+                                    }
                                 }
                             }
                         } else {
-                            logger.debug("触发点：”{}“的接收对象：“{}”找不到对应的用户、组、角色等数据", notifyTriggerType, receiver);
+                            notifyAuditList.add(notifyAuditMessage + "该通知策略该触发点没有通知设置，不触发通知");
                         }
+                    } else {
+                        notifyAuditList.add(notifyAuditMessage + " 该通知策略触发列表中没有为触发点" + notifyTriggerType.getTrigger() + "，不触发通知");
                     }
+                } else {
+                    notifyAuditList.add(notifyAuditMessage + " 该通知策略config为null，不触发通知");
                 }
-                notifyBuilder.addFileList(fileList);
-                NotifyVo notifyVo = notifyBuilder.build();
-                /* 通知出现异常时，防止循环调用本方法 */
-                if (callerData instanceof NotifyVo) {
-                    notifyVo.setIsSendExceptionNotify(((NotifyVo) callerData).getIsSendExceptionNotify());
+            } else {
+                notifyAuditList.add(notifyAuditMessage + " 通知策略处理器：" + notifyPolicyHandler + "不存在，不触发通知");
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            if (CollectionUtils.isNotEmpty(notifyAuditList)) {
+                Logger notifyAuditLogger = LoggerFactory.getLogger("notifyAudit");
+                for (String notifyAudit : notifyAuditList) {
+                    notifyAuditLogger.info("\n" + notifyAudit);
                 }
-                /* 发送通知 */
-                notifyVo.setCallerData(callerData);
-                notifyVo.setCallerMessageHandlerClass(newsHandlerClass);
-                notifyVo.setCallerNotifyPolicyVo(notifyPolicyVo);
-                boolean isSentSuccessfully = handler.execute(notifyVo);
-                audit($.t(policyHandler.getName()), notifyPolicyVo.getName(), notifyTriggerType.getText(), handler.getName(), isSentSuccessfully, notifyVo.getTitle(), notifyAuditMessage, notifyVo);
             }
         }
     }
@@ -336,6 +350,6 @@ public class NotifyPolicyUtil {
             stringBuilder.append("\n");
         }
         Logger notifyAuditLogger = LoggerFactory.getLogger("notifyAudit");
-        notifyAuditLogger.info(stringBuilder.toString());
+        notifyAuditLogger.info("\n" + stringBuilder);
     }
 }

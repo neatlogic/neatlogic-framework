@@ -17,7 +17,6 @@ package neatlogic.module.framework.filter.handler;
 
 import com.alibaba.nacos.api.utils.StringUtils;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.UserVo;
@@ -28,16 +27,18 @@ import neatlogic.framework.exception.user.UserAuthFailedException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Cas20ServiceTicketValidator;
-import org.jasig.cas.client.validation.TicketValidationException;
 import org.jasig.cas.client.validation.TicketValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 @Service
 public class CasLoginAuthHandler extends LoginAuthHandlerBase {
+    protected static Logger logger = LoggerFactory.getLogger(CasLoginAuthHandler.class);
 
     @Override
     public String getType() {
@@ -45,17 +46,16 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
     }
 
     @Override
-    public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException{
+    public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException {
 
         String ticket = request.getHeader("AuthValue");
         String tenant = request.getHeader("Tenant");
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();
-        if(!selfUrl.endsWith("/")){
+        if (!selfUrl.endsWith("/")) {
             selfUrl = selfUrl + "/";
         }
         selfUrl = selfUrl + tenant;
-
         if (StringUtils.isBlank(ticket)) {
             throw new LoginAuthCasParamNoFoundException();
         }
@@ -64,38 +64,33 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
             throw new LoginAuthConfigNoFoundException("cas");
         }
 
-        if(casUrl.indexOf("http:") == -1 ){
+        if (!casUrl.contains("http:")) {
             casUrl = "http://" + casUrl;
         }
-
-        UserVo userVo  = null;
+        logger.debug("=======cas auth ======== ticket:{},tenant:{},casUrl:{},selfUrl:{}", ticket, tenant, casUrl, selfUrl);
+        UserVo userVo = null;
         boolean isFailed = true;
         try {
             String userId = "";
             TicketValidator validator = new Cas20ServiceTicketValidator(casUrl);
             Assertion assertion = validator.validate(ticket, selfUrl);
             if (assertion != null && assertion.getPrincipal() != null) {
-                if(assertion.getPrincipal().getName().indexOf("@") > -1){
+                if (assertion.getPrincipal().getName().contains("@")) {
                     userId = assertion.getPrincipal().getName().substring(0, assertion.getPrincipal().getName().indexOf("@")).toUpperCase();
-                }else{
+                } else {
                     userId = assertion.getPrincipal().getName().toUpperCase();
                 }
             }
-            isFailed = false ;
-            userVo =  new UserVo();
-            userVo.setUserId(userId);
-            TenantContext.init();
-            TenantContext.get().switchTenant(tenant);
+            isFailed = false;
             userVo = userMapper.getUserByUserId(userId);
-            logger.info("[CAS认证成功] userId:" + userId);
-        } catch (TicketValidationException e) {
-            logger.error("[CAS认证失败]" + e.getMessage());
-            isFailed = true;
+            logger.debug("[CAS认证成功] userId:{}", userId);
+        } catch (Exception e) {
+            logger.error(String.format("[CAS认证失败] ticket:%s,tenant:%s,casUrl:%s,selfUrl:%s,error:%s", ticket, tenant, casUrl, selfUrl, e.getMessage()), e);
         }
 
-        if(isFailed){
+        if (isFailed) {
             throw new UserAuthFailedException();
-        }else if(userVo == null){//认证通过，但数据库内没用户
+        } else if (userVo == null) {//认证通过，但数据库内没用户
             throw new LoginAuthUserNotFoundException();
         }
         return userVo;
@@ -103,34 +98,31 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Override
     public String myDirectUrl() {
-        HttpServletRequest request=  RequestContext.get().getRequest();
+        HttpServletRequest request = RequestContext.get().getRequest();
         String tenant = request.getHeader("Tenant");
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();
-        if(!selfUrl.endsWith("/")){
-            selfUrl = selfUrl + "/" ;
+        if (!selfUrl.endsWith("/")) {
+            selfUrl = selfUrl + "/";
         }
         selfUrl = selfUrl + tenant;
-        String redirectTo = casUrl + "/login?service=" +  selfUrl;
-        return redirectTo;
+        return casUrl + "/login?service=" + selfUrl;
     }
 
     @Override
-    protected String myLogout() throws IOException {
-        HttpServletRequest request=  UserContext.get().getRequest();
-        HttpServletResponse response = UserContext.get().getResponse();
+    protected String myLogout() {
+        HttpServletRequest request = UserContext.get().getRequest();
 
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();
         String tenant = request.getHeader("Tenant");
-        if(!selfUrl.endsWith("/")){
+        if (!selfUrl.endsWith("/")) {
             selfUrl = selfUrl + "/";
         }
         selfUrl = selfUrl + tenant;
         if (StringUtils.isBlank(casUrl)) {
             throw new LoginAuthConfigNoFoundException("cas");
         }
-        String redirectTo = casUrl + "/logout?service=" + selfUrl + "&renew=true&other=form";
-        return redirectTo;
+        return casUrl + "/logout?service=" + selfUrl + "&renew=true&other=form";
     }
 }

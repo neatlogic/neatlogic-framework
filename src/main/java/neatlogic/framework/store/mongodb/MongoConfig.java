@@ -24,12 +24,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
 public class MongoConfig {
-
-    @Bean
-    public NeatlogicMongoDatabaseFactory neatlogicMongoDatabaseFactory() {
-        return new NeatlogicMongoDatabaseFactory();
-    }
-
     @Bean
     public MongoTemplate mongoTemplate(NeatlogicMongoDatabaseFactory factory) {
         return new MongoTemplate(factory);

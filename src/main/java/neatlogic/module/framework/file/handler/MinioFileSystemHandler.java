@@ -15,7 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.file.handler;
 
-import io.minio.MinioClient;
+import io.minio.*;
+import io.minio.errors.ErrorResponseException;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
@@ -46,7 +47,12 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
     public void afterPropertiesSet() throws Exception {
         // 使用MinIO服务的URL，端口，Access key和Secret key创建一个MinioClient对象
         if (StringUtils.isNotBlank(Config.getConfigProperty("minio.url"))) {
-            this.minioClient = new MinioClient(Config.getConfigProperty("minio.url"), Config.getConfigProperty("minio.accesskey", "minioadmin"), Config.getConfigProperty("minio.secretkey", "minioadmin"));
+            this.minioClient =
+                    MinioClient.builder()
+                            .endpoint(Config.getConfigProperty("minio.url"))
+                            .credentials(Config.getConfigProperty("minio.accesskey", "minioadmin"), Config.getConfigProperty("minio.secretkey", "minioadmin"))
+                            .build();
+            //this.minioClient = new MinioClient(Config.getConfigProperty("minio.url"), Config.getConfigProperty("minio.accesskey", "minioadmin"), Config.getConfigProperty("minio.secretkey", "minioadmin"));
             minioClient.setTimeout(TimeUnit.SECONDS.toMillis(10), 0, 0);
         }
     }
@@ -54,7 +60,7 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
     /**
      * @param tenantUuid  租户uuid
      * @param inputStream 输入流
-     * @param fileParam 文件
+     * @param fileParam   文件
      * @return 附件路径
      */
     @Override
@@ -63,15 +69,30 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
         // 检查存储桶是否已经存在
-        boolean bucketExists = minioClient.bucketExists(Config.getConfigProperty("minio.bucket", "neatlogic"));
+        String bucket = Config.getConfigProperty("minio.bucket", "neatlogic");
+        //boolean bucketExists = minioClient.bucketExists(Config.getConfigProperty("minio.bucket", "neatlogic"));
+        boolean bucketExists =
+                minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         if (!bucketExists) {
             // 创建一个名为bucketName的存储桶，用于存储照片等zip文件。
-            minioClient.makeBucket(Config.getConfigProperty("minio.bucket", "neatlogic"));
+            //minioClient.makeBucket(Config.getConfigProperty("minio.bucket", "neatlogic"));
+            minioClient.makeBucket(
+                    MakeBucketArgs.builder().bucket(bucket).build()
+            );
         }
+
+
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
         String finalPath = "/" + tenantUuid + "/upload/" + fileParam.getType() + "/" + format.format(new Date()) + "/" + fileParam.getPathName();
         // 使用putObject上传一个文件到存储桶中
-        minioClient.putObject(Config.getConfigProperty("minio.bucket", "neatlogic"), finalPath, inputStream, fileParam.getContentType());
+        //minioClient.putObject(Config.getConfigProperty("minio.bucket", "neatlogic"), finalPath, inputStream, fileParam.getContentType());
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(finalPath)
+                        .stream(inputStream, inputStream.available(), -1)
+                        .contentType(fileParam.getContentType())
+                        .build());
 //		fileVo.setPath("minio:" + finalPath);
         return MinioFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
     }
@@ -87,7 +108,10 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         }
         if (StringUtils.isNotBlank(filePath) && filePath.startsWith(NAME.toLowerCase() + ":")) {
             String path = filePath.replaceAll(NAME.toLowerCase() + ":", "");
-            minioClient.removeObject(Config.getConfigProperty("minio.bucket", "neatlogic"), path);
+            //minioClient.removeObject(Config.getConfigProperty("minio.bucket", "neatlogic"), path);
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
+                    .object(path).build());
+
         } else {
             throw new FilePathIllegalException(filePath);
         }
@@ -105,7 +129,11 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
-        return minioClient.getObject(Config.getConfigProperty("minio.bucket", "neatlogic"), path.replaceAll(NAME.toLowerCase() + ":", ""));
+        //return minioClient.getObject(Config.getConfigProperty("minio.bucket", "neatlogic"), path.replaceAll(NAME.toLowerCase() + ":", ""));
+        return minioClient.getObject(GetObjectArgs.builder()
+                .bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
+                .object(path.replaceAll(NAME.toLowerCase() + ":", "")).build()
+        );
     }
 
     @Override
@@ -113,7 +141,9 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
-        return minioClient.statObject(Config.getConfigProperty("minio.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
+        //return minioClient.statObject(Config.getConfigProperty("minio.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
+        return minioClient.statObject(StatObjectArgs.builder().bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
+                .object(filePath.replaceAll(NAME.toLowerCase() + ":", "")).build()).size();
     }
 
     @Override
@@ -121,7 +151,17 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
-        minioClient.statObject(Config.getConfigProperty("minio.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", ""));
-        return true;
+        //minioClient.statObject(Config.getConfigProperty("minio.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", ""));
+        try {
+            minioClient.statObject(StatObjectArgs.builder().bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
+                    .object(filePath.replaceAll(NAME.toLowerCase() + ":", "")).build());
+            return true;
+        } catch (ErrorResponseException e) {
+            if (e.errorResponse().code().equals("NoSuchKey")) {
+                return false;
+            } else {
+                throw e;
+            }
+        }
     }
 }

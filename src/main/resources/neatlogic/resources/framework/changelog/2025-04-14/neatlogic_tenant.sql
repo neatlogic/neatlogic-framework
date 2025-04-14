@@ -6,7 +6,7 @@ ALTER TABLE `notify_config`
     DROP PRIMARY KEY,
     ADD PRIMARY KEY (`id`);
 
-ALTER TABLE `neatlogic_develop`.`notify_config`
+ALTER TABLE `notify_config`
     CHANGE `id` `id` BIGINT NOT NULL COMMENT '主键ID',
     CHANGE `is_active` `is_active` TINYINT (1) DEFAULT 0 NOT NULL COMMENT '是否激活',
-    CHANGE `is_default` `is_default` TINYINT (1) DEFAULT 0 NOT NULL COMMENT '是否是默认配置'
+    CHANGE `is_default` `is_default` TINYINT (1) DEFAULT 0 NOT NULL COMMENT '是否是默认配置';

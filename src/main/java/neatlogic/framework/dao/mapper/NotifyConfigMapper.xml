@@ -17,8 +17,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.NotifyConfigMapper">
 
+    <select id="getNotifyConfigListByType" parameterType="java.lang.String" resultType="neatlogic.framework.dto.NotifyConfigVo">
+        SELECT
+            `id`,
+            `name`,
+            `is_active` AS isActive,
+            `is_default` AS isDefault,
+            `type`,
+            `config` AS configStr
+        FROM `notify_config`
+        WHERE `type` = #{value}
+    </select>
+
+    <select id="getNotifyConfigById" parameterType="java.lang.Long" resultType="neatlogic.framework.dto.NotifyConfigVo">
+        SELECT
+            `id`,
+            `name`,
+            `is_active` AS isActive,
+            `is_default` AS isDefault,
+            `type`,
+            `config` AS configStr
+        FROM `notify_config`
+        WHERE `id` = #{value}
+    </select>
+
     <select id="getConfigByType" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT `config` FROM `notify_config` WHERE `type` = #{value}
+        SELECT `config` FROM `notify_config` WHERE `type` = #{value} AND `is_default` = 1
     </select>
 
     <insert id="insertNotifyConfig" parameterType="java.util.Map">
@@ -27,4 +51,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         ON DUPLICATE KEY
         UPDATE `config` = #{config}
     </insert>
+
+    <insert id="insertNotifyConfigVo" parameterType="neatlogic.framework.dto.NotifyConfigVo">
+        INSERT INTO `notify_config` (
+            `id`,
+            `name`,
+            `is_active`,
+            `is_default`,
+            `type`,
+            `config`
+        )
+        VALUES
+            (
+                #{id},
+                #{name},
+                #{isActive},
+                #{isDefault},
+                #{type},
+                #{configStr, typeHandler=CompressHandler}
+            )
+        ON DUPLICATE KEY UPDATE
+        `name` = #{name},
+        `config` = #{configStr, typeHandler=CompressHandler}
+    </insert>
+
+    <update id="updateNotifyConfigIsActive">
+        UPDATE `notify_config`
+        SET
+            `is_active` = #{isActive}
+        WHERE `id` = #{id}
+    </update>
+
+    <update id="updateNotifyConfigIsDefault">
+        UPDATE `notify_config`
+        SET
+        <if test="isDefault != null and isDefault == 1">
+            `is_active` = 1,
+        </if>
+            `is_default` = #{isDefault}
+        WHERE `id` = #{id}
+    </update>
+
+    <delete id="deleteNotifyConfigById" parameterType="java.lang.Long">
+        DELETE FROM `notify_config` WHERE `id` = #{value}
+    </delete>
 </mapper>

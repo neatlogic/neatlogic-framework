@@ -16,11 +16,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.dao.mapper;
 
 
+import neatlogic.framework.dto.NotifyConfigVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface NotifyConfigMapper {
+
+    List<NotifyConfigVo> getNotifyConfigListByType(String type);
+
+    NotifyConfigVo getNotifyConfigById(Long id);
 
     String getConfigByType(String type);
 
     int insertNotifyConfig(@Param("type") String type, @Param("config") String config);
+
+    int insertNotifyConfigVo(NotifyConfigVo notifyConfigVo);
+
+    int updateNotifyConfigIsActive(@Param("id") Long id, @Param("isActive") Integer isActive);
+
+    int updateNotifyConfigIsDefault(@Param("id") Long id, @Param("isDefault") Integer isDefault);
+
+    int deleteNotifyConfigById(Long id);
 }

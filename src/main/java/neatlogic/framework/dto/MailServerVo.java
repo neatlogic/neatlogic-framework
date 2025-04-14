@@ -3,9 +3,6 @@ package neatlogic.framework.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.UUID;
 
 /**
  * @program: neatlogic
@@ -16,8 +13,8 @@ public class MailServerVo extends BasePageVo {
 
     private static final long serialVersionUID = 6550790567158161414L;
 
-    @EntityField(name = "common.uuid", type = ApiParamType.STRING)
-    private String uuid;
+    @EntityField(name = "common.id", type = ApiParamType.LONG)
+    private Long id;
 
     @EntityField(name = "common.name", type = ApiParamType.STRING)
     private String name;
@@ -42,16 +39,17 @@ public class MailServerVo extends BasePageVo {
 
     @EntityField(name = "common.homeurl", type = ApiParamType.STRING)
     private String homeUrl;
+    @EntityField(name = "common.isactive", type = ApiParamType.INTEGER)
+    private Integer isActive;
+    @EntityField(name = "common.isdefault", type = ApiParamType.INTEGER)
+    private Integer isDefault;
 
-    public String getUuid() {
-        if (StringUtils.isBlank(uuid)) {
-            uuid = UUID.randomUUID().toString().replace("-", "");
-        }
-        return uuid;
+    public Long getId() {
+        return id;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -116,5 +114,21 @@ public class MailServerVo extends BasePageVo {
 
     public void setHomeUrl(String homeUrl) {
         this.homeUrl = homeUrl;
+    }
+
+    public Integer getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Integer isActive) {
+        this.isActive = isActive;
+    }
+
+    public Integer getIsDefault() {
+        return isDefault;
+    }
+
+    public void setIsDefault(Integer isDefault) {
+        this.isDefault = isDefault;
     }
 }

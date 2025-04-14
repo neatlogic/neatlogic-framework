@@ -947,14 +947,15 @@ CREATE TABLE `mq_topic`
 -- ----------------------------
 -- Table structure for notify_config
 -- ----------------------------
-CREATE TABLE IF NOT EXISTS `notify_config`
-(
-    `type`   varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '通知类型',
-    `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci         NOT NULL COMMENT '配置',
-    PRIMARY KEY (`type`) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_general_ci COMMENT = '通知配置表';
+CREATE TABLE `notify_config` (
+    `id` bigint NOT NULL COMMENT '主键ID',
+    `name` varchar(250) COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '名称',
+    `is_active` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否激活',
+    `is_default` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否是默认配置',
+    `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '通知类型',
+    `config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='通知配置表';
 
 -- ----------------------------
 -- Table structure for notify_job

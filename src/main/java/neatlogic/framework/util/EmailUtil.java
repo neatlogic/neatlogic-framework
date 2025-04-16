@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import neatlogic.framework.common.constvalue.MimeType;
 import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.MailServerVo;
+import neatlogic.framework.dto.NotifyConfigVo;
 import neatlogic.framework.notify.core.NotifyHandlerType;
 import neatlogic.framework.notify.exception.EmailSendException;
 import neatlogic.framework.notify.exception.EmailServerNotFoundException;
@@ -218,6 +219,25 @@ public class EmailUtil {
         }
     }
 
+    public static void sendEmailWithFile(Long notifyId, String title, String content, List<String> to, List<String> cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
+        String config = null;
+        if (notifyId != null) {
+            NotifyConfigVo notifyConfigVo = notifyConfigMapper.getNotifyConfigById(notifyId);
+            if (notifyConfigVo != null) {
+                config = notifyConfigVo.getConfigStr();
+            }
+        }
+        if (StringUtils.isBlank(config)) {
+            config = notifyConfigMapper.getConfigByType(NotifyHandlerType.EMAIL.getValue());
+        }
+
+        if (StringUtils.isBlank(config)) {
+            throw new EmailServerNotFoundException();
+        }
+        MailServerVo mailServerVo = JSON.parseObject(config, MailServerVo.class);
+        sendEmailWithFile(title, content, to, cc, attachmentMap, mailServerVo);
+    }
+
     public static void sendEmailWithFile(String title, String content, List<String> to, List<String> cc, Map<String, InputStream> attachmentMap) throws MessagingException, IOException {
         String config = notifyConfigMapper.getConfigByType(NotifyHandlerType.EMAIL.getValue());
         if (StringUtils.isBlank(config)) {
@@ -225,6 +245,10 @@ public class EmailUtil {
         }
         MailServerVo mailServerVo = JSON.parseObject(config, MailServerVo.class);
         sendEmailWithFile(title, content, to, cc, attachmentMap, mailServerVo);
+    }
+
+    public static void sendHtmlEmail(Long notifyConfigId, String title, String content, List<String> to, List<String> cc) throws MessagingException, IOException {
+        sendEmailWithFile(notifyConfigId, title, content, to, cc, null);
     }
 
     public static void sendHtmlEmail(String title, String content, List<String> to, List<String> cc) throws MessagingException, IOException {

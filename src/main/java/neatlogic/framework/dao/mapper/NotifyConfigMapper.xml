@@ -42,7 +42,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <select id="getConfigByType" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT `config` FROM `notify_config` WHERE `type` = #{value} AND `is_default` = 1
+        SELECT `config`
+        FROM `notify_config`
+        WHERE `type` = #{value}
+          AND `is_default` = 1
+        limit 1
     </select>
 
     <insert id="insertNotifyConfig" parameterType="java.util.Map">

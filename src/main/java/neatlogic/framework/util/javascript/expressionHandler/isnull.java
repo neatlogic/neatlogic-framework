@@ -33,14 +33,24 @@ public class isnull {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
 
         if (CollectionUtils.isNotEmpty(dataValueList)) {
-            List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
-            ApiRuntimeException error = new ValueNeedNullException(prefix);
-            if (errorList != null) {
-                errorList.add(error);
-            } else {
-                logger.warn(error.getMessage());
+            boolean hasValue = false;
+            for (int i = 0; i < dataValueList.size(); i++) {
+                String v = dataValueList.getString(i);
+                if (StringUtils.isNotBlank(v)) {
+                    hasValue = true;
+                    break;
+                }
             }
-            return false;
+            if (hasValue) {
+                List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
+                ApiRuntimeException error = new ValueNeedNullException(prefix);
+                if (errorList != null) {
+                    errorList.add(error);
+                } else {
+                    logger.warn(error.getMessage());
+                }
+            }
+            return !hasValue;
         }
         return true;
     }

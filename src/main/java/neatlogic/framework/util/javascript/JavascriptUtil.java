@@ -21,6 +21,8 @@ import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.script.*;
 import java.io.StringWriter;
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JavascriptUtil {
+    private static final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
     private static final ThreadLocal<List<ApiRuntimeException>> instance = new ThreadLocal<>();
     private static int MAX_CACHE_SIZE = 10;
 
@@ -153,6 +156,8 @@ public class JavascriptUtil {
             if (rv != null) {
                 return Boolean.parseBoolean(rv.toString());
             }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
         } finally {
             if (instance.get() != null) {
                 instance.remove();

@@ -41,7 +41,24 @@ public class isnotnull {
                 logger.warn(error.getMessage());
             }
             return false;
+        } else {
+            boolean hasValue = false;
+            for (int i = 0; i < dataValueList.size(); i++) {
+                String v = dataValueList.getString(i);
+                if (StringUtils.isNotBlank(v)) {
+                    hasValue = true;
+                    break;
+                }
+            }
+            if (!hasValue) {
+                ApiRuntimeException error = new ValueConNotNullException(prefix);
+                if (errorList != null) {
+                    errorList.add(error);
+                } else {
+                    logger.warn(error.getMessage());
+                }
+            }
+            return hasValue;
         }
-        return true;
     }
 }

@@ -93,7 +93,7 @@ public interface TeamMapper {
 
     int insertTeamUserTitle(@Param("teamUuid") String teamUuid, @Param("userUuid") String userUuid, @Param("titleId") Long titleId);
 
-    int updateTeamNameByUuid(TeamVo teamVo);
+    int updateTeamByUuid(TeamVo teamVo);
 
     int updateTeamIsDeleteBySourceAndLcd(@Param("source") String source, @Param("lcd") Date lcd);
 

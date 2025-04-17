@@ -22,6 +22,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <id property="uuid" column="uuid"/>
         <result property="id" column="id"/>
         <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
         <result property="parentUuid" column="parentUuid"/>
         <result property="level" column="level"/>
         <result property="upwardNamePath" column="upwardNamePath"/>
@@ -34,6 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `id`,
         `uuid`,
         `name`,
+        `email`,
+        `phone`,
         `lft`,
         `rht`,
         `parent_uuid` AS `parentUuid`,
@@ -83,6 +87,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `id`,
         `uuid`,
         `name`,
+        `email`,
+        `phone`,
         `lft`,
         `rht`,
         `parent_uuid` AS `parentUuid`,
@@ -114,6 +120,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
         a.`lft`,
         a.`rht`,
         a.`parent_uuid` AS `parentUuid`,
@@ -151,6 +159,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
         a.`lft`,
         a.`rht`,
         a.`parent_uuid` as `parentUuid`,
@@ -195,22 +205,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT a.`id`,
                a.`uuid`,
                a.`name`,
+               a.`email`,
+               a.`phone`,
                (SELECT COUNT(1) FROM `team` WHERE `parent_uuid` = a.`uuid`) as `childCount`,
                a.`parent_uuid`                                              as `parentUuid`,
                a.`lft`,
                a.`rht`,
                a.`level`
         FROM `team` a
-        WHERE a.`uuid` = #{uuid} and a.`is_delete` = 0
+        WHERE a.`uuid` = #{uuid}
+          and a.`is_delete` = 0
     </select>
 
     <select id="checkTeamIsExists" parameterType="string" resultType="int" useCache="false">
         SELECT COUNT(1)
         FROM `team`
-        WHERE `uuid` = #{uuid} and `is_delete` = 0
+        WHERE `uuid` = #{uuid}
+          and `is_delete` = 0
     </select>
 
-    <select id="checkTeamNameIsIsRepeat" parameterType="neatlogic.framework.dto.TeamVo" resultType="int" useCache="false">
+    <select id="checkTeamNameIsIsRepeat" parameterType="neatlogic.framework.dto.TeamVo" resultType="int"
+            useCache="false">
         SELECT COUNT(1)
         FROM `team`
         WHERE `name` = #{name}
@@ -236,6 +251,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <id property="uuid" column="uuid"/>
         <result property="id" column="id"/>
         <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
         <result property="parentUuid" column="parentUuid"/>
         <result property="lft" column="lft"/>
         <result property="rht" column="rht"/>
@@ -249,6 +266,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
         a.`parent_uuid` AS parentUuid,
         a.`lft`,
         a.`rht`,
@@ -273,6 +292,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
         a.`parent_uuid` AS parentUuid,
         a.`lft`,
         a.`rht`,
@@ -297,6 +318,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `id`,
         `uuid`,
         `name`,
+        `email`,
+        `phone`,
         `parent_uuid` AS parentUuid,
         `level`,
         `lft`,
@@ -311,7 +334,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         and `is_delete` = 0
     </select>
 
-    <select id="getTeamListContainsDeletedByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TeamVo"
+    <select id="getTeamListContainsDeletedByUuidList" parameterType="java.lang.String"
+            resultType="neatlogic.framework.dto.TeamVo"
             useCache="false">
         SELECT
         `id`,
@@ -337,6 +361,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `id`,
         `uuid`,
         `name`,
+        `email`,
+        `phone`,
         `parent_uuid` AS parentUuid,
         `level`,
         `lft`,
@@ -382,6 +408,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT a.`id`,
                a.`uuid`,
                a.`name`,
+               a.`email`,
+               a.`phone`,
                a.`parent_uuid` AS parentUuid,
                a.`lft`,
                a.`rht`
@@ -397,6 +425,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
         a.`parent_uuid` AS parentUuid,
         a.`lft`,
         a.`rht`,
@@ -463,18 +493,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="getTeamUuidByName" parameterType="java.lang.String" resultType="java.lang.String">
         select `uuid`
         from `team`
-        where `name` = #{value} and `is_delete` = 0
+        where `name` = #{value}
+          and `is_delete` = 0
     </select>
 
-    <select id="getTeamByNameAndParentUuid" parameterType="neatlogic.framework.dto.TeamVo" resultType="neatlogic.framework.dto.TeamVo">
-        select
-            `id`,
-            `uuid`,
-            `name`,
-            `parent_uuid` AS `parentUuid`
+    <select id="getTeamByNameAndParentUuid" parameterType="neatlogic.framework.dto.TeamVo"
+            resultType="neatlogic.framework.dto.TeamVo">
+        select `id`,
+               `uuid`,
+               `name`,
+               `email`,
+               `phone`,
+               `parent_uuid` AS `parentUuid`
         from `team`
         where `name` = #{name}
-        and `parent_uuid` = #{parentUuid}
+          and `parent_uuid` = #{parentUuid}
     </select>
 
     <select id="getRepeatTeamNameByNameList" parameterType="java.util.List"
@@ -558,7 +591,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <select id="getTeamUuidByUpwardNamePath" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT `uuid` FROM `team` WHERE `upward_name_path` = #{value}
+        SELECT `uuid`
+        FROM `team`
+        WHERE `upward_name_path` = #{value}
     </select>
 
     <sql id="searchTeamForMatrixSql">
@@ -621,7 +656,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                                 OR ${filter.uuid} IS NULL)
                             </when>
                             <otherwise>
-                                (${filter.uuid} NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR ${filter.uuid} IS NULL)
+                                (${filter.uuid} NOT LIKE CONCAT('%', #{filter.valueList[0]}, '%') OR ${filter.uuid} IS
+                                NULL)
                             </otherwise>
                         </choose>
                     </when>
@@ -650,57 +686,63 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </sql>
 
     <sql id="searchTeamForMatrixChildSql">
-        SELECT
-            a.`id`,
-            a.`uuid`,
-            a.`name`,
-            a.`description`,
-            a.`parent_uuid` AS parentUuid,
-            a.`is_delete` AS isDelete,
-            b.`name` AS parentName
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`name`,
+               a.`email`,
+               a.`phone`,
+               a.`description`,
+               a.`parent_uuid` AS parentUuid,
+               a.`is_delete`   AS isDelete,
+               b.`name`        AS parentName
         FROM `team` a
                  LEFT JOIN `team` b ON b.`uuid` = a.`parent_uuid`
         WHERE a.`is_delete` = 0
     </sql>
 
-    <select id="searchTeamCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.lang.Integer">
+    <select id="searchTeamCountForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
+            resultType="java.lang.Integer">
         SELECT
-            COUNT(1)
+        COUNT(1)
         FROM (
-            SELECT DISTINCT
-                <foreach collection="columnList" item="column" separator=",">
-                    `${column}`
-                </foreach>
-            FROM (
-                <include refid="searchTeamForMatrixChildSql"/>
-            ) a
-            <where>
-                <include refid="searchTeamForMatrixSql"/>
-            </where>
+        SELECT DISTINCT
+        <foreach collection="columnList" item="column" separator=",">
+            `${column}`
+        </foreach>
+        FROM (
+        <include refid="searchTeamForMatrixChildSql"/>
+        ) a
+        <where>
+            <include refid="searchTeamForMatrixSql"/>
+        </where>
         ) b
     </select>
 
-    <select id="searchTeamListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo" resultType="java.util.HashMap">
+    <select id="searchTeamListForMatrix" parameterType="neatlogic.framework.matrix.dto.MatrixDataVo"
+            resultType="java.util.HashMap">
         SELECT DISTINCT
-            <foreach collection="columnList" item="column" separator=",">
-                `${column}`
-            </foreach>
+        <foreach collection="columnList" item="column" separator=",">
+            `${column}`
+        </foreach>
         FROM (
-            <include refid="searchTeamForMatrixChildSql"/>
+        <include refid="searchTeamForMatrixChildSql"/>
         ) a
         <where>
             <include refid="searchTeamForMatrixSql"/>
         </where>
         LIMIT #{startNum}, #{pageSize}
     </select>
+
     <select id="getTeamByNameList" resultType="neatlogic.framework.dto.TeamVo">
         SELECT
-            a.`id`,
-            a.`uuid`,
-            a.`name`,
-            a.`description`,
-            a.`parent_uuid` AS parentUuid,
-            a.`is_delete` AS isDelete
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`email`,
+        a.`phone`,
+        a.`description`,
+        a.`parent_uuid` AS parentUuid,
+        a.`is_delete` AS isDelete
         FROM `team` a
         where `name` in
         <foreach collection="list" item="name" separator="," open="(" close=")">
@@ -712,6 +754,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
         a.`description`,
         a.`parent_uuid` AS parentUuid,
         a.`is_delete` AS isDelete,
@@ -727,6 +771,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         INSERT INTO `team` (`id`,
                             `uuid`,
                             `name`,
+                            `email`,
+                            `phone`,
                             `parent_uuid`,
                             `lft`,
                             `rht`,
@@ -739,6 +785,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         VALUES (#{id},
                 #{uuid},
                 #{name},
+                #{email},
+                #{phone},
                 #{parentUuid},
                 #{lft},
                 #{rht},
@@ -748,23 +796,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 0,
                 #{source},
                 NOW())
-        ON DUPLICATE KEY UPDATE
-             `name` = #{name},
-             `parent_uuid` = #{parentUuid},
-             `lft` = #{lft},
-             `rht` = #{rht},
-             `level` = #{level},
-             `upward_uuid_path` = #{upwardUuidPath},
-             `upward_name_path` = #{upwardNamePath},
-             `is_delete` = 0,
-             `source` = #{source},
-             `lcd` = NOW()
+        ON DUPLICATE KEY UPDATE `name`             = #{name},
+                                `email`            = #{email},
+                                `phone`            = #{phone},
+                                `parent_uuid`      = #{parentUuid},
+                                `lft`              = #{lft},
+                                `rht`              = #{rht},
+                                `level`            = #{level},
+                                `upward_uuid_path` = #{upwardUuidPath},
+                                `upward_name_path` = #{upwardNamePath},
+                                `is_delete`        = 0,
+                                `source`           = #{source},
+                                `lcd`              = NOW()
     </insert>
 
     <insert id="insertTeamForLdap" parameterType="neatlogic.framework.dto.TeamVo">
         INSERT INTO `team` (`id`,
                             `uuid`,
                             `name`,
+                            `email`,
+                            `phone`,
                             `parent_uuid`,
                             `upward_uuid_path`,
                             `upward_name_path`,
@@ -774,25 +825,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         VALUES (#{id},
                 #{uuid},
                 #{name},
+                #{email},
+                #{phone},
                 #{parentUuid},
                 #{upwardUuidPath},
                 #{upwardNamePath},
                 0,
                 #{source},
                 #{lcd})
-        on DUPLICATE KEY UPDATE
-             `name` = #{name},
-             `parent_uuid` = #{parentUuid},
-             `upward_uuid_path` = #{upwardUuidPath},
-             `upward_name_path` = #{upwardNamePath},
-             `is_delete` = 0,
-             `source` = #{source},
-             `lcd` = #{lcd}
+        on DUPLICATE KEY UPDATE `name`             = #{name},
+                                `email`            = #{email},
+                                `phone`            = #{phone},
+                                `parent_uuid`      = #{parentUuid},
+                                `upward_uuid_path` = #{upwardUuidPath},
+                                `upward_name_path` = #{upwardNamePath},
+                                `is_delete`        = 0,
+                                `source`           = #{source},
+                                `lcd`              = #{lcd}
     </insert>
 
     <insert id="insertTeamUser" parameterType="neatlogic.framework.dto.TeamUserVo">
         INSERT ignore INTO `user_team` (`team_uuid`,
-                                 `user_uuid`)
+                                        `user_uuid`)
         VALUES (#{teamUuid},
                 #{userUuid})
     </insert>
@@ -805,10 +859,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{titleId});
     </insert>
 
-    <update id="updateTeamNameByUuid" parameterType="neatlogic.framework.dto.TeamVo">
+    <update id="updateTeamByUuid" parameterType="neatlogic.framework.dto.TeamVo">
         UPDATE `team`
         SET `level` = #{level},
             `name`  = #{name},
+            `email` = #{email},
+            `phone` = #{phone},
             `lcd`   = NOW()
         WHERE `uuid` = #{uuid}
     </update>
@@ -854,8 +910,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <update id="updateTeamIsDeleteBySourceAndLcd" parameterType="java.util.Map">
         UPDATE
             `team`
-        SET
-            `is_delete` = 1
+        SET `is_delete` = 1
         WHERE `source` = #{source}
           AND (`lcd` &lt; #{lcd} OR `lcd` IS NULL)
     </update>
@@ -863,7 +918,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <update id="updateTeamIsDeletedByUuidList" parameterType="java.lang.String">
         UPDATE `team`
         SET `is_delete` = 1
-        WHERE `uuid`  IN
+        WHERE `uuid` IN
         <foreach collection="list" item="uuid" open="(" separator="," close=")">
             #{uuid}
         </foreach>

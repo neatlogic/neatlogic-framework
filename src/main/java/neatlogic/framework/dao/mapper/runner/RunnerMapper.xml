@@ -131,10 +131,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `runnergroup` a
                  LEFT JOIN `runnergroup_network` b ON a.`id` = b.`group_id`
                  LEFT JOIN `runnergroup_runner` e ON e.`runnergroup_id` = a.`id`
-                 LEFT JOIN `runner` c ON c.`id` = e.`runner_id`
+                 LEFT JOIN `runner` c ON c.`id` = e.`runner_id` and c.is_delete = 0
                  LEFT JOIN `runner_map` d ON c.`id` = d.`runner_id`
         WHERE a.`id` = #{id}
-          and c.is_delete = 0
     </select>
 
     <select id="getAllRunnerMap" resultMap="runnerMapMap" useCache="false">

@@ -21,8 +21,8 @@ public class RunnerGroupRunnerNotFoundException extends ApiRuntimeException {
 
     private static final long serialVersionUID = -4324826681772207554L;
 
-    public RunnerGroupRunnerNotFoundException(String name,String network) {
-        super("执行器组“{0}”-网段“{1}”,未配置执行器(runner)", name);
+    public RunnerGroupRunnerNotFoundException(String name, String network) {
+        super("执行器组“{0}”-网段“{1}”,未配置执行器(runner)", name, network);
     }
 
     public RunnerGroupRunnerNotFoundException(String name) {
@@ -33,7 +33,7 @@ public class RunnerGroupRunnerNotFoundException extends ApiRuntimeException {
         super("nfer.runnergrouprunnernotfoundexception.runnergrouprunnernotfoundexceptionid", id);
     }
 
-    public RunnerGroupRunnerNotFoundException(Long id,String tag) {
+    public RunnerGroupRunnerNotFoundException(Long id, String tag) {
         super("nfer.runnergrouprunnernotfoundexception.runnergrouprunnernotfoundexceptionid", id);
     }
 

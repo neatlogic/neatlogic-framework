@@ -649,10 +649,10 @@ public class HttpRequestUtil {
         }
 
         if (StringUtils.isNotBlank(this.error)) {
-            this.error = String.format("connect failed! url:%s, errorMsg:%s", this.url, this.error);
+            this.error = String.format("failed! url:%s, errorMsg:%s", this.url, this.error);
         }
         if (StringUtils.isNotBlank(this.errorMsg)) {
-            this.errorMsg = String.format("connect failed! url:%s, errorMsg:%s", this.url, this.errorMsg);
+            this.errorMsg = String.format("failed! url:%s, errorMsg:%s", this.url, this.errorMsg);
         }
         return this;
     }

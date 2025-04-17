@@ -27,6 +27,8 @@ import neatlogic.framework.exception.file.FileAccessDeniedException;
 import neatlogic.framework.exception.file.FileNotFoundException;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileTypeHandlerNotFoundException;
+import neatlogic.framework.exception.server.ServerHostIsBankException;
+import neatlogic.framework.exception.server.ServerNotFoundException;
 import neatlogic.framework.exception.user.NoTenantException;
 import neatlogic.framework.file.core.FileOperationType;
 import neatlogic.framework.file.core.FileTypeHandlerFactory;
@@ -216,10 +218,12 @@ public class FileServiceImpl implements IFileCrossoverService {
         ServerClusterVo serverClusterVo = serverMapper.getServerByServerId(serverId);
         if (serverClusterVo != null) {
             host = serverClusterVo.getHost();
+        } else {
+            throw new ServerNotFoundException(serverId);
         }
         TenantContext.get().setUseMasterDatabase(false);
         if (StringUtils.isBlank(host)) {
-            return resultObj;
+            throw new ServerHostIsBankException(serverId);
         }
         HttpServletRequest request = RequestContext.get().getRequest();
         String url = host + request.getRequestURI();
@@ -292,10 +296,12 @@ public class FileServiceImpl implements IFileCrossoverService {
         ServerClusterVo serverClusterVo = serverMapper.getServerByServerId(serverId);
         if (serverClusterVo != null) {
             host = serverClusterVo.getHost();
+        } else {
+            throw new ServerNotFoundException(serverId);
         }
         TenantContext.get().setUseMasterDatabase(false);
         if (StringUtils.isBlank(host)) {
-            return;
+            throw new ServerHostIsBankException(serverId);
         }
         String url = host + request.getRequestURI();
         HttpRequestUtil httpRequestUtil = HttpRequestUtil.download(url, "POST", response.getOutputStream()).setPayload(paramObj.toJSONString()).setAuthType(AuthenticateType.BUILDIN).sendRequest();

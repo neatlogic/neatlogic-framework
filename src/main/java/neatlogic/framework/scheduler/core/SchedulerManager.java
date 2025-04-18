@@ -41,6 +41,7 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @RootComponent
@@ -50,6 +51,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
     private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
     private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
+    private static final ReentrantLock GLOBAL_LOCK = new ReentrantLock();
 
     @Resource
     private TenantMapper tenantMapper;
@@ -111,9 +113,6 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
 
             JobKey jobKey = new JobKey(jobName, jobGroup);
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
-            if (scheduler.getJobDetail(jobKey) != null) {
-                scheduler.deleteJob(jobKey);
-            }
 
             try {
                 JobLockVo jobLockVo = schedulerMapper.getJobLockByJobNameGroup(jobName, jobGroup);
@@ -158,9 +157,21 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                     jobStatusVo.setHandler(className);
                     schedulerMapper.insertJobStatus(jobStatusVo);
                 }
-                Date nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
-                jobStatusVo.setNextFireTime(nextFireDate);
-                schedulerMapper.updateJobNextFireTime(jobStatusVo);
+                Date nextFireDate;
+                //加上全局锁，避免并发加载同一个作业时出现作业已存在的问题
+                GLOBAL_LOCK.lock();
+                try {
+                    if (scheduler.getJobDetail(jobKey) != null) {
+                        scheduler.deleteJob(jobKey);
+                    }
+                    nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
+                } finally {
+                    GLOBAL_LOCK.unlock();
+                }
+                if (nextFireDate != null) {
+                    jobStatusVo.setNextFireTime(nextFireDate);
+                    schedulerMapper.updateJobNextFireTime(jobStatusVo);
+                }
 //                schedulerMapper.insertJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup(), jobObject.getCron(), jobObject.getLoadTime()));
                 return nextFireDate;
             } catch (Exception ex) {

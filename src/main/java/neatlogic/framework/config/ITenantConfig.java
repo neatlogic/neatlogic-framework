@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.config;
 
+import neatlogic.framework.common.constvalue.ApiParamType;
+
 /**
  * 租户级别配置接口
  */
@@ -34,4 +36,12 @@ public interface ITenantConfig {
      * @return
      */
     String getDescription();
+
+    /**
+     * 数值类型
+     * @return
+     */
+    default ApiParamType getType() {
+        return null;
+    }
 }

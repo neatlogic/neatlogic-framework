@@ -7,7 +7,7 @@
 		`id`
 		FROM `tag`
 		where
-			`type` = #{type} and `name` LIKE CONCAT('%', #{name}, '%')
+			`type` = #{type} and `name` = #{name}
 	</select>
 
 	<select id="getTagLockById" resultType="neatlogic.framework.dto.TagVo">

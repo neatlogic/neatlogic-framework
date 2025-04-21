@@ -23,6 +23,7 @@ public class ConfigVo implements Serializable {
     private String key;
     private String value;
     private String description;
+    private String type;
 
     public String getKey() {
         return key;
@@ -48,5 +49,11 @@ public class ConfigVo implements Serializable {
         this.description = description;
     }
 
+    public String getType() {
+        return type;
+    }
 
+    public void setType(String type) {
+        this.type = type;
+    }
 }

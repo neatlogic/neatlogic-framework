@@ -28,6 +28,8 @@ import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dao.mapper.ElasticsearchMapper;
 import neatlogic.framework.dto.ElasticsearchVo;
+import neatlogic.framework.exception.elasticsearch.ElasticSearchHostNotFoundException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -42,10 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RootComponent
 public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
@@ -70,28 +69,49 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
                     credentialsProvider.setCredentials(AuthScope.ANY,
                             new UsernamePasswordCredentials(elasticsearch.getUsername(), elasticsearch.getPasswordPlain()));
                 }
-                RestClient restClient = RestClient
-                        .builder(HttpHost.create(elasticsearch.getHost()))
-                        .setHttpClientConfigCallback(httpClientBuilder -> {
-                            httpClientBuilder.disableAuthCaching();
-                            httpClientBuilder.setDefaultHeaders(Collections.singletonList(
-                                    new BasicHeader(
-                                            HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
-                            httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
-                                    (response, context) ->
-                                            response.addHeader("X-Elastic-Product", "Elasticsearch"));
-                            return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                        }).build();
+                List<HttpHost> httpHosts = new ArrayList<>();
+                if (StringUtils.isNotBlank(elasticsearch.getHost())) {
+                    String[] hostArray = elasticsearch.getHost().split(",");
+                    for (String host : hostArray) {
+                        if (StringUtils.isNotBlank(host)) {
+                            httpHosts.add(HttpHost.create(host));
+                        }
+                    }
+                }
+                if (CollectionUtils.isNotEmpty(httpHosts)) {
+                    RestClient restClient = RestClient
+                            .builder(httpHosts.toArray(new HttpHost[0]))
+                            .setHttpClientConfigCallback(httpClientBuilder -> {
+                                httpClientBuilder.disableAuthCaching();
+                                httpClientBuilder.setDefaultHeaders(Collections.singletonList(
+                                        new BasicHeader(
+                                                HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
+                                httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
+                                        (response, context) ->
+                                                response.addHeader("X-Elastic-Product", "Elasticsearch"));
 
-                ElasticsearchTransport transport = new RestClientTransport(
-                        restClient, new JacksonJsonpMapper());
+                                if (elasticsearch.getConfig().containsKey("maxConnPerRoute")) {
+                                    int maxConnPerRoute = elasticsearch.getConfig().getIntValue("maxConnPerRoute");
+                                    if (maxConnPerRoute > 0) {
+                                        httpClientBuilder.setMaxConnTotal(httpHosts.size() * maxConnPerRoute);
+                                        httpClientBuilder.setMaxConnPerRoute(maxConnPerRoute);
+                                    }
+                                }
+                                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                            }).build();
 
-                ElasticsearchClient esClient = new ElasticsearchClient(transport);
-                elasticSearchClientMap.put(elasticsearch.getTenantUuid(), esClient);
+                    ElasticsearchTransport transport = new RestClientTransport(
+                            restClient, new JacksonJsonpMapper());
 
-                List<IElasticsearchIndex> indexList = ElasticsearchIndexFactory.getAllIndex();
-                for (IElasticsearchIndex index : indexList) {
-                    index.createIndex();
+                    ElasticsearchClient esClient = new ElasticsearchClient(transport);
+                    elasticSearchClientMap.put(elasticsearch.getTenantUuid(), esClient);
+
+                    List<IElasticsearchIndex> indexList = ElasticsearchIndexFactory.getAllIndex();
+                    for (IElasticsearchIndex index : indexList) {
+                        index.createIndex();
+                    }
+                } else {
+                    throw new ElasticSearchHostNotFoundException();
                 }
             }
         }

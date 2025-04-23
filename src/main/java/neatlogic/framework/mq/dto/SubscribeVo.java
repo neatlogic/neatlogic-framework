@@ -65,6 +65,8 @@ public class SubscribeVo extends BasePageVo {
     private String handlerName;
     @EntityField(name = "是否启用", type = ApiParamType.BOOLEAN)
     private Boolean isEnable;
+    @JSONField(serialize = false)
+    private boolean ignoreServerId;
 
     public String getTopicName() {
         return topicName;
@@ -76,6 +78,14 @@ public class SubscribeVo extends BasePageVo {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean getIgnoreServerId() {
+        return ignoreServerId;
+    }
+
+    public void setIgnoreServerId(boolean ignoreServerId) {
+        this.ignoreServerId = ignoreServerId;
     }
 
     public String getSubscribeHandlerName() {

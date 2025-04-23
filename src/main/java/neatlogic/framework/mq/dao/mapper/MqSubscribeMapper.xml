@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <if test="isActive != null">
                 AND is_active = #{isActive}
             </if>
-            <if test="serverId != null">
+            <if test="ignoreServerId and serverId != null">
                 AND server_id = #{serverId}
             </if>
         </where>

@@ -63,6 +63,7 @@ public class SubscribeStartupComponent extends StartupBase {
                         SubscribeManager.create(subVo);
                         subVo.setError("");
                     } catch (Exception ex) {
+                        logger.error(ex.getMessage(), ex);
                         subVo.setIsActive(0);
                         subVo.setError(ex.getMessage());
                     } finally {

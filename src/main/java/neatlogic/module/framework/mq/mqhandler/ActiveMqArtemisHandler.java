@@ -81,7 +81,7 @@ public class ActiveMqArtemisHandler implements IMqHandler {
         }
         String topicName = subVo.getTopicName();
         String clientName = subVo.getName();
-        boolean isDurable = subVo.getIsDurable().equals(1);
+        //boolean isDurable = subVo.getIsDurable().equals(1);
         topicName = topicName.toLowerCase(Locale.ROOT);
         clientName = clientName.toLowerCase(Locale.ROOT);
         if (!containerMap.containsKey(subVo.getId())) {

@@ -17,6 +17,7 @@ package neatlogic.framework.exception.type;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParamNotExistsException extends ApiRuntimeException {
@@ -24,7 +25,7 @@ public class ParamNotExistsException extends ApiRuntimeException {
     private static final long serialVersionUID = -2608671566655133328L;
 
     public ParamNotExistsException(String paramNames) {
-        super("参数“{0}”不能为空",paramNames);
+        super("参数“{0}”不能为空", paramNames);
     }
 
     public ParamNotExistsException(int index, String keyName) {
@@ -39,7 +40,16 @@ public class ParamNotExistsException extends ApiRuntimeException {
         super("参数“{0}”不能同时为空", String.join("、", paramNames));
     }
 
-    public ParamNotExistsException(List<String> eitherParamList, List<String> orParamList) {
-        super("必须在[{0}]与[{1}}]两组参数中选择一组填写", String.join("、", eitherParamList), String.join("、", orParamList));
+    @SafeVarargs
+    public ParamNotExistsException(List<String>... paramGroups) {
+        super(buildMessage(paramGroups));
+    }
+
+    private static String buildMessage(List<String>... paramGroups) {
+        List<String> groupStrList = new ArrayList<>();
+        for (List<String> group : paramGroups) {
+            groupStrList.add("[" + String.join("、", group) + "]");
+        }
+        return "必须在" + String.join("、", groupStrList) + "中选择一组填写";
     }
 }

@@ -561,7 +561,7 @@ public class HttpRequestUtil {
             connection.connect();
             return connection;
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(this.url + "-" + ex.getMessage(), ex);
             this.error = ExceptionUtils.getStackTrace(ex);
             this.errorMsg = ex.getMessage();
         }

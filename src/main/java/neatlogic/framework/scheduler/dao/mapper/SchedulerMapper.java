@@ -70,8 +70,6 @@ public interface SchedulerMapper {
 
     int updateJobLock(JobLockVo jobLock);
 
-    int updateJobLockByServerId(JobLockVo jobLock);
-
     // INSERT
     int insertJob(JobVo job);
 
@@ -99,6 +97,8 @@ public interface SchedulerMapper {
     int deleteJobStatus(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
     int deleteJobLock(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+
+    int deleteJobLockByServerId(Integer serverId);
 
     void deleteUnusedJobStatus();
 

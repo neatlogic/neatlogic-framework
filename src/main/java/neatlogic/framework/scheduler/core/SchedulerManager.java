@@ -22,6 +22,7 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
@@ -104,6 +105,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     public Date loadJob(JobObject jobObject) {
         // 如果结束时间比当前时间早，就不加载了
         if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
+            unloadJob(jobObject);
             return null;
         }
         try {
@@ -180,6 +182,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
+        unloadJob(jobObject);
         return null;
     }
 
@@ -256,6 +259,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             try {
                 // 切换租户数据源
                 TenantContext.get().switchTenant(tenantUuid).setUseMasterDatabase(false);
+                schedulerMapper.deleteJobLockByServerId(Config.SCHEDULE_SERVER_ID);
                 UserContext.init(SystemUser.SYSTEM);
                 for (IJob jobHandler : jobHandlerList) {
                     jobHandler.initJob(tenantUuid);

@@ -370,12 +370,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
           AND job_group = #{jobGroup}
     </update>
 
-    <update id="updateJobLockByServerId">
-        UPDATE `schedule_job_lock`
-        SET `lock`=#{lock}
-        WHERE `server_id` = #{serverId}
-    </update>
-
     <insert id="saveJobData" parameterType="neatlogic.framework.scheduler.dto.JobDataVo">
         insert into schedule_job_data
             (job_uuid, data_name, data_value)
@@ -493,6 +487,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `schedule_job_lock`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
+    </delete>
+
+    <delete id="deleteJobLockByServerId" parameterType="java.lang.Integer">
+        DELETE
+        FROM `schedule_job_lock`
+        WHERE `server_id` = #{value}
     </delete>
 
 

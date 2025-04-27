@@ -170,7 +170,7 @@ public class SqlCostInterceptor implements Interceptor {
             if (obj != null) {
                 value = obj.toString();
             } else {
-                value = "";
+                value = "NULL";
             }
 
         }

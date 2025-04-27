@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dao.plugin;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
@@ -45,7 +46,7 @@ import java.sql.SQLException;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})
 })
 public class ExceptionCatchInterceptor implements Interceptor {
-
+    private final static Logger logger = LoggerFactory.getLogger(ExceptionCatchInterceptor.class);
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         //获取拦截方法的参数
@@ -108,6 +109,8 @@ public class ExceptionCatchInterceptor implements Interceptor {
                 logger.error("parameters: " + JSONObject.toJSONString(parameterObject));
                 logger.error(targetException.getMessage(), targetException);
             }
+            Object parameterObject = invocation.getArgs()[1];
+            logger.error("SQL Failed: {} with params: {}", ms.getBoundSql(parameterObject).getSql(), JSON.toJSONString(parameterObject), targetException);
             throw targetException;
         }
         return result;

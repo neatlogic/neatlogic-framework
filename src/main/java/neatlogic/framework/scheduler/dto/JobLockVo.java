@@ -18,8 +18,8 @@ package neatlogic.framework.scheduler.dto;
 import neatlogic.framework.common.config.Config;
 
 public class JobLockVo {
-    public final static String RUNNING = "running";
-    public final static String WAITING = "waiting";
+    public static final String RUNNING = "running";
+    public static final String WAITING = "waiting";
 
     private String jobName;
     private String jobGroup;

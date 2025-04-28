@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.scheduler.heartbreak.handler;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.heartbeat.core.IHeartbreakHandler;
@@ -55,6 +56,8 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			// 接管异常server的作业
 			List<JobLockVo> jobLockList = schedulerMapper.getJobLockByServerId(serverId);
 			for (JobLockVo jobLockVo : jobLockList) {
+				jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+				schedulerMapper.updateJobLock(jobLockVo);
 				if (!schedulerManager.checkJobIsExists(jobLockVo.getJobName(), jobLockVo.getJobGroup())) {
 					IJob jobHandler = SchedulerManager.getHandler(jobLockVo.getJobHandler());
 					if (jobHandler != null) {

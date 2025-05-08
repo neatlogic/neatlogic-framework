@@ -21,6 +21,7 @@ import neatlogic.framework.dao.mapper.ModuleMapper;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -59,6 +60,7 @@ public class TenantContext implements Serializable {
         if (_tenantContext != null) {
             context.setTenantUuid(_tenantContext.getTenantUuid());
             context.setActiveModuleList(_tenantContext.getActiveModuleList());
+            MDC.put("tenant", _tenantContext.getTenantUuid());
         }
         instance.set(context);
         return context;
@@ -67,6 +69,7 @@ public class TenantContext implements Serializable {
     public static TenantContext init(String _tenantUuid) {
         TenantContext context = new TenantContext(_tenantUuid);
         instance.set(context);
+        MDC.put("tenant", _tenantUuid);
         return context;
     }
 
@@ -134,6 +137,7 @@ public class TenantContext implements Serializable {
                     activeModuleMap.put(module.getId(), module);
                 }
             }
+            MDC.put("tenant", tenantUuid);
         }
         return this;
     }
@@ -143,6 +147,7 @@ public class TenantContext implements Serializable {
     }
 
     public void release() {
+        MDC.remove("tenant");
         instance.remove();
     }
 

@@ -52,7 +52,7 @@ public class SubscribeStartupComponent extends StartupBase {
     public int executeForCurrentTenant() {
         SubscribeVo subscribeVo = new SubscribeVo();
         subscribeVo.setIsActive(1);
-        subscribeVo.setServerId(Config.SCHEDULE_SERVER_ID);
+        //subscribeVo.setServerId(Config.SCHEDULE_SERVER_ID);
         subscribeVo.setPageSize(100);
         subscribeVo.setCurrentPage(1);
         List<SubscribeVo> subList = mqSubscribeMapper.searchSubscribe(subscribeVo);

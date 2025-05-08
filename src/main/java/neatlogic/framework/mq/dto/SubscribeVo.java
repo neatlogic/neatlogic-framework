@@ -18,7 +18,6 @@ package neatlogic.framework.mq.dto;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.mq.core.*;
@@ -65,8 +64,6 @@ public class SubscribeVo extends BasePageVo {
     private String handlerName;
     @EntityField(name = "是否启用", type = ApiParamType.BOOLEAN)
     private Boolean isEnable;
-    @JSONField(serialize = false)
-    private boolean ignoreServerId;
 
     public String getTopicName() {
         return topicName;
@@ -80,13 +77,6 @@ public class SubscribeVo extends BasePageVo {
         this.id = id;
     }
 
-    public boolean getIgnoreServerId() {
-        return ignoreServerId;
-    }
-
-    public void setIgnoreServerId(boolean ignoreServerId) {
-        this.ignoreServerId = ignoreServerId;
-    }
 
     public String getSubscribeHandlerName() {
         if (StringUtils.isNotBlank(className)) {
@@ -156,9 +146,6 @@ public class SubscribeVo extends BasePageVo {
     }
 
     public Integer getServerId() {
-        if (serverId == null) {
-            serverId = Config.SCHEDULE_SERVER_ID;
-        }
         return serverId;
     }
 

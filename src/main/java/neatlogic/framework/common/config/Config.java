@@ -76,6 +76,8 @@ public class Config {
     private static int LOGIN_FAILED_TIMES_CAPTCHA; //设置需要验证码的登录错误次数
 
     private static String JMS_URL;
+    private static String JMS_USER;
+    private static String JMS_PASSWORD;
 
     private static String KAFKA_URL;
 
@@ -267,6 +269,15 @@ public class Config {
     public static String JMS_URL() {
         return JMS_URL;
     }
+
+    public static String JMS_USER() {
+        return JMS_USER;
+    }
+
+    public static String JMS_PASSWORD() {
+        return JMS_PASSWORD;
+    }
+
 
     public static String KAFKA_URL() {
         return KAFKA_URL;
@@ -603,6 +614,9 @@ public class Config {
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));
 
             JMS_URL = prop.getProperty("jms.url"/*, "tcp://localhost:61616"*/);
+            JMS_USER = prop.getProperty("jms.user");
+            JMS_PASSWORD = prop.getProperty("jms.password");
+
             KAFKA_URL = prop.getProperty("kafka.url"/*, "localhost:9092"*/);
 
             FILE_HANDLER = prop.getProperty("file.handler", "FILE");
@@ -642,7 +656,7 @@ public class Config {
             LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));
 
             JWT_SECRET = prop.getProperty("jwt.secret");
-            if(StringUtils.isBlank(JWT_SECRET)){
+            if (StringUtils.isBlank(JWT_SECRET)) {
                 System.out.println(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 System.exit(1);

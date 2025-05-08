@@ -83,19 +83,22 @@ public class KafkaHandler implements IMqHandler {
 
     @Override
     public boolean create(SubscribeVo subVo) throws SubscribeTopicException, ExecutionException, InterruptedException {
-        ISubscribeHandler subscribeHandler = SubscribeHandlerFactory.getHandler(subVo.getClassName());
-        if (subscribeHandler == null) {
-            throw new SubscribeHandlerNotFoundException(subVo.getClassName());
-        }
-        String topicName = subVo.getTopicName();
-        String clientName = subVo.getName();
-        //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
-        clientName = clientName.toLowerCase();
-        String tenantUuid = TenantContext.get().getTenantUuid();
-
         if (!containerMap.containsKey(subVo.getId())) {
+            ISubscribeHandler subscribeHandler = SubscribeHandlerFactory.getHandler(subVo.getClassName());
+            if (subscribeHandler == null) {
+                throw new SubscribeHandlerNotFoundException(subVo.getClassName());
+            }
+            String topicName = subVo.getTopicName();
+            String clientName = subVo.getName();
+            //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
+            topicName = topicName.toLowerCase();
+            clientName = clientName.toLowerCase();
+            String tenantUuid = TenantContext.get().getTenantUuid();
+
+
             //用租户uuid+订阅id作为分组id，确保每个消费者都可以独立消费
             consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, tenantUuid + "_" + subVo.getId());
+            consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, tenantUuid + "_" + subVo.getId() + "_" + Config.SCHEDULE_SERVER_ID);
             AdminClient adminClient = AdminClient.create(consumerProps);
             ListTopicsResult topics = adminClient.listTopics();
             boolean topicExists = topics.names().get().contains(topicName);
@@ -122,7 +125,8 @@ public class KafkaHandler implements IMqHandler {
 
             ConcurrentMessageListenerContainer<String, String> container =
                     new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
-
+            container.setConcurrency(1);
+            container.setAutoStartup(true);
             containerMap.put(subVo.getId(), container);
 
             try {

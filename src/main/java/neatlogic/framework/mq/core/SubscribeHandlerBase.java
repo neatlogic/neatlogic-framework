@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.mq.core;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.mq.dao.mapper.MqSubscribeMapper;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public abstract class SubscribeHandlerBase implements ISubscribeHandler {
         //从DB再查一次订阅信息，检查订阅是否仍然有效
         SubscribeVo checkSubscribeVo = mqSubscribeMapper.getSubscribeByName(subscribeVo.getName());
         //如果订阅已经被删除或被禁用，则直接从删除订阅
-        if (checkSubscribeVo != null && checkSubscribeVo.getIsActive().equals(1) && checkSubscribeVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
+        if (checkSubscribeVo != null && checkSubscribeVo.getIsActive().equals(1) /*&& checkSubscribeVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)*/) {
             //System.out.println(clientName);
             myOnMessage(checkSubscribeVo, message);
         } else if (checkSubscribeVo != null && checkSubscribeVo.getIsActive().equals(0)) {

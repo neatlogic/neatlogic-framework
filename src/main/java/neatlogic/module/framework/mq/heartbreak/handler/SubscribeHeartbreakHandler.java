@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.mq.heartbreak.handler;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.heartbeat.core.IHeartbreakHandler;
@@ -24,6 +23,10 @@ import neatlogic.framework.mq.core.SubscribeManager;
 import neatlogic.framework.mq.dao.mapper.MqSubscribeMapper;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,7 +34,7 @@ import java.util.List;
 
 @Service
 public class SubscribeHeartbreakHandler implements IHeartbreakHandler {
-
+    Logger logger = LoggerFactory.getLogger(SubscribeHeartbreakHandler.class);
     @Resource
     private MqSubscribeMapper mqSubscribeMapper;
 
@@ -50,20 +53,31 @@ public class SubscribeHeartbreakHandler implements IHeartbreakHandler {
 
             SubscribeVo subscribeVo = new SubscribeVo();
             subscribeVo.setIsActive(1);
+            subscribeVo.setPageSize(100);
+            subscribeVo.setCurrentPage(1);
+            //subscribeVo.setServerId(serverId);
             List<SubscribeVo> subList = mqSubscribeMapper.searchSubscribe(subscribeVo);
-            if (CollectionUtils.isNotEmpty(subList)) {
+            while (CollectionUtils.isNotEmpty(subList)) {
                 for (SubscribeVo subVo : subList) {
-                    if (subVo.getServerId().equals(serverId)) {
-                        subVo.setServerId(Config.SCHEDULE_SERVER_ID);
-                        mqSubscribeMapper.updateSubscribeServerId(subVo);
-                        try {
-                            SubscribeManager.create(subVo);
-                        } catch (Exception ex) {
-                            subVo.setError(ex.getMessage());
-                            mqSubscribeMapper.updateSubscribeError(subVo);
-                        }
+                    //if (subVo.getServerId().equals(serverId)) {
+                    //subVo.setServerId(Config.SCHEDULE_SERVER_ID);
+                    //mqSubscribeMapper.updateSubscribeServerId(subVo);
+                    try {
+                        System.out.println("接管:" + subVo.getName());
+                        SubscribeManager.create(subVo);
+                    } catch (InterruptedException ex) {
+                        subVo.setError(StringUtils.isNotBlank(ex.getMessage()) ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
+                        mqSubscribeMapper.updateSubscribeError(subVo);
+                        Thread.currentThread().interrupt();
+                        logger.error(ex.getMessage(), ex);
+                    } catch (Exception ex) {
+                        subVo.setError(StringUtils.isNotBlank(ex.getMessage()) ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));
+                        mqSubscribeMapper.updateSubscribeError(subVo);
                     }
+                    //}
                 }
+                subscribeVo.setCurrentPage(subscribeVo.getCurrentPage() + 1);
+                subList = mqSubscribeMapper.searchSubscribe(subscribeVo);
             }
         }
     }

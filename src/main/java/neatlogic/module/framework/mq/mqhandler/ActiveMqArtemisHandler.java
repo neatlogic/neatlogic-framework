@@ -26,41 +26,23 @@ import neatlogic.framework.mq.core.ISubscribeHandler;
 import neatlogic.framework.mq.core.SubscribeHandlerFactory;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.listener.SimpleMessageListenerContainer;
-import org.springframework.jms.listener.adapter.MessageListenerAdapter;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
-import java.util.Locale;
+import javax.jms.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class ActiveMqArtemisHandler implements IMqHandler {
     private static final Logger logger = LoggerFactory.getLogger(ActiveMqArtemisHandler.class);
-    private static ConnectionFactory connectionFactory;
-    private static final Map<Long, SimpleMessageListenerContainer> containerMap = new ConcurrentHashMap<>();
-    public static final String SEPARATOR = "#";
-    protected static JmsTemplate jmsTemplate;
+    private static final Map<Long, MessageConsumer> consumerMap = new ConcurrentHashMap<>();
 
-    @Autowired
-    public void setJmsTemplate(JmsTemplate _jmsTemplate) {
-        jmsTemplate = _jmsTemplate;
-    }
-
-    @Autowired
-    public void setConnectionFactory(ActiveMQConnectionFactory _connectionFactory) {
-        connectionFactory = _connectionFactory;
-    }
+    private final String brokerUrl = Config.JMS_URL();
+    private final String user = Config.JMS_USER();
+    private final String password = Config.JMS_PASSWORD();
 
     @Override
     public String getName() {
@@ -72,46 +54,34 @@ public class ActiveMqArtemisHandler implements IMqHandler {
         return "ActiveMQ Artemis";
     }
 
-
     @Override
     public boolean create(SubscribeVo subVo) throws SubscribeTopicException {
-        ISubscribeHandler subscribeHandler = SubscribeHandlerFactory.getHandler(subVo.getClassName());
-        if (subscribeHandler == null) {
-            throw new SubscribeHandlerNotFoundException(subVo.getClassName());
-        }
-        String topicName = subVo.getTopicName();
-        String clientName = subVo.getName();
-        //boolean isDurable = subVo.getIsDurable().equals(1);
-        topicName = topicName.toLowerCase(Locale.ROOT);
-        clientName = clientName.toLowerCase(Locale.ROOT);
-        if (!containerMap.containsKey(subVo.getId())) {
+        if (!consumerMap.containsKey(subVo.getId())) {
+            ISubscribeHandler subscribeHandler = SubscribeHandlerFactory.getHandler(subVo.getClassName());
+            if (subscribeHandler == null) {
+                throw new SubscribeHandlerNotFoundException(subVo.getClassName());
+            }
+            String topicName = subVo.getTopicName().toLowerCase();
+            String queueName = TenantContext.get().getTenantUuid() + "/" + topicName;
             subVo.setTenantUuid(TenantContext.get().getTenantUuid());
-            MessageListenerAdapter messageAdapter = new MessageListenerAdapter() {
-                @Override
-                public void onMessage(Message message, @Nullable Session session) throws JMSException {
+
+            try {
+                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
+                Connection connection = connectionFactory.createConnection();
+                connection.start();
+                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Destination destination = new ActiveMQQueue(queueName);
+                MessageConsumer consumer = session.createConsumer(destination);
+                consumer.setMessageListener(message -> {
                     try {
                         subscribeHandler.onMessage(subVo, message);
                     } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
+                        logger.error("消费消息失败: {}", ex.getMessage(), ex);
                     }
-                }
-            };
-
-            SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-            container.setConnectionFactory(connectionFactory);
-            container.setPubSubDomain(true);
-            container.setDestinationName(TenantContext.get().getTenantUuid() + "/" + topicName);
-            container.setDurableSubscriptionName(TenantContext.get().getTenantUuid() + "/" + clientName + "/" + Config.SCHEDULE_SERVER_ID);
-            //container.setSubscriptionDurable(isDurable);
-            container.setSubscriptionDurable(false);//默认都是临时订阅，持久订阅暂时没有场景，因为订阅主题没有暂停功能
-            container.setClientId(TenantContext.get().getTenantUuid() + "/" + clientName + "/" + Config.SCHEDULE_SERVER_ID);
-            container.setMessageListener(messageAdapter);
-            //container.setAutoStartup(true);
-            containerMap.put(subVo.getId(), container);
-            try {
-                container.start();
+                });
+                consumerMap.put(subVo.getId(), consumer);
             } catch (Exception ex) {
-                throw new SubscribeTopicException(topicName, clientName, ex.getMessage());
+                throw new SubscribeTopicException(topicName, subVo.getName(), ex.getMessage());
             }
         }
         return true;
@@ -119,40 +89,47 @@ public class ActiveMqArtemisHandler implements IMqHandler {
 
     @Override
     public void reconnect(SubscribeVo subscribeVo) throws SubscribeTopicException {
-        this.destroy(subscribeVo);
-        this.create(subscribeVo);
+        destroy(subscribeVo);
+        create(subscribeVo);
     }
 
     @Override
     public boolean isRunning(SubscribeVo subscribeVo) {
-        SimpleMessageListenerContainer container = containerMap.get(subscribeVo.getId());
-        return container != null && container.isRunning();
+        return consumerMap.containsKey(subscribeVo.getId());
     }
 
     @Override
     public void destroy(SubscribeVo subscribeVo) {
-        SimpleMessageListenerContainer container = containerMap.get(subscribeVo.getId());
-        if (container != null) {
-            if (container.isRunning()) {
-                container.stop();
+        MessageConsumer consumer = consumerMap.get(subscribeVo.getId());
+        if (consumer != null) {
+            try {
+                consumer.close();
+            } catch (JMSException e) {
+                logger.error("关闭消费者失败: {}", e.getMessage());
             }
-            container.shutdown();
-            container.destroy();
-            containerMap.remove(subscribeVo.getId());
+            consumerMap.remove(subscribeVo.getId());
         }
     }
 
     @Override
     public void send(String topicName, String content) {
-        try {
-            jmsTemplate.convertAndSend(TenantContext.get().getTenantUuid() + "/" + topicName, content);
+        String queueName = TenantContext.get().getTenantUuid() + "/" + topicName.toLowerCase();
+        try (ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
+             Connection connection = connectionFactory.createConnection();
+             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+
+            Destination destination = new ActiveMQQueue(queueName);
+            MessageProducer producer = session.createProducer(destination);
+            TextMessage message = session.createTextMessage(content);
+            producer.setDeliveryMode(DeliveryMode.PERSISTENT);
+            producer.send(message);
         } catch (Exception ex) {
-            logger.error("发送消息到{}/{}失败，异常：{}", TenantContext.get().getTenantUuid(), topicName, ex.getMessage());
+            logger.error("发送消息到 Artemis 失败，异常：{}", ex.getMessage());
         }
     }
 
     @Override
     public boolean isEnable() {
-        return StringUtils.isNotBlank(Config.JMS_URL());
+        return brokerUrl != null && !brokerUrl.isEmpty();
     }
 }

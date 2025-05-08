@@ -39,7 +39,7 @@ public class equal {
             if (dataValueList.size() == conditionValueList.size()) {
                 dataValueList.sort(Comparator.comparing(Object::toString));
                 conditionValueList.sort(Comparator.comparing(Object::toString));
-                if (!dataValueList.toString().equals(conditionValueList.toString())) {
+                if (!dataValueList.toString().trim().equalsIgnoreCase(conditionValueList.toString().trim())) {
                     ApiRuntimeException error = new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                     if (errorList != null) {
                         errorList.add(error);

@@ -37,7 +37,7 @@ public class notequal {
             if (dataValueList.size() == conditionValueList.size()) {
                 dataValueList.sort(Comparator.comparing(Object::toString));
                 conditionValueList.sort(Comparator.comparing(Object::toString));
-                if (!dataValueList.toString().equals(conditionValueList.toString())) {
+                if (!dataValueList.toString().trim().equalsIgnoreCase(conditionValueList.toString().trim())) {
                     return true;
                 } else {
                     ApiRuntimeException error = new ValueIsEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));

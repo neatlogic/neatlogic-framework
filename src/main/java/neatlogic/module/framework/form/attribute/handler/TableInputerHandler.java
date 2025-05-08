@@ -26,6 +26,7 @@ import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalException;
+import neatlogic.framework.util.FormUtil;
 import neatlogic.framework.util.TableResultUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -59,6 +60,11 @@ public class TableInputerHandler extends FormHandlerBase {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public Object getEnhanceReadabilityValue(Object originalValue, FormAttributeVo formAttributeVo) {
+        return FormUtil.getEnhanceReadabilityValue(originalValue, formAttributeVo);
     }
 
     @Override

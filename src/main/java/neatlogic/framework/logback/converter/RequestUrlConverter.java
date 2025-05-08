@@ -40,7 +40,6 @@ public class RequestUrlConverter extends ClassicConverter implements Serializabl
     public String convert(ILoggingEvent event) {
         RequestContext requestContext = RequestContext.get();
         if (requestContext != null) {
-            System.out.println("RequestUrlConverter requestContext.getUrl() = " + requestContext.getUrl());
             return requestContext.getUrl();
         } else {
             Map<String, String> map = event.getMDCPropertyMap();

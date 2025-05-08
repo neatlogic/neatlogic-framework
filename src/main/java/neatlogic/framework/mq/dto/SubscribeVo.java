@@ -25,6 +25,8 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 public class SubscribeVo extends BasePageVo {
     @EntityField(name = "id", type = ApiParamType.LONG)
     private Long id;
@@ -64,6 +66,18 @@ public class SubscribeVo extends BasePageVo {
     private String handlerName;
     @EntityField(name = "是否启用", type = ApiParamType.BOOLEAN)
     private Boolean isEnable;
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof SubscribeVo)) return false;
+        SubscribeVo that = (SubscribeVo) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 
     public String getTopicName() {
         return topicName;

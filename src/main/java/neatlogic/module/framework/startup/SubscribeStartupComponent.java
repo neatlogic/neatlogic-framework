@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -87,12 +88,12 @@ public class SubscribeStartupComponent extends StartupBase {
         Runnable runnable = new NeatLogicThread("MQ-SUBSCRIBE-RECONNECT") {
             @Override
             protected void execute() {
-                Map<String, List<SubscribeVo>> activeSubscribeMap = SubscribeManager.getActiveSubscribeMap();
+                Map<String, Set<SubscribeVo>> activeSubscribeMap = SubscribeManager.getActiveSubscribeMap();
                 if (MapUtils.isNotEmpty(activeSubscribeMap)) {
-                    for (Map.Entry<String, List<SubscribeVo>> entry : activeSubscribeMap.entrySet()) {
+                    for (Map.Entry<String, Set<SubscribeVo>> entry : activeSubscribeMap.entrySet()) {
                         //切换租户
                         TenantContext.get().switchTenant(entry.getKey());
-                        List<SubscribeVo> activeSubscribeList = entry.getValue();
+                        Set<SubscribeVo> activeSubscribeList = entry.getValue();
                         for (SubscribeVo subVo : activeSubscribeList) {
                             try {
                                 if (!SubscribeManager.needReconnect(subVo)) {

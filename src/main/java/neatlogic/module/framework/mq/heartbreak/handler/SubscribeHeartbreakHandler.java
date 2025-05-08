@@ -63,7 +63,6 @@ public class SubscribeHeartbreakHandler implements IHeartbreakHandler {
                     //subVo.setServerId(Config.SCHEDULE_SERVER_ID);
                     //mqSubscribeMapper.updateSubscribeServerId(subVo);
                     try {
-                        System.out.println("接管:" + subVo.getName());
                         SubscribeManager.create(subVo);
                     } catch (InterruptedException ex) {
                         subVo.setError(StringUtils.isNotBlank(ex.getMessage()) ? ex.getMessage() : ExceptionUtils.getStackTrace(ex));

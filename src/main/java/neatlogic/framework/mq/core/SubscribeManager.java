@@ -22,17 +22,17 @@ import neatlogic.framework.exception.mq.MqHandlerNotFoundException;
 import neatlogic.framework.exception.mq.SubscribeTopicException;
 import neatlogic.framework.mq.dto.SubscribeVo;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 @RootComponent
 public final class SubscribeManager {
-    private static final Map<String, List<SubscribeVo>> activeSubscribeMap = new HashMap<>();//记录所有激活的订阅，重连时直接从这里获取，避免反复查询数据库
+    private static final Map<String, Set<SubscribeVo>> activeSubscribeMap = new HashMap<>();//记录所有激活的订阅，重连时直接从这里获取，避免反复查询数据库
 
-    public static Map<String, List<SubscribeVo>> getActiveSubscribeMap() {
+    public static Map<String, Set<SubscribeVo>> getActiveSubscribeMap() {
         return activeSubscribeMap;
     }
 
@@ -88,7 +88,7 @@ public final class SubscribeManager {
             }*/
             //不管是否成功添加，都需要加入activeSubscribeMap，重连机制会从这里取数重连
             if (!activeSubscribeMap.containsKey(TenantContext.get().getTenantUuid())) {
-                activeSubscribeMap.put(TenantContext.get().getTenantUuid(), new ArrayList<>());
+                activeSubscribeMap.put(TenantContext.get().getTenantUuid(), new HashSet<>());
             }
             activeSubscribeMap.get(TenantContext.get().getTenantUuid()).add(subVo);
             handler.create(subVo);

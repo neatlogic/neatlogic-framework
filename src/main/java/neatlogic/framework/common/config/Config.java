@@ -592,9 +592,9 @@ public class Config {
         try {
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             AUDIT_HOME = prop.getProperty("audit.home");
-            SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "1"));
+            SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "60"));
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
-            MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "5"));
+            MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "60"));
             HOME_URL = prop.getProperty("home.url");
             MASTER_HOME_URL = prop.getProperty("master.home.url");
             BACK_END_URL = prop.getProperty("back.end.url");

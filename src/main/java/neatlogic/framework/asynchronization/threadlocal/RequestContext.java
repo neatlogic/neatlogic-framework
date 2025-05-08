@@ -17,6 +17,7 @@ package neatlogic.framework.asynchronization.threadlocal;
 
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.restful.constvalue.RejectSource;
+import org.slf4j.MDC;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -118,6 +119,7 @@ public class RequestContext implements Serializable {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
             context.setSqlAuditList(_requestContext.getSqlAuditList());
+            MDC.put("url", _requestContext.getUrl());
         }
         instance.set(context);
         return context;
@@ -135,6 +137,7 @@ public class RequestContext implements Serializable {
                 context.setLocale(Locale.getDefault());
             }
         }
+        MDC.put("url", url);
         return context;
     }
 
@@ -152,6 +155,7 @@ public class RequestContext implements Serializable {
     }
 
     public void release() {
+        MDC.remove("url");
         instance.remove();
     }
 

@@ -18,13 +18,18 @@ package neatlogic.framework.logback.converter;
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * logback.xml文件使用，日志中输出租户信息
  * @author linbq
  * @since 2022/1/19 15:12
  **/
-public class TenantConverter extends ClassicConverter {
+public class TenantConverter extends ClassicConverter implements Serializable {
+
     /**
      * The convert method is responsible for extracting data from the event and
      * storing it for later use by the write method.
@@ -36,7 +41,14 @@ public class TenantConverter extends ClassicConverter {
         TenantContext tenantContext = TenantContext.get();
         if (tenantContext != null) {
             return tenantContext.getTenantUuid();
+        } else {
+            Map<String, String> map = event.getMDCPropertyMap();
+            String tenant = map.get("tenant");
+            if (StringUtils.isNotBlank(tenant)) {
+                return tenant;
+            }
         }
-        return "";
+        return StringUtils.EMPTY;
     }
+
 }

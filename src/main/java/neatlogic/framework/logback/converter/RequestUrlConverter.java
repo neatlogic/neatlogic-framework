@@ -18,13 +18,18 @@ package neatlogic.framework.logback.converter;
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * logback.xml文件使用，日志中输出请求url
  * @author linbq
  * @since 2022/1/19 16:08
  **/
-public class RequestUrlConverter extends ClassicConverter {
+public class RequestUrlConverter extends ClassicConverter implements Serializable {
+
     /**
      * The convert method is responsible for extracting data from the event and
      * storing it for later use by the write method.
@@ -35,8 +40,15 @@ public class RequestUrlConverter extends ClassicConverter {
     public String convert(ILoggingEvent event) {
         RequestContext requestContext = RequestContext.get();
         if (requestContext != null) {
+            System.out.println("RequestUrlConverter requestContext.getUrl() = " + requestContext.getUrl());
             return requestContext.getUrl();
+        } else {
+            Map<String, String> map = event.getMDCPropertyMap();
+            String url = map.get("url");
+            if (StringUtils.isNotBlank(url)) {
+                return url;
+            }
         }
-        return "";
+        return StringUtils.EMPTY;
     }
 }

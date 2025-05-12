@@ -104,6 +104,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE `role_uuid` = #{roleUuid}
     </select>
 
+    <select id="searchRoleAuthByRoleUuidList" parameterType="String" resultType="neatlogic.framework.dto.RoleAuthVo"
+            useCache="false">
+        SELECT `role_uuid`  as `roleUuid`,
+               `auth_group` as `authGroup`,
+               `auth`
+        FROM `role_authority`
+        WHERE `role_uuid` = #{roleUuid}
+    </select>
+
     <select id="searchRoleCount" parameterType="neatlogic.framework.dto.RoleVo" resultType="int" useCache="false">
         SELECT
         COUNT(DISTINCT (a.`uuid`))

@@ -88,10 +88,10 @@ public class KafkaHandler implements IMqHandler {
             if (subscribeHandler == null) {
                 throw new SubscribeHandlerNotFoundException(subVo.getClassName());
             }
+            //kafka对主题大小写敏感，因此需要保持主题大小写！！
             String topicName = subVo.getTopicName();
             String clientName = subVo.getName();
             //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
-            topicName = topicName.toLowerCase();
             clientName = clientName.toLowerCase();
             String tenantUuid = TenantContext.get().getTenantUuid();
 

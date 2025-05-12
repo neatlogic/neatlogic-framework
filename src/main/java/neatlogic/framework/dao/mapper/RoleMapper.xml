@@ -110,7 +110,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                `auth_group` as `authGroup`,
                `auth`
         FROM `role_authority`
-        WHERE `role_uuid` = #{roleUuid}
+        WHERE `role_uuid` IN
+        <foreach collection="list" item="roleUuid" open="(" separator="," close=")">
+            #{roleUuid}
+        </foreach>
     </select>
 
     <select id="searchRoleCount" parameterType="neatlogic.framework.dto.RoleVo" resultType="int" useCache="false">

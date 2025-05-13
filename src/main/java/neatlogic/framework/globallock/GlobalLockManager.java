@@ -187,8 +187,9 @@ public class GlobalLockManager {
         GlobalLockVo globalLockTmp = globalLockMapper.getGlobalLockById(globalLockVo.getId());
         if (globalLockTmp == null) {
             insertLock(globalLockVo);
+        }else {
+            globalLockVo = globalLockTmp;
         }
-        globalLockVo = globalLockTmp;
         return lock(globalLockVo);
     }
 

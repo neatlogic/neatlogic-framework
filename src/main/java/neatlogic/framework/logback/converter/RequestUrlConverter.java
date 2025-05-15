@@ -20,6 +20,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -40,7 +41,18 @@ public class RequestUrlConverter extends ClassicConverter implements Serializabl
     public String convert(ILoggingEvent event) {
         RequestContext requestContext = RequestContext.get();
         if (requestContext != null) {
-            return requestContext.getUrl();
+            String url = requestContext.getUrl();
+            if (url == null) {
+                url = StringUtils.EMPTY;
+            }
+            HttpServletRequest request = requestContext.getRequest();
+            if (request != null) {
+                String remoteAddr = request.getRemoteAddr();
+                if (StringUtils.isNotBlank(remoteAddr)) {
+                    url += "(" + remoteAddr + ")";
+                }
+            }
+            return url;
         } else {
             Map<String, String> map = event.getMDCPropertyMap();
             String url = map.get("url");

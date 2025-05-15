@@ -23,7 +23,6 @@ import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.core.ApiFieldValidNotFoundException;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -31,15 +30,11 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements MyApiComponent {
-
-    @Resource
-    private ApiLongCacheMapper apiLongCacheMapper;
 
     public int needAudit() {
         return 0;
@@ -174,12 +169,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         } finally {
             long endTime = System.currentTimeMillis();
             if (!apiVo.getModuleId().equals("master")) {
-                ApiVo apiConfigVo = apiLongCacheMapper.getApiByToken(apiVo.getToken());
-                // 如果没有配置，则使用默认配置
-                if (apiConfigVo == null) {
-                    apiConfigVo = apiVo;
-                }
-                if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+                if (apiVo.getNeedAudit() != null && apiVo.getNeedAudit().equals(1)) {
                     saveAudit(apiVo, paramObj, result, error, startTime, endTime);
                 }
             }

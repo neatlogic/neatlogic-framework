@@ -16,8 +16,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.restful.dao.mapper.ApiMapper">
-
-    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="30000" size="100"></cache>
+    <!-- 缓存5分钟 -->
+    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache" flushInterval="300000" size="1000"></cache>
 
     <select id="getApiByToken" parameterType="java.lang.String" resultType="neatlogic.framework.restful.dto.ApiVo"
             useCache="true">

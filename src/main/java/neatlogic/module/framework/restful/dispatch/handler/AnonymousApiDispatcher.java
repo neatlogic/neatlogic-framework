@@ -38,7 +38,7 @@ import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
+import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
@@ -74,7 +74,7 @@ public class AnonymousApiDispatcher {
     Logger logger = LoggerFactory.getLogger(AnonymousApiDispatcher.class);
 
     @Resource
-    private ApiLongCacheMapper apiLongCacheMapper;
+    private ApiMapper apiMapper;
 
     @Resource
     private ApiAccessCountService apiAccessCountService;
@@ -82,14 +82,21 @@ public class AnonymousApiDispatcher {
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         RequestContext.init(request, token, response);
+        ApiVo dbApiVo = apiMapper.getApiByToken(token);
         if (interfaceVo == null) {
-            interfaceVo = apiLongCacheMapper.getApiByToken(token);
+            if (dbApiVo != null) {
+                interfaceVo = dbApiVo;
+            }
             if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
                 throw new ApiNotFoundException(token);
             }
         } else if (interfaceVo.getPathVariableObj() != null) {
             // 融合路径参数
             paramObj.putAll(interfaceVo.getPathVariableObj());
+            if (dbApiVo != null) {
+                interfaceVo.setQps(dbApiVo.getQps());
+                interfaceVo.setNeedAudit(dbApiVo.getNeedAudit());
+            }
         }
 
         // 判断是否master模块接口，如果是不允许访问
@@ -102,10 +109,6 @@ public class AnonymousApiDispatcher {
             throw new ComponentNotFoundException(interfaceVo.getHandler());
         }
         Double qps = interfaceVo.getQps();
-        ApiVo apiVo = apiLongCacheMapper.getApiByToken(token);
-        if (apiVo != null) {
-            qps = apiVo.getQps();
-        }
         RequestContext.get().setApiRate(qps);
         //从令牌桶拿到令牌才能继续访问，否则直接返回，提示“系统繁忙，请稍后重试”
         if (!RateLimiterTokenBucket.tryAcquire()) {

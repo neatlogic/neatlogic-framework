@@ -4,21 +4,16 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.CacheControlType;
 import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
-import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBase implements MyBinaryStreamApiComponent {
-
-    @Resource
-    private ApiLongCacheMapper apiLongCacheMapper;
 
     public int needAudit() {
         return 0;
@@ -66,12 +61,7 @@ public abstract class BinaryStreamApiComponentBase extends ApiValidateAndHelpBas
             throw e;
         } finally {
             long endTime = System.currentTimeMillis();
-            ApiVo apiConfigVo = apiLongCacheMapper.getApiByToken(apiVo.getToken());
-            // 如果没有配置，则使用默认配置
-            if (apiConfigVo == null) {
-                apiConfigVo = apiVo;
-            }
-            if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+            if (apiVo.getNeedAudit() != null && apiVo.getNeedAudit().equals(1)) {
                 saveAudit(apiVo, paramObj, result, error, startTime, endTime);
             }
         }

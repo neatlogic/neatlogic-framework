@@ -19,11 +19,13 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -90,8 +92,17 @@ public class NeatLogicConcurrentSafeCache implements Cache {
      */
     @Override
     public void clear() {
-        //System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
-        getCache().removeAll();
+        Ehcache cache = getCache();
+        List keys = cache.getKeys();
+        cache.removeAll();
+        if (CollectionUtils.isNotEmpty(keys)) {
+            for (Object key : keys) {
+                ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
+                if (lock != null) {
+                    lock.unlock();
+                }
+            }
+        }
     }
 
     /**

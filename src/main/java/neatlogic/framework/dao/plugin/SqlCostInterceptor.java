@@ -21,8 +21,6 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -133,17 +131,11 @@ public class SqlCostInterceptor implements Interceptor {
                             RowBounds rowBounds = (RowBounds) args[2];
                             key = executor.createCacheKey(mappedStatement, parameterObject, rowBounds, mappedStatement.getBoundSql(parameterObject));
                         }
-                        String useCacheLevel = StringUtils.EMPTY;
-                        if (mappedStatement.getCache() != null) {
-                            Cache cache = mappedStatement.getCache();
-                            if (cache.getObject(key) != null) {
-                                useCacheLevel = "二级缓存";
-                            }
+                        if (mappedStatement.getCache() != null && mappedStatement.getCache().getObject(key) != null) {
+                            sqlAuditVo.setUseCacheLevel("二级缓存");
+                        } else if (executor.isCached(mappedStatement, key)) {
+                            sqlAuditVo.setUseCacheLevel("一级级缓存");
                         }
-                        if (StringUtils.isBlank(useCacheLevel) && executor.isCached(mappedStatement, key)) {
-                            useCacheLevel = "一级级缓存";
-                        }
-                        sqlAuditVo.setUseCacheLevel(useCacheLevel);
                     }
                 }
             }

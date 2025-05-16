@@ -84,8 +84,9 @@ public class NeatLogicConcurrentSafeCache implements Cache {
             if (!CACHE_MANAGER.cacheExists(id)) {
                 Ehcache ehcache = CACHE_MANAGER.addCacheIfAbsent(id);
                 CacheConfiguration cacheConfiguration = ehcache.getCacheConfiguration();
-                cacheConfiguration.setTimeToIdleSeconds(600);
-                cacheConfiguration.setTimeToLiveSeconds(600);
+                // 缓存5分钟
+                cacheConfiguration.setTimeToIdleSeconds(300);
+                cacheConfiguration.setTimeToLiveSeconds(300);
             }
             return CACHE_MANAGER.getEhcache(id);
         }

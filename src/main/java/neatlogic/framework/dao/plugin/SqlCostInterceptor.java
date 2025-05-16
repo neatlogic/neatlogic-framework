@@ -21,6 +21,8 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.cache.Cache;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -120,6 +122,29 @@ public class SqlCostInterceptor implements Interceptor {
                     //System.out.println(sql);
                     sqlAuditVo.setSql(sql);
                     sqlAuditVo.setId(sqlId);
+                    if (Objects.equals(invocation.getMethod().getName(), "query")) {
+                        CacheKey key = null;
+                        Executor executor = (Executor) invocation.getTarget();
+                        Object[] args = invocation.getArgs();
+                        if (args.length > 4) {
+                            key = (CacheKey) args[4];
+                        } else if (args.length == 4) {
+                            Object parameterObject = args[1];
+                            RowBounds rowBounds = (RowBounds) args[2];
+                            key = executor.createCacheKey(mappedStatement, parameterObject, rowBounds, mappedStatement.getBoundSql(parameterObject));
+                        }
+                        String useCacheLevel = StringUtils.EMPTY;
+                        if (mappedStatement.getCache() != null) {
+                            Cache cache = mappedStatement.getCache();
+                            if (cache.getObject(key) != null) {
+                                useCacheLevel = "二级缓存";
+                            }
+                        }
+                        if (StringUtils.isBlank(useCacheLevel) && executor.isCached(mappedStatement, key)) {
+                            useCacheLevel = "一级级缓存";
+                        }
+                        sqlAuditVo.setUseCacheLevel(useCacheLevel);
+                    }
                 }
             }
         } catch (Exception e) {

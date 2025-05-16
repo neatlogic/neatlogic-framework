@@ -19,11 +19,10 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
+import net.sf.ehcache.config.CacheConfiguration;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,8 +34,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * 高并发场景下，防止缓存击穿
  */
 public class NeatLogicConcurrentSafeCache implements Cache {
-
-    private final static Logger logger = LoggerFactory.getLogger(NeatLogicConcurrentSafeCache.class);
     /**
      * The cache manager reference.
      */
@@ -76,12 +73,19 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         }
         if (StringUtils.isNotBlank(tenant)) {
             if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
-                CACHE_MANAGER.addCache(tenant + ":" + id);
+                Ehcache ehcache = CACHE_MANAGER.addCacheIfAbsent(tenant + ":" + id);
+                CacheConfiguration cacheConfiguration = ehcache.getCacheConfiguration();
+                // 缓存5分钟
+                cacheConfiguration.setTimeToIdleSeconds(300);
+                cacheConfiguration.setTimeToLiveSeconds(300);
             }
             return CACHE_MANAGER.getEhcache(tenant + ":" + id);
         } else {
             if (!CACHE_MANAGER.cacheExists(id)) {
-                CACHE_MANAGER.addCache(id);
+                Ehcache ehcache = CACHE_MANAGER.addCacheIfAbsent(id);
+                CacheConfiguration cacheConfiguration = ehcache.getCacheConfiguration();
+                cacheConfiguration.setTimeToIdleSeconds(600);
+                cacheConfiguration.setTimeToLiveSeconds(600);
             }
             return CACHE_MANAGER.getEhcache(id);
         }
@@ -98,7 +102,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         if (CollectionUtils.isNotEmpty(keys)) {
             for (Object key : keys) {
                 ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
-                if (lock != null) {
+                if (lock != null && lock.isLocked()) {
                     lock.unlock();
                 }
             }
@@ -130,7 +134,9 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         }
         cachedElement = getCache().get(key);
         if (cachedElement != null) {
-            lock.unlock();
+            if (lock.isLocked()) {
+                lock.unlock();
+            }
             return cachedElement.getObjectValue();
         }
         return null;

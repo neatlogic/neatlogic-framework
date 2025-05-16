@@ -36,6 +36,8 @@ public class SqlAuditVo extends BasePageVo {
     private String tenant;
     @EntityField(name = "用户", type = ApiParamType.STRING)
     private String userId;
+    @EntityField(name = "使用到的缓存级别", type = ApiParamType.STRING)
+    private String useCacheLevel;
 
     public String getId() {
         return id;
@@ -91,5 +93,13 @@ public class SqlAuditVo extends BasePageVo {
 
     public void setRecordCount(int recordCount) {
         this.recordCount = recordCount;
+    }
+
+    public String getUseCacheLevel() {
+        return useCacheLevel;
+    }
+
+    public void setUseCacheLevel(String useCacheLevel) {
+        this.useCacheLevel = useCacheLevel;
     }
 }

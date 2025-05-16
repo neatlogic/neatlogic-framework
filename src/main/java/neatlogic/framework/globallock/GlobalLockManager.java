@@ -24,10 +24,10 @@ import neatlogic.framework.globallock.core.IGlobalLockHandler;
 import neatlogic.framework.globallock.dao.mapper.GlobalLockMapper;
 import neatlogic.framework.lock.core.LockManager;
 import neatlogic.framework.transaction.util.TransactionUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
@@ -56,12 +56,19 @@ public class GlobalLockManager {
     public static void insertLock(GlobalLockVo globalLockVo) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
-            if(StringUtils.isBlank(globalLockMapper.getGlobalLockPkByUuid(globalLockVo.getUuid()))) {
+            try {
+                // 使用悲观锁。尝试插入，如果已经存在，则忽略,不能使用insert ignore，可能会导致锁不住的情况
                 globalLockMapper.insertLockPk(globalLockVo.getUuid());
+            } catch (DuplicateKeyException ex) {
+                // 主键重复，表示已有记录，无需处理
             }
-            //获取所有该key的锁和未上锁的队列 for update
+            //获取所有该key的锁和未上锁的队列 for update ，如果高并发的时候会出现死锁的情况属于正常情况
             globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
-            globalLockMapper.insertLock(globalLockVo);
+            try {
+                globalLockMapper.insertLock(globalLockVo);
+            } catch (DuplicateKeyException ex) {
+                // 主键重复，表示已有记录，无需处理
+            }
             List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuid(globalLockVo.getUuid());
             //执行mode 策略 验证是否允许上锁
             if (GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getIsCanInsertLock(globalLockVoList, globalLockVo)) {

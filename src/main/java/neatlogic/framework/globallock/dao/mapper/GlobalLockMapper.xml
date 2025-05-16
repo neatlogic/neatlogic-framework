@@ -182,7 +182,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </insert>
 
     <insert id="insertLockPk" parameterType="java.lang.String">
-        INSERT IGNORE INTO `global_lock_pk` (`lock_uuid`)
+        INSERT INTO `global_lock_pk` (`lock_uuid`)
         VALUES (#{value})
     </insert>
 

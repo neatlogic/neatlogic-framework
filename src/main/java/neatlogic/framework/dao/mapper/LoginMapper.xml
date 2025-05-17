@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.LoginMapper">
-    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="300000" size="10"/>
+    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache" flushInterval="300000" size="10"/>
     <select id="getLoginCaptchaBySessionId" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.captcha.LoginCaptchaVo" useCache="false">
         SELECT `session_id` as sessionId, `code`, `expired_time` as expiredTime

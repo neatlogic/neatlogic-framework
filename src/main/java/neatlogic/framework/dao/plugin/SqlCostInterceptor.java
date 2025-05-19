@@ -120,6 +120,23 @@ public class SqlCostInterceptor implements Interceptor {
                     //System.out.println(sql);
                     sqlAuditVo.setSql(sql);
                     sqlAuditVo.setId(sqlId);
+                    if (Objects.equals(invocation.getMethod().getName(), "query")) {
+                        CacheKey key = null;
+                        Executor executor = (Executor) invocation.getTarget();
+                        Object[] args = invocation.getArgs();
+                        if (args.length > 4) {
+                            key = (CacheKey) args[4];
+                        } else if (args.length == 4) {
+                            Object parameterObject = args[1];
+                            RowBounds rowBounds = (RowBounds) args[2];
+                            key = executor.createCacheKey(mappedStatement, parameterObject, rowBounds, mappedStatement.getBoundSql(parameterObject));
+                        }
+                        if (mappedStatement.getCache() != null && mappedStatement.getCache().getObject(key) != null) {
+                            sqlAuditVo.setUseCacheLevel("二级缓存");
+                        } else if (executor.isCached(mappedStatement, key)) {
+                            sqlAuditVo.setUseCacheLevel("一级级缓存");
+                        }
+                    }
                 }
             }
         } catch (Exception e) {

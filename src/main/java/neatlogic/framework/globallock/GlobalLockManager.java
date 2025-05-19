@@ -27,7 +27,6 @@ import neatlogic.framework.transaction.util.TransactionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
@@ -56,19 +55,18 @@ public class GlobalLockManager {
     public static void insertLock(GlobalLockVo globalLockVo) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
-            try {
-                // 使用悲观锁。尝试插入，如果已经存在，则忽略,不能使用insert ignore，可能会导致锁不住的情况
-                globalLockMapper.insertLockPk(globalLockVo.getUuid());
-            } catch (DuplicateKeyException ex) {
-                // 主键重复，表示已有记录，无需处理
+            globalLockMapper.insertLockPk(globalLockVo.getUuid());
+            int retry = 0;
+            while (true) {
+                try {
+                    globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
+                    break;
+                } catch (Exception e) {
+                    if (++retry > 3) throw e; // 最多重试 3 次
+                    Thread.sleep(100); // 等待 100ms 再试，避免过多的锁竞争
+                }
             }
-            //获取所有该key的锁和未上锁的队列 for update ，如果高并发的时候会出现死锁的情况属于正常情况
-            globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
-            try {
-                globalLockMapper.insertLock(globalLockVo);
-            } catch (DuplicateKeyException ex) {
-                // 主键重复，表示已有记录，无需处理
-            }
+            globalLockMapper.insertLock(globalLockVo);
             List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuid(globalLockVo.getUuid());
             //执行mode 策略 验证是否允许上锁
             if (GlobalLockHandlerFactory.getHandler(globalLockVo.getHandler()).getIsCanInsertLock(globalLockVoList, globalLockVo)) {
@@ -163,7 +161,7 @@ public class GlobalLockManager {
                 globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
                 globalLockMapper.deleteLock(lockId);
                 //只有释放已经获得锁的才notify
-                if(globalLockVo.getIsLock() == 1) {
+                if (globalLockVo.getIsLock() == 1) {
                     //获取对应uuid队列中下一个lockId notify
                     GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
                     if (nextGlobalLockVo != null) {
@@ -194,7 +192,7 @@ public class GlobalLockManager {
         GlobalLockVo globalLockTmp = globalLockMapper.getGlobalLockById(globalLockVo.getId());
         if (globalLockTmp == null) {
             insertLock(globalLockVo);
-        }else {
+        } else {
             globalLockVo = globalLockTmp;
         }
         return lock(globalLockVo);

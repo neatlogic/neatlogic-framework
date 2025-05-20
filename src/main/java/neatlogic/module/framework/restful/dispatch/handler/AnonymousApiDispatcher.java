@@ -90,9 +90,11 @@ public class AnonymousApiDispatcher {
             if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
                 throw new ApiNotFoundException(token);
             }
-        } else if (interfaceVo.getPathVariableObj() != null) {
-            // 融合路径参数
-            paramObj.putAll(interfaceVo.getPathVariableObj());
+        } else {
+            if (interfaceVo.getPathVariableObj() != null) {
+                // 融合路径参数
+                paramObj.putAll(interfaceVo.getPathVariableObj());
+            }
             if (dbApiVo != null) {
                 interfaceVo.setQps(dbApiVo.getQps());
                 interfaceVo.setNeedAudit(dbApiVo.getNeedAudit());

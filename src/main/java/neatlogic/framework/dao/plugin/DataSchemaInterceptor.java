@@ -36,7 +36,6 @@ public class DataSchemaInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        System.out.println("DataSchemaInterceptor = ");
         QUERY_FROM_DATABASE_INSTANCE.set(true);
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
 

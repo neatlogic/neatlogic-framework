@@ -48,6 +48,8 @@ public interface RunnerMapper {
 
     RunnerMapVo getRunnerMapByRunnerName(String runnerName);
 
+    List<RunnerMapVo> getRunnerMapByRunnerNameList(List<String> runnerNameList);
+
     List<RunnerVo> searchRunner(RunnerVo runnerVo);
 
     List<RunnerVo> getRunnerListByIdSet(@Param("runnerIdSet") Set<Long> runnerIdSet);
@@ -67,6 +69,8 @@ public interface RunnerMapper {
     List<RunnerGroupVo> getRunnerGroupByTagIdOrNameList(List<String> tagList);
 
     List<RunnerMapVo> getRunnerMapListByRunnerGroupId(Long runnerGroupId);
+
+    List<RunnerMapVo> getAllRunnerMapList();
 
     List<Map<String, Object>> searchRunnerGroupForMatrix(MatrixDataVo matrixDataVo);
 

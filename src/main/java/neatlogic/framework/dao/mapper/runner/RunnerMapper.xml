@@ -728,6 +728,25 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where p.name = #{value}
     </select>
 
+    <select id="getRunnerMapByRunnerNameList" resultType="neatlogic.framework.dto.runner.RunnerMapVo">
+        SELECT p.`id`            AS id,
+               p.`name`          AS name,
+               p.`url`           AS url,
+               p.`access_key`    AS accessKey,
+               p.`access_secret` AS accessSecret,
+               p.`auth_type`     AS authType,
+               p.is_delete       AS isDelete,
+               p.`host`,
+               p.`port`,
+               rm.id             as runnerMapId
+        FROM runner p
+                 left join runner_map rm on p.id = rm.runner_id
+        where p.name in
+              <foreach collection="list" item="value" open="(" close=")" separator=",">
+                #{value}
+              </foreach>
+    </select>
+
     <select id="getRunnerListByIdSet" resultType="neatlogic.framework.dto.runner.RunnerVo">
         SELECT `id`,
         `name`,
@@ -793,6 +812,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 left JOIN  `runnergroup_runner` rgr ON ar.`id` = rgr.`runner_id`
                 left JOIN  `runnergroup` rg ON rg.`id` = rgr.`runnergroup_id`
         where ar.is_delete = 0 and rg.id = #{value}
+    </select>
+
+    <select id="getAllRunnerMapList" resultType="neatlogic.framework.dto.runner.RunnerMapVo" useCache="false">
+        SELECT ar.`id`,
+               ar.`name`,
+               ar.`url`,
+               ar.`host`,
+               ar.`port`,
+               ar.`access_key`                         AS accessKey,
+               ar.`access_secret`                      AS accessSecret,
+               ar.`auth_type`                          AS authType,
+               ar.`public_key`                         AS publicKey,
+               ar.`private_key`                        AS privateKey,
+               ar.`is_delete`                          AS isDelete,
+               IF(arm.`id` IS NULL, ar.`id`, arm.`id`) AS runnerMapId
+        FROM `runner` ar
+                 left JOIN `runner_map` arm ON ar.`id` = arm.`runner_id`
+        where ar.is_delete = 0
     </select>
 
     <insert id="replaceRunner" parameterType="neatlogic.framework.dto.runner.RunnerVo">

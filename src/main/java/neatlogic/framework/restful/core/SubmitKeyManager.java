@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SubmitKeyManager {
     private static final Map<String, Long> SUBMIT_MAP = new ConcurrentHashMap<>();
+    private static final int CLEANUP_THRESHOLD = 10000; // 清理阈值
 
     /**
      * 添加一个 key，并设置 timeout 秒后过期
@@ -32,6 +33,11 @@ public class SubmitKeyManager {
     public static void add(String key, int timeout) {
         long expireTime = System.currentTimeMillis() + timeout * 1000L;
         SUBMIT_MAP.put(key, expireTime);
+        System.out.println(SUBMIT_MAP.size());
+        // 超过阈值触发清理
+        if (SUBMIT_MAP.size() > CLEANUP_THRESHOLD) {
+            cleanupExpiredKeys();
+        }
     }
 
     /**
@@ -62,5 +68,10 @@ public class SubmitKeyManager {
 
     public static Map<String, Long> getAll() {
         return new HashMap<>(SUBMIT_MAP); // 防止外部修改原始 map
+    }
+
+    private static void cleanupExpiredKeys() {
+        long now = System.currentTimeMillis();
+        SUBMIT_MAP.entrySet().removeIf(entry -> entry.getValue() < now);
     }
 }

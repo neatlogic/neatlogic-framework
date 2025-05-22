@@ -36,7 +36,7 @@ public class SubmitKeyManager {
      */
     public static void add(String key, int timeout) {
         long expireTime = System.currentTimeMillis() + timeout * 1000L;
-        SUBMIT_MAP.put(TenantContext.get().getTenantUuid() +" "+ key, expireTime);
+        SUBMIT_MAP.put(TenantContext.get().getTenantUuid() + " " + key, expireTime);
         // 超过阈值触发清理
         if (SUBMIT_MAP.size() > CLEANUP_THRESHOLD) {
             cleanupExpiredKeys();
@@ -47,12 +47,13 @@ public class SubmitKeyManager {
      * 检查 key 是否存在（未过期）
      */
     public static boolean contain(String key) {
-        Long expireTime = SUBMIT_MAP.get(key);
+        String keyTmp = TenantContext.get().getTenantUuid() + " " + key;
+        Long expireTime = SUBMIT_MAP.get(keyTmp);
         if (expireTime == null) {
             return false;
         }
         if (System.currentTimeMillis() > expireTime) {
-            SUBMIT_MAP.remove(key); // 懒移除
+            SUBMIT_MAP.remove(keyTmp); // 懒移除
             return false;
         }
         return true;

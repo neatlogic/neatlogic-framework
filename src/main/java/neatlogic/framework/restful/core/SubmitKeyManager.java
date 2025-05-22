@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 参数重复校验
+ * 定时作业SubmitKeyClearJob 凌晨3点清map
  */
 public class SubmitKeyManager {
     private static final Map<String, Long> SUBMIT_MAP = new ConcurrentHashMap<>();

@@ -15,12 +15,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.restful.core;
 
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 参数重复校验
+ * GetSubmitKeyInfoApi 实时查看队列情况接口
+ * CleanSubmitKeyApi 临时手动清理接口
  * 定时作业SubmitKeyClearJob 凌晨3点清map
  */
 public class SubmitKeyManager {
@@ -32,8 +36,7 @@ public class SubmitKeyManager {
      */
     public static void add(String key, int timeout) {
         long expireTime = System.currentTimeMillis() + timeout * 1000L;
-        SUBMIT_MAP.put(key, expireTime);
-        System.out.println(SUBMIT_MAP.size());
+        SUBMIT_MAP.put(TenantContext.get().getTenantUuid() +" "+ key, expireTime);
         // 超过阈值触发清理
         if (SUBMIT_MAP.size() > CLEANUP_THRESHOLD) {
             cleanupExpiredKeys();
@@ -70,7 +73,7 @@ public class SubmitKeyManager {
         return new HashMap<>(SUBMIT_MAP); // 防止外部修改原始 map
     }
 
-    private static void cleanupExpiredKeys() {
+    public static void cleanupExpiredKeys() {
         long now = System.currentTimeMillis();
         SUBMIT_MAP.entrySet().removeIf(entry -> entry.getValue() < now);
     }

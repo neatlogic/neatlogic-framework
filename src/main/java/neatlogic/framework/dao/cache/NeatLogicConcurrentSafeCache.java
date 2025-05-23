@@ -103,7 +103,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         if (CollectionUtils.isNotEmpty(keys)) {
             for (Object key : keys) {
                 ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
-                if (lock != null && lock.isLocked()) {
+                if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
                     lock.unlock();
                 }
             }
@@ -135,7 +135,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         }
         cachedElement = getCache().get(key);
         if (cachedElement != null) {
-            if (lock.isLocked()) {
+            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
                 lock.unlock();
             }
             return cachedElement.getObjectValue();
@@ -158,7 +158,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     public void putObject(Object key, Object value) {
         getCache().put(new Element(key, value));
         ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
-        if (lock != null) {
+        if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
             lock.unlock();
         }
     }
@@ -171,7 +171,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         Object obj = getObject(key);
         getCache().remove(key);
         ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
-        if (lock != null) {
+        if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
             lock.unlock();
         }
         return obj;

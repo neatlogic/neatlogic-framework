@@ -38,7 +38,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
      * The cache manager reference.
      */
     protected static CacheManager CACHE_MANAGER = CacheManager.create();
-    private final static ConcurrentHashMap<String, ReentrantLock> LOCAL_LOCK_MAP = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ReentrantLock> LOCAL_LOCK_MAP = new ConcurrentHashMap<>();
 
     private static String generateLockKey(String id, Object key) {
         String tenant = null;

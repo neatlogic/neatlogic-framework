@@ -20,11 +20,14 @@ import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.config.CacheConfiguration;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -34,6 +37,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * 高并发场景下，防止缓存击穿
  */
 public class NeatLogicConcurrentSafeCache implements Cache {
+
+    private final static Logger logger = LoggerFactory.getLogger(NeatLogicConcurrentSafeCache.class);
     /**
      * The cache manager reference.
      */
@@ -97,17 +102,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
      */
     @Override
     public void clear() {
-        Ehcache cache = getCache();
-        List keys = cache.getKeys();
-        cache.removeAll();
-        if (CollectionUtils.isNotEmpty(keys)) {
-            for (Object key : keys) {
-                ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
-                if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
-                    lock.unlock();
-                }
-            }
-        }
+        getCache().removeAll();
     }
 
     /**
@@ -123,24 +118,48 @@ public class NeatLogicConcurrentSafeCache implements Cache {
      */
     @Override
     public Object getObject(Object key) {
+        Object obj = null;
         Element cachedElement = getCache().get(key);
         if (cachedElement != null) {
-            return cachedElement.getObjectValue();
+            obj = cachedElement.getObjectValue();
         }
-        ReentrantLock lock = LOCAL_LOCK_MAP.computeIfAbsent(generateLockKey(getId(), key), k -> new ReentrantLock());
-        try {
-            boolean flag = lock.tryLock(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            // ignore
-        }
-        cachedElement = getCache().get(key);
-        if (cachedElement != null) {
-            if (lock.isLocked() && lock.isHeldByCurrentThread()) {
-                lock.unlock();
+        if (obj == null) {
+            String lockKey = generateLockKey(getId(), key);
+            // 1.这里是锁对象放入LOCAL_LOCK_MAP的唯一入口
+            // 2.该锁对象会被第一个获取该锁的线程在putObject方法中移除LOCAL_LOCK_MAP
+            // 3.其他获取该锁的线程只要释放锁就行
+            ReentrantLock lock = LOCAL_LOCK_MAP.computeIfAbsent(lockKey, k -> new ReentrantLock());
+            boolean flag = false;
+            try {
+                flag = lock.tryLock(5, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                // ignore
             }
-            return cachedElement.getObjectValue();
+            cachedElement = getCache().get(key);
+            if (cachedElement != null) {
+                obj = cachedElement.getObjectValue();
+            }
+            if (flag) {
+                if (obj != null) {
+                    if (LOCAL_LOCK_MAP.containsValue(lock)) {
+                        logger.error("NeatLogicConcurrentSafeCache.LOCAL_LOCK_MAP中的锁对象没有被正常移除");
+                    }
+                    // 获取到锁后，从缓存中得到的结果不为null，不会再查询数据库，也不会调用putObject方法，所以要在这里释放该锁
+                    lock.unlock();
+                } else {
+                    // 获取到锁后，从缓存中得到的结果为null，有以下3种情况：
+                    // 1.该线程是第一个获取到该锁的线程，需要去查询数据库，该线程会在putObject方法中释放该锁。
+                    // 2.有其他线程调用了clear方法，清空了缓存。
+                    // 3.该SQL语句执行报错。
+                    // 对应第2和3种情况，第一个获取到该锁的线程，在调用putObject()方法时会在LOCAL_LOCK_MAP删除锁，会出现一种场景，这里获得锁，但LOCAL_LOCK_MAP中已经删除了该锁，必须在这里释放锁
+                    ReentrantLock reentrantLock = LOCAL_LOCK_MAP.get(lockKey);
+                    if (reentrantLock != lock) {
+                        lock.unlock();
+                    }
+                }
+            }
         }
-        return null;
+        return obj;
     }
 
     /**
@@ -152,27 +171,34 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     }
 
     /**
+     * 不管SQL语句执行是否抛异常，都会调用putObject方法
+     * SQL语句执行成功得到结果为null时，value为[]
+     * SQL语句执行异常时，value为null
      * {@inheritDoc}
      */
     @Override
     public void putObject(Object key, Object value) {
         getCache().put(new Element(key, value));
-        ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
+        String lockKey = generateLockKey(getId(), key);
+        ReentrantLock lock = LOCAL_LOCK_MAP.get(lockKey);
         if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
+            LOCAL_LOCK_MAP.remove(lockKey, lock);
             lock.unlock();
         }
     }
 
     /**
+     * 对应二级缓存，该方法不会被调用
      * {@inheritDoc}
      */
     @Override
     public Object removeObject(Object key) {
-        Object obj = getObject(key);
-        getCache().remove(key);
-        ReentrantLock lock = LOCAL_LOCK_MAP.remove(generateLockKey(getId(), key));
-        if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
-            lock.unlock();
+        Object obj = null;
+        Ehcache ehcache = getCache();
+        Element cachedElement = ehcache.get(key);
+        if (cachedElement != null) {
+            obj = cachedElement.getObjectValue();
+            ehcache.remove(key);
         }
         return obj;
     }
@@ -223,54 +249,11 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         return "EHCache {" + id + "}";
     }
 
-    // DYNAMIC PROPERTIES
-
-    /**
-     * Sets the time to idle for an element before it expires. Is only used if
-     * the element is not eternal.
-     *
-     * @param timeToIdleSeconds the default amount of time to live for an element from its
-     *                          last accessed or modified date
-     */
-    public void setTimeToIdleSeconds(long timeToIdleSeconds) {
-        getCache().getCacheConfiguration().setTimeToIdleSeconds(timeToIdleSeconds);
+    public static List<String> getAllLockKeyList() {
+        List<String> resultList = new ArrayList<>();
+        for (Map.Entry<String, ReentrantLock> entry : LOCAL_LOCK_MAP.entrySet()) {
+            resultList.add(entry.getKey());
+        }
+        return resultList;
     }
-
-    /**
-     * Sets the time to idle for an element before it expires. Is only used if
-     * the element is not eternal.
-     *
-     * @param timeToLiveSeconds the default amount of time to live for an element from its
-     *                          creation date
-     */
-    public void setTimeToLiveSeconds(long timeToLiveSeconds) {
-        getCache().getCacheConfiguration().setTimeToLiveSeconds(timeToLiveSeconds);
-    }
-
-    /**
-     * Sets the maximum objects to be held in memory (0 = no limit).
-     * evicted (0 == no limit)
-     */
-    public void setMaxEntriesLocalHeap(long maxEntriesLocalHeap) {
-        getCache().getCacheConfiguration().setMaxEntriesLocalHeap(maxEntriesLocalHeap);
-    }
-
-    /**
-     * Sets the maximum number elements on Disk. 0 means unlimited.
-     * unlimited.
-     */
-    public void setMaxEntriesLocalDisk(long maxEntriesLocalDisk) {
-        getCache().getCacheConfiguration().setMaxEntriesLocalDisk(maxEntriesLocalDisk);
-    }
-
-    /**
-     * Sets the eviction policy. An invalid argument will set it to null.
-     *
-     * @param memoryStoreEvictionPolicy a String representation of the policy. One of "LRU", "LFU" or
-     *                                  "FIFO".
-     */
-    public void setMemoryStoreEvictionPolicy(String memoryStoreEvictionPolicy) {
-        getCache().getCacheConfiguration().setMemoryStoreEvictionPolicy(memoryStoreEvictionPolicy);
-    }
-
 }

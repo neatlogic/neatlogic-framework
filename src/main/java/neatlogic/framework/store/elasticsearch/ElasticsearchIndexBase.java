@@ -197,12 +197,12 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }
 
     @Override
-    public final void deleteDocument(T targetVo) {
-        this.myDeleteDocument(targetVo);
+    public final void deleteDocument(Long targetId) {
+        this.myDeleteDocument(targetId);
     }
 
 
-    protected abstract void myDeleteDocument(T targetVo);
+    protected abstract void myDeleteDocument(Long targetId);
 
     /*private static Query buildQuery(Map<String, Object> conditionObj) {
         // 如果条件为空，使用 match_all

@@ -69,13 +69,12 @@ public interface IElasticsearchIndex<T> {
     /*
     删除文档
      */
-    void deleteDocument(T targetVo);
+    void deleteDocument(Long targetId);
 
     /*
     获取文档
      */
     T getDocument(T targetVo);
-
 
 
     /*

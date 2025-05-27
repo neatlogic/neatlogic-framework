@@ -32,6 +32,7 @@ public enum InputFrom implements IEnum {
     AUTOEXEC("autoexec", "nfcc.inputfrom.autocollect"),
     RELATIVE("relative", "nfcc.inputfrom.relative"),
     DIAGRAN("diagram", "term.diagram.name"),
+    EVENT("event", "事件"),
     MQ("mq", "消息队列");
 
     private final String value;

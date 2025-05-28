@@ -104,20 +104,21 @@ public class SystemNoticeServiceImpl implements SystemNoticeService, ISystemNoti
 
     @Override
     public void pullIssuedSystemNotice() {
-//        List<String> recipientUuidList = getRecipientUuidList();
-//        List<Long> issuedNoticeList = systemNoticeMapper.getIssuedNoticeIdListByRecipientUuidList(recipientUuidList);
-//        if (CollectionUtils.isNotEmpty(issuedNoticeList)) {
-//            List<SystemNoticeUserVo> noticeUserVoList = new ArrayList<>();
-//            for (Long id : issuedNoticeList) {
-//                noticeUserVoList.add(new SystemNoticeUserVo(id, UserContext.get().getUserUuid(true)));
-//            }
-//            systemNoticeMapper.batchInsertSystemNoticeUser(noticeUserVoList);
-//        }
-        String userUuid = UserContext.get().getUserUuid();
-        List<String> uuidList = UserContext.get().getUuidList();
-        uuidList.add(userUuid);
-        uuidList.add(UserType.ALL.getValue());
-        systemNoticeMapper.insertInsertSystemNoticeUser(userUuid, uuidList);
+        String userUuid = UserContext.get().getUserUuid(true);
+        List<String> recipientUuidList = getRecipientUuidList();
+        List<Long> issuedNoticeList = systemNoticeMapper.getIssuedNoticeIdListByUserUuidAndRecipientUuidList(userUuid, recipientUuidList);
+        if (CollectionUtils.isNotEmpty(issuedNoticeList)) {
+            List<SystemNoticeUserVo> noticeUserVoList = new ArrayList<>();
+            for (Long id : issuedNoticeList) {
+                noticeUserVoList.add(new SystemNoticeUserVo(id, userUuid));
+            }
+            systemNoticeMapper.batchInsertSystemNoticeUser(noticeUserVoList);
+        }
+//        String userUuid = UserContext.get().getUserUuid();
+//        List<String> uuidList = UserContext.get().getUuidList();
+//        uuidList.add(userUuid);
+//        uuidList.add(UserType.ALL.getValue());
+//        systemNoticeMapper.insertInsertSystemNoticeUser(userUuid, uuidList);
     }
 
     @Override
@@ -237,11 +238,11 @@ public class SystemNoticeServiceImpl implements SystemNoticeService, ISystemNoti
     }
 
     private List<String> getRecipientUuidList() {
-        List<String> uuidList = new ArrayList<>();
-        uuidList.add(UserContext.get().getUserUuid(true));
+        List<String> uuidList = UserContext.get().getUuidList();
+//        uuidList.add(UserContext.get().getUserUuid(true));
         uuidList.add(UserType.ALL.getValue());
-        uuidList.addAll(teamMapper.getTeamUuidListByUserUuid(UserContext.get().getUserUuid(true)));
-        uuidList.addAll(roleMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true)));
+//        uuidList.addAll(teamMapper.getTeamUuidListByUserUuid(UserContext.get().getUserUuid(true)));
+//        uuidList.addAll(roleMapper.getRoleUuidListByUserUuid(UserContext.get().getUserUuid(true)));
         return uuidList;
     }
 }

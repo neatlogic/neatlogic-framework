@@ -1,5 +1,7 @@
 package neatlogic.framework.message.dto;
 
+import java.io.Serializable;
+
 /**
  * @Title: TriggerMessageCountVo
  * @Package neatlogic.framework.message.dto
@@ -8,7 +10,9 @@ package neatlogic.framework.message.dto;
  * @Date: 2021/2/22 18:46
 
  **/
-public class TriggerMessageCountVo {
+public class TriggerMessageCountVo implements Serializable {
+
+    private static final long serialVersionUID = 2910089979265665037L;
     private String notifyPolicyHandler;
     private String trigger;
     private Integer count;

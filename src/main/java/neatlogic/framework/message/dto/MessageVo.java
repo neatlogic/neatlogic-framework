@@ -4,8 +4,8 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.notify.dto.NotifyVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
-import com.alibaba.fastjson.annotation.JSONField;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -15,7 +15,9 @@ import java.util.Date;
  * @Author: linbq
  * @Date: 2020/12/30 15:13
  **/
-public class MessageVo {
+public class MessageVo implements Serializable {
+
+    private static final long serialVersionUID = 2910089979265665039L;
     @EntityField(name = "消息id", type = ApiParamType.LONG)
     private Long id;
     @EntityField(name = "标题", type = ApiParamType.STRING)

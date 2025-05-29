@@ -4,6 +4,7 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.annotation.JSONField;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,7 +14,9 @@ import java.util.Date;
  * @Author: linbq
  * @Date: 2020/12/30 18:33
  **/
-public class MessageHandlerVo implements Cloneable {
+public class MessageHandlerVo implements Cloneable, Serializable {
+    private static final long serialVersionUID = 2910089979265665038L;
+
     @EntityField(name = "模块id", type = ApiParamType.STRING)
     private String moduleId;
     @EntityField(name = "模块名", type = ApiParamType.STRING)

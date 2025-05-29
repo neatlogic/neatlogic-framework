@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.systemnotice.dao.mapper.SystemNoticeMapper">
 
+    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache" flushInterval="60000" size="1000"/>
+
     <select id="getSystemNoticeBaseInfoById" parameterType="java.lang.Long" resultType="neatlogic.framework.systemnotice.dto.SystemNoticeVo">
         select
         `id`,
@@ -132,7 +134,7 @@
         where `system_notice_id` = #{value}
     </select>
 
-    <select id="getIssuedNoticeIdListByRecipientUuidList" parameterType="java.util.List" resultType="java.lang.Long">
+    <select id="getIssuedNoticeIdListByUserUuidAndRecipientUuidList" parameterType="java.util.List" resultType="java.lang.Long">
         select
         distinct a.`id`
         from
@@ -141,8 +143,9 @@
         on a.`id` = b.`system_notice_id`
         where
         a.`status` = 'issued'
+        AND a.`id` NOT IN (SELECT `system_notice_id` FROM `system_notice_user` WHERE `user_uuid` = #{userUuid})
         and b.`uuid` in
-        <foreach collection="list" item="item" open="(" close=")" separator=",">
+        <foreach collection="recipientUuidList" item="item" open="(" close=")" separator=",">
             #{item}
         </foreach>
     </select>

@@ -2,6 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.message.dao.mapper.MessageMapper">
 
+    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache" flushInterval="60000" size="1000"/>
+
     <select id="getMessageSubscribeListByUserUuid" parameterType="java.lang.String"
             resultType="neatlogic.framework.message.dto.MessageHandlerVo">
         SELECT `handler`,

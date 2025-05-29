@@ -141,8 +141,8 @@ public class NeatLogicConcurrentSafeCache implements Cache {
             }
             if (flag) {
                 if (obj != null) {
-                    if (LOCAL_LOCK_MAP.containsValue(lock)) {
-                        logger.error("NeatLogicConcurrentSafeCache.LOCAL_LOCK_MAP中的锁对象没有被正常移除");
+                    if (LOCAL_LOCK_MAP.get(lockKey) == lock) {
+                        logger.error("NeatLogicConcurrentSafeCache.LOCAL_LOCK_MAP中的锁对象没有被正常移除，lockKey = " + lockKey);
                     }
                     // 获取到锁后，从缓存中得到的结果不为null，不会再查询数据库，也不会调用putObject方法，所以要在这里释放该锁
                     lock.unlock();
@@ -157,6 +157,8 @@ public class NeatLogicConcurrentSafeCache implements Cache {
                         lock.unlock();
                     }
                 }
+            } else {
+                logger.error("NeatLogicConcurrentSafeCache 获取锁超时 lockKey = " + lockKey);
             }
         }
         return obj;

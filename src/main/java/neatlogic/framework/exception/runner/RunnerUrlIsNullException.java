@@ -19,6 +19,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 
 public class RunnerUrlIsNullException extends ApiRuntimeException {
     public RunnerUrlIsNullException(Long runnerId) {
-        super("exception.framework.runnerurlisnullexception", runnerId);
+        super("nfer.runnerurlisnullexception.runnerurlisnullexception", runnerId);
     }
 }

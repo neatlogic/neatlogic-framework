@@ -91,7 +91,15 @@ public class PublicApiDispatcher {
 
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
-        InputFromContext.init(InputFrom.RESTFUL);
+        InputFrom inputFrom = null;
+        String source = request.getHeader("source");
+        if (StringUtils.isNotBlank(source)) {
+            inputFrom = InputFrom.get(source);
+        }
+        if (inputFrom == null) {
+            inputFrom = InputFrom.UNKNOWN;
+        }
+        InputFromContext.init(inputFrom);
         RequestContext.init(request, token, response);
         //初始化时区
         Cookie[] cookies = request.getCookies();

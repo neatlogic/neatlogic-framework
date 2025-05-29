@@ -99,7 +99,15 @@ public class ApiDispatcher {
 
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
-        InputFromContext.init(InputFrom.PAGE);
+        InputFrom inputFrom = null;
+        String source = request.getHeader("source");
+        if (StringUtils.isNotBlank(source)) {
+            inputFrom = InputFrom.get(source);
+        }
+        if (inputFrom == null) {
+            inputFrom = InputFrom.UNKNOWN;
+        }
+        InputFromContext.init(inputFrom);
         RequestContext.init(request, token, response);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         if (paramObj == null) {

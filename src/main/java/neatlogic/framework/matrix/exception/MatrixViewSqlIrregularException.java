@@ -21,10 +21,10 @@ public class MatrixViewSqlIrregularException extends ApiRuntimeException {
     private static final long serialVersionUID = -8248360500986046478L;
 
     public MatrixViewSqlIrregularException(Exception msg) {
-        super("sql 非法{0}", msg.getMessage());
+        super("nfme.matrixviewsqlirregularexception.matrixviewsqlirregularexception", msg.getMessage());
     }
 
     public MatrixViewSqlIrregularException() {
-        super("exception.framework.matrixviewsqlirregularexception.2");
+        super("nfme.matrixviewsqlirregularexception.matrixviewsqlirregularexception_a");
     }
 }

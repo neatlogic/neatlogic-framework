@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.asynchronization.threadlocal;
 
+import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.restful.constvalue.RejectSource;
 import org.apache.commons.lang3.StringUtils;
@@ -126,7 +127,7 @@ public class RequestContext implements Serializable {
             }
             HttpServletRequest request = _requestContext.getRequest();
             if (request != null) {
-                String remoteAddr = request.getRemoteAddr();
+                String remoteAddr = IpUtil.getIpAddr(request);
                 if (StringUtils.isNotBlank(remoteAddr)) {
                     tempUrl += "(" + remoteAddr + ")";
                 }

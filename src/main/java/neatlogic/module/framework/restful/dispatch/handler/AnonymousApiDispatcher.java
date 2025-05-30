@@ -19,10 +19,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.common.util.RC4Util;
@@ -80,6 +82,15 @@ public class AnonymousApiDispatcher {
     private ApiAccessCountService apiAccessCountService;
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+        InputFrom inputFrom = null;
+        String source = request.getHeader("source");
+        if (StringUtils.isNotBlank(source)) {
+            inputFrom = InputFrom.get(source);
+        }
+        if (inputFrom == null) {
+            inputFrom = InputFrom.UNKNOWN;
+        }
+        InputFromContext.init(inputFrom);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         RequestContext.init(request, token, response);
         ApiVo dbApiVo = apiMapper.getApiByToken(token);

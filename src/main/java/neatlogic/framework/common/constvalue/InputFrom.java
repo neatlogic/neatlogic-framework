@@ -24,6 +24,8 @@ import java.util.List;
 
 public enum InputFrom implements IEnum {
     PAGE("page", "nfcc.inputfrom.page"),
+    PC("pc", "nfcc.inputfrom.pc"),
+    MOBILE("mobile", "nfcc.inputfrom.mobile"),
     IMPORT("import", "nfcc.inputfrom.excel"),
     RESTFUL("restful", "nfcc.inputfrom.api"),
     ITSM("itsm", "nfcc.inputfrom.itsm"),

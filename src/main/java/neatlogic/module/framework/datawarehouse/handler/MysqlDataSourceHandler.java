@@ -89,7 +89,7 @@ public class MysqlDataSourceHandler extends DataSourceServiceHandlerBase {
                       新增日志记录
                      */
                 if (logger.isInfoEnabled()) {
-                    logger.info("REPORT RUN SQL::" + sqlText);
+                    logger.info("REPORT RUN SQL::{}", sqlText);
                 }
 
                 resultSet = queryStatement.executeQuery();

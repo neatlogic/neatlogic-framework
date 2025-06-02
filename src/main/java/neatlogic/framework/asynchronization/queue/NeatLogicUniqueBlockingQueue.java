@@ -28,7 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class NeatLogicUniqueBlockingQueue<T> {
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicUniqueBlockingQueue.class);
-    private final BlockingQueue<Task<T>> blockingQueue;
+    private final BlockingQueue<QueueTask<T>> blockingQueue;
     private final ConcurrentHashMap<String, Boolean> taskMap; // 用于去重
 
     public NeatLogicUniqueBlockingQueue(int capacity) {
@@ -36,11 +36,16 @@ public class NeatLogicUniqueBlockingQueue<T> {
         this.taskMap = new ConcurrentHashMap<>();
     }
 
+    public NeatLogicUniqueBlockingQueue() {
+        this.blockingQueue = new LinkedBlockingQueue<>();
+        this.taskMap = new ConcurrentHashMap<>();
+    }
+
     public boolean offer(T t) {
-        Task<T> task = new Task<>(t);
+        QueueTask<T> task = new QueueTask<>(t);
         // 保证任务唯一性
         if (taskMap.putIfAbsent(task.getUniqueKey(), Boolean.TRUE) == null) {
-            logger.debug("====TagentUpdateInfo-addQueue:" + JSON.toJSONString(task));
+            logger.debug("====TagentUpdateInfo-addQueue:{}", JSON.toJSONString(task));
             // 如果任务是新任务，放入队列
             boolean added = blockingQueue.offer(task);
             if (!added) {
@@ -58,7 +63,7 @@ public class NeatLogicUniqueBlockingQueue<T> {
     }
 
     public T take() throws InterruptedException {
-        Task<T> task = blockingQueue.take(); // 阻塞式获取任务
+        QueueTask<T> task = blockingQueue.take(); // 阻塞式获取任务
         taskMap.remove(task.getUniqueKey()); // 移除已处理任务的唯一标记
         TenantContext tenantContext = TenantContext.get();
         if (tenantContext != null) {
@@ -69,31 +74,8 @@ public class NeatLogicUniqueBlockingQueue<T> {
         return task.getT();
     }
 
-    private static class Task<T> {
-        private final T t;
-        private final String tenantUuid;
 
-        public Task(T t) {
-            this.t = t;
-            this.tenantUuid = TenantContext.get().getTenantUuid();
-        }
-
-        public T getT() {
-            return t;
-        }
-
-        public String getTenantUuid() {
-            return tenantUuid;
-        }
-
-        public String getUniqueKey() {
-            // 唯一标识任务的 key，可根据需求定义，例如 `tenantUuid-t.hashCode`
-            //System.out.println(tenantUuid + "-" + t.hashCode());
-            return tenantUuid + "-" + t.hashCode();
-        }
-    }
-
-    public int size(){
+    public int size() {
         return blockingQueue.size();
     }
 

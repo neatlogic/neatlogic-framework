@@ -23,7 +23,6 @@ import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.GetIndexResponse;
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -57,13 +56,14 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }
 
     @Override
-    public final void updateDocument(Long targetId, JSONObject jsonObj) {
+    public final void updateDocument(Long targetId, Map<String,Object> document, boolean isUpsert) {
         //myUpdateDocument(targetId, jsonObj);
         ElasticsearchClient client = ElasticsearchClientFactory.getClient();
         UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
                 .index(getIndexName())                   // 索引名称
                 .id(targetId.toString())          // 文档 ID
-                .doc(jsonObj)                            // 需要更新的字段
+                .docAsUpsert(isUpsert)
+                .doc(document)                            // 需要更新的字段
                 .build();
         try {
             client.update(updateRequest, Object.class);

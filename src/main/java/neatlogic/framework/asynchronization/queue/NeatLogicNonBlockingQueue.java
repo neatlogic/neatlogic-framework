@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+ * Copyright (C) 2025  深圳极向量科技有限公司 All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -14,28 +14,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package neatlogic.framework.asynchronization.queue;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 
-import java.util.concurrent.BlockingQueue;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class NeatLogicBlockingQueue<T> {
+public class NeatLogicNonBlockingQueue<T> {
 
-    private final BlockingQueue<QueueTask<T>> blockingQueue;
-
-    public NeatLogicBlockingQueue(BlockingQueue<QueueTask<T>> _blockingQueue) {
-        this.blockingQueue = _blockingQueue;
-    }
+    private final Queue<QueueTask<T>> queue = new ConcurrentLinkedQueue<>();
 
     public boolean offer(T t) {
-        return blockingQueue.offer(new QueueTask<>(t));
+        return queue.offer(new QueueTask<>(t));
     }
 
-    public T take() throws InterruptedException {
-        QueueTask<T> task = blockingQueue.take();
+    public T poll() {
+        QueueTask<T> task = queue.poll();
+        if (task == null) {
+            return null;
+        }
         TenantContext tenantContext = TenantContext.get();
         UserContext userContext = task.getUserContext();
         if (tenantContext != null) {
@@ -48,4 +47,13 @@ public class NeatLogicBlockingQueue<T> {
         }
         return task.getT();
     }
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
+
+    public int size() {
+        return queue.size();
+    }
+
 }

@@ -262,7 +262,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 schedulerMapper.deleteJobLockByServerId(Config.SCHEDULE_SERVER_ID);
                 UserContext.init(SystemUser.SYSTEM);
                 for (IJob jobHandler : jobHandlerList) {
-//                    jobHandler.initJob(tenantUuid);
+                    jobHandler.initJob(tenantUuid);
                 }
                 schedulerMapper.deleteUnusedJobStatus();
             } catch (Exception e) {

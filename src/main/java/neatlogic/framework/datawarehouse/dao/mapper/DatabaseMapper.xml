@@ -29,6 +29,16 @@
         WHERE `id` = #{value}
     </select>
 
+    <select id="checkDatabaseNameIsRepeat" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `database`
+        WHERE `name` = #{name}
+          <if test="id != null">
+            AND `id` != #{id}
+          </if>
+    </select>
+
     <select id="getDataBaseCount" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo" resultType="int">
         SELECT
             COUNT(`id`)

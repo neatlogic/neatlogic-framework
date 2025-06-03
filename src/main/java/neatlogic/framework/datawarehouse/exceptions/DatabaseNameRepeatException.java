@@ -15,23 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.datawarehouse.dao.mapper;
+package neatlogic.framework.datawarehouse.exceptions;
 
-import neatlogic.framework.datawarehouse.dto.DatabaseVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import java.util.List;
-
-public interface DatabaseMapper {
-
-    DatabaseVo getDataBaseById(Long id);
-
-    int checkDatabaseNameIsRepeat(DatabaseVo dataBaseVo);
-
-    int getDataBaseCount(DatabaseVo DataBaseVo);
-
-    List<DatabaseVo> getDataBaseList(DatabaseVo DataBaseVo);
-
-    int insertDataBase(DatabaseVo DataBaseVo);
-
-    int deleteDataBaseById(Long id);
+public class DatabaseNameRepeatException extends ApiRuntimeException {
+    public DatabaseNameRepeatException(String name) {
+        super("nfde.databasenamerepeatexception.databasenamerepeatexception", name);
+    }
 }

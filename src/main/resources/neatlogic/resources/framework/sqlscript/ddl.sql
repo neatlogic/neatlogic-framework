@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS `datawarehouse_datasource`
     `data_count`       int                                                                                          NULL DEFAULT NULL COMMENT '数据量',
     `expire_unit`      enum ('minute','hour','day','month','year') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '过期单位',
     `db_type`          enum ('mysql','mongodb') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                    NULL DEFAULT 'mysql' COMMENT '数据库类型',
-    `database_id`      bigint                                                                                       NULL DEFAULT NULL COMMENT '数据源',
+    `database_id`      bigint                                                                                       NULL DEFAULT NULL COMMENT '数据库ID',
     `last_fire_time`   timestamp(3)                                                                                 NULL DEFAULT NULL COMMENT '最后一次激活时间',
     `last_finish_time` timestamp(3)                                                                                 NULL DEFAULT NULL COMMENT '最后一次完成时间',
     `next_fire_time`   timestamp(3)                                                                                 NULL DEFAULT NULL COMMENT '下一次激活时间',

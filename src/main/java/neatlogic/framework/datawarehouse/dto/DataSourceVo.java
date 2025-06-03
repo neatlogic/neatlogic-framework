@@ -76,7 +76,7 @@ public class DataSourceVo extends BasePageVo {
     private List<DataSourceFieldVo> fieldList = new ArrayList<>();//需要默认值为空数组，避免空指针异常
     @EntityField(name = "nfdd.datasourcevo.entityfield.name.connectionid", type = ApiParamType.LONG)
     private Long connectionId;
-    @EntityField(name = "nfdd.datasourcedatavo.entityfield.name.datasourceid", type = ApiParamType.LONG)
+    @EntityField(name = "nfdd.datasourcevo.entityfield.name.databaseid", type = ApiParamType.LONG)
     private Long databaseId;
     @JSONField(serialize = false)//数据列表
     private List<DataSourceDataVo> dataList;

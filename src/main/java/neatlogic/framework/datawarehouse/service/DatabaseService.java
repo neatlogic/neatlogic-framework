@@ -15,21 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.datawarehouse.dao.mapper;
+package neatlogic.framework.datawarehouse.service;
 
-import neatlogic.framework.datawarehouse.dto.DatabaseVo;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-import java.util.List;
+public interface DatabaseService {
 
-public interface DataBaseMapper {
-
-    DatabaseVo getDataBaseById(Long id);
-
-    int getDataBaseCount(DatabaseVo DataBaseVo);
-
-    List<DatabaseVo> getDataBaseList(DatabaseVo DataBaseVo);
-
-    int insertDataBase(DatabaseVo DataBaseVo);
-
-    int deleteDataBaseById(Long id);
+    Connection getConnectionByDatabaseId(Long databaseId) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException;
 }

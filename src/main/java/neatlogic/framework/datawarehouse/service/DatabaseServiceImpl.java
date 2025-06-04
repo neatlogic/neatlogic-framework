@@ -17,7 +17,6 @@
 
 package neatlogic.framework.datawarehouse.service;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.datawarehouse.dao.mapper.DatabaseMapper;
@@ -42,10 +41,10 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 
 @Service
@@ -66,50 +65,52 @@ public class DatabaseServiceImpl implements DatabaseService {
         if (dataBaseVo == null) {
             throw new DatabaseNotFoundException(databaseId);
         }
-        JSONObject config = dataBaseVo.getConfig();
-        if (MapUtils.isNotEmpty(config)) {
-            String user = config.getString("user");
-            String password = config.getString("password");
-            String url = config.getString("url");
-            String driverClassName = config.getString("driverClassName");
-            Properties props = new Properties();
-            if (StringUtils.isNoneBlank(user)) {
-                props.put("user", user);
-            }
-            if (StringUtils.isNotBlank(password)) {
-                props.put("password", password);
-            }
-            JSONArray fileIdList = config.getJSONArray("fileIdList");
-            if (CollectionUtils.isNotEmpty(fileIdList)) {
-                URL[] urls = new URL[fileIdList.size()];
-                for (int i = 0; i < fileIdList.size(); i++) {
-                    Long fileId = fileIdList.getLong(i);
-                    FileVo fileVo = fileMapper.getFileById(fileId);
-                    if (fileVo == null) {
-                        throw new FileNotFoundException(fileId);
-                    }
-                    try (InputStream is = FileUtil.getData(fileVo.getPath())) {
-                        String fileName = fileVo.getName();
-                        String suffix = ".jar";
-                        String prefix = fileName.substring(0, fileName.length() - suffix.length());
-                        File file = new File(prefix + "-" + fileVo.getId() + suffix);
+        List<Long> fileIdList = dataBaseVo.getFileIdList();
+        if (CollectionUtils.isNotEmpty(fileIdList)) {
+            URL[] urls = new URL[fileIdList.size()];
+            for (int i = 0; i < fileIdList.size(); i++) {
+                Long fileId = fileIdList.get(i);
+                FileVo fileVo = fileMapper.getFileById(fileId);
+                if (fileVo == null) {
+                    throw new FileNotFoundException(fileId);
+                }
+                try (InputStream is = FileUtil.getData(fileVo.getPath())) {
+                    String fileName = fileVo.getName();
+                    String suffix = ".jar";
+                    String prefix = fileName.substring(0, fileName.length() - suffix.length());
+                    File file = new File(prefix + "-" + fileVo.getId() + suffix);
+                    if (!file.exists()) {
                         Path path = Paths.get(file.toURI());
-                        Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
-                        urls[i] = file.toURI().toURL();
-                    }catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                        throw new RuntimeException(e);
+                        Files.copy(is, path);
                     }
+                    urls[i] = file.toURI().toURL();
+                }catch (Exception e) {
+                    logger.error(e.getMessage(), e);
+                    throw new RuntimeException(e);
+                }
+            }
+            JSONObject config = dataBaseVo.getConfig();
+            if (MapUtils.isNotEmpty(config)) {
+                String user = config.getString("user");
+                String password = config.getString("password");
+                String url = config.getString("url");
+                String driverClassName = config.getString("driverClassName");
+                Properties props = new Properties();
+                if (StringUtils.isNoneBlank(user)) {
+                    props.put("user", user);
+                }
+                if (StringUtils.isNotBlank(password)) {
+                    props.put("password", password);
                 }
                 URLClassLoader loader = new URLClassLoader(urls, null);
                 Class<?> clazz = loader.loadClass(driverClassName);
                 Driver driver = ((Driver) clazz.newInstance());
                 return driver.connect(url, props);
             } else {
-                throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.FILE_ID_LIST_IS_EMPTY, dataBaseVo.getName());
+                throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.CONFIG_IS_EMPTY, dataBaseVo.getName());
             }
         } else {
-            throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.CONFIG_IS_EMPTY, dataBaseVo.getName());
+            throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.FILE_ID_LIST_IS_EMPTY, dataBaseVo.getName());
         }
     }
 }

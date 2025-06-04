@@ -17,17 +17,25 @@
 
 package neatlogic.framework.datawarehouse.dto;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.file.dto.FileVo;
+
+import java.util.List;
 
 public class DatabaseVo extends BasePageVo {
     private Long id;
     private String name;
     private String type;
     private JSONObject config;
+    private List<Long> fileIdList;
+    private List<FileVo> fileList;
     @JSONField(serialize = false)
     private String configStr;
+    @JSONField(serialize = false)
+    private String fileIdListStr;
 
     public Long getId() {
         return id;
@@ -77,5 +85,39 @@ public class DatabaseVo extends BasePageVo {
 
     public void setConfigStr(String configStr) {
         this.configStr = configStr;
+    }
+
+    public List<Long> getFileIdList() {
+        if (fileIdList == null && fileIdListStr != null) {
+            try {
+                fileIdList = JSONArray.parseArray(fileIdListStr, Long.class);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return fileIdList;
+    }
+
+    public void setFileIdList(List<Long> fileIdList) {
+        this.fileIdList = fileIdList;
+    }
+
+    public List<FileVo> getFileList() {
+        return fileList;
+    }
+
+    public void setFileList(List<FileVo> fileList) {
+        this.fileList = fileList;
+    }
+
+    public String getFileIdListStr() {
+        if (fileIdListStr == null && fileIdList != null) {
+            fileIdListStr = JSONArray.toJSONString(fileIdList);
+        }
+        return fileIdListStr;
+    }
+
+    public void setFileIdListStr(String fileIdListStr) {
+        this.fileIdListStr = fileIdListStr;
     }
 }

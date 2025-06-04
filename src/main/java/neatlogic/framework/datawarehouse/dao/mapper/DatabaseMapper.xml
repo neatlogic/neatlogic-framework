@@ -24,7 +24,8 @@
             `id`,
             `name`,
             `type`,
-            `config` AS configStr
+            `config` AS configStr,
+            `file_id_list` AS fileIdListStr
         FROM `database`
         WHERE `id` = #{value}
     </select>
@@ -71,12 +72,13 @@
     </select>
 
     <insert id="insertDataBase" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo">
-        INSERT INTO `database` (`id`, `name`, `type`, `config`)
-        VALUES (#{id}, #{name}, #{type}, #{configStr, typeHandler=CompressHandler})
+        INSERT INTO `database` (`id`, `name`, `type`, `config`, `file_id_list`)
+        VALUES (#{id}, #{name}, #{type}, #{configStr, typeHandler=CompressHandler}, #{fileIdListStr})
         ON DUPLICATE KEY UPDATE
         `name` = #{name},
         `type` = #{type},
-        `config` = #{configStr, typeHandler=CompressHandler}
+        `config` = #{configStr, typeHandler=CompressHandler},
+        `file_id_list` = #{fileIdListStr}
     </insert>
 
     <delete id="deleteDataBaseById" parameterType="java.lang.Long">

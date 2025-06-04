@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Copyright (C) 2025  深圳极向量科技有限公司 All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.datawarehouse.dao.mapper.DatabaseMapper">
+
+    <select id="getDataBaseById" parameterType="java.lang.Long" resultType="neatlogic.framework.datawarehouse.dto.DatabaseVo">
+        SELECT
+            `id`,
+            `name`,
+            `type`,
+            `config` AS configStr,
+            `file_id_list` AS fileIdListStr
+        FROM `database`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="checkDatabaseNameIsRepeat" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `database`
+        WHERE `name` = #{name}
+          <if test="id != null">
+            AND `id` != #{id}
+          </if>
+    </select>
+
+    <select id="getDataBaseCount" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo" resultType="int">
+        SELECT
+            COUNT(`id`)
+        FROM `database`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                `type` = #{type}
+            </if>
+        </where>
+    </select>
+
+    <select id="getDataBaseList" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo" resultType="neatlogic.framework.datawarehouse.dto.DatabaseVo">
+        SELECT
+            `id`,
+            `name`,
+            `type`
+        FROM `database`
+        <where>
+            <if test="keyword != null and keyword != ''">
+                `name` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="type != null and type != ''">
+                  `type` = #{type}
+            </if>
+        </where>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertDataBase" parameterType="neatlogic.framework.datawarehouse.dto.DatabaseVo">
+        INSERT INTO `database` (`id`, `name`, `type`, `config`, `file_id_list`)
+        VALUES (#{id}, #{name}, #{type}, #{configStr, typeHandler=CompressHandler}, #{fileIdListStr})
+        ON DUPLICATE KEY UPDATE
+        `name` = #{name},
+        `type` = #{type},
+        `config` = #{configStr, typeHandler=CompressHandler},
+        `file_id_list` = #{fileIdListStr}
+    </insert>
+
+    <delete id="deleteDataBaseById" parameterType="java.lang.Long">
+        DELETE FROM `database` WHERE `id` = #{value}
+    </delete>
+</mapper>

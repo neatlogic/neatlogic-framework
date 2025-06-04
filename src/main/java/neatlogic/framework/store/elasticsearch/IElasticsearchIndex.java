@@ -17,8 +17,9 @@
 
 package neatlogic.framework.store.elasticsearch;
 
-import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
+
+import java.util.Map;
 
 public interface IElasticsearchIndex<T> {
     /*
@@ -51,10 +52,6 @@ public interface IElasticsearchIndex<T> {
      */
     void createDocument(T targetVo);
 
-    /**
-     * 修改文档某些属性
-     */
-    void updateDocument(Long targetId, JSONObject jsonObj);
 
     /*
     根据目标id创建文档
@@ -72,8 +69,18 @@ public interface IElasticsearchIndex<T> {
     void deleteDocument(Long targetId);
 
     /*
-    获取文档
+    更新文档
      */
+    void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert);
+
+    /*
+    组装文档数据
+     */
+    Map<String, Object> makeupDocument(T targetVo);
+
+    /*
+        获取文档
+         */
     T getDocument(T targetVo);
 
 

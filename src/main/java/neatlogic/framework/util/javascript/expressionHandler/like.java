@@ -28,6 +28,7 @@ import java.util.List;
 
 public class like {
     private static final Logger logger = LoggerFactory.getLogger(like.class);
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
@@ -37,6 +38,10 @@ public class like {
                 if (dataValueList.size() == 1) {
                     String dataValue = dataValueList.getString(0);
                     String conditionValue = conditionValueList.getString(0);
+                    if (StringUtils.isBlank(dataValue)) {
+                        //如果数据值为空，代表不包含任何值，直接返回false
+                        return false;
+                    }
                     if (dataValue.contains(conditionValue)) {
                         return true;
                     } else {

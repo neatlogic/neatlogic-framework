@@ -20,6 +20,7 @@ package neatlogic.framework.store.elasticsearch;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.exception.elasticsearch.ElasticSearchIndexNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +33,11 @@ public class ElasticsearchIndexFactory extends ModuleInitializedListenerBase {
     private static final List<IElasticsearchIndex> components = new ArrayList<>();
 
     public static IElasticsearchIndex getIndex(String name) {
-        return componentMap.get(name);
+        IElasticsearchIndex index = componentMap.get(name);
+        if (index == null) {
+            throw new ElasticSearchIndexNotFoundException(name);
+        }
+        return index;
     }
 
     public static List<IElasticsearchIndex> getAllIndex() {

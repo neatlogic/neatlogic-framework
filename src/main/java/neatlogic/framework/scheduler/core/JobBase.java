@@ -258,7 +258,11 @@ public abstract class JobBase implements IJob {
                     schedulerMapper.updateJobAudit(auditVo);
                 }
             } else {
-                jobHandler.executeInternal(context, jobObject);
+                try {
+                    jobHandler.executeInternal(context, jobObject);
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
             }
 /*
   异步模式，如果事务hold住时间太长，可以考虑使用异步模式，但作业的执行时间需要手动处理

@@ -10,8 +10,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Resource;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class FullIndexAspect {
     private static final ThreadLocal<Map<Long, String>> DOCUMENT_MAP = new ThreadLocal<>();
     private static final Logger logger = LoggerFactory.getLogger(FullIndexAspect.class);
 
-    @Autowired
+    @Resource
     private FullTextIndexMapper fullTextIndexMapper;
 
     @After("@annotation(fullIndex)")

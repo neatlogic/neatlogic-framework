@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 
 @RootComponent
 public class TenantInitManager extends ModuleInitializedListenerBase {
-    private final static Logger logger = LoggerFactory.getLogger(TenantInitManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(TenantInitManager.class);
 
-    private final static List<ITenantInit> tenantInitList = new ArrayList<>();
+    private static final List<ITenantInit> tenantInitList = new ArrayList<>();
 
     public static List<ITenantInit> getTenantInitList() {
         return tenantInitList.stream().sorted(Comparator.comparing(ITenantInit::sort)).collect(Collectors.toList());
@@ -70,10 +70,10 @@ public class TenantInitManager extends ModuleInitializedListenerBase {
                     tenantInit.execute();
                 }
             } catch (Exception ex) {
-                logger.error("租户“" + tenantVo.getName() + "”初始化数据“" + tenantInit.getName() + "”失败：" + ex.getMessage(), ex);
+                logger.error("租户“{}”初始化数据“{}”失败：{}", tenantVo.getName(), tenantInit.getName(), ex.getMessage(), ex);
             }
         }
-        TenantContext.get().setUseMasterDatabase(true);
+       // TenantContext.get().setUseMasterDatabase(true);
     }
 
 

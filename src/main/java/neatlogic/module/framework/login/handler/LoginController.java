@@ -117,7 +117,7 @@ public class LoginController {
             }
             if (StringUtils.isNotBlank(tenant)) {
                 // 使用master库
-                tenantContext.setUseMasterDatabase(true);
+                //tenantContext.setUseMasterDatabase(true);
                 TenantVo tenantVo = tenantService.getTenantByUuid(tenant);
                 if (tenantVo == null) {
                     throw new TenantNotFoundException(tenant);
@@ -127,7 +127,7 @@ public class LoginController {
                 }
                 tenantContext.switchTenant(tenant);
                 // 还原回租户库
-                tenantContext.setUseMasterDatabase(false);
+                //tenantContext.setUseMasterDatabase(false);
             }
             // 验证并获取用户
             UserVo userVo = new UserVo();
@@ -192,7 +192,7 @@ public class LoginController {
                 userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash);
                 userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(jwtVo.getTokenHash(), jwtVo.getToken()));
                 //更新租户visitTime
-                TenantContext.get().setUseMasterDatabase(true);
+                //TenantContext.get().setUseMasterDatabase(true);
                 if (!tenantVisitSet.contains(tenant)) {
                     tenantMapper.updateTenantVisitTime(tenant);
                     tenantVisitSet.add(tenant);
@@ -226,7 +226,7 @@ public class LoginController {
         }
         if (StringUtils.isNotBlank(tenant)) {
             // 使用master库
-            tenantContext.setUseMasterDatabase(true);
+            //tenantContext.setUseMasterDatabase(true);
             TenantVo tenantVo = tenantService.getTenantByUuid(tenant);
             if (tenantVo == null) {
                 throw new TenantNotFoundException(tenant);
@@ -236,7 +236,7 @@ public class LoginController {
             }
             tenantContext.switchTenant(tenant);
             // 还原回租户库
-            tenantContext.setUseMasterDatabase(false);
+           // tenantContext.setUseMasterDatabase(false);
         }
         String sessionId = jsonObj.getString("sessionId");
         JSONObject result = CaptchaUtil.getCaptcha();

@@ -109,7 +109,7 @@ public class ModuleUtil {
                     moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
                     moduleGroup.setGroupSort(moduleVo.getGroupSort());
 
-                    List<ModuleVo> moduleList = new ArrayList<ModuleVo>();
+                    List<ModuleVo> moduleList = new ArrayList<>();
                     moduleList.add(moduleVo);
                     moduleGroup.setModuleList(moduleList);
                 } else {
@@ -121,13 +121,13 @@ public class ModuleUtil {
     }
 
     public static Map<String, ModuleGroupVo> getModuleGroupMap() {
-        Map<String, ModuleGroupVo> moduleGroupMap = new HashMap<String, ModuleGroupVo>();
+        Map<String, ModuleGroupVo> moduleGroupMap = new HashMap<>();
         Set<Entry<String, ModuleVo>> moduleSet = moduleMap.entrySet();
         for (Entry<String, ModuleVo> moduleEntry : moduleSet) {
             ModuleVo moduleVo = moduleEntry.getValue();
             ModuleGroupVo moduleGroupVo = null;
             if (moduleGroupMap.containsKey(moduleVo.getGroup())) {
-                moduleGroupVo = (ModuleGroupVo) moduleGroupMap.get(moduleVo.getGroup());
+                moduleGroupVo = moduleGroupMap.get(moduleVo.getGroup());
                 moduleGroupVo.getModuleList().add(moduleVo);
             } else {
                 moduleGroupVo = new ModuleGroupVo();

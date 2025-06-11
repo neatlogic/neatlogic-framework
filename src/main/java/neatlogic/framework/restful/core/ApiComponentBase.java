@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.restful.core;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.FieldValidResultVo;
 import neatlogic.framework.dto.api.CacheControlVo;
@@ -114,12 +113,12 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (response != null) {
                         CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
                         if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
-                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() +"="+ cacheControlVo.getMaxAge());
+                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() + "=" + cacheControlVo.getMaxAge());
                         }
                     }
                 }
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException |
-                    SecurityException ex) {
+                     SecurityException ex) {
                 validApi(this.getClass(), paramObj, apiVo, JSONObject.class);
                 boolean canRun = false;
                 if (apiVo.getIsActive().equals(0)) {
@@ -145,7 +144,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     }
                 }
             } catch (Exception ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
+                if (ex.getCause() instanceof ApiRuntimeException) {
                     throw new ApiRuntimeException(ex.getCause().getMessage(), ex.getCause());
                 } else {
                     throw ex;
@@ -153,9 +152,9 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } catch (Exception e) {
             Throwable target = e;
-            if (TenantContext.get() != null) {
+           /* if (TenantContext.get() != null) {
                 TenantContext.get().setUseMasterDatabase(false);//防止上游异常导致后续审计没有还原原来的租户
-            }
+            }*/
             //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
             while (target instanceof InvocationTargetException) {
                 target = ((InvocationTargetException) target).getTargetException();

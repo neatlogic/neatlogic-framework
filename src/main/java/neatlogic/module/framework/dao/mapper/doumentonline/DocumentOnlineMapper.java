@@ -15,11 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.dao.mapper.doumentonline;
 
+import neatlogic.framework.dao.aop.UseMasterDatabase;
 import neatlogic.framework.documentonline.crossover.IDocumentOnlineCrossoverMapper;
 import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
 
 import java.util.List;
 
+@UseMasterDatabase
 public interface DocumentOnlineMapper extends IDocumentOnlineCrossoverMapper {
 
 //    List<DocumentOnlineConfigVo> getDocumentOnlineConfigListByFilePathList(List<String> filePathList);

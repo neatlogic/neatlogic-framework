@@ -116,7 +116,7 @@ public class TenantContext implements Serializable {
     public TenantContext switchTenant(String tenantUuid) {
         if (StringUtils.isNotBlank(tenantUuid)) {
             this.tenantUuid = tenantUuid;
-            this.setUseMasterDatabase(false);
+            //this.setUseMasterDatabase(false);
             MDC.put("tenant", tenantUuid);
         }
         return this;
@@ -133,10 +133,10 @@ public class TenantContext implements Serializable {
         List<String> moduleGroupList = tenantModuleGroupListMap.get(tenantUuid);
         if (moduleGroupList == null) {
             // 使用master库
-            this.setUseMasterDatabase(true);
+            //this.setUseMasterDatabase(true);
             List<String> tenantModuleGroupList = moduleMapper.getModuleGroupListByTenantUuid(tenantUuid);
             // 还原回租户库
-            this.setUseMasterDatabase(false);
+            //this.setUseMasterDatabase(false);
             tenantModuleGroupListMap.put(tenantUuid, tenantModuleGroupList);
         }
         return tenantModuleGroupListMap.get(tenantUuid);
@@ -154,6 +154,7 @@ public class TenantContext implements Serializable {
     /**
      * 切换数据库
      * 注意：不能在事务场景使用此方法，否则会切库失败
+     *
      * @param useDefaultDatasource true 使用neatlogic 库 ，false 还原使用租户库
      */
     public void setUseMasterDatabase(Boolean useDefaultDatasource) {
@@ -167,6 +168,8 @@ public class TenantContext implements Serializable {
 
     public List<ModuleGroupVo> getActiveModuleGroupList() {
         List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+        //补充framework模块
+        ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
         List<ModuleGroupVo> activeModuleGroupList = new ArrayList<>();
         for (String group : tenantModuleGroupList) {
             ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);

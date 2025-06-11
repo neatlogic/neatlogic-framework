@@ -69,7 +69,9 @@ public class StartupManager extends ModuleInitializedListenerBase {
             return;
         }
         //模块全部加载完毕后再开始启动作业，依赖NeatLogicThread任务会等待全部模块加载完毕后再开始执行逻辑
+        //TenantContext.get().setUseMasterDatabase(true);
         List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
+        //TenantContext.get().setUseMasterDatabase(false);
         if (CollectionUtils.isNotEmpty(tenantList)) {
             CachedThreadPool.execute(new NeatLogicThread("STARTUP-RUNNER") {
                 @Override
@@ -77,7 +79,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                     if (CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             for (TenantVo tenantVo : tenantList) {
-                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
+                                //TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
                                 List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
                                 List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
                                 //只有拥有当前模块权限的的租户才会执行startup
@@ -85,7 +87,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                                     continue;
                                 }
 
-                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
+                                TenantContext.get().switchTenant(tenantVo.getUuid());//.setUseMasterDatabase(false);
                                 UserContext.init(SystemUser.SYSTEM);
                                 try {
                                     int i = startup.executeForCurrentTenant();
@@ -99,7 +101,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                         }
                     }
                     //还原默认数据库neatlogic
-                    TenantContext.get().setUseMasterDatabase(true);
+                   // TenantContext.get().setUseMasterDatabase(true);
                     if (CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             try {
@@ -112,7 +114,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             }
                         }
                     }
-                    TenantContext.get().setUseMasterDatabase(false);
+                    //TenantContext.get().setUseMasterDatabase(false);
                 }
             });
         }

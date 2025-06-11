@@ -55,9 +55,8 @@ public class MongoDbDataSourceGetApi extends PrivateApiComponentBase {
     @Override
     public Object myDoService(JSONObject jsonObj) throws Exception {
         String tenant = TenantContext.get().getTenantUuid();
-        TenantContext.get().setUseMasterDatabase(true);
-        MongoDbVo mongodbVo = neatlogicMapper.getMongodbByTenant(tenant);
-        TenantContext.get().setUseMasterDatabase(false);
-        return mongodbVo;
+        //TenantContext.get().setUseMasterDatabase(true);
+        //TenantContext.get().setUseMasterDatabase(false);
+        return neatlogicMapper.getMongodbByTenant(tenant);
     }
 }

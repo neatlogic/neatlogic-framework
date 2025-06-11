@@ -44,12 +44,12 @@ public class SubscribeHeartbreakHandler implements IHeartbreakHandler {
     @Override
     public void whenServerInactivated(Integer serverId) {
         //切换到核心库
-        TenantContext.get().setUseMasterDatabase(true);
+        //TenantContext.get().setUseMasterDatabase(true);
         List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
 
         for (TenantVo tenantVo : tenantList) {
             // 切换到租户库
-            TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
+            TenantContext.get().switchTenant(tenantVo.getUuid());//.setUseMasterDatabase(false);
 
             SubscribeVo subscribeVo = new SubscribeVo();
             subscribeVo.setIsActive(1);

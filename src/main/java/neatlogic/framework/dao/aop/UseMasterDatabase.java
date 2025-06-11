@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
+ * Copyright (C) 2025  深圳极向量科技有限公司 All Rights Reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.heartbeat.dao.mapper;
+package neatlogic.framework.dao.aop;
 
-import neatlogic.framework.dao.aop.UseMasterDatabase;
-import org.apache.ibatis.annotations.Param;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.util.Date;
-
-@UseMasterDatabase
-public interface TenantServerMapper {
-    int insertTenantServerRunTime(@Param("serverId") Integer serverId, @Param("startTime") Date startTime);
+@Target({ElementType.METHOD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface UseMasterDatabase {
 }

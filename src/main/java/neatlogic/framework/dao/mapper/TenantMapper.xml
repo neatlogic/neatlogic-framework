@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.TenantMapper">
+    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="30000" size="1000"></cache>
 
-    <select id="getTenantAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String">
+    <select id="getTenantAuditDetailByHash" parameterType="java.lang.String" resultType="java.lang.String"
+            useCache="false">
         SELECT `content`
         FROM `tenant_audit_detail`
         WHERE `hash` = #{value}
     </select>
 
     <select id="getTenantModuleGroupByTenantUuid" parameterType="java.lang.String"
-            resultType="neatlogic.framework.dto.TenantModuleGroupVo">
-        SELECT
-               `tenant_uuid`  as tenantUuid,
+            resultType="neatlogic.framework.dto.TenantModuleGroupVo" useCache="false">
+        SELECT `tenant_uuid`  as tenantUuid,
                `module_group` AS moduleGroup
         FROM `tenant_modulegroup`
         WHERE tenant_uuid = #{value}
     </select>
 
     <select id="getTenantModuleByTenantUuid" parameterType="java.lang.String"
-            resultType="neatlogic.framework.dto.TenantModuleVo">
-        SELECT
-               `module_id`  as moduleId,
+            resultType="neatlogic.framework.dto.TenantModuleVo" useCache="false">
+        SELECT `module_id`  as moduleId,
                `ddl_status` as ddlStatus,
                `dml_status` as dmlStatus,
                `version`
@@ -38,7 +38,7 @@
     </sql>
 
     <select id="searchTenantAudit" parameterType="neatlogic.framework.dto.TenantAuditVo"
-            resultType="neatlogic.framework.dto.TenantAuditVo">
+            resultType="neatlogic.framework.dto.TenantAuditVo" useCache="false">
         SELECT
         `id`,
         `group_id` AS groupId,
@@ -58,7 +58,8 @@
         ORDER BY id DESC
     </select>
 
-    <select id="searchTenantAuditCount" parameterType="neatlogic.framework.dto.TenantAuditVo" resultType="int">
+    <select id="searchTenantAuditCount" parameterType="neatlogic.framework.dto.TenantAuditVo" resultType="int"
+            useCache="false">
         SELECT
         COUNT(1)
         FROM
@@ -75,7 +76,7 @@
     </sql>
 
     <select id="searchTenant" parameterType="neatlogic.framework.dto.TenantVo"
-            resultType="neatlogic.framework.dto.TenantVo">
+            resultType="neatlogic.framework.dto.TenantVo" useCache="false">
         SELECT
         `uuid`,
         `name`,
@@ -90,7 +91,7 @@
         ORDER BY `is_active`,`visit_time` DESC
     </select>
 
-    <select id="searchTenantCount" parameterType="neatlogic.framework.dto.TenantVo" resultType="int">
+    <select id="searchTenantCount" parameterType="neatlogic.framework.dto.TenantVo" resultType="int" useCache="false">
         SELECT
         COUNT(1)
         FROM
@@ -98,18 +99,19 @@
         <include refid="searchTenantCondition"/>
     </select>
 
-    <select id="checkTenantUuidIsExists" parameterType="neatlogic.framework.dto.TenantVo" resultType="int">
+    <select id="checkTenantUuidIsExists" parameterType="neatlogic.framework.dto.TenantVo" resultType="int"
+            useCache="false">
         SELECT COUNT(1)
         FROM `tenant`
         WHERE uuid = #{uuid}
     </select>
 
-    <select id="getTenantByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TenantVo">
-        SELECT
-               `uuid`,
+    <select id="getTenantByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TenantVo"
+            useCache="false">
+        SELECT `uuid`,
                `name`,
-               `is_active`   AS isActive,
-               `expire_date` AS expireDate,
+               `is_active`    AS isActive,
+               `expire_date`  AS expireDate,
                `status`,
                `description`,
                `is_need_demo` as isNeedDemo
@@ -117,48 +119,50 @@
         WHERE `uuid` = #{value}
     </select>
 
-    <select id="getAllActiveTenant" resultType="neatlogic.framework.dto.TenantVo">
-        SELECT
-                t.`uuid`,
-                t.`name`,
-                t.visit_time as visitTime,
-                t.`fcd`
+    <select id="getAllActiveTenant" resultType="neatlogic.framework.dto.TenantVo" useCache="true">
+        SELECT t.`uuid`,
+               t.`name`,
+               t.visit_time as visitTime,
+               t.`fcd`
         FROM `tenant` t
                  JOIN `datasource` ds ON ds.`tenant_uuid` = t.`uuid`
         WHERE t.`is_active` = 1
     </select>
-    <select id="getTenantAuditMaxGroupIdByTenantUuid" resultType="java.lang.Long">
+
+    <select id="getTenantAuditMaxGroupIdByTenantUuid" resultType="java.lang.Long" useCache="false">
         select max(group_id)
         from tenant_audit
         where tenant_uuid = #{value}
     </select>
-    <select id="getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId" resultType="java.lang.String">
+
+    <select id="getTenantModuleDmlSqlMd5ByTenantUuidAndModuleId" resultType="java.lang.String" useCache="false">
         select sql_uuid
         from tenant_module_dmlsql
         where tenant_uuid = #{tenantUuid}
           and `module_id` = #{moduleId}
     </select>
-    <select id="getTenantAuditListWithDmlDemo" resultType="neatlogic.framework.dto.TenantAuditVo">
-        SELECT
-            `id`,
-            `group_id` AS groupId,
-            `tenant_uuid` as tenantUuid,
-            `module_id` as moduleId,
-            `module_group` as moduleGroup,
-            `sql_type` as sqlType,
-            `start_time` as startTime,
-            `end_time` as endTime,
-            (UNIX_TIMESTAMP(IFNULL(end_time, NOW(3)))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost,
-            `result_hash` as resultHash,
-            `error_hash` as errorHash,
-            `status`
-        FROM
-            `tenant_audit` where `tenant_uuid` = #{value} and `module_group`= 'webroot' and `module_id` = 'webroot'
+
+    <select id="getTenantAuditListWithDmlDemo" resultType="neatlogic.framework.dto.TenantAuditVo" useCache="false">
+        SELECT `id`,
+               `group_id`                                                                            AS groupId,
+               `tenant_uuid`                                                                         as tenantUuid,
+               `module_id`                                                                           as moduleId,
+               `module_group`                                                                        as moduleGroup,
+               `sql_type`                                                                            as sqlType,
+               `start_time`                                                                          as startTime,
+               `end_time`                                                                            as endTime,
+               (UNIX_TIMESTAMP(IFNULL(end_time, NOW(3))) * 1000 - UNIX_TIMESTAMP(start_time) * 1000) AS timeCost,
+               `result_hash`                                                                         as resultHash,
+               `error_hash`                                                                          as errorHash,
+               `status`
+        FROM `tenant_audit`
+        where `tenant_uuid` = #{value}
+          and `module_group` = 'webroot'
+          and `module_id` = 'webroot'
     </select>
 
     <insert id="insertTenant" parameterType="neatlogic.framework.dto.TenantVo">
-        INSERT INTO `tenant` (
-                              `uuid`,
+        INSERT INTO `tenant` (`uuid`,
                               `name`,
                               `is_active`,
                               `is_need_demo`,
@@ -166,8 +170,7 @@
                               `status`,
                               `fcd`,
                               `description`)
-        VALUES (
-                #{uuid},
+        VALUES (#{uuid},
                 #{name},
                 #{isActive},
                 #{isNeedDemo},
@@ -179,7 +182,7 @@
 
     <insert id="insertTenantModuleGroup">
         INSERT INTO `tenant_modulegroup` (`tenant_uuid`, `module_group`)
-        VALUES ( #{tenantUuid}, #{moduleGroup})
+        VALUES (#{tenantUuid}, #{moduleGroup})
     </insert>
 
     <insert id="insertTenantAudit" parameterType="neatlogic.framework.dto.TenantAuditVo">
@@ -247,7 +250,7 @@
         WHERE `uuid` = #{uuid}
     </update>
 
-    <update id="updateTenantIsActiveByUuid" >
+    <update id="updateTenantIsActiveByUuid">
         UPDATE
             `tenant`
         SET `is_active` = #{isActive}
@@ -275,7 +278,9 @@
         AND `module_id` = #{moduleId}
     </update>
     <update id="updateTenantVisitTime">
-        update `tenant` set `visit_time` = now() where `uuid` = #{value}
+        update `tenant`
+        set `visit_time` = now()
+        where `uuid` = #{value}
     </update>
 
     <delete id="deleteTenantModuleGroupByTenantUuid" parameterType="java.lang.String">

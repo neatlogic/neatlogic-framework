@@ -15,7 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.applicationlistener.core;
 
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -27,7 +26,7 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
 
     @PostConstruct
     public final void init() {
-        TenantContext.get().setUseMasterDatabase(true);
+        //TenantContext.get().setUseMasterDatabase(true);
         myInit();
     }
 
@@ -35,7 +34,7 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
     public final void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext c = event.getApplicationContext();
         if (c instanceof NeatLogicWebApplicationContext) {
-            TenantContext.get().setUseMasterDatabase(true);
+            //TenantContext.get().setUseMasterDatabase(true);
             onInitialized((NeatLogicWebApplicationContext) c);
         }
     }

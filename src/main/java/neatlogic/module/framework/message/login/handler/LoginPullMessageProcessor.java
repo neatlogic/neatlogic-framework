@@ -17,6 +17,7 @@ package neatlogic.module.framework.message.login.handler;
 
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.PageUtil;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.login.core.LoginPostProcessorBase;
@@ -39,6 +40,10 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
     @Override
     protected void myLoginAfterInitialization() {
+        // 系统用户登录，不需要拉取系统消息
+        if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
+            return;
+        }
         MessageSearchVo searchVo = new MessageSearchVo();
         List<String> handlerList = getActiveHandlerList();
         if(CollectionUtils.isNotEmpty(handlerList)){

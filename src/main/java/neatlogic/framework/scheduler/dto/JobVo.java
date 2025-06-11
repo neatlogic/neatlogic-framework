@@ -56,6 +56,9 @@ public class JobVo extends BasePageVo {
     @EntityField(name = "结束时间",
             type = ApiParamType.LONG)
     private Date endTime;
+    @EntityField(name = "是否已加载",
+            type = ApiParamType.INTEGER)
+    private Integer isLoad;
 
     private JobStatusVo jobStatus;
 
@@ -181,4 +184,11 @@ public class JobVo extends BasePageVo {
         return 0;
     }
 
+    public Integer getIsLoad() {
+        return isLoad;
+    }
+
+    public void setIsLoad(Integer isLoad) {
+        this.isLoad = isLoad;
+    }
 }

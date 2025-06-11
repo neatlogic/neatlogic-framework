@@ -96,13 +96,14 @@ public abstract class JobBase implements IJob {
                 // 如果锁的状态是running状态，证明其他节点已经在执行，直接返回
                 if (jobLockVo.getLock().equals(JobLockVo.RUNNING) && !jobLockVo.getServerId().equals(Config.SCHEDULE_SERVER_ID)) {
                     jobLockVo = null;
+                } else {
+                    // 修改锁状态
+                    jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+                    jobLockVo.setLock(JobLockVo.RUNNING);
+                    schedulerMapper.updateJobLock(jobLockVo);
                 }
-            }
-            if (jobLockVo != null) {
-                // 修改锁状态
-                jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
-                jobLockVo.setLock(JobLockVo.RUNNING);
-                schedulerMapper.updateJobLock(jobLockVo);
+            } else {
+                logger.error("执行定时作业(jobName={0},jobGroup={1})时，`schedule_job_lock`表中没有对应数据");
             }
         } finally {
             transactionUtil.commitTx(ts);
@@ -196,8 +197,12 @@ public abstract class JobBase implements IJob {
         }
         Date currentFireTime = context.getFireTime();// 本次执行激活时间
         JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+        if (beforeJobStatusVo == null) {
+            logger.error("执行定时作业(jobName={0},jobGroup={1})时，`schedule_job_status`表中没有对应数据");
+            return;
+        }
         // 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
-        if (beforeJobStatusVo == null || (beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime))) {
+        if (beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
             return;
         }
 

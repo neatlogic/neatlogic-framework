@@ -39,7 +39,7 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
 
     @Override
     protected void myLoginAfterInitialization() {
-        // 系统用户登录了，不需要拉取系统通知
+        // 系统用户登录，不需要拉取系统通知
         if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
             return;
         }

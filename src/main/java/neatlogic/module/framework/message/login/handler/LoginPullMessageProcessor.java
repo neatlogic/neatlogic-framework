@@ -40,7 +40,7 @@ public class LoginPullMessageProcessor extends LoginPostProcessorBase {
 
     @Override
     protected void myLoginAfterInitialization() {
-        // 系统用户登录了，不需要拉取系统消息
+        // 系统用户登录，不需要拉取系统消息
         if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
             return;
         }

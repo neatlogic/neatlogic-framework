@@ -27,7 +27,6 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
 
     @PostConstruct
     public final void init() {
-        //初始化TenantContext，避免子类使用TenantContext时出现空指针
         TenantContext.get().setUseMasterDatabase(true);
         myInit();
     }

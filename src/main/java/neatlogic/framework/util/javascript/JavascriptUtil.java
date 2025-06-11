@@ -257,8 +257,8 @@ public class JavascriptUtil {
             se.getContext().setWriter(sw);
         }
         se.put("O", paramObj);
-        se.put("N", null);
-        se.eval("try{O = JSON.parse(O);}catch(e){}");
+        se.put("N", paramObj);
+        se.eval("try{O = JSON.parse(O);N = JSON.parse(N);}catch(e){}");
         se.eval(script);
         Object result = se.eval("JSON.stringify(N);");
         String resultStr = "";

@@ -27,11 +27,7 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
 
     @PostConstruct
     public final void init() {
-        //初始化TenantContext，避免子类使用TenantContext时出现空指针
-        TenantContext.init();
-        //TenantContext tenantContext = TenantContext.get();
-        //String tenant = tenantContext.getTenantUuid();
-        //tenantContext.switchTenant(tenant);
+        TenantContext.get().setUseMasterDatabase(true);
         myInit();
     }
 
@@ -39,6 +35,7 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
     public final void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext c = event.getApplicationContext();
         if (c instanceof NeatLogicWebApplicationContext) {
+            TenantContext.get().setUseMasterDatabase(true);
             onInitialized((NeatLogicWebApplicationContext) c);
         }
     }

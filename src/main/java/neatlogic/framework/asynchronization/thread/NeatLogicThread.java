@@ -17,13 +17,11 @@ package neatlogic.framework.asynchronization.thread;
 
 import neatlogic.framework.asynchronization.threadlocal.*;
 import neatlogic.framework.cache.threadlocal.CacheContext;
-import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 
@@ -32,7 +30,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     protected UserContext userContext;
     protected MongodbSessionContext mongodbSessionContext;
     private final String tenantUuid;
-    private final List<ModuleVo> activeModuleList;
     protected InputFromContext inputFromContext;
     protected RequestContext requestContext;
     private String threadName;
@@ -100,7 +97,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
             userContext = tmp.copy();
         }
         tenantUuid = TenantContext.get().getTenantUuid();
-        activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
         mongodbSessionContext = MongodbSessionContext.get();
@@ -113,7 +109,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
             userContext = tmp.copy();
         }
         tenantUuid = TenantContext.get().getTenantUuid();
-        activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
         mongodbSessionContext = MongodbSessionContext.get();
@@ -124,7 +119,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
     public NeatLogicThread(String _threadName, boolean _isUnique) {
         userContext = UserContext.get();
         tenantUuid = TenantContext.get().getTenantUuid();
-        activeModuleList = TenantContext.get().getActiveModuleList();
         inputFromContext = InputFromContext.get();
         requestContext = RequestContext.get();
         mongodbSessionContext = MongodbSessionContext.get();
@@ -134,8 +128,7 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
 
     @Override
     public final void run() {
-        TenantContext tenantContext = TenantContext.init(tenantUuid);
-        tenantContext.setActiveModuleList(activeModuleList);
+        TenantContext.init(tenantUuid);
         UserContext.init(userContext);
         InputFromContext.init(inputFromContext);
         RequestContext.init(requestContext);

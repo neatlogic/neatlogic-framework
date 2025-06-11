@@ -20,6 +20,7 @@ import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dao.mapper.ModuleMapper;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +30,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RootConfiguration
 public class TenantContext implements Serializable {
     private static final long serialVersionUID = -5977938340288247600L;
     private static final ThreadLocal<TenantContext> instance = new ThreadLocal<>();
+    private static final ConcurrentHashMap<String, List<String>> tenantModuleGroupListMap = new ConcurrentHashMap<>();
     private String tenantUuid;
     private Boolean useDefaultDatasource = false;
-    private List<ModuleVo> activeModuleList;
-    private List<ModuleGroupVo> activeModuleGroupList;
-    private Map<String, ModuleVo> activeModuleMap;
     private Boolean isData = false;
     private final String dataDbName = "";
 
@@ -59,7 +59,6 @@ public class TenantContext implements Serializable {
         TenantContext context = new TenantContext();
         if (_tenantContext != null) {
             context.setTenantUuid(_tenantContext.getTenantUuid());
-            context.setActiveModuleList(_tenantContext.getActiveModuleList());
             MDC.put("tenant", _tenantContext.getTenantUuid());
         }
         instance.set(context);
@@ -117,33 +116,30 @@ public class TenantContext implements Serializable {
     public TenantContext switchTenant(String tenantUuid) {
         if (StringUtils.isNotBlank(tenantUuid)) {
             this.tenantUuid = tenantUuid;
-            // 使用master库
-            this.setUseMasterDatabase(true);
-            //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
-            List<String> tenantModuleGroupList = new ArrayList<>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
-            this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
-            this.activeModuleGroupList = new ArrayList<>();
-            for (String group : tenantModuleGroupList) {
-                ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
-                if (groupVo != null) {
-                    this.activeModuleGroupList.add(groupVo);
-                }
-            }
-            // 还原回租户库
             this.setUseMasterDatabase(false);
-            activeModuleMap = new HashMap<>();
-            if (activeModuleList != null && activeModuleList.size() > 0) {
-                for (ModuleVo module : activeModuleList) {
-                    activeModuleMap.put(module.getId(), module);
-                }
-            }
             MDC.put("tenant", tenantUuid);
         }
         return this;
     }
 
     public static TenantContext get() {
+        if (instance.get() == null) {
+            init();
+        }
         return instance.get();
+    }
+
+    private List<String> searchModuleGroupList(String tenantUuid) {
+        List<String> moduleGroupList = tenantModuleGroupListMap.get(tenantUuid);
+        if (moduleGroupList == null) {
+            // 使用master库
+            this.setUseMasterDatabase(true);
+            List<String> tenantModuleGroupList = moduleMapper.getModuleGroupListByTenantUuid(tenantUuid);
+            // 还原回租户库
+            this.setUseMasterDatabase(false);
+            tenantModuleGroupListMap.put(tenantUuid, tenantModuleGroupList);
+        }
+        return tenantModuleGroupListMap.get(tenantUuid);
     }
 
     public void release() {
@@ -165,28 +161,35 @@ public class TenantContext implements Serializable {
     }
 
     public List<ModuleVo> getActiveModuleList() {
-        return activeModuleList;
+        List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+        return ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
     }
 
     public List<ModuleGroupVo> getActiveModuleGroupList() {
+        List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+        List<ModuleGroupVo> activeModuleGroupList = new ArrayList<>();
+        for (String group : tenantModuleGroupList) {
+            ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
+            if (groupVo != null) {
+                activeModuleGroupList.add(groupVo);
+            }
+        }
         return activeModuleGroupList;
     }
 
-    public void setActiveModuleList(List<ModuleVo> activeModuleList) {
-        this.activeModuleList = activeModuleList;
-        activeModuleMap = new HashMap<>();
-        if (activeModuleList != null && activeModuleList.size() > 0) {
+    public Map<String, ModuleVo> getActiveModuleMap() {
+        List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+        List<ModuleVo> activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
+        Map<String, ModuleVo> activeModuleMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(activeModuleList)) {
             for (ModuleVo module : activeModuleList) {
                 activeModuleMap.put(module.getId(), module);
             }
         }
-    }
-
-    public Map<String, ModuleVo> getActiveModuleMap() {
         return activeModuleMap;
     }
 
     public boolean containsModule(String moduleId) {
-        return activeModuleMap.containsKey(moduleId);
+        return getActiveModuleMap().containsKey(moduleId);
     }
 }

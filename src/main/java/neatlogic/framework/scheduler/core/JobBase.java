@@ -27,7 +27,6 @@ import neatlogic.framework.scheduler.annotation.Param;
 import neatlogic.framework.scheduler.annotation.Prop;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.*;
-import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.scheduler.exception.ScheduleIllegalParameterException;
 import neatlogic.framework.scheduler.exception.ScheduleParamNotExistsException;
 import neatlogic.framework.transaction.util.TransactionUtil;
@@ -42,13 +41,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 /**
@@ -103,7 +100,7 @@ public abstract class JobBase implements IJob {
                     schedulerMapper.updateJobLock(jobLockVo);
                 }
             } else {
-                logger.error("执行定时作业(jobName={0},jobGroup={1})时，`schedule_job_lock`表中没有对应数据");
+                logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，`schedule_job_lock`表中没有对应数据", jobName, jobGroup));
             }
         } finally {
             transactionUtil.commitTx(ts);
@@ -167,6 +164,10 @@ public abstract class JobBase implements IJob {
 
     @Override
     public final void execute(JobExecutionContext context) throws JobExecutionException {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            logger.error(String.format("定时作业%s类的execute()方法不应该开始事务", this.getClassName()));
+            return;
+        }
         InputFromContext.init(InputFrom.CRON);
         Date fireTime = new Date();
         JobDetail jobDetail = context.getJobDetail();
@@ -177,6 +178,7 @@ public abstract class JobBase implements IJob {
         String tenantUuid = jobObject.getTenantUuid();
         //如果租户不存在则不执行该租户的作业
         if (!TenantUtil.hasTenant(tenantUuid)) {
+            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，租户：%s不存在", jobName, jobGroup, tenantUuid));
             return;
         }
         // 从job组名中获取租户uuid,切换到租户的数据源
@@ -186,19 +188,22 @@ public abstract class JobBase implements IJob {
         IJob jobHandler = SchedulerManager.getHandler(this.getClassName());
         if (jobHandler == null) {
             schedulerManager.unloadJob(jobObject);
-            throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
+            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，定时作业组件：%s不存在", jobName, jobGroup, this.getClassName()));
+            return;
+//            throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
         }
         if (!jobHandler.isHealthy(jobObject)) {
             // not healthy 不能unloadJob 否则会删除作业状态和锁，导致正常接管的server也无法跑作业。
             // 例如：A Server 修改cron 每天0点跑作业，B Server 修改cron每分钟跑。 当A Server 发现not healthy 则会unload 并删除status，lock。后续判断会导致B Server 也不会再跑作业。
             // 应该有jobHandler来自行判断是否需要unloadJob
             //schedulerManager.unloadJob(jobObject);
+            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，isHealthy()方法检查出作业不正常", jobName, jobGroup));
             return;
         }
         Date currentFireTime = context.getFireTime();// 本次执行激活时间
         JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
         if (beforeJobStatusVo == null) {
-            logger.error("执行定时作业(jobName={0},jobGroup={1})时，`schedule_job_status`表中没有对应数据");
+            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，`schedule_job_status`表中没有对应数据", jobName, jobGroup));
             return;
         }
         // 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
@@ -214,7 +219,7 @@ public abstract class JobBase implements IJob {
         }
         JobStatusVo oldJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
         // 前后执行次数不一致，证明已经执行过，直接退出
-        if (beforeJobStatusVo.getExecCount().intValue() != oldJobStatusVo.getExecCount().intValue()) {
+        if (!Objects.equals(beforeJobStatusVo.getExecCount(), oldJobStatusVo.getExecCount())) {
             return;
         }
         try {

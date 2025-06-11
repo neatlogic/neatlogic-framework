@@ -117,26 +117,10 @@ public class TenantContext implements Serializable {
     public TenantContext switchTenant(String tenantUuid) {
         if (StringUtils.isNotBlank(tenantUuid)) {
             this.tenantUuid = tenantUuid;
-            // 使用master库
-            this.setUseMasterDatabase(true);
-            //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
-            List<String> tenantModuleGroupList = new ArrayList<>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
-            this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
-            this.activeModuleGroupList = new ArrayList<>();
-            for (String group : tenantModuleGroupList) {
-                ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
-                if (groupVo != null) {
-                    this.activeModuleGroupList.add(groupVo);
-                }
-            }
-            // 还原回租户库
+            this.activeModuleList = null;
+            this.activeModuleGroupList = null;
+            this.activeModuleMap = null;
             this.setUseMasterDatabase(false);
-            activeModuleMap = new HashMap<>();
-            if (activeModuleList != null && activeModuleList.size() > 0) {
-                for (ModuleVo module : activeModuleList) {
-                    activeModuleMap.put(module.getId(), module);
-                }
-            }
             MDC.put("tenant", tenantUuid);
         }
         return this;
@@ -144,6 +128,29 @@ public class TenantContext implements Serializable {
 
     public static TenantContext get() {
         return instance.get();
+    }
+
+    private void initModule() {
+        // 使用master库
+        this.setUseMasterDatabase(true);
+        //防止 ArrayList HashMap 对象在存入 ehcache 之前迭代序列化时，另一个线程对这个 list、map 进行了修改操作
+        List<String> tenantModuleGroupList = new ArrayList<>(moduleMapper.getModuleGroupListByTenantUuid(tenantUuid));
+        this.activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
+        this.activeModuleGroupList = new ArrayList<>();
+        for (String group : tenantModuleGroupList) {
+            ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
+            if (groupVo != null) {
+                this.activeModuleGroupList.add(groupVo);
+            }
+        }
+        // 还原回租户库
+        this.setUseMasterDatabase(false);
+        this.activeModuleMap = new HashMap<>();
+        if (activeModuleList != null && activeModuleList.size() > 0) {
+            for (ModuleVo module : activeModuleList) {
+                this.activeModuleMap.put(module.getId(), module);
+            }
+        }
     }
 
     public void release() {
@@ -165,10 +172,16 @@ public class TenantContext implements Serializable {
     }
 
     public List<ModuleVo> getActiveModuleList() {
+        if (activeModuleList == null) {
+            initModule();
+        }
         return activeModuleList;
     }
 
     public List<ModuleGroupVo> getActiveModuleGroupList() {
+        if (activeModuleGroupList == null) {
+            initModule();
+        }
         return activeModuleGroupList;
     }
 
@@ -183,6 +196,9 @@ public class TenantContext implements Serializable {
     }
 
     public Map<String, ModuleVo> getActiveModuleMap() {
+        if (activeModuleMap == null) {
+            initModule();
+        }
         return activeModuleMap;
     }
 

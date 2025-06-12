@@ -454,7 +454,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE `user_uuid` = #{userUuid}
     </select>
 
-    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
+    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="false">
         SELECT
         `auth_group` AS authGroup,
         `auth`

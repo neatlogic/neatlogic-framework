@@ -158,9 +158,8 @@ public class NeatLogicConcurrentSafeCache implements Cache {
                     }
                 }
             } else {
-                RuntimeException runtimeException = new RuntimeException("NeatLogicConcurrentSafeCache 获取锁超时 lockKey = " + lockKey);
-                logger.warn(runtimeException.getMessage(), runtimeException);
-//                logger.error("NeatLogicConcurrentSafeCache 获取锁超时 lockKey = " + lockKey);
+                RuntimeException ex = new RuntimeException("NeatLogicConcurrentSafeCache 获取锁超时 lockKey = " + lockKey);
+                logger.warn(ex.getMessage(), ex);
             }
         }
         return obj;

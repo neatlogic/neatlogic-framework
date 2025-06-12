@@ -74,7 +74,6 @@ public class DriverHolder {
             URLClassLoader loader = new URLClassLoader(urls, DriverHolder.class.getClassLoader());
             Class<?> clazz = loader.loadClass(databaseVo.getConfig().getString("driverClassName"));
             driver = (Driver) clazz.newInstance();
-            // 驱动已经自动注册到 DriverManager，这里再记一次
             LOADER_MAP.put(id, loader);
             DRIVER_MAP.put(id, driver);
             return driver;

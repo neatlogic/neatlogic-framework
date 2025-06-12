@@ -17,12 +17,19 @@
 
 package neatlogic.module.framework.datawarehouse.handler;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerBase;
 import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
+import neatlogic.framework.datawarehouse.dao.mapper.DatabaseMapper;
 import neatlogic.framework.datawarehouse.dto.*;
+import neatlogic.framework.datawarehouse.exceptions.DatabaseConnectionFailedException;
+import neatlogic.framework.datawarehouse.exceptions.DatabaseNotFoundException;
 import neatlogic.framework.datawarehouse.exceptions.ReportDataSourceSyncException;
-import neatlogic.framework.datawarehouse.service.DatabaseService;
+import neatlogic.framework.datawarehouse.utils.DriverHolder;
+import neatlogic.framework.file.dao.mapper.FileMapper;
+import neatlogic.framework.file.dto.FileVo;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -30,12 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.net.URLClassLoader;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class JDBCDataSourceHandler extends DataSourceServiceHandlerBase {
@@ -43,8 +46,12 @@ public class JDBCDataSourceHandler extends DataSourceServiceHandlerBase {
     int FETCH_SIZE = 1000;
     @Resource
     private DataWarehouseDataSourceMapper dataSourceMapper;
+
     @Resource
-    private DatabaseService databaseService;
+    private DatabaseMapper databaseMapper;
+
+    @Resource
+    private FileMapper fileMapper;
 
     @Override
     public String getHandler() {
@@ -157,11 +164,7 @@ public class JDBCDataSourceHandler extends DataSourceServiceHandlerBase {
                     queryStatement.close();
                 }
                 if (conn != null) {
-                    ClassLoader classLoader = conn.getClass().getClassLoader();
                     conn.close();
-                    if (classLoader instanceof URLClassLoader) {
-                        ((URLClassLoader) classLoader).close();
-                    }
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -170,6 +173,33 @@ public class JDBCDataSourceHandler extends DataSourceServiceHandlerBase {
     }
 
     private Connection getConnection(DataSourceVo dataSourceVo) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException {
-        return databaseService.getConnectionByDatabaseId(dataSourceVo.getDatabaseId());
+        DatabaseVo databaseVo = databaseMapper.getDataBaseById(dataSourceVo.getDatabaseId());
+        if (databaseVo == null) {
+            throw new DatabaseNotFoundException(dataSourceVo.getDatabaseId());
+        }
+        List<Long> fileIdList = databaseVo.getFileIdList();
+        if (CollectionUtils.isNotEmpty(fileIdList)) {
+            List<FileVo> fileList = fileMapper.getFileListByIdList(fileIdList);
+            databaseVo.setFileList(fileList);
+        } else {
+            throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.FILE_ID_LIST_IS_EMPTY, databaseVo.getName());
+        }
+        Driver driver = DriverHolder.borrowDriver(databaseVo);
+        JSONObject config = databaseVo.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            String user = config.getString("user");
+            String password = config.getString("password");
+            String url = config.getString("url");
+            Properties props = new Properties();
+            if (StringUtils.isNoneBlank(user)) {
+                props.put("user", user);
+            }
+            if (StringUtils.isNotBlank(password)) {
+                props.put("password", password);
+            }
+            return driver.connect(url, props);
+        } else {
+            throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.CONFIG_IS_EMPTY, databaseVo.getName());
+        }
     }
 }

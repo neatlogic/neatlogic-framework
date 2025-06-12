@@ -198,7 +198,8 @@ public class JDBCDataSourceHandler extends DataSourceServiceHandlerBase {
                 props.put("password", password);
             }
             return driver.connect(url, props);
+        } else {
+            throw new DatabaseConnectionFailedException(DatabaseConnectionFailedException.Type.CONFIG_IS_EMPTY, databaseVo.getName());
         }
-        return null;
     }
 }

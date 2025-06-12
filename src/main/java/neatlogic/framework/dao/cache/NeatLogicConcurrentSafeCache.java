@@ -203,6 +203,12 @@ public class NeatLogicConcurrentSafeCache implements Cache {
             obj = cachedElement.getObjectValue();
             ehcache.remove(key);
         }
+        String lockKey = generateLockKey(getId(), key);
+        ReentrantLock lock = LOCAL_LOCK_MAP.get(lockKey);
+        if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
+            LOCAL_LOCK_MAP.remove(lockKey, lock);
+            lock.unlock();
+        }
         return obj;
     }
 

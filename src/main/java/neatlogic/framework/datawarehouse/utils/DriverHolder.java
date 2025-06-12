@@ -85,11 +85,19 @@ public class DriverHolder {
     public static synchronized void destroyDriver(Long id) throws SQLException, IOException {
         Driver driver = DRIVER_MAP.remove(id);
         if (driver != null) {
-            DriverManager.deregisterDriver(driver);
+            try {
+                DriverManager.deregisterDriver(driver);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
         URLClassLoader classLoader = LOADER_MAP.remove(id);
         if (classLoader != null) {
-            classLoader.close();
+            try {
+                classLoader.close();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 }

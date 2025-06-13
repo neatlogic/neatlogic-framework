@@ -45,11 +45,7 @@ public class NeatLogicCache implements Cache {
     }
 
     private synchronized Ehcache getCache() {
-        TenantContext tenantContext = TenantContext.get();
-        String tenant = null;
-        if (tenantContext != null) {
-            tenant = tenantContext.getTenantUuid();
-        }
+        String tenant = TenantContext.get().getTenantUuid();
         if (StringUtils.isNotBlank(tenant)) {
             if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
                 CACHE_MANAGER.addCache(tenant + ":" + id);

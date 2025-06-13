@@ -46,11 +46,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     private static final ConcurrentHashMap<String, ReentrantLock> LOCAL_LOCK_MAP = new ConcurrentHashMap<>();
 
     private static String generateLockKey(String id, Object key) {
-        String tenant = null;
-        TenantContext tenantContext = TenantContext.get();
-        if (tenantContext != null) {
-            tenant = tenantContext.getTenantUuid();
-        }
+        String tenant = TenantContext.get().getTenantUuid();
         if (StringUtils.isNotBlank(tenant)) {
             return tenant + ":" + id + ":" + key;
         } else {
@@ -71,11 +67,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     }
 
     private synchronized Ehcache getCache() {
-        TenantContext tenantContext = TenantContext.get();
-        String tenant = null;
-        if (tenantContext != null) {
-            tenant = tenantContext.getTenantUuid();
-        }
+        String tenant = TenantContext.get().getTenantUuid();
         if (StringUtils.isNotBlank(tenant)) {
             if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
                 Ehcache ehcache = CACHE_MANAGER.addCacheIfAbsent(tenant + ":" + id);

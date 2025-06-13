@@ -162,31 +162,38 @@ public class TenantContext implements Serializable {
     }
 
     public List<ModuleVo> getActiveModuleList() {
-        List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
-        return ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
+        if (StringUtils.isNotBlank(this.tenantUuid)) {
+            List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+            return ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
+        }
+        return new ArrayList<>();
     }
 
     public List<ModuleGroupVo> getActiveModuleGroupList() {
-        List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
-        //补充framework模块
-        ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
         List<ModuleGroupVo> activeModuleGroupList = new ArrayList<>();
-        for (String group : tenantModuleGroupList) {
-            ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
-            if (groupVo != null) {
-                activeModuleGroupList.add(groupVo);
+        if (StringUtils.isNotBlank(this.tenantUuid)) {
+            List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+            //补充framework模块
+            ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
+            for (String group : tenantModuleGroupList) {
+                ModuleGroupVo groupVo = ModuleUtil.getModuleGroup(group);
+                if (groupVo != null) {
+                    activeModuleGroupList.add(groupVo);
+                }
             }
         }
         return activeModuleGroupList;
     }
 
     public Map<String, ModuleVo> getActiveModuleMap() {
-        List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
-        List<ModuleVo> activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
         Map<String, ModuleVo> activeModuleMap = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(activeModuleList)) {
-            for (ModuleVo module : activeModuleList) {
-                activeModuleMap.put(module.getId(), module);
+        if (StringUtils.isNotBlank(this.tenantUuid)) {
+            List<String> tenantModuleGroupList = searchModuleGroupList(this.tenantUuid);
+            List<ModuleVo> activeModuleList = ModuleUtil.getTenantActiveModuleList(tenantModuleGroupList);
+            if (CollectionUtils.isNotEmpty(activeModuleList)) {
+                for (ModuleVo module : activeModuleList) {
+                    activeModuleMap.put(module.getId(), module);
+                }
             }
         }
         return activeModuleMap;

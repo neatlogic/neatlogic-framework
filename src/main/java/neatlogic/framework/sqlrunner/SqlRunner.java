@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class SqlRunner {
-    private final static String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
+    private static final String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
 
     private static DataSource dataSource;
 
@@ -86,7 +86,7 @@ public class SqlRunner {
         configuration.setDefaultStatementTimeout(Config.SQLRUNNER_QUERY_TIMEOUT());
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOCTYPE);
-        stringBuilder.append("<mapper namespace=\"" + this.namespace + "\">");
+        stringBuilder.append("<mapper namespace=\"").append(this.namespace).append("\">");
 
         stringBuilder.append(mapperXml.substring("<mapper>".length()));
         ByteArrayInputStream inputStream = null;

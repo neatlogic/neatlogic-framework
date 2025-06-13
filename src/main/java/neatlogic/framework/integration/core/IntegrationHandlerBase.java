@@ -280,10 +280,10 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
             if (connection.getDoOutput()) {
                 try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                    if (!otherConfig.containsKey("chartset")) {
+                    if (!otherConfig.containsKey("charset")) {
                         out.write(inputParam.getBytes(StandardCharsets.UTF_8));
                     } else {
-                        out.write(inputParam.getBytes(otherConfig.getString("chartset")));
+                        out.write(inputParam.getBytes(otherConfig.getString("charset")));
                     }
                     out.flush();
                 } catch (Exception e) {

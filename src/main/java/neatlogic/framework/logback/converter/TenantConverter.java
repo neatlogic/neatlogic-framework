@@ -39,7 +39,7 @@ public class TenantConverter extends ClassicConverter implements Serializable {
     @Override
     public String convert(ILoggingEvent event) {
         TenantContext tenantContext = TenantContext.get();
-        if (tenantContext != null) {
+        if (tenantContext != null && StringUtils.isNotBlank(tenantContext.getTenantUuid())) {
             return tenantContext.getTenantUuid();
         } else {
             Map<String, String> map = event.getMDCPropertyMap();

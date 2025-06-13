@@ -48,7 +48,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     private static String generateLockKey(String id, Object key) {
         String tenant = null;
         TenantContext tenantContext = TenantContext.get();
-        if (tenantContext != null) {
+        if (tenantContext != null && StringUtils.isNotBlank(tenantContext.getTenantUuid())) {
             tenant = tenantContext.getTenantUuid();
         }
         if (StringUtils.isNotBlank(tenant)) {
@@ -73,7 +73,7 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     private synchronized Ehcache getCache() {
         TenantContext tenantContext = TenantContext.get();
         String tenant = null;
-        if (tenantContext != null) {
+        if (tenantContext != null && StringUtils.isNotBlank(tenantContext.getTenantUuid())) {
             tenant = tenantContext.getTenantUuid();
         }
         if (StringUtils.isNotBlank(tenant)) {

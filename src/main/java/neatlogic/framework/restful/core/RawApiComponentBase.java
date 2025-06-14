@@ -88,9 +88,6 @@ public abstract class RawApiComponentBase extends ApiValidateAndHelpBase impleme
             }
         } catch (Exception e) {
             Throwable target = e;
-            /*if (TenantContext.get() != null) {
-                TenantContext.get().setUseMasterDatabase(false);//防止上游异常导致后续审计没有还原原来的租户
-            }*/
             //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
             while (target instanceof InvocationTargetException) {
                 target = ((InvocationTargetException) target).getTargetException();

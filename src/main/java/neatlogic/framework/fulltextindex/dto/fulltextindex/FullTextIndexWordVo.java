@@ -28,9 +28,6 @@ public class FullTextIndexWordVo implements Serializable {
     private String type;
     private String wordHash;
 
-    public FullTextIndexWordVo() {
-
-    }
 
     public String getWordHash() {
         if (wordHash == null && StringUtils.isNotBlank(word)) {

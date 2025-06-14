@@ -15,6 +15,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.fulltextindex.dao.mapper;
 
+import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo;
+
+import java.util.List;
+
 public interface FullTextIndexDictMapper {
     Long getMaxDictionaryWordId();
+
+    void insertDictionary(FullTextIndexWordVo wordVo);
+
+    int searchDictionaryCount(BasePageVo pageVo);
+
+    List<FullTextIndexWordVo> searchDictionary(BasePageVo pageVo);
 }

@@ -214,14 +214,12 @@ public class FileServiceImpl implements IFileCrossoverService {
     public JSONObject readRemoteFile(JSONObject paramObj, Integer serverId) {
         JSONObject resultObj = new JSONObject();
         String host = null;
-       // TenantContext.get().setUseMasterDatabase(true);
         ServerClusterVo serverClusterVo = serverMapper.getServerByServerId(serverId);
         if (serverClusterVo != null) {
             host = serverClusterVo.getHost();
         } else {
             throw new ServerNotFoundException(serverId);
         }
-        //TenantContext.get().setUseMasterDatabase(false);
         if (StringUtils.isBlank(host)) {
             throw new ServerHostIsBankException(serverId);
         }
@@ -291,15 +289,13 @@ public class FileServiceImpl implements IFileCrossoverService {
 
     @Override
     public void downloadRemoteFile(JSONObject paramObj, Integer serverId, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String host = null;
-        //TenantContext.get().setUseMasterDatabase(true);
+        String host;
         ServerClusterVo serverClusterVo = serverMapper.getServerByServerId(serverId);
         if (serverClusterVo != null) {
             host = serverClusterVo.getHost();
         } else {
             throw new ServerNotFoundException(serverId);
         }
-        //TenantContext.get().setUseMasterDatabase(false);
         if (StringUtils.isBlank(host)) {
             throw new ServerHostIsBankException(serverId);
         }

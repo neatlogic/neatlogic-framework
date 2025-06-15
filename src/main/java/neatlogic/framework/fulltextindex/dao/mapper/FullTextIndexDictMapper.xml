@@ -38,16 +38,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <select id="searchDictionary" parameterType="neatlogic.framework.common.dto.BasePageVo"
             resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
-        select word, word_hash as wordHash
+        select id, word, word_hash as wordHash
         from fulltextindex_dictionary
         <include refid="searchDictionarySql"/>
+        order by id desc
         limit #{startNum}, #{pageSize}
     </select>
 
-    <insert id="insertDictionary"
+    <insert id="insertWord"
             parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
         insert ignore into fulltextindex_dictionary (id, word, word_hash)
         values (#{id}, #{word}, #{wordHash})
     </insert>
+
+    <delete id="deleteWordById" parameterType="java.lang.Long">
+        delete
+        from fulltextindex_dictionary
+        where id = #{value}
+    </delete>
 </mapper>
 

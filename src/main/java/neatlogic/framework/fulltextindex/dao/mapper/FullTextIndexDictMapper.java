@@ -23,9 +23,11 @@ import java.util.List;
 public interface FullTextIndexDictMapper {
     Long getMaxDictionaryWordId();
 
-    void insertDictionary(FullTextIndexWordVo wordVo);
+    int insertWord(FullTextIndexWordVo wordVo);
 
     int searchDictionaryCount(BasePageVo pageVo);
 
     List<FullTextIndexWordVo> searchDictionary(BasePageVo pageVo);
+
+    void deleteWordById(Long id);
 }

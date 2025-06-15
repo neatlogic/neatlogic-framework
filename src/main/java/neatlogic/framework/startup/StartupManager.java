@@ -103,7 +103,7 @@ public class StartupManager extends ModuleInitializedListenerBase {
                             try {
                                 int i = startup.executeForAllTenant();
                                 if (i != -999) {
-                                    System.out.println("⚡" + $.t("common.startloadstartupjob", $.t(startup.getName()), "All Tenant"));
+                                    System.out.println("⚡" + $.t("common.startloadstartupjobforall", $.t(startup.getName())));
                                 }
                             } catch (Exception ex) {
                                 logger.error(ex.getMessage(), ex);

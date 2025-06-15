@@ -74,8 +74,6 @@ public class FullTextIndexUtil {
             if (CollectionUtils.isNotEmpty(wordList)) {
                 Set<String> newWordList = new HashSet<>();
                 for (String word : wordList) {
-                    //word = word.replace("_", "");
-                    //word = word.replace("-", "");
                     String[] newWords = word.split("\\s+");
                     for (String w : newWords) {
                         if (StringUtils.isNotBlank(w) && StringUtils.isNotBlank(w.trim())) {

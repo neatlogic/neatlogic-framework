@@ -24,8 +24,8 @@ import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.dto.TeamVo;
+import neatlogic.framework.util.AviatorEvaluatorUtil;
 import neatlogic.framework.util.FreemarkerUtil;
-import neatlogic.framework.util.RunScriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -188,7 +188,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
                 }
                 try {
                     rule = FreemarkerUtil.transform(originHeader, rule);
-                    if (RunScriptUtil.runScript(rule)) {
+                    if (AviatorEvaluatorUtil.evaluateBoolean(rule)) {
                         validRoleUuidList.add(ro.getUuid());
                     }
                 } catch (Exception e) {

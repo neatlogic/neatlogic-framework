@@ -24,6 +24,7 @@ import neatlogic.framework.exception.mq.SubscribeTopicException;
 import neatlogic.framework.mq.core.IMqHandler;
 import neatlogic.framework.mq.core.ISubscribeHandler;
 import neatlogic.framework.mq.core.SubscribeHandlerFactory;
+import neatlogic.framework.mq.dto.HealthcheckResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
@@ -138,8 +139,8 @@ public class ActiveMqArtemisHandler implements IMqHandler {
     }
 
     @Override
-    public List<String> healthCheck(SubscribeVo subVo) {
-        List<String> errorList = new ArrayList<>();
+    public List<HealthcheckResultVo> healthCheck(SubscribeVo subVo) {
+        List<HealthcheckResultVo> errorList = new ArrayList<>();
         String queueName = subVo.getTopicName();  // Artemis 中也叫 queue
 
         try (ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl)) {
@@ -159,14 +160,19 @@ public class ActiveMqArtemisHandler implements IMqHandler {
                             messages.nextElement();
                             depth++;
                         }
-                        if (depth > 0) {
-                            errorList.add("消息积压：" + depth);
+                        if (depth > 1000) {
+                            errorList.add(new HealthcheckResultVo("消息消费严重滞后，滞后消息 " + depth + " 条", "error"));
+                        } else if (depth > 0) {
+                            errorList.add(new HealthcheckResultVo("消息消费存在滞后，滞后消息 " + depth + " 条", "warning"));
+                        } else {
+                            errorList.add(new HealthcheckResultVo("无消费滞后消息", "normal"));
                         }
                     }
                 }
             }
         } catch (Exception e) {
-            errorList.add("健康检查失败，异常：" + e.getMessage());
+            logger.error(e.getMessage(), e);
+            errorList.add(new HealthcheckResultVo("健康检查失败，异常：" + e.getMessage(), "error"));
         }
         return errorList;
     }

@@ -18,6 +18,7 @@
 package neatlogic.framework.mq.core;
 
 import neatlogic.framework.exception.mq.SubscribeTopicException;
+import neatlogic.framework.mq.dto.HealthcheckResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
 
 import java.util.List;
@@ -40,5 +41,5 @@ public interface IMqHandler {
 
     boolean isEnable();
 
-    List<String> healthCheck(SubscribeVo subVo);
+    List<HealthcheckResultVo> healthCheck(SubscribeVo subVo);
 }

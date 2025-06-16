@@ -24,6 +24,7 @@ import neatlogic.framework.exception.mq.SubscribeTopicException;
 import neatlogic.framework.mq.core.IMqHandler;
 import neatlogic.framework.mq.core.ISubscribeHandler;
 import neatlogic.framework.mq.core.SubscribeHandlerFactory;
+import neatlogic.framework.mq.dto.HealthcheckResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -114,9 +115,9 @@ public class KafkaHandler implements IMqHandler {
                 DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
                 ContainerProperties containerProperties = new ContainerProperties(topicName);
                 subVo.setTenantUuid(TenantContext.get().getTenantUuid());
-                containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
+                containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (consumerRecord, acknowledgment) -> {
                     try {
-                        subscribeHandler.onMessage(subVo, record.value());
+                        subscribeHandler.onMessage(subVo, consumerRecord.value());
                         if (acknowledgment != null) {
                             //手动提交偏移量，如果处理有问题可以重新消费
                             acknowledgment.acknowledge();
@@ -191,8 +192,8 @@ public class KafkaHandler implements IMqHandler {
 
 
     @Override
-    public List<String> healthCheck(SubscribeVo subVo) {
-        List<String> errorList = new ArrayList<>();
+    public List<HealthcheckResultVo> healthCheck(SubscribeVo subVo) {
+        List<HealthcheckResultVo> errorList = new ArrayList<>();
         String topicName = subVo.getTopicName();
         String groupId = TenantContext.get().getTenantUuid() + "_" + subVo.getId();
         try (AdminClient adminClient = AdminClient.create(consumerProps);
@@ -201,15 +202,13 @@ public class KafkaHandler implements IMqHandler {
             ListTopicsResult topics = adminClient.listTopics();
             boolean topicExists = topics.names().get().contains(topicName);
             if (!topicExists) {
-                errorList.add("主题:" + topicName + "不存在");
-                return errorList;
+                errorList.add(new HealthcheckResultVo("主题 " + topicName + " 不存在", "error"));
             }
 
             // 2. 检查 container 是否正常
             MessageListenerContainer container = containerMap.get(subVo.getId());
             if (container == null || !container.isRunning()) {
-                errorList.add("Kafka Container未运行");
-                return errorList;
+                errorList.add(new HealthcheckResultVo("订阅未激活", "warning"));
             }
             // 检查 lag 是否正常
             List<PartitionInfo> partitions = consumer.partitionsFor(topicName);
@@ -226,10 +225,17 @@ public class KafkaHandler implements IMqHandler {
                 long end = endOffsets.getOrDefault(tp, 0L);
                 long committed = committedOffsets.getOrDefault(tp, new OffsetAndMetadata(0L)).offset();
                 long lag = end - committed;
-                errorList.add("消费滞后：" + lag + "，分片：" + tp.partition());
+                if (lag > 1000) {
+                    errorList.add(new HealthcheckResultVo("消息消费严重滞后，滞后消息 " + lag + " 条", "error"));
+                } else if (lag > 0) {
+                    errorList.add(new HealthcheckResultVo("消息消费存在滞后，滞后消息 " + lag + " 条", "warning"));
+                } else {
+                    errorList.add(new HealthcheckResultVo("无消费滞后消息", "normal"));
+                }
             }
         } catch (Exception e) {
-            errorList.add("健康检查失败，异常：" + e.getMessage());
+            logger.error(e.getMessage(), e);
+            errorList.add(new HealthcheckResultVo("健康检查失败，异常：" + e.getMessage(), "error"));
         }
         return errorList;
     }

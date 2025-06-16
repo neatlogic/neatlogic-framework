@@ -27,11 +27,15 @@ import neatlogic.framework.mq.core.SubscribeHandlerFactory;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.jms.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -65,21 +69,21 @@ public class ActiveMqArtemisHandler implements IMqHandler {
             String queueName = TenantContext.get().getTenantUuid() + "/" + topicName;
             subVo.setTenantUuid(TenantContext.get().getTenantUuid());
 
-            try {
-                ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
-                Connection connection = connectionFactory.createConnection();
-                connection.start();
-                Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                Destination destination = new ActiveMQQueue(queueName);
-                MessageConsumer consumer = session.createConsumer(destination);
-                consumer.setMessageListener(message -> {
-                    try {
-                        subscribeHandler.onMessage(subVo, message);
-                    } catch (Exception ex) {
-                        logger.error("消费消息失败: {}", ex.getMessage(), ex);
-                    }
-                });
-                consumerMap.put(subVo.getId(), consumer);
+            try (ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password)) {
+                try (Connection connection = connectionFactory.createConnection()) {
+                    connection.start();
+                    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                    Destination destination = new ActiveMQQueue(queueName);
+                    MessageConsumer consumer = session.createConsumer(destination);
+                    consumer.setMessageListener(message -> {
+                        try {
+                            subscribeHandler.onMessage(subVo, message);
+                        } catch (Exception ex) {
+                            logger.error("消费消息失败: {}", ex.getMessage(), ex);
+                        }
+                    });
+                    consumerMap.put(subVo.getId(), consumer);
+                }
             } catch (Exception ex) {
                 throw new SubscribeTopicException(topicName, subVo.getName(), ex.getMessage());
             }
@@ -131,5 +135,39 @@ public class ActiveMqArtemisHandler implements IMqHandler {
     @Override
     public boolean isEnable() {
         return brokerUrl != null && !brokerUrl.isEmpty();
+    }
+
+    @Override
+    public List<String> healthCheck(SubscribeVo subVo) {
+        List<String> errorList = new ArrayList<>();
+        String queueName = subVo.getTopicName();  // Artemis 中也叫 queue
+
+        try (ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl)) {
+            if (StringUtils.isNotBlank(user)) {
+                factory.setUser(user);
+                factory.setPassword(password);
+            }
+
+            try (Connection connection = factory.createConnection()) {
+                connection.start();
+                try (Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
+                    Queue queue = session.createQueue(queueName);
+                    try (QueueBrowser browser = session.createBrowser(queue)) {
+                        Enumeration<?> messages = browser.getEnumeration();
+                        int depth = 0;
+                        while (messages.hasMoreElements()) {
+                            messages.nextElement();
+                            depth++;
+                        }
+                        if (depth > 0) {
+                            errorList.add("消息积压：" + depth);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            errorList.add("健康检查失败，异常：" + e.getMessage());
+        }
+        return errorList;
     }
 }

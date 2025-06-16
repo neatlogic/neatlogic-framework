@@ -30,9 +30,13 @@ import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.ListTopicsResult;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.PartitionInfo;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
@@ -44,11 +48,11 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 public class KafkaHandler implements IMqHandler {
@@ -91,7 +95,6 @@ public class KafkaHandler implements IMqHandler {
             //kafka对主题大小写敏感，因此需要保持主题大小写！！
             String topicName = subVo.getTopicName();
             String clientName = subVo.getName();
-            //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
             clientName = clientName.toLowerCase();
             String tenantUuid = TenantContext.get().getTenantUuid();
 
@@ -99,40 +102,41 @@ public class KafkaHandler implements IMqHandler {
             //用租户uuid+订阅id作为分组id，确保每个消费者都可以独立消费
             consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, tenantUuid + "_" + subVo.getId());
             consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, tenantUuid + "_" + subVo.getId() + "_" + Config.SCHEDULE_SERVER_ID);
-            AdminClient adminClient = AdminClient.create(consumerProps);
-            ListTopicsResult topics = adminClient.listTopics();
-            boolean topicExists = topics.names().get().contains(topicName);
+            try (AdminClient adminClient = AdminClient.create(consumerProps)) {
+                ListTopicsResult topics = adminClient.listTopics();
+                boolean topicExists = topics.names().get().contains(topicName);
 
-            // 如果主题不存在，创建新主题
-            if (!topicExists) {
-                NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
-                adminClient.createTopics(Collections.singleton(newTopic)).all().get();
-            }
-            DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
-            ContainerProperties containerProperties = new ContainerProperties(topicName);
-            subVo.setTenantUuid(TenantContext.get().getTenantUuid());
-            containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
-                try {
-                    subscribeHandler.onMessage(subVo, record.value());
-                    if (acknowledgment != null) {
-                        //手动提交偏移量，如果处理有问题可以重新消费
-                        acknowledgment.acknowledge();
-                    }
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage(), ex);
+                // 如果主题不存在，创建新主题
+                if (!topicExists) {
+                    NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
+                    adminClient.createTopics(Collections.singleton(newTopic)).all().get();
                 }
-            });
+                DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
+                ContainerProperties containerProperties = new ContainerProperties(topicName);
+                subVo.setTenantUuid(TenantContext.get().getTenantUuid());
+                containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
+                    try {
+                        subscribeHandler.onMessage(subVo, record.value());
+                        if (acknowledgment != null) {
+                            //手动提交偏移量，如果处理有问题可以重新消费
+                            acknowledgment.acknowledge();
+                        }
+                    } catch (Exception ex) {
+                        logger.error(ex.getMessage(), ex);
+                    }
+                });
 
-            ConcurrentMessageListenerContainer<String, String> container =
-                    new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
-            container.setConcurrency(1);
-            container.setAutoStartup(true);
-            containerMap.put(subVo.getId(), container);
+                ConcurrentMessageListenerContainer<String, String> container =
+                        new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
+                container.setConcurrency(1);
+                container.setAutoStartup(true);
+                containerMap.put(subVo.getId(), container);
 
-            try {
-                container.start();
-            } catch (Exception ex) {
-                throw new SubscribeTopicException(topicName, clientName, ex.getMessage());
+                try {
+                    container.start();
+                } catch (Exception ex) {
+                    throw new SubscribeTopicException(topicName, clientName, ex.getMessage());
+                }
             }
         }
 
@@ -173,8 +177,8 @@ public class KafkaHandler implements IMqHandler {
     public void send(String topicName, String content) {
         //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
         try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
-            ProducerRecord<String, String> record = new ProducerRecord<>(topicName, content);
-            producer.send(record);
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topicName, content);
+            producer.send(producerRecord);
         } catch (Exception ex) {
             logger.error("发送消息到Kafka失败，异常：{}", ex.getMessage());
         }
@@ -183,5 +187,50 @@ public class KafkaHandler implements IMqHandler {
     @Override
     public boolean isEnable() {
         return StringUtils.isNotBlank(Config.KAFKA_URL());
+    }
+
+
+    @Override
+    public List<String> healthCheck(SubscribeVo subVo) {
+        List<String> errorList = new ArrayList<>();
+        String topicName = subVo.getTopicName();
+        String groupId = TenantContext.get().getTenantUuid() + "_" + subVo.getId();
+        try (AdminClient adminClient = AdminClient.create(consumerProps);
+             KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps)) {
+            // 1. 检查 topic 是否存在
+            ListTopicsResult topics = adminClient.listTopics();
+            boolean topicExists = topics.names().get().contains(topicName);
+            if (!topicExists) {
+                errorList.add("主题:" + topicName + "不存在");
+                return errorList;
+            }
+
+            // 2. 检查 container 是否正常
+            MessageListenerContainer container = containerMap.get(subVo.getId());
+            if (container == null || !container.isRunning()) {
+                errorList.add("Kafka Container未运行");
+                return errorList;
+            }
+            // 检查 lag 是否正常
+            List<PartitionInfo> partitions = consumer.partitionsFor(topicName);
+            List<TopicPartition> topicPartitions = partitions.stream()
+                    .map(p -> new TopicPartition(topicName, p.partition()))
+                    .collect(Collectors.toList());
+
+            Map<TopicPartition, Long> endOffsets = consumer.endOffsets(topicPartitions);
+
+            Map<TopicPartition, OffsetAndMetadata> committedOffsets =
+                    adminClient.listConsumerGroupOffsets(groupId).partitionsToOffsetAndMetadata().get(10, TimeUnit.SECONDS);
+
+            for (TopicPartition tp : topicPartitions) {
+                long end = endOffsets.getOrDefault(tp, 0L);
+                long committed = committedOffsets.getOrDefault(tp, new OffsetAndMetadata(0L)).offset();
+                long lag = end - committed;
+                errorList.add("消费滞后：" + lag + "，分片：" + tp.partition());
+            }
+        } catch (Exception e) {
+            errorList.add("健康检查失败，异常：" + e.getMessage());
+        }
+        return errorList;
     }
 }

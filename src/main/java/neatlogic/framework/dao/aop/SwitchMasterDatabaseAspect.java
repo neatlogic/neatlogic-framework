@@ -13,11 +13,9 @@ public class SwitchMasterDatabaseAspect {
     @Around("@annotation(neatlogic.framework.dao.aop.UseMasterDatabase) || @within(neatlogic.framework.dao.aop.UseMasterDatabase)")
     public Object switchMasterDatabase(ProceedingJoinPoint joinPoint) throws Throwable {
         try {
-            //System.out.println("切换MASTER：" + joinPoint.getSignature().getName());
             TenantContext.get().setUseMasterDatabase(true);
             return joinPoint.proceed();
         } finally {
-            //System.out.println("切回user:" + joinPoint.getSignature().getName());
             TenantContext.get().setUseMasterDatabase(false);
         }
     }

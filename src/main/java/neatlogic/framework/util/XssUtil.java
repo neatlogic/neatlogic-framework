@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -26,12 +27,12 @@ public class XssUtil {
         Object value = paramObj.get(key);
         if (value instanceof String) {
             try {
-                JSONObject valObj = JSONObject.parseObject(value.toString());
+                JSONObject valObj = JSON.parseObject(value.toString());
                 escapeXss(valObj);
                 paramObj.replace(key, valObj.toJSONString());
             } catch (Exception ex) {
                 try {
-                    JSONArray valList = JSONArray.parseArray(value.toString());
+                    JSONArray valList = JSON.parseArray(value.toString());
                     encodeHtml(valList);
                     paramObj.replace(key, valList.toJSONString());
                 } catch (Exception e) {

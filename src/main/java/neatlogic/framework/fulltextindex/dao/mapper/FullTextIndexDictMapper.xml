@@ -21,5 +21,40 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         select max(id)
         from fulltextindex_dictionary
     </select>
+
+    <sql id="searchDictionarySql">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and word like concat(#{keyword}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchDictionaryCount" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="int">
+        select count(1)
+        from fulltextindex_dictionary
+        <include refid="searchDictionarySql"/>
+    </select>
+
+    <select id="searchDictionary" parameterType="neatlogic.framework.common.dto.BasePageVo"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
+        select id, word, word_hash as wordHash
+        from fulltextindex_dictionary
+        <include refid="searchDictionarySql"/>
+        order by id desc
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertWord"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
+        insert ignore into fulltextindex_dictionary (id, word, word_hash)
+        values (#{id}, #{word}, #{wordHash})
+    </insert>
+
+    <delete id="deleteWordById" parameterType="java.lang.Long">
+        delete
+        from fulltextindex_dictionary
+        where id = #{value}
+    </delete>
 </mapper>
 

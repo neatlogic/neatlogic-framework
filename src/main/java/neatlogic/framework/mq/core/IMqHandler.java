@@ -18,8 +18,10 @@
 package neatlogic.framework.mq.core;
 
 import neatlogic.framework.exception.mq.SubscribeTopicException;
+import neatlogic.framework.mq.dto.HealthcheckResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public interface IMqHandler {
@@ -38,4 +40,6 @@ public interface IMqHandler {
     void send(String topicName, String content);
 
     boolean isEnable();
+
+    List<HealthcheckResultVo> healthCheck(SubscribeVo subVo);
 }

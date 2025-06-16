@@ -13,21 +13,12 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
-package neatlogic.framework.fulltextindex.dao.mapper;
+package neatlogic.framework.exception.mq;
 
-import neatlogic.framework.common.dto.BasePageVo;
-import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo;
+import neatlogic.framework.exception.core.ApiException;
 
-import java.util.List;
-
-public interface FullTextIndexDictMapper {
-    Long getMaxDictionaryWordId();
-
-    int insertWord(FullTextIndexWordVo wordVo);
-
-    int searchDictionaryCount(BasePageVo pageVo);
-
-    List<FullTextIndexWordVo> searchDictionary(BasePageVo pageVo);
-
-    void deleteWordById(Long id);
+public class SubscribeUnHealthyException extends ApiException {
+    public SubscribeUnHealthyException(String error) {
+        super(error);
+    }
 }

@@ -40,7 +40,6 @@ public class TenantContext implements Serializable {
     private String tenantUuid;
     private Boolean useDefaultDatasource = false;
     private Boolean isData = false;
-    private final String dataDbName = "";
 
     private static ModuleMapper moduleMapper;
 
@@ -116,7 +115,6 @@ public class TenantContext implements Serializable {
     public TenantContext switchTenant(String tenantUuid) {
         if (StringUtils.isNotBlank(tenantUuid)) {
             this.tenantUuid = tenantUuid;
-            //this.setUseMasterDatabase(false);
             MDC.put("tenant", tenantUuid);
         }
         return this;
@@ -132,11 +130,7 @@ public class TenantContext implements Serializable {
     private List<String> searchModuleGroupList(String tenantUuid) {
         List<String> moduleGroupList = tenantModuleGroupListMap.get(tenantUuid);
         if (moduleGroupList == null) {
-            // 使用master库
-            //this.setUseMasterDatabase(true);
             List<String> tenantModuleGroupList = moduleMapper.getModuleGroupListByTenantUuid(tenantUuid);
-            // 还原回租户库
-            //this.setUseMasterDatabase(false);
             tenantModuleGroupListMap.put(tenantUuid, tenantModuleGroupList);
         }
         return tenantModuleGroupListMap.get(tenantUuid);

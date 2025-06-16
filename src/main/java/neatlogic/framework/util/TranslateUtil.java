@@ -20,7 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import org.apache.commons.collections4.MapUtils;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -34,7 +34,7 @@ public class TranslateUtil {
         JSONObject resultJson = HttpRequestUtil.get(TRANS_API_HOST).setQueryString(params).setConnectTimeout(5000).setReadTimeout(10000).setAuthType(AuthenticateType.BUILDIN).sendRequest().getResultJson();
         if (resultJson.containsKey("trans_result")) {
             JSONArray transResult = resultJson.getJSONArray("trans_result");
-            if (resultJson.size() > 0) {
+            if (!resultJson.isEmpty()) {
                 return transResult.getJSONObject(0).getString("dst");
             }
         }
@@ -88,7 +88,7 @@ public class TranslateUtil {
             // 拿到一个MD5转换器（如果想要SHA1参数换成”SHA1”）
             MessageDigest messageDigest = MessageDigest.getInstance("MD5");
             // 输入的字符串转换成字节数组
-            byte[] inputByteArray = input.getBytes("utf-8");
+            byte[] inputByteArray = input.getBytes(StandardCharsets.UTF_8);
             // inputByteArray是输入字符串转换得到的字节数组
             messageDigest.update(inputByteArray);
             // 转换并返回结果，也是字节数组，包含16个元素
@@ -97,10 +97,7 @@ public class TranslateUtil {
             return byteArrayToHex(resultByteArray);
         } catch (NoSuchAlgorithmException e) {
             return null;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
-        return null;
     }
 
     private static String byteArrayToHex(byte[] byteArray) {

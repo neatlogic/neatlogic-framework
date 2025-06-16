@@ -22,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -35,14 +34,13 @@ public class WorkTimeUtil {
     public void setWorktimeMapper(WorktimeMapper _worktimeMapper) {
         worktimeMapper = _worktimeMapper;
     }
+
     /**
-     * 
-    * @Time:2020年11月17日
-    * @Description: 超时前，计算超时时间点
-    * @param activeTime 当前时间
-    * @param timeLimit 剩余时长
-    * @param worktimeUuid 时间窗口uuid
-    * @return long
+     * @param activeTime   当前时间
+     * @param timeLimit    剩余时长
+     * @param worktimeUuid 时间窗口uuid
+     * @return long
+     * @Description: 超时前，计算超时时间点
      */
     public static long calculateExpireTime(long activeTime, long timeLimit, String worktimeUuid) {
         if (worktimeMapper.checkWorktimeIsExists(worktimeUuid) == 0) {
@@ -77,14 +75,11 @@ public class WorkTimeUtil {
             }
         }
     }
+
     /**
-     * 
-    * @Time:2020年11月17日
-    * @Description: 超时后，计算超时时间点
-    * @param currentTimeMillis
-    * @param timeoutPeriod 已超时时长
-    * @param worktimeUuid
-    * @return long
+     * @param timeoutPeriod 已超时时长
+     * @return long
+     * @Description: 超时后，计算超时时间点
      */
     public static long calculateExpireTimeForTimedOut(long currentTimeMillis, long timeoutPeriod, String worktimeUuid) {
         if (worktimeMapper.checkWorktimeIsExists(worktimeUuid) == 0) {
@@ -119,26 +114,21 @@ public class WorkTimeUtil {
             }
         }
     }
-    
+
     public static long calculateCostTime(List<WorktimeRangeVo> worktimeRangeList) {
         if (worktimeRangeList == null || worktimeRangeList.isEmpty()) {
             return 0L;
         }
 
         // 先按开始时间从小到大排序
-        Collections.sort(worktimeRangeList, new Comparator<WorktimeRangeVo>() {
-            @Override
-            public int compare(WorktimeRangeVo o1, WorktimeRangeVo o2) {
-                return o1.getStartTime().compareTo(o2.getStartTime());
-            }
-        });
+        worktimeRangeList.sort(Comparator.comparing(WorktimeRangeVo::getStartTime));
         // 保存删除重复时间后的列表
         List<WorktimeRangeVo> deduplicationList = new ArrayList<>();
         long startTime = -1L;
         long endTime = -1L;
         WorktimeRangeVo worktimeRange = null;
         String worktimeUuid = null;
-        for (WorktimeRangeVo worktimeRangeVo: worktimeRangeList) {
+        for (WorktimeRangeVo worktimeRangeVo : worktimeRangeList) {
             if (startTime == -1L) {
                 worktimeUuid = worktimeRangeVo.getWorktimeUuid();
                 startTime = worktimeRangeVo.getStartTime();

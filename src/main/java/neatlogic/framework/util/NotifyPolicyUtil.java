@@ -29,6 +29,7 @@ import neatlogic.framework.notify.core.*;
 import neatlogic.framework.notify.dao.mapper.NotifyMapper;
 import neatlogic.framework.notify.dto.*;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
+import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -148,7 +149,7 @@ public class NotifyPolicyUtil {
                                         String script = conditionConfig.buildScript();
                                         // System.out.println(script);
                                         /* 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
-                                        if (!RunScriptUtil.runScript(script)) {
+                                        if (!Boolean.parseBoolean(JavascriptUtil.runScript(new JSONObject(), "return " + script).toString())) {
                                             notifyAuditList.add(notifyAuditMessage + " 通知设置ID为" + notifyObj.getId() + "的通知条件判断结果为false，不触发通知");
                                             continue;
                                         }

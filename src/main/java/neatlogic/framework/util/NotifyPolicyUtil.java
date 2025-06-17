@@ -149,7 +149,8 @@ public class NotifyPolicyUtil {
                                         String script = conditionConfig.buildScript();
                                         // System.out.println(script);
                                         /* 运行javascript脚本，结果为true，则继续执行下面的发送通知逻辑，结果为false，则跳过，不发送通知 **/
-                                        if (!Boolean.parseBoolean(JavascriptUtil.runScript(new JSONObject(), "return " + script).toString())) {
+                                        Object returnValue = JavascriptUtil.runScript(new JSONObject(), "return " + script);
+                                        if (!Boolean.parseBoolean(returnValue != null ? returnValue.toString() : "false")) {
                                             notifyAuditList.add(notifyAuditMessage + " 通知设置ID为" + notifyObj.getId() + "的通知条件判断结果为false，不触发通知");
                                             continue;
                                         }

@@ -151,7 +151,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).build();
                 jobDetail.getJobDataMap().put("jobObject", jobObject);
                 // 写入jobstatus (如果数据库不存在job，则需先insert job到数据库，再创建job,否则jobBase 先触发execute，会导致跳过第一次执行)
-                JobStatusVo jobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+                JobStatusVo jobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup, System.currentTimeMillis());
                 if (jobStatusVo == null) {
                     jobStatusVo = new JobStatusVo();
                     jobStatusVo.setJobName(jobName);
@@ -239,7 +239,6 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 }
             }
         }
-        // TODO 这里要增加清理job_status的逻辑
     }
 
     class ScheduleLoadJobRunner extends NeatLogicThread {
@@ -258,7 +257,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             String oldThreadName = Thread.currentThread().getName();
             try {
                 // 切换租户数据源
-                TenantContext.get().switchTenant(tenantUuid);//.setUseMasterDatabase(false);
+                TenantContext.get().switchTenant(tenantUuid);
                 schedulerMapper.deleteJobLockByServerId(Config.SCHEDULE_SERVER_ID);
                 UserContext.init(SystemUser.SYSTEM);
                 for (IJob jobHandler : jobHandlerList) {

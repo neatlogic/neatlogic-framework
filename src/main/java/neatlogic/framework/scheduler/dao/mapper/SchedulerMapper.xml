@@ -66,16 +66,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 
     <select id="getJobStatusByJobNameGroup" resultType="neatlogic.framework.scheduler.dto.JobStatusVo">
-        SELECT `job_name`         as jobName,
-               `job_group`        as jobGroup,
-               `handler`,
-               `last_fire_time`   as lastFireTime,
-               `last_finish_time` as lastFinishTime,
-               `next_fire_time`   as nextFireTime,
-               `exec_count`       as execCount
+        <!--这是一级缓存的干扰器，不要删除 ${timestamp}-->
+        SELECT `job_name` as jobName,
+        `job_group` as jobGroup,
+        `handler`,
+        `last_fire_time` as lastFireTime,
+        `last_finish_time` as lastFinishTime,
+        `next_fire_time` as nextFireTime,
+        `exec_count` as execCount
         FROM `schedule_job_status`
         WHERE `job_name` = #{jobName}
-          AND `job_group` = #{jobGroup}
+        AND `job_group` = #{jobGroup}
     </select>
 
     <select id="getJobByHandler" parameterType="java.lang.String" resultMap="jobMap">

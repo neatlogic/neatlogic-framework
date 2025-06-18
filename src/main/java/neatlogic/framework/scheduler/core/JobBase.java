@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -100,7 +99,7 @@ public abstract class JobBase implements IJob {
                     schedulerMapper.updateJobLock(jobLockVo);
                 }
             } else {
-                logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，`schedule_job_lock`表中没有对应数据", jobName, jobGroup));
+                logger.error("执行定时作业(jobName={},jobGroup={})时，`schedule_job_lock`表中没有对应数据", jobName, jobGroup);
             }
         } finally {
             transactionUtil.commitTx(ts);
@@ -164,10 +163,6 @@ public abstract class JobBase implements IJob {
 
     @Override
     public final void execute(JobExecutionContext context) throws JobExecutionException {
-        if (TransactionSynchronizationManager.isSynchronizationActive()) {
-            logger.error(String.format("定时作业%s类的execute()方法不应该开始事务", this.getClassName()));
-            return;
-        }
         InputFromContext.init(InputFrom.CRON);
         Date fireTime = new Date();
         JobDetail jobDetail = context.getJobDetail();
@@ -178,7 +173,7 @@ public abstract class JobBase implements IJob {
         String tenantUuid = jobObject.getTenantUuid();
         //如果租户不存在则不执行该租户的作业
         if (!TenantUtil.hasTenant(tenantUuid)) {
-            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，租户：%s不存在", jobName, jobGroup, tenantUuid));
+            logger.error("执行定时作业(jobName={},jobGroup={})时，租户：{}不存在", jobName, jobGroup, tenantUuid);
             return;
         }
         // 从job组名中获取租户uuid,切换到租户的数据源
@@ -188,7 +183,7 @@ public abstract class JobBase implements IJob {
         IJob jobHandler = SchedulerManager.getHandler(this.getClassName());
         if (jobHandler == null) {
             schedulerManager.unloadJob(jobObject);
-            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，定时作业组件：%s不存在", jobName, jobGroup, this.getClassName()));
+            logger.error("执行定时作业(jobName={},jobGroup={})时，定时作业组件：{}不存在", jobName, jobGroup, this.getClassName());
             return;
 //            throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
         }
@@ -197,13 +192,13 @@ public abstract class JobBase implements IJob {
             // 例如：A Server 修改cron 每天0点跑作业，B Server 修改cron每分钟跑。 当A Server 发现not healthy 则会unload 并删除status，lock。后续判断会导致B Server 也不会再跑作业。
             // 应该有jobHandler来自行判断是否需要unloadJob
             //schedulerManager.unloadJob(jobObject);
-            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，isHealthy()方法检查出作业不正常", jobName, jobGroup));
+            logger.error("执行定时作业(jobName={},jobGroup={})时，isHealthy()方法检查出作业不正常", jobName, jobGroup);
             return;
         }
         Date currentFireTime = context.getFireTime();// 本次执行激活时间
-        JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+        JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup, System.currentTimeMillis());
         if (beforeJobStatusVo == null) {
-            logger.error(String.format("执行定时作业(jobName=%s,jobGroup=%s)时，`schedule_job_status`表中没有对应数据", jobName, jobGroup));
+            logger.error("执行定时作业(jobName={},jobGroup={})时，`schedule_job_status`表中没有对应数据", jobName, jobGroup);
             return;
         }
         // 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
@@ -217,7 +212,7 @@ public abstract class JobBase implements IJob {
         if (jobLockVo == null) {
             return;
         }
-        JobStatusVo oldJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+        JobStatusVo oldJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup, System.currentTimeMillis());
         // 前后执行次数不一致，证明已经执行过，直接退出
         if (!Objects.equals(beforeJobStatusVo.getExecCount(), oldJobStatusVo.getExecCount())) {
             return;
@@ -323,8 +318,7 @@ public abstract class JobBase implements IJob {
 
             oldJobStatusVo.setExecCount(oldJobStatusVo.getExecCount() + 1);
         } catch (ApiRuntimeException ex) {
-            //能识别的exception,不打error日志
-            logger.debug(ex.getMessage(), ex);
+            logger.warn(ex.getMessage(), ex);
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
@@ -335,11 +329,6 @@ public abstract class JobBase implements IJob {
         }
     }
 
-    /**
-     * 主要定时方法实现区
-     */
-    @Override
-    public abstract void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception;
 
     @Override
     public Boolean valid(List<JobPropVo> propVoList) {
@@ -347,7 +336,7 @@ public abstract class JobBase implements IJob {
         if (paramMap.isEmpty()) {
             return true;
         }
-        if (propVoList != null && propVoList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(propVoList)) {
             for (JobPropVo jobProp : propVoList) {
                 if (jobProp.getValue() == null || "".equals(jobProp.getValue())) {
                     continue;
@@ -373,7 +362,7 @@ public abstract class JobBase implements IJob {
                     }
                 } else if ("double".equals(dataType) || "Double".equals(dataType)) {
                     try {
-                        Double.parseDouble(dataType);
+                        Double.parseDouble(jobProp.getValue());
                     } catch (NumberFormatException e) {
                         logger.error(e.getMessage(), e);
                         throw new ScheduleIllegalParameterException("定时作业参数类型不匹配，参数" + jobProp.getName() + "的类型是" + dataType);

@@ -102,7 +102,8 @@ public class KafkaHandler implements IMqHandler {
 
             //用租户uuid+订阅id作为分组id，确保每个消费者都可以独立消费
             consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, tenantUuid + "_" + subVo.getId());
-            consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, tenantUuid + "_" + subVo.getId() + "_" + Config.SCHEDULE_SERVER_ID);
+            //客户端id仅用于标识客户端实例，每个租户共用一个
+            consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, tenantUuid + "_" + Config.SCHEDULE_SERVER_ID);
             try (AdminClient adminClient = AdminClient.create(consumerProps)) {
                 ListTopicsResult topics = adminClient.listTopics();
                 boolean topicExists = topics.names().get().contains(topicName);

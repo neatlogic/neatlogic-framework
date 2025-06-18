@@ -28,7 +28,7 @@ public interface SchedulerMapper {
 
     JobVo getJobBaseInfoByUuid(String uuid);
 
-    JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+    JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup, @Param("timestamp") Long timestamp);
 
     List<JobVo> getJobByHandler(String handler);
 

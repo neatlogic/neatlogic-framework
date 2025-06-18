@@ -312,8 +312,9 @@ public abstract class JobBase implements IJob {
             } else {
                 // 没有下次执行时间，则unload作业，清除作业相关信息。
                 schedulerManager.unloadJob(jobObject);
-                schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
-                schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
+                //unloadJob会删除锁和状态
+                //schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
+                //schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
             }
 
             oldJobStatusVo.setExecCount(oldJobStatusVo.getExecCount() + 1);

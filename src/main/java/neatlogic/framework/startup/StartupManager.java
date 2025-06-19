@@ -43,12 +43,6 @@ import java.util.stream.Collectors;
 public class StartupManager extends ModuleInitializedListenerBase {
     private static final Logger logger = LoggerFactory.getLogger(StartupManager.class);
 
-    private static final List<IStartup> startupList = new ArrayList<>();
-
-    public static List<IStartup> getStartupList() {
-        return startupList;
-    }
-
     @Resource
     private TenantMapper tenantMapper;
 
@@ -113,7 +107,6 @@ public class StartupManager extends ModuleInitializedListenerBase {
                 }
             });
         }
-        startupList.addAll(list);
     }
 
 

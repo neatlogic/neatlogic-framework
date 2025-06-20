@@ -227,11 +227,11 @@ public class KafkaHandler implements IMqHandler {
                 long committed = committedOffsets.getOrDefault(tp, new OffsetAndMetadata(0L)).offset();
                 long lag = end - committed;
                 if (lag > 1000) {
-                    errorList.add(new HealthcheckResultVo("消息消费严重滞后，滞后消息 " + lag + " 条", "error"));
+                    errorList.add(new HealthcheckResultVo("分区 " + tp.partition() + " 消息消费严重滞后，滞后消息 " + lag + " 条", "error"));
                 } else if (lag > 0) {
-                    errorList.add(new HealthcheckResultVo("消息消费存在滞后，滞后消息 " + lag + " 条", "warning"));
+                    errorList.add(new HealthcheckResultVo("分区 " + tp.partition() + " 消息消费存在滞后，滞后消息 " + lag + " 条", "warning"));
                 } else {
-                    errorList.add(new HealthcheckResultVo("无消费滞后消息", "normal"));
+                    errorList.add(new HealthcheckResultVo("分区 " + tp.partition() + " 无消费滞后消息", "normal"));
                 }
             }
         } catch (Exception e) {

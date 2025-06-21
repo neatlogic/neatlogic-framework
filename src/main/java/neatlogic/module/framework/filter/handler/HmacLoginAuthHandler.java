@@ -30,6 +30,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -43,6 +45,8 @@ import java.util.List;
 
 @Service
 public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
+
+    private final Logger logger = LoggerFactory.getLogger(HmacLoginAuthHandler.class);
 
     @Resource
     private UserMapper userMapper;
@@ -132,6 +136,15 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         String result = SHA256Util.encrypt(token, sign);
         if (result.equalsIgnoreCase(authorization)) {
             return userVo;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug("header Authorization = {}", request.getHeader("Authorization"));
+            logger.debug("header x-access-key = {}", request.getHeader("x-access-key"));
+            logger.debug("token = {}", token);
+            logger.debug("bodyJsonString = {}", bodyJsonString);
+            logger.debug("queryString = {}", queryString);
+            logger.debug("sign = {}", sign);
+            logger.debug("result = {}", result);
         }
         return null;
     }

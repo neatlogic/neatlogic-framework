@@ -64,6 +64,8 @@ public interface RunnerMapper {
 
     List<RunnerGroupVo> getRunnerGroupByIdList(List<Long> idlist);
 
+    List<RunnerGroupVo> getAllRunnerGroupList();
+
     RunnerGroupVo getRunnerGroupByName(String string);
 
     List<RunnerGroupVo> getRunnerGroupByTagIdOrNameList(List<String> tagList);

@@ -17,98 +17,120 @@
 
 package neatlogic.framework.util;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AviatorEvaluatorUtil {
-    private static final Logger logger = LoggerFactory.getLogger(AviatorEvaluatorUtil.class);
-    // 缓存编译后的表达式
-    private static final ConcurrentHashMap<String, Expression> expressionCache = new ConcurrentHashMap<>();
 
-    // 匹配 ${...} 的变量表达式
+    private static final Logger logger = LoggerFactory.getLogger(AviatorEvaluatorUtil.class);
+
     private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
 
+    // Guava 缓存表达式：最多缓存 1000 条，1 小时内未访问会被清理
+    private static final LoadingCache<String, Expression> expressionCache =
+            CacheBuilder.newBuilder()
+                    .maximumSize(1000)
+                    .expireAfterAccess(1, TimeUnit.HOURS)
+                    .build(new CacheLoader<String, Expression>() {
+                        @Override
+                        public Expression load(String key) throws Exception {
+                            return AviatorEvaluator.compile(key, true);
+                        }
+                    });
+
     /**
-     * 处理表达式变量（将 ${DATA.env} 替换成 DATA.env）
+     * 将 ${env-var} 转换为 env_var
      */
     private static String normalizeExpression(String expr) {
         Matcher matcher = VAR_PATTERN.matcher(expr);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
-            matcher.appendReplacement(sb, matcher.group(1));
+            String replacement = matcher.group(1).replace("-", "_");
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
         }
         matcher.appendTail(sb);
         return sb.toString();
     }
 
     /**
-     * 执行 Aviator 表达式
-     *
-     * @param rawExpression 表达式，支持 ${var} 格式
-     * @param variables     变量上下文 Map（支持嵌套）
-     * @return 结果（Boolean、String、Number 等）
+     * 替换变量中的非法 key，避免 Aviator 不识别
+     */
+    private static Map<String, Object> getFinalVariables(Map<String, Object> variables) {
+        Map<String, Object> finalVariables = new HashMap<>();
+        for (Map.Entry<String, Object> entry : variables.entrySet()) {
+            String safeKey = entry.getKey().replace("-", "_");
+            if (finalVariables.containsKey(safeKey)) {
+                logger.warn("Variable name conflict: multiple keys map to {}", safeKey);
+            }
+            finalVariables.put(safeKey, entry.getValue());
+        }
+        return finalVariables;
+    }
+
+    /**
+     * 通用表达式执行（含变量）
      */
     public static Object evaluate(String rawExpression, Map<String, Object> variables) {
         try {
-            String finalExpression = normalizeExpression(rawExpression);
-            Expression compiled = expressionCache.computeIfAbsent(finalExpression, AviatorEvaluator::compile);
-            return compiled.execute(variables);
+            String normalizedExpr = normalizeExpression(rawExpression);
+            Expression expression = expressionCache.get(normalizedExpr);
+            return expression.execute(getFinalVariables(variables));
         } catch (Exception e) {
-            // 可替换为日志系统
-            logger.error("Aviator expression failed: " + rawExpression + ",errMsg:" + e.getMessage(), e);
-            e.printStackTrace();
+            logger.error("Aviator expression failed: {}, error: {}", rawExpression, e.getMessage(), e);
             return null;
         }
     }
 
     /**
-     * 执行 Aviator 表达式
-     *
-     * @param finalExpression 最终表达式
-     * @return 结果（Boolean、String、Number 等）
+     * 执行表达式（无变量）
      */
-    public static Object evaluate(String finalExpression) {
+    public static Object evaluate(String rawExpression) {
         try {
-            Expression compiled = expressionCache.computeIfAbsent(finalExpression, AviatorEvaluator::compile);
-            return compiled.execute();
+            Expression expression = expressionCache.get(rawExpression);
+            return expression.execute();
         } catch (Exception e) {
-            // 可替换为日志系统
-            logger.error("Aviator expression failed: " + finalExpression + ",errMsg:" + e.getMessage(), e);
-            e.printStackTrace();
+            logger.error("Aviator expression failed: {}, error: {}", rawExpression, e.getMessage(), e);
             return null;
         }
     }
 
     /**
-     * 执行布尔类型表达式，返回 true/false
+     * 执行布尔表达式（含变量）
      */
     public static boolean evaluateBoolean(String rawExpression, Map<String, Object> variables) {
         Object result = evaluate(rawExpression, variables);
-        if (result instanceof Boolean) {
-            return (Boolean) result;
-        }
-        if (result == null) return false;
-        return Boolean.parseBoolean(result.toString());
+        return toBoolean(result, rawExpression);
     }
-
 
     /**
-     * 执行布尔类型表达式，返回 true/false
+     * 执行布尔表达式（无变量）
      */
-    public static boolean evaluateBoolean(String finalExpression) {
-        Object result = evaluate(finalExpression);
+    public static boolean evaluateBoolean(String rawExpression) {
+        Object result = evaluate(rawExpression);
+        return toBoolean(result, rawExpression);
+    }
+
+    private static boolean toBoolean(Object result, String context) {
         if (result instanceof Boolean) {
             return (Boolean) result;
         }
-        if (result == null) return false;
-        return Boolean.parseBoolean(result.toString());
+        if (result == null) {
+            logger.warn("Boolean evaluation returned null: {}", context);
+            return false;
+        }
+        boolean parsed = Boolean.parseBoolean(result.toString());
+        logger.debug("Parsed boolean [{}] from expression: {}", parsed, context);
+        return parsed;
     }
-
 }

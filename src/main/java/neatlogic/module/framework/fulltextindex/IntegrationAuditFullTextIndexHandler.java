@@ -35,6 +35,8 @@ import neatlogic.framework.integration.dto.IntegrationVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -44,6 +46,8 @@ import java.util.Objects;
 
 @Component
 public class IntegrationAuditFullTextIndexHandler extends FullTextIndexHandlerBase {
+
+    private final Logger logger = LoggerFactory.getLogger(IntegrationAuditFullTextIndexHandler.class);
 
     @Resource
     private IntegrationMapper integrationMapper;
@@ -62,45 +66,6 @@ public class IntegrationAuditFullTextIndexHandler extends FullTextIndexHandlerBa
                 fullTextIndexVo.addFieldContent("param", new FullTextIndexVo.WordVo(value));
             }
         }
-//        IntegrationAuditVo integrationAuditVo = integrationMapper.getIntegrationAuditById(fullTextIndexVo.getTargetId());
-//        if (integrationAuditVo != null && StringUtils.isNotBlank(integrationAuditVo.getParamFilePath())) {
-//            IntegrationVo integrationVo = integrationMapper.getIntegrationByUuid(integrationAuditVo.getIntegrationUuid());
-//            if (integrationVo != null) {
-//                JSONObject config = integrationVo.getConfig();
-//                JSONObject param = config.getJSONObject("param");
-//                if (MapUtils.isNotEmpty(param)) {
-//                    JSONArray paramList = param.getJSONArray("paramList");
-//                    if (CollectionUtils.isNotEmpty(paramList)) {
-//                        List<String> searchAbleParamNameList = new ArrayList<>();
-//                        for (int i = 0; i < paramList.size(); i++) {
-//                            JSONObject paramObj = paramList.getJSONObject(i);
-//                            String name = paramObj.getString("name");
-//                            String mode = paramObj.getString("mode");
-//                            Integer isSearchAble = paramObj.getInteger("isSearchAble");
-//                            if (StringUtils.isNotBlank(name) && Objects.equals(mode, "input") && Objects.equals(isSearchAble, 1)) {
-//                                searchAbleParamNameList.add(name);
-//                            }
-//                        }
-//                        if (CollectionUtils.isNotEmpty(searchAbleParamNameList)) {
-//                            List<String> paramValueList = new ArrayList<>();
-//                            String content = getContent(integrationAuditVo.getParamFilePath());
-//                            if (StringUtils.isNotBlank(content) && content.startsWith("{") && content.endsWith("}")) {
-//                                JSONObject paramObj = JSONObject.parseObject(content);
-//                                for (String paramName : searchAbleParamNameList) {
-//                                    Object paramValue = paramObj.get(paramName);
-//                                    if (paramValue != null) {
-//                                        paramValueList.add(paramValue.toString());
-//                                    }
-//                                }
-//                            }
-//                            if (CollectionUtils.isNotEmpty(paramValueList)) {
-//                                fullTextIndexVo.addFieldContent("param", new FullTextIndexVo.WordVo(String.join(",", paramValueList)));
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
     }
 
     @Override
@@ -116,7 +81,7 @@ public class IntegrationAuditFullTextIndexHandler extends FullTextIndexHandlerBa
             searchVo.setRowNum(rowNum);
             searchVo.setPageSize(100);
             Integer pageCount = searchVo.getPageCount();
-            for (int currentPage = 1; currentPage < pageCount; currentPage++) {
+            for (int currentPage = 1; currentPage <= pageCount; currentPage++) {
                 searchVo.setCurrentPage(currentPage);
                 List<IntegrationVo> integrationList = integrationMapper.searchIntegration(searchVo);
                 for (IntegrationVo integrationVo : integrationList) {
@@ -162,16 +127,21 @@ public class IntegrationAuditFullTextIndexHandler extends FullTextIndexHandlerBa
     }
 
     private String getContent(String filePath) {
-        AuditFilePathVo auditFilePathVo = new AuditFilePathVo(filePath);
-        IFileCrossoverService fileCrossoverService = CrossoverServiceFactory.getApi(IFileCrossoverService.class);
-        if (Objects.equals(auditFilePathVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
-            JSONObject jsonObj = fileCrossoverService.readLocalFile(auditFilePathVo.getPath(), auditFilePathVo.getStartIndex(), auditFilePathVo.getOffset());
-            return jsonObj.getString("content");
-        } else {
-            JSONObject paramObj = new JSONObject();
-            paramObj.put("filePath", filePath);
-            JSONObject jsonObj =  fileCrossoverService.readRemoteFile(paramObj, auditFilePathVo.getServerId());
-            return jsonObj.getString("content");
+        try {
+            AuditFilePathVo auditFilePathVo = new AuditFilePathVo(filePath);
+            IFileCrossoverService fileCrossoverService = CrossoverServiceFactory.getApi(IFileCrossoverService.class);
+            if (Objects.equals(auditFilePathVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
+                JSONObject jsonObj = fileCrossoverService.readLocalFile(auditFilePathVo.getPath(), auditFilePathVo.getStartIndex(), auditFilePathVo.getOffset());
+                return jsonObj.getString("content");
+            } else {
+                JSONObject paramObj = new JSONObject();
+                paramObj.put("filePath", filePath);
+                JSONObject jsonObj = fileCrossoverService.readRemoteFile(paramObj, auditFilePathVo.getServerId());
+                return jsonObj.getString("content");
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
         }
+        return null;
     }
 }

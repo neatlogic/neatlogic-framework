@@ -55,39 +55,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <sql id="searchIntegrationAuditCondition">
-        <where>
-            <if test="startTime != null">`start_time` &gt;= #{startTime}</if>
-            <if test="endTime != null">AND `end_time` &lt;= #{endTime}</if>
-            <if test="idList != null and idList.size() > 0">
-                AND a.id in
-                <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
-            </if>
-            <if test="integrationUuid != null and integrationUuid != ''">
-                AND a.integration_uuid = #{integrationUuid}
-            </if>
-            <if test="integrationUuidList != null and integrationUuidList.size() > 0">
-                AND a.integration_uuid in
-                <foreach collection="integrationUuidList" item="item" open="(" close=")" separator=",">#{item}</foreach>
-            </if>
-            <if test="userUuidList != null and userUuidList.size() > 0">
-                AND a.`user_uuid` IN
-                <foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
-                    #{uuid}
-                </foreach>
-            </if>
-            <if test="statusList != null and statusList.size() > 0">
-                AND a.`status` IN
-                <foreach collection="statusList" item="status" open="(" separator="," close=")">
-                    #{status}
-                </foreach>
-            </if>
-            <if test="paramWordList != null and paramWordList.size() > 0">
-                and fw.word in
-                <foreach collection="paramWordList" open="(" close=")" separator="," item="item">
-                    #{item}
-                </foreach>
-            </if>
-        </where>
+        <if test="startTime != null">`start_time` &gt;= #{startTime}</if>
+        <if test="endTime != null">AND `end_time` &lt;= #{endTime}</if>
+        <if test="idList != null and idList.size() > 0">
+            AND a.id in
+            <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+        </if>
+        <if test="integrationUuid != null and integrationUuid != ''">
+            AND a.integration_uuid = #{integrationUuid}
+        </if>
+        <if test="integrationUuidList != null and integrationUuidList.size() > 0">
+            AND a.integration_uuid in
+            <foreach collection="integrationUuidList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+        </if>
+        <if test="userUuidList != null and userUuidList.size() > 0">
+            AND a.`user_uuid` IN
+            <foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
+                #{uuid}
+            </foreach>
+        </if>
+        <if test="statusList != null and statusList.size() > 0">
+            AND a.`status` IN
+            <foreach collection="statusList" item="status" open="(" separator="," close=")">
+                #{status}
+            </foreach>
+        </if>
     </sql>
 
 
@@ -109,7 +101,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         (UNIX_TIMESTAMP(IFNULL(a.end_time, NOW()))*1000 - UNIX_TIMESTAMP(a.start_time)*1000) AS timeCost
         FROM
         `integration_audit` a
-        <include refid="searchIntegrationAuditCondition"/>
+        <where>
+            <include refid="searchIntegrationAuditCondition"/>
+        </where>
         ORDER BY a.id DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
@@ -123,11 +117,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM
         `integration_audit` a
         <if test="paramWordList != null and paramWordList.size() > 0">
-            join fulltextindex_target_framework ftf on a.id = ftf.target_id and ftf.target_type = 'integration_audit'
-            join fulltextindex_field_framework fff on ftf.target_id = fff.target_id
-            join fulltextindex_word fw on fff.word_id = fw.id
+            join `fulltextindex_target_framework` ftf on a.id = ftf.target_id and ftf.target_type = 'integration_audit'
+            join `fulltextindex_field_framework` fff on ftf.target_id = fff.target_id AND fff.target_field = 'param'
+            join `fulltextindex_word` fw on fff.word_id = fw.id
         </if>
-        <include refid="searchIntegrationAuditCondition"/>
+        <where>
+            <include refid="searchIntegrationAuditCondition"/>
+            <if test="paramWordList != null and paramWordList.size() > 0">
+                and fw.word in
+                <foreach collection="paramWordList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </select>
 
 
@@ -136,22 +138,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         select b.id from (
         SELECT
         a.id
-        <if test="wordList != null and wordList.size() > 0">
+        <if test="paramWordList != null and paramWordList.size() > 0">
             ,COUNT(distinct fw.word) AS match_count
         </if>
         FROM
         `integration_audit` a
         <if test="paramWordList != null and paramWordList.size() > 0">
-            join fulltextindex_target_framework ftf on a.id = ftf.target_id and ftf.target_type = 'integration_audit'
-            join fulltextindex_field_framework fff on ftf.target_id = fff.target_id
-            join fulltextindex_word fw on fff.word_id = fw.id
+            join `fulltextindex_target_framework` ftf on a.id = ftf.target_id and ftf.target_type = 'integration_audit'
+            join `fulltextindex_field_framework` fff on ftf.target_id = fff.target_id AND fff.target_field = 'param'
+            join `fulltextindex_word` fw on fff.word_id = fw.id
         </if>
-        <include refid="searchIntegrationAuditCondition"/>
-        <if test="wordList != null and wordList.size() > 0">
+        <where>
+            <include refid="searchIntegrationAuditCondition"/>
+            <if test="paramWordList != null and paramWordList.size() > 0">
+                and fw.word in
+                <foreach collection="paramWordList" open="(" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+        <if test="paramWordList != null and paramWordList.size() > 0">
             GROUP BY a.`id`
         </if>
         order by
-        <if test="wordList != null and wordList.size() > 0">
+        <if test="paramWordList != null and paramWordList.size() > 0">
             match_count DESC,
         </if>
         a.`id` DESC
@@ -303,7 +313,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
     </select>
 
-    <select id="getNotIndexIntegrationAuditIdList">
+    <select id="getNotIndexIntegrationAuditIdList" resultType="java.lang.Long">
         SELECT a.`id`
         FROM `integration_audit` a
         WHERE a.`integration_uuid` = #{integrationUuid}

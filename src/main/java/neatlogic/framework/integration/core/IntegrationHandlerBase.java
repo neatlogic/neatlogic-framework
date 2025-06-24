@@ -30,8 +30,12 @@ import neatlogic.framework.exception.type.ParamTypeNotFoundException;
 import neatlogic.framework.file.core.AuditType;
 import neatlogic.framework.file.core.Event;
 import neatlogic.framework.file.core.appender.AppenderManager;
+import neatlogic.framework.fulltextindex.core.FullTextIndexHandlerFactory;
+import neatlogic.framework.fulltextindex.core.IFullTextIndexHandler;
+import neatlogic.framework.fulltextindex.enums.FrameworkFullTextIndexType;
 import neatlogic.framework.integration.authentication.core.AuthenticateHandlerFactory;
 import neatlogic.framework.integration.authentication.core.IAuthenticateHandler;
+import neatlogic.framework.integration.crossover.IntegrationCrossoverService;
 import neatlogic.framework.integration.dto.IntegrationAuditVo;
 import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
@@ -199,11 +203,22 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         }
 
 
+        List<String> fullIndexParamValueList = new ArrayList<>();
         integrationAuditVo.setRequestFrom(iRequestFrom.toString());
         integrationAuditVo.setUserUuid(UserContext.get().getUserUuid());// 用户非必填，因作业不存在登录用户
         integrationAuditVo.setIntegrationUuid(integrationVo.getUuid());
         integrationAuditVo.setStartTime(new Date());
         if (MapUtils.isNotEmpty(requestParamObj)) {
+            IntegrationCrossoverService integrationCrossoverService = CrossoverServiceFactory.getApi(IntegrationCrossoverService.class);
+            List<String> searchAbleInputParamNameList = integrationCrossoverService.getSearchAbleInputParamNameList(integrationVo);
+            if (CollectionUtils.isNotEmpty(searchAbleInputParamNameList)) {
+                for (String paramName : searchAbleInputParamNameList) {
+                    Object paramValue = requestParamObj.get(paramName);
+                    if (paramValue != null) {
+                        fullIndexParamValueList.add(paramValue.toString());
+                    }
+                }
+            }
             integrationAuditVo.setParam(requestParamObj.toJSONString());
         }
 
@@ -364,7 +379,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 //        NeatLogicThread thread = new IntegrationAuditSaveThread(integrationAuditVo);
 //        thread.setThreadName("INTEGRATION-AUDIT-SAVER-" + integrationVo.getUuid());
 //        CachedThreadPool.execute(thread);
-
+        Long auditId = integrationAuditVo.getId();
         JSONObject data = new JSONObject();
         data.put("integrationAudit", integrationAuditVo);
         String param = integrationAuditVo.getParam();
@@ -389,10 +404,15 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         IntegrationAuditAppendPreProcessor appendPreProcessor = CrossoverServiceFactory.getApi(IntegrationAuditAppendPreProcessor.class);
         AppenderManager.execute(new Event(integrationVo.getName(), integrationAuditVo.getStartTime().getTime(), data, appendPreProcessor, appendPostProcessor, AuditType.INTEGRATION_AUDIT));
 
-        // connection.disconnect(); //Indicates that other requests to the
-        // server are unlikely in the near future. Calling disconnect() should
-        // not imply that this HttpURLConnection
-        // instance can be reused for other requests.
+        //创建全文检索索引
+        if (CollectionUtils.isNotEmpty(fullIndexParamValueList)) {
+            IFullTextIndexHandler indexHandler = FullTextIndexHandlerFactory.getHandler(FrameworkFullTextIndexType.INTEGRATION_AUDIT);
+            if (indexHandler != null) {
+                JSONObject dataObj = new JSONObject();
+                dataObj.put("param", String.join(",", fullIndexParamValueList));
+                indexHandler.createIndex(auditId, dataObj);
+            }
+        }
         return resultVo;
     }
 }

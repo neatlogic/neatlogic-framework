@@ -339,6 +339,28 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
         return true;
     }
 
+    @Override
+    public List<String> getSearchAbleInputParamNameList(IntegrationVo integrationVo) {
+        List<String> searchAbleInputParamNameList = new ArrayList<>();
+        JSONObject config = integrationVo.getConfig();
+        JSONObject param = config.getJSONObject("param");
+        if (MapUtils.isNotEmpty(param)) {
+            JSONArray paramList = param.getJSONArray("paramList");
+            if (CollectionUtils.isNotEmpty(paramList)) {
+                for (int i = 0; i < paramList.size(); i++) {
+                    JSONObject paramObj = paramList.getJSONObject(i);
+                    String name = paramObj.getString("name");
+                    String mode = paramObj.getString("mode");
+                    Integer isSearchAble = paramObj.getInteger("isSearchAble");
+                    if (StringUtils.isNotBlank(name) && Objects.equals(mode, "input") && Objects.equals(isSearchAble, 1)) {
+                        searchAbleInputParamNameList.add(name);
+                    }
+                }
+            }
+        }
+        return searchAbleInputParamNameList;
+    }
+
     private List<ColumnVo> getSearchColumnDetailList(String integrationUuid, List<ColumnVo> columnVoList, JSONArray searchColumnArray) {
         Map<String, ColumnVo> columnVoMap = new HashMap<>();
         for (ColumnVo columnVo : columnVoList) {

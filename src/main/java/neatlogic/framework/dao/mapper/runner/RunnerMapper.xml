@@ -656,6 +656,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             `status_lcd` = now()
         where `host` = #{host}
     </update>
+    <update id="updateStatusById">
+        update `runner`
+        set `status` = #{status},
+            `status_lcd` = now()
+        where `id` = #{id}
+    </update>
 
     <select id="checkRunnerIsUsedByJob" resultType="int">
         select count(1)

@@ -40,6 +40,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="description" property="description"/>
+        <result column="rule" property="rule"/>
         <collection property="groupNetworkList" ofType="neatlogic.framework.dto.runner.GroupNetworkVo">
             <id column="networkId" property="id"/>
             <result column="groupId" property="groupId"/>
@@ -57,6 +58,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <resultMap id="runnerMapGroupMap" type="neatlogic.framework.dto.runner.RunnerGroupVo">
         <id column="id" property="id"/>
         <result column="name" property="name"/>
+        <result column="rule" property="rule"/>
         <collection property="networkList" ofType="neatlogic.framework.dto.runner.GroupNetworkVo">
             <id column="networkId" property="id"/>
             <result column="groupId" property="groupId"/>
@@ -116,6 +118,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="getRunnerMapGroupById" resultMap="runnerMapGroupMap" useCache="false">
         SELECT a.id              id,
                a.name            name,
+               a.rule            rule,
                c.id           AS runnerId,
                d.`id`         AS runnerMapId,
                c.`auth_type`  AS authType,
@@ -207,6 +210,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         g.`id` as id,
         g.`name` as name,
         g.`description`,
+        g.`rule`,
         nk.`id` as networkId,
         nk.`group_id` as groupId,
         nk.`network_ip` as networkIp,
@@ -217,6 +221,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         (SELECT DISTINCT
         rg.`id`,
         rg.`name`,
+        rg.`rule`,
         rg.`description`
         FROM
         runnergroup rg
@@ -269,6 +274,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <foreach collection="list" separator="," open="(" close=")" item="id">
             #{id}
         </foreach>
+    </select>
+
+    <select id="getAllRunnerGroupList" resultType="neatlogic.framework.dto.runner.RunnerGroupVo" useCache="false">
+        SELECT
+        rg.`id`,
+        rg.`name`,
+        rg.`rule`,
+        rg.`description`
+        FROM
+        runnergroup rg
     </select>
 
     <select id="checkRunnerGroupIdIsExist" resultType="int" useCache="false">
@@ -563,15 +578,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <update id="updateRunnerGroup" parameterType="neatlogic.framework.dto.runner.RunnerGroupVo">
         update runnergroup
         set `name`=#{name},
+            `rule` = #{rule},
             `description` =#{description}
         where `id` = #{id}
     </update>
 
     <insert id="insertRunnerGroup" parameterType="neatlogic.framework.dto.runner.RunnerGroupVo">
-        insert runnergroup(`id`, `name`, `description`)
+        insert runnergroup(`id`, `name`, `description`, `rule`)
         VALUES (#{id},
                 #{name},
-                #{description})
+                #{description},
+                #{rule})
     </insert>
 
     <delete id="deleteGroupNetWork">

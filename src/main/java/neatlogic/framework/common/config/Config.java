@@ -136,6 +136,8 @@ public class Config {
 
     private static String CHANGELOG_JDBC_SOCKETTIME;//changelog jdbc 读取数据时间耗时限制
 
+    private static String HEADER_RULE_PREFIX; //请求头规则，目前用于角色和执行器组规则
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -476,6 +478,10 @@ public class Config {
         return CHANGELOG_JDBC_SOCKETTIME;
     }
 
+    public static String HEADER_RULE_PREFIX() {
+        return HEADER_RULE_PREFIX;
+    }
+
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -656,6 +662,7 @@ public class Config {
             LICENSE_WILL_EXPIRED_NOTIFY_DAY = Integer.parseInt(prop.getProperty("license.will.expired.notify.day", "30"));
 
             JWT_SECRET = prop.getProperty("jwt.secret");
+            HEADER_RULE_PREFIX = prop.getProperty("header.rule.prefix", "neatlogic-rule-");
             if (StringUtils.isBlank(JWT_SECRET)) {
                 System.out.println(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));

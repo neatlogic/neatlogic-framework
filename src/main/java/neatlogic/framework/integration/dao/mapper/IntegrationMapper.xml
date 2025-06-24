@@ -16,31 +16,75 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.integration.dao.mapper.IntegrationMapper">
+
+    <select id="getIntegrationAuditById" parameterType="java.lang.Long" resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
+        SELECT
+        `id`,
+        `integration_uuid` AS integrationUuid,
+        `user_uuid` AS userUuid,
+        `request_from` AS requestFrom,
+        `server_id` AS serverId,
+        `start_time` AS startTime,
+        `end_time` AS endTime,
+        `status`,
+        `param_file_path` AS paramFilePath,
+        `result_file_path` AS resultFilePath,
+        `error_file_path` AS errorFilePath
+        FROM `integration_audit`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getIntegrationAuditListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
+        SELECT
+            `id`,
+            `integration_uuid` AS integrationUuid,
+            `user_uuid` AS userUuid,
+            `request_from` AS requestFrom,
+            `server_id` AS serverId,
+            `start_time` AS startTime,
+            `end_time` AS endTime,
+            `status`,
+            `param_file_path` AS paramFilePath,
+            `result_file_path` AS resultFilePath,
+            `error_file_path` AS errorFilePath
+        FROM `integration_audit`
+        WHERE `id` IN
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+              #{id}
+        </foreach>
+    </select>
+
     <sql id="searchIntegrationAuditCondition">
         <where>
             <if test="startTime != null">`start_time` &gt;= #{startTime}</if>
             <if test="endTime != null">AND `end_time` &lt;= #{endTime}</if>
             <if test="idList != null and idList.size() > 0">
-                AND id in
+                AND a.id in
                 <foreach collection="idList" item="item" open="(" close=")" separator=",">#{item}</foreach>
             </if>
             <if test="integrationUuid != null and integrationUuid != ''">
-                AND integration_uuid = #{integrationUuid}
+                AND a.integration_uuid = #{integrationUuid}
             </if>
             <if test="integrationUuidList != null and integrationUuidList.size() > 0">
-                AND integration_uuid in
+                AND a.integration_uuid in
                 <foreach collection="integrationUuidList" item="item" open="(" close=")" separator=",">#{item}</foreach>
             </if>
             <if test="userUuidList != null and userUuidList.size() > 0">
-                AND `user_uuid` IN
+                AND a.`user_uuid` IN
                 <foreach collection="userUuidList" item="uuid" open="(" separator="," close=")">
                     #{uuid}
                 </foreach>
             </if>
             <if test="statusList != null and statusList.size() > 0">
-                AND `status` IN
+                AND a.`status` IN
                 <foreach collection="statusList" item="status" open="(" separator="," close=")">
                     #{status}
+                </foreach>
+            </if>
+            <if test="paramWordList != null and paramWordList.size() > 0">
+                and fw.word in
+                <foreach collection="paramWordList" open="(" close=")" separator="," item="item">
+                    #{item}
                 </foreach>
             </if>
         </where>
@@ -50,23 +94,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <select id="searchIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo"
             resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
         SELECT
-        `id`,
-        `integration_uuid` AS integrationUuid,
-        `user_uuid` AS userUuid,
-        (SELECT user_name FROM user WHERE uuid = user_uuid) AS userName,
-        `request_from` AS requestFrom,
-        `server_id` AS serverId,
-        `start_time` AS startTime,
-        `end_time` AS endTime,
-        `status`,
-        `param_file_path` AS paramFilePath,
-        `result_file_path` AS resultFilePath,
-        `error_file_path` AS errorFilePath,
-        (UNIX_TIMESTAMP(IFNULL(end_time, NOW()))*1000 - UNIX_TIMESTAMP(start_time)*1000) AS timeCost
+        a.`id`,
+        a.`integration_uuid` AS integrationUuid,
+        a.`user_uuid` AS userUuid,
+        (SELECT user_name FROM user WHERE uuid = a.user_uuid) AS userName,
+        a.`request_from` AS requestFrom,
+        a.`server_id` AS serverId,
+        a.`start_time` AS startTime,
+        a.`end_time` AS endTime,
+        a.`status`,
+        a.`param_file_path` AS paramFilePath,
+        a.`result_file_path` AS resultFilePath,
+        a.`error_file_path` AS errorFilePath,
+        (UNIX_TIMESTAMP(IFNULL(a.end_time, NOW()))*1000 - UNIX_TIMESTAMP(a.start_time)*1000) AS timeCost
         FROM
-        `integration_audit`
+        `integration_audit` a
         <include refid="searchIntegrationAuditCondition"/>
-        ORDER BY id DESC
+        ORDER BY a.id DESC
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
         </if>
@@ -77,8 +121,42 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT
         COUNT(1)
         FROM
-        `integration_audit`
+        `integration_audit` a
+        <if test="paramWordList != null and paramWordList.size() > 0">
+            join fulltextindex_target_framework ftf on a.id = ftf.target_id and ftf.target_type = 'integration_audit'
+            join fulltextindex_field_framework fff on ftf.target_id = fff.target_id
+            join fulltextindex_word fw on fff.word_id = fw.id
+        </if>
         <include refid="searchIntegrationAuditCondition"/>
+    </select>
+
+
+    <select id="getIntegrationAuditIdList" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo"
+            resultType="java.lang.Long">
+        select b.id from (
+        SELECT
+        a.id
+        <if test="wordList != null and wordList.size() > 0">
+            ,COUNT(distinct fw.word) AS match_count
+        </if>
+        FROM
+        `integration_audit` a
+        <if test="paramWordList != null and paramWordList.size() > 0">
+            join fulltextindex_target_framework ftf on a.id = ftf.target_id and ftf.target_type = 'integration_audit'
+            join fulltextindex_field_framework fff on ftf.target_id = fff.target_id
+            join fulltextindex_word fw on fff.word_id = fw.id
+        </if>
+        <include refid="searchIntegrationAuditCondition"/>
+        <if test="wordList != null and wordList.size() > 0">
+            GROUP BY a.`id`
+        </if>
+        order by
+        <if test="wordList != null and wordList.size() > 0">
+            match_count DESC,
+        </if>
+        a.`id` DESC
+        LIMIT #{startNum}, #{pageSize}
+        ) b
     </select>
 
     <select id="getIntegrationByUuid" parameterType="java.lang.String"
@@ -223,6 +301,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <foreach collection="list" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
+    </select>
+
+    <select id="getNotIndexIntegrationAuditIdList">
+        SELECT a.`id`
+        FROM `integration_audit` a
+        WHERE a.`integration_uuid` = #{integrationUuid}
+          AND a.id > #{id}
+          AND NOT EXISTS (
+            SELECT 1
+            FROM `fulltextindex_target_framework` b
+            WHERE a.`id` = b.`target_id` and b.`target_type` = #{type}
+        )
+        ORDER BY a.`id`
+        LIMIT #{pageSize}
     </select>
 
     <update id="updateIntegrationActive" parameterType="neatlogic.framework.integration.dto.IntegrationVo">

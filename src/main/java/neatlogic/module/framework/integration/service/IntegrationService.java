@@ -51,4 +51,11 @@ public interface IntegrationService {
      * @param sourceColumnList
      */
     boolean mergeFilterListAndSourceColumnList(JSONArray filterList, List<SourceColumnVo> sourceColumnList);
+
+    /**
+     * 找出允许搜索的输入参数名称列表
+     * @param integrationVo
+     * @return
+     */
+    List<String> getSearchAbleInputParamNameList(IntegrationVo integrationVo);
 }

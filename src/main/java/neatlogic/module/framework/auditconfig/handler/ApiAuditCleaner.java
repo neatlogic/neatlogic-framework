@@ -30,10 +30,14 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 @Component
 public class ApiAuditCleaner extends AuditCleanerBase {
@@ -46,6 +50,8 @@ public class ApiAuditCleaner extends AuditCleanerBase {
     private DatabaseFragmentMapper databaseFragmentMapper;
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
+
+    private final String PREFIX = "fileFooter##########";
 
     @Override
     public String getName() {
@@ -60,11 +66,19 @@ public class ApiAuditCleaner extends AuditCleanerBase {
             File[] listFiles = dir.listFiles();
             if (listFiles != null) {
                 Arrays.sort(listFiles, Comparator.comparing(File::lastModified));
+                List<File> fileList = new ArrayList<>();
                 for (File file : listFiles) {
+                    // 判断文件是不是软链接
+                    if (!Files.isSymbolicLink(Paths.get(file.getAbsolutePath()))) {
+                        fileList.add(file);
+                    }
+                }
+                for (int i = 0; i < (fileList.size() - 1); i++) {
+                    File file = fileList.get(0);
                     try (ReversedLinesFileReader rlfr = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
                         String lastLine = rlfr.readLine();
-                        if (lastLine.startsWith("fileFooter##########") && lastLine.endsWith("##########fileFooter")) {
-                            String formatStr = lastLine.substring(20, lastLine.length() - 20);
+                        if (lastLine.startsWith(PREFIX)) {
+                            String formatStr = lastLine.substring(PREFIX.length(), PREFIX.length() + TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS.length());
                             LocalDate endDate = LocalDate.parse(formatStr, dateTimeFormatter);
                             if (LocalDate.now().toEpochDay() - endDate.toEpochDay() > dayBefore) {
                                 file.delete();

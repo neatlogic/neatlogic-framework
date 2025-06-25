@@ -47,6 +47,8 @@ public class ApiAuditCleaner extends AuditCleanerBase {
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
 
+    private final String PREFIX = "fileFooter##########";
+
     @Override
     public String getName() {
         return "API-AUDIT";
@@ -63,8 +65,8 @@ public class ApiAuditCleaner extends AuditCleanerBase {
                 for (File file : listFiles) {
                     try (ReversedLinesFileReader rlfr = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
                         String lastLine = rlfr.readLine();
-                        if (lastLine.startsWith("fileFooter##########") && lastLine.endsWith("##########fileFooter")) {
-                            String formatStr = lastLine.substring(20, lastLine.length() - 20);
+                        if (lastLine.startsWith(PREFIX)) {
+                            String formatStr = lastLine.substring(PREFIX.length(), PREFIX.length() + TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS.length());
                             LocalDate endDate = LocalDate.parse(formatStr, dateTimeFormatter);
                             if (LocalDate.now().toEpochDay() - endDate.toEpochDay() > dayBefore) {
                                 file.delete();

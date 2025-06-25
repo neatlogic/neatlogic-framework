@@ -74,7 +74,7 @@ public class ApiAuditCleaner extends AuditCleanerBase {
                     }
                 }
                 for (int i = 0; i < (fileList.size() - 1); i++) {
-                    File file = fileList.get(0);
+                    File file = fileList.get(i);
                     try (ReversedLinesFileReader rlfr = new ReversedLinesFileReader(file, StandardCharsets.UTF_8)) {
                         String lastLine = rlfr.readLine();
                         if (lastLine.startsWith(PREFIX)) {

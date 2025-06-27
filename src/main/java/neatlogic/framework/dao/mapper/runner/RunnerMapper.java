@@ -20,6 +20,7 @@ import neatlogic.framework.dto.runner.*;
 import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -116,7 +117,7 @@ public interface RunnerMapper {
 
     void updateStatusAndInfoByHost(@Param("host") String host, @Param("status") String status, @Param("info") String info);
 
-    void updateStatusById(@Param("id") Long id, @Param("status") String status);
+    void updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("statusLcd") Date statusLcd);
 
     void deleteGroupNetWork(Long id);
 

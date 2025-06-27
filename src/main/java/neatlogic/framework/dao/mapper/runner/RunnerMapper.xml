@@ -659,7 +659,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <update id="updateStatusById">
         update `runner`
         set `status` = #{status},
-            `status_lcd` = now()
+            `status_lcd` = #{statusLcd}
         where `id` = #{id}
     </update>
 

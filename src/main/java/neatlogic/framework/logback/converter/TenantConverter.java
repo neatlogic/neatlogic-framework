@@ -17,7 +17,6 @@ package neatlogic.framework.logback.converter;
 
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -38,14 +37,10 @@ public class TenantConverter extends ClassicConverter implements Serializable {
      */
     @Override
     public String convert(ILoggingEvent event) {
-        if (StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
-            return TenantContext.get().getTenantUuid();
-        } else {
-            Map<String, String> map = event.getMDCPropertyMap();
-            String tenant = map.get("tenant");
-            if (StringUtils.isNotBlank(tenant)) {
-                return tenant;
-            }
+        Map<String, String> map = event.getMDCPropertyMap();
+        String tenant = map.get("tenant");
+        if (StringUtils.isNotBlank(tenant)) {
+            return tenant;
         }
         return StringUtils.EMPTY;
     }

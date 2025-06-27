@@ -34,6 +34,7 @@ public class RequestContext implements Serializable {
     private static final ThreadLocal<RequestContext> instance = new ThreadLocal<>();
     private static final long serialVersionUID = -5420998728515359626L;
     private String url;
+    private String remoteAddr;
     private HttpServletRequest request;
     private HttpServletResponse response;
     //接口访问拒绝来源，租户或接口
@@ -53,6 +54,14 @@ public class RequestContext implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
+    }
+
+    public void setRemoteAddr(String remoteAddr) {
+        this.remoteAddr = remoteAddr;
     }
 
     public HttpServletRequest getRequest() {
@@ -121,16 +130,14 @@ public class RequestContext implements Serializable {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
             context.setSqlAuditList(_requestContext.getSqlAuditList());
+            context.setRemoteAddr(_requestContext.getRemoteAddr());
             String tempUrl = _requestContext.getUrl();
             if (tempUrl == null) {
                 tempUrl = StringUtils.EMPTY;
             }
-            HttpServletRequest request = _requestContext.getRequest();
-            if (request != null) {
-                String remoteAddr = IpUtil.getIpAddr(request);
-                if (StringUtils.isNotBlank(remoteAddr)) {
-                    tempUrl += "(" + remoteAddr + ")";
-                }
+            String remoteAddr = _requestContext.getRemoteAddr();
+            if (StringUtils.isNotBlank(remoteAddr)) {
+                tempUrl += "(" + remoteAddr + ")";
             }
             MDC.put("url", tempUrl);
         }
@@ -151,8 +158,9 @@ public class RequestContext implements Serializable {
             }
         }
         String tempUrl = url;
-        String remoteAddr = request.getRemoteAddr();
+        String remoteAddr = IpUtil.getIpAddr(request);
         if (StringUtils.isNotBlank(remoteAddr)) {
+            context.setRemoteAddr(remoteAddr);
             tempUrl += "(" + remoteAddr + ")";
         }
         MDC.put("url", tempUrl);

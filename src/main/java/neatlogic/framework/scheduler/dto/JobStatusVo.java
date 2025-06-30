@@ -4,6 +4,8 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.scheduler.core.SchedulerManager;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -30,6 +32,9 @@ public class JobStatusVo extends BaseEditorVo {
 	@EntityField(name = "执行次数",
 			type = ApiParamType.INTEGER)
 	private Integer execCount = 0;
+	@EntityField(name = "是否已加载",
+			type = ApiParamType.INTEGER)
+	private Integer isLoad;
 
 	@JSONField(serialize = false)
 	private Integer needAudit;
@@ -99,5 +104,22 @@ public class JobStatusVo extends BaseEditorVo {
 
 	public void setHandler(String handler) {
 		this.handler = handler;
+	}
+
+	public Integer getIsLoad() {
+		if (isLoad == null) {
+			if (StringUtils.isNotBlank(this.jobName) && StringUtils.isNotBlank(this.jobGroup)) {
+				if (SchedulerManager.checkJobIsLoad(this.jobName, this.jobGroup)) {
+					isLoad = 1;
+				} else {
+					isLoad = 0;
+				}
+			}
+		}
+		return isLoad;
+	}
+
+	public void setIsLoad(Integer isLoad) {
+		this.isLoad = isLoad;
 	}
 }

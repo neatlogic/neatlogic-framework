@@ -46,12 +46,13 @@ import java.util.stream.Collectors;
 
 @RootComponent
 public class SchedulerManager extends ModuleInitializedListenerBase {
-    private final Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
 
     private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
     private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
     private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
     private static final ReentrantLock GLOBAL_LOCK = new ReentrantLock();
+    private static SchedulerFactoryBean staticSchedulerFactoryBean;
 
     @Resource
     private TenantMapper tenantMapper;
@@ -64,6 +65,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
 
     protected void myInit() {
         tenantList = tenantMapper.getAllActiveTenant();
+        staticSchedulerFactoryBean = schedulerFactoryBean;
     }
 
     public static IJob getHandler(String className) {
@@ -85,6 +87,19 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     public boolean checkJobIsExists(String jobName, String jobGroup) {
         JobKey jobKey = new JobKey(jobName, jobGroup);
         Scheduler scheduler = schedulerFactoryBean.getScheduler();
+        try {
+            if (scheduler.getJobDetail(jobKey) != null) {
+                return true;
+            }
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
+    public static boolean checkJobIsLoad(String jobName, String jobGroup) {
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+        Scheduler scheduler = staticSchedulerFactoryBean.getScheduler();
         try {
             if (scheduler.getJobDetail(jobKey) != null) {
                 return true;

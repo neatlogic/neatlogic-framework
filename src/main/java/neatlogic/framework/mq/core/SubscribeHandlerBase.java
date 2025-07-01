@@ -32,7 +32,7 @@ public abstract class SubscribeHandlerBase implements ISubscribeHandler {
     public final void onMessage(SubscribeVo subscribeVo, Object message) {
         //由于这是通过MQ监听触发的线程，因此需要自己初始化TenantContext
         TenantContext.init();
-        TenantContext.get().switchTenant(subscribeVo.getTenantUuid()).setUseMasterDatabase(false);
+        TenantContext.get().switchTenant(subscribeVo.getTenantUuid());
         //从DB再查一次订阅信息，检查订阅是否仍然有效
         SubscribeVo checkSubscribeVo = mqSubscribeMapper.getSubscribeByName(subscribeVo.getName());
         //如果订阅已经被删除或被禁用，则直接从删除订阅

@@ -1,15 +1,15 @@
 package neatlogic.framework.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 @Service
 public class TenantServiceImpl implements TenantService {
 
-	@Autowired
+	@Resource
 	private TenantMapper tenantMapper;
 
 	@Override

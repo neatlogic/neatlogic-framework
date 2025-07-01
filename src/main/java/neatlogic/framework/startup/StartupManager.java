@@ -43,12 +43,6 @@ import java.util.stream.Collectors;
 public class StartupManager extends ModuleInitializedListenerBase {
     private static final Logger logger = LoggerFactory.getLogger(StartupManager.class);
 
-    private static final List<IStartup> startupList = new ArrayList<>();
-
-    public static List<IStartup> getStartupList() {
-        return startupList;
-    }
-
     @Resource
     private TenantMapper tenantMapper;
 
@@ -77,16 +71,15 @@ public class StartupManager extends ModuleInitializedListenerBase {
                     if (CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             for (TenantVo tenantVo : tenantList) {
-                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
+                                TenantContext.get().switchTenant(tenantVo.getUuid());
+                                UserContext.init(SystemUser.SYSTEM);
+
                                 List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
                                 List<String> groupList = activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList());
                                 //只有拥有当前模块权限的的租户才会执行startup
                                 if (!groupList.contains(moduleVo.getGroup())) {
                                     continue;
                                 }
-
-                                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
-                                UserContext.init(SystemUser.SYSTEM);
                                 try {
                                     int i = startup.executeForCurrentTenant();
                                     if (i != -999) {
@@ -99,24 +92,21 @@ public class StartupManager extends ModuleInitializedListenerBase {
                         }
                     }
                     //还原默认数据库neatlogic
-                    TenantContext.get().setUseMasterDatabase(true);
                     if (CollectionUtils.isNotEmpty(list)) {
                         for (IStartup startup : list) {
                             try {
                                 int i = startup.executeForAllTenant();
                                 if (i != -999) {
-                                    System.out.println("⚡" + $.t("common.startloadstartupjob", $.t(startup.getName()), "All Tenant"));
+                                    System.out.println("⚡" + $.t("common.startloadstartupjobforall", $.t(startup.getName())));
                                 }
                             } catch (Exception ex) {
                                 logger.error(ex.getMessage(), ex);
                             }
                         }
                     }
-                    TenantContext.get().setUseMasterDatabase(false);
                 }
             });
         }
-        startupList.addAll(list);
     }
 
 

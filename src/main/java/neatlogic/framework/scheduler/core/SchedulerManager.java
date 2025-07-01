@@ -22,7 +22,6 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
@@ -47,12 +46,13 @@ import java.util.stream.Collectors;
 
 @RootComponent
 public class SchedulerManager extends ModuleInitializedListenerBase {
-    private final Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(SchedulerManager.class);
 
     private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
     private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
     private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
     private static final ReentrantLock GLOBAL_LOCK = new ReentrantLock();
+    private static SchedulerFactoryBean staticSchedulerFactoryBean;
 
     @Resource
     private TenantMapper tenantMapper;
@@ -65,6 +65,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
 
     protected void myInit() {
         tenantList = tenantMapper.getAllActiveTenant();
+        staticSchedulerFactoryBean = schedulerFactoryBean;
     }
 
     public static IJob getHandler(String className) {
@@ -96,6 +97,19 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         return false;
     }
 
+    public static boolean checkJobIsLoad(String jobName, String jobGroup) {
+        JobKey jobKey = new JobKey(jobName, jobGroup);
+        Scheduler scheduler = staticSchedulerFactoryBean.getScheduler();
+        try {
+            if (scheduler.getJobDetail(jobKey) != null) {
+                return true;
+            }
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return false;
+    }
+
     /**
      * 加载定时作业，同时设置定时作业状态和锁
      *
@@ -105,7 +119,6 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     public Date loadJob(JobObject jobObject) {
         // 如果结束时间比当前时间早，就不加载了
         if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
-            unloadJob(jobObject);
             return null;
         }
         try {
@@ -151,7 +164,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 JobDetail jobDetail = JobBuilder.newJob(clazz).withIdentity(jobKey).build();
                 jobDetail.getJobDataMap().put("jobObject", jobObject);
                 // 写入jobstatus (如果数据库不存在job，则需先insert job到数据库，再创建job,否则jobBase 先触发execute，会导致跳过第一次执行)
-                JobStatusVo jobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup);
+                JobStatusVo jobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup, System.currentTimeMillis());
                 if (jobStatusVo == null) {
                     jobStatusVo = new JobStatusVo();
                     jobStatusVo.setJobName(jobName);
@@ -182,7 +195,6 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         }
-        unloadJob(jobObject);
         return null;
     }
 
@@ -230,16 +242,15 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {
             System.out.println("⚡" + $.t("common.startloadschedulejob", context.getModuleId()));
             for (TenantVo tenantVo : tenantList) {
-                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
+                TenantContext.get().switchTenant(tenantVo.getUuid());//.setUseMasterDatabase(false);
                 List<ModuleGroupVo> activeModuleGroupList = TenantContext.get().getActiveModuleGroupList();
-                TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(true);
+                //TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(true);
                 if (activeModuleGroupList.stream().map(ModuleGroupVo::getGroup).collect(Collectors.toList()).contains(context.getGroup())) {
                     CachedThreadPool.execute(new ScheduleLoadJobRunner(tenantVo.getUuid(), tmpJobHandlerList));
                     System.out.println("  ✓" + tenantVo.getName());
                 }
             }
         }
-        // TODO 这里要增加清理job_status的逻辑
     }
 
     class ScheduleLoadJobRunner extends NeatLogicThread {
@@ -258,8 +269,9 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             String oldThreadName = Thread.currentThread().getName();
             try {
                 // 切换租户数据源
-                TenantContext.get().switchTenant(tenantUuid).setUseMasterDatabase(false);
-                schedulerMapper.deleteJobLockByServerId(Config.SCHEDULE_SERVER_ID);
+                TenantContext.get().switchTenant(tenantUuid);
+                //可能存在误删，先注释
+                //schedulerMapper.deleteJobLockByServerId(Config.SCHEDULE_SERVER_ID);
                 UserContext.init(SystemUser.SYSTEM);
                 for (IJob jobHandler : jobHandlerList) {
                     jobHandler.initJob(tenantUuid);

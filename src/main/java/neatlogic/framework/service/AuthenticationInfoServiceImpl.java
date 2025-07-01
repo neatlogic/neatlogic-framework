@@ -19,13 +19,13 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.dto.TeamVo;
-import neatlogic.framework.util.FreemarkerUtil;
-import neatlogic.framework.util.RunScriptUtil;
+import neatlogic.framework.util.AviatorEvaluatorUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,8 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author linbq
@@ -46,7 +45,6 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
     private TeamMapper teamMapper;
     private RoleMapper roleMapper;
     static Logger logger = LoggerFactory.getLogger(AuthenticationInfoServiceImpl.class);
-    Pattern pattern = Pattern.compile("\\$\\{DATA\\.(.*?)}");
 
     @Resource
     public void setTeamMapper(TeamMapper _teamMapper) {
@@ -177,18 +175,17 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         if (MapUtils.isEmpty(originHeader)) {
             originHeader = getHeaders();
         }
+        //只保留符合指定前缀的header
+        if (MapUtils.isNotEmpty(originHeader)) {
+            headerSet.addAll(originHeader.keySet().stream().filter(o -> o.startsWith(Config.HEADER_RULE_PREFIX())).collect(Collectors.toSet()));
+        }
         List<String> validRoleUuidList = new ArrayList<>();
         List<RoleVo> roleVos = roleMapper.getRoleByUuidList(roleUuidList);
         for (RoleVo ro : roleVos) {
             String rule = ro.getRule();
             if (StringUtils.isNotBlank(rule)) {
-                Matcher matcher = pattern.matcher(rule);
-                while (matcher.find()) {
-                    headerSet.add(matcher.group(1));
-                }
                 try {
-                    rule = FreemarkerUtil.transform(originHeader, rule);
-                    if (RunScriptUtil.runScript(rule)) {
+                    if (AviatorEvaluatorUtil.evaluateBoolean(rule, originHeader)) {
                         validRoleUuidList.add(ro.getUuid());
                     }
                 } catch (Exception e) {

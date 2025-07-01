@@ -17,11 +17,12 @@
 
 package neatlogic.framework.heartbeat.dao.mapper;
 
+import neatlogic.framework.dao.aop.UseMasterDatabase;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 
+@UseMasterDatabase
 public interface TenantServerMapper {
-
     int insertTenantServerRunTime(@Param("serverId") Integer serverId, @Param("startTime") Date startTime);
 }

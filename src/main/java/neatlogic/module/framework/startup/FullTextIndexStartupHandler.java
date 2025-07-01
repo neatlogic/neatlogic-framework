@@ -17,18 +17,25 @@
 
 package neatlogic.module.framework.startup;
 
+import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.fulltextindex.core.FullTextIndexHandlerFactory;
 import neatlogic.framework.fulltextindex.core.IFullTextIndexHandler;
+import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexDictMapper;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexTypeVo;
+import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo;
+import neatlogic.framework.fulltextindex.utils.FullTextIndexUtil;
 import neatlogic.framework.startup.StartupBase;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Component
 public class FullTextIndexStartupHandler extends StartupBase {
 
+    @Resource
+    private FullTextIndexDictMapper fullTextIndexDictMapper;
 
     /**
      * 作业名称
@@ -53,6 +60,18 @@ public class FullTextIndexStartupHandler extends StartupBase {
                     handler.initialTerms(null);
                 }
             }
+        }
+        //补充自定义字典
+        BasePageVo pageVo = new BasePageVo();
+        pageVo.setCurrentPage(1);
+        pageVo.setPageSize(100);
+        List<FullTextIndexWordVo> wordList = fullTextIndexDictMapper.searchDictionary(pageVo);
+        while (CollectionUtils.isNotEmpty(wordList)) {
+            for (FullTextIndexWordVo wordVo : wordList) {
+                FullTextIndexUtil.addWord(wordVo.getWord());
+            }
+            pageVo.setCurrentPage(pageVo.getCurrentPage() + 1);
+            wordList = fullTextIndexDictMapper.searchDictionary(pageVo);
         }
         return 0;
     }

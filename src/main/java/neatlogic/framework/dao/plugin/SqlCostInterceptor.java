@@ -21,6 +21,7 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -92,6 +93,7 @@ public class SqlCostInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         long starttime = 0;
         SqlAuditVo sqlAuditVo = null;
+        boolean hasCacheFirstLevel = false;
         try {
             if (!SqlIdMap.isEmpty()) {
                 // Object target = invocation.getTarget();
@@ -120,14 +122,40 @@ public class SqlCostInterceptor implements Interceptor {
                     //System.out.println(sql);
                     sqlAuditVo.setSql(sql);
                     sqlAuditVo.setId(sqlId);
+                    if (Objects.equals(invocation.getMethod().getName(), "query")) {
+                        CacheKey key = null;
+                        Executor executor = (Executor) invocation.getTarget();
+                        Object[] args = invocation.getArgs();
+                        if (args.length > 4) {
+                            key = (CacheKey) args[4];
+                        } else if (args.length == 4) {
+                            Object parameterObject = args[1];
+                            RowBounds rowBounds = (RowBounds) args[2];
+                            key = executor.createCacheKey(mappedStatement, parameterObject, rowBounds, mappedStatement.getBoundSql(parameterObject));
+                        }
+                        if (executor.isCached(mappedStatement, key)) {
+                            hasCacheFirstLevel = true;
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
+        DataSchemaInterceptor.QUERY_FROM_DATABASE_INSTANCE.set(false);
         // 执行完上面的任务后，不改变原有的sql执行过程
         Object val = invocation.proceed();
         if (sqlAuditVo != null) {
+            if (DataSchemaInterceptor.QUERY_FROM_DATABASE_INSTANCE.get()) {
+                // sql语句被执行，没有使用到缓存
+                sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
+            } else {
+                if (hasCacheFirstLevel) {
+                    sqlAuditVo.setUseCacheLevel("一级缓存");
+                } else {
+                    sqlAuditVo.setUseCacheLevel("二级缓存");
+                }
+            }
             sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
             sqlAuditVo.setRunTime(new Date());
 

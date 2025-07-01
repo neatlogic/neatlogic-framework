@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.fulltextindex.dto.fulltextindex;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.fulltextindex.utils.FullTextIndexUtil;
 import neatlogic.framework.restful.annotation.EntityField;
@@ -40,6 +41,7 @@ public class FullTextIndexVo {
     private List<FullTextIndexWordOffsetVo> wordOffsetVoList;
     private final Map<String, WordVo> fieldContentMap = new HashMap<>();
     private Map<String, List<FullTextIndexWordOffsetVo>> wordOffsetMap = new HashMap<>();
+    private JSONObject dataObj;
 
     public FullTextIndexVo() {
     }
@@ -47,6 +49,12 @@ public class FullTextIndexVo {
     public FullTextIndexVo(Long _targetId, String _targetType) {
         targetId = _targetId;
         targetType = _targetType;
+    }
+
+    public FullTextIndexVo(Long _targetId, String _targetType, JSONObject _dataObj) {
+        targetId = _targetId;
+        targetType = _targetType;
+        dataObj = _dataObj;
     }
 
     public Long getTargetId() {
@@ -196,6 +204,14 @@ public class FullTextIndexVo {
 
     public void setTargetField(String targetField) {
         this.targetField = targetField;
+    }
+
+    public JSONObject getDataObj() {
+        return dataObj;
+    }
+
+    public void setDataObj(JSONObject dataObj) {
+        this.dataObj = dataObj;
     }
 
     public Map<String, WordVo> getFieldContentMap() {

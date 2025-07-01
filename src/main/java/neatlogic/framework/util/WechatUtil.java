@@ -16,21 +16,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.wechat.WechatGetUserIdFailedException;
-import neatlogic.framework.integration.authentication.enums.AuthenticateType;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class WechatUtil {
     private static final Logger logger = LoggerFactory.getLogger(WechatUtil.class);
@@ -47,7 +38,7 @@ public class WechatUtil {
         //优先使用缓存的token
         long ctime = System.currentTimeMillis();
         if (TOKEN != null && ctime < (TOKEN.getCtime() + TOKEN.getExpiresIn() * 1000L)) {
-            logger.info("---> re-use token in cache : " + TOKEN.toString());
+            logger.info("---> re-use token in cache : {}", TOKEN.toString());
             return TOKEN;
         }
         AccessToken accessToken = null;
@@ -61,13 +52,13 @@ public class WechatUtil {
                 accessToken.setExpiresIn(jsonObject.getInteger("expires_in"));
                 accessToken.setCtime(ctime);
                 TOKEN = accessToken;
-                logger.info("get token:::" + jsonObject.toJSONString());
+                logger.info("get token:::{}", jsonObject.toJSONString());
             } else {
                 // 获取token失败
                 throw new RuntimeException(String.format("get accessToken return is empty, errcode:{%s} errmsg:{%s}", jsonObject.getInteger("errcode"), jsonObject.getString("errmsg")));
             }
         } else {
-            logger.error(String.format("HttpRequestUtil get accessToken failed ,url:'%s' ", requestUrl));
+            logger.error("HttpRequestUtil get accessToken failed ,url:'{}' ", requestUrl);
             throw new RuntimeException("HttpRequestUtil get accessToken failed");
         }
         return accessToken;
@@ -95,12 +86,12 @@ public class WechatUtil {
         if (MapUtils.isNotEmpty(jsonobject)) {
             UserId = jsonobject.getString("UserId");
             if (StringUtils.isNotBlank(UserId)) {
-                logger.info("获取信息成功，o(∩_∩)o ————UserID:" + UserId);
+                logger.info("获取信息成功，o(∩_∩)o ————UserID:{}", UserId);
             } else {
                 int errcode = jsonobject.getInteger("errcode");
                 String errmsg = jsonobject.getString("errmsg");
-                logger.error("url：" + url);
-                logger.error("错误码：" + errcode + "————" + "错误信息：" + errmsg);
+                logger.error("url：{}", url);
+                logger.error("错误码：{}————错误信息：{}", errcode, errmsg);
                 throw new WechatGetUserIdFailedException(String.format("wechat getUserId api return userId is blank! %s---%s", errcode, errmsg));
             }
         } else {
@@ -121,7 +112,7 @@ public class WechatUtil {
         String forwardURL = "";
         content = content.trim();
         //插件个性化跳转url，存放模板内插件内部处理
-        if(content.indexOf("@link:") > -1 ){
+        if(content.contains("@link:")){
             forwardURL = content.substring(content.lastIndexOf("@link:")+6 , content.length());
 //            String corpID = Config.WECHAT_CORP_ID();
             forwardURL = forwardURL.replace("CorpID", corpID);

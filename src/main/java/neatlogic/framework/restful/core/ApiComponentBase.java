@@ -16,14 +16,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.restful.core;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.FieldValidResultVo;
 import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.core.ApiFieldValidNotFoundException;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -31,15 +29,11 @@ import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements MyApiComponent {
-
-    @Resource
-    private ApiLongCacheMapper apiLongCacheMapper;
 
     public int needAudit() {
         return 0;
@@ -119,12 +113,12 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     if (response != null) {
                         CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
                         if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
-                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() +"="+ cacheControlVo.getMaxAge());
+                            response.setHeader("Cache-Control", cacheControlVo.getCacheControlType().getValue() + "=" + cacheControlVo.getMaxAge());
                         }
                     }
                 }
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException |
-                    SecurityException ex) {
+                     SecurityException ex) {
                 validApi(this.getClass(), paramObj, apiVo, JSONObject.class);
                 boolean canRun = false;
                 if (apiVo.getIsActive().equals(0)) {
@@ -150,7 +144,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
                     }
                 }
             } catch (Exception ex) {
-                if (ex.getCause() != null && ex.getCause() instanceof ApiRuntimeException) {
+                if (ex.getCause() instanceof ApiRuntimeException) {
                     throw new ApiRuntimeException(ex.getCause().getMessage(), ex.getCause());
                 } else {
                     throw ex;
@@ -158,9 +152,9 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             }
         } catch (Exception e) {
             Throwable target = e;
-            if (TenantContext.get() != null) {
+           /* if (TenantContext.get() != null) {
                 TenantContext.get().setUseMasterDatabase(false);//防止上游异常导致后续审计没有还原原来的租户
-            }
+            }*/
             //如果是反射抛得异常，则需循环拆包，把真实得异常类找出来
             while (target instanceof InvocationTargetException) {
                 target = ((InvocationTargetException) target).getTargetException();
@@ -174,12 +168,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
         } finally {
             long endTime = System.currentTimeMillis();
             if (!apiVo.getModuleId().equals("master")) {
-                ApiVo apiConfigVo = apiLongCacheMapper.getApiByToken(apiVo.getToken());
-                // 如果没有配置，则使用默认配置
-                if (apiConfigVo == null) {
-                    apiConfigVo = apiVo;
-                }
-                if (apiConfigVo.getNeedAudit() != null && apiConfigVo.getNeedAudit().equals(1)) {
+                if (apiVo.getNeedAudit() != null && apiVo.getNeedAudit().equals(1)) {
                     saveAudit(apiVo, paramObj, result, error, startTime, endTime);
                 }
             }

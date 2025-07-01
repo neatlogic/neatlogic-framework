@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.fulltextindex.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -91,6 +92,10 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         createIndex(targetId, isSync, null);
     }
 
+    protected final void createIndex(Long targetId, JSONObject dataObj, boolean isSync) {
+        createIndex(targetId, isSync, null, dataObj);
+    }
+
     /**
      * 给重建索引使用的方法，以同步方式执行索引创建
      *
@@ -98,9 +103,19 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
      * @param isSync   是否同步
      */
     protected final void createIndex(Long targetId, boolean isSync, Semaphore lock) {
+        this.createIndex(targetId, isSync, lock, null);
+    }
+
+    /**
+     * 给重建索引使用的方法，以同步方式执行索引创建
+     *
+     * @param targetId 目标id
+     * @param isSync   是否同步
+     */
+    protected final void createIndex(Long targetId, boolean isSync, Semaphore lock, JSONObject dataObj) {
         AfterTransactionJob<FullTextIndexVo> job = new AfterTransactionJob<>("FULLTEXTINDEX-CREATE-" + this.getType().getType().toUpperCase(Locale.ROOT) + "-" + targetId);
         String moduleId = this.getModuleId();
-        job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> {
+        job.execute(new FullTextIndexVo(targetId, this.getType().getType(), dataObj), fullTextIndexVo -> {
             //System.out.println("创建索引");
             //删除索引
             fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo, moduleId);
@@ -192,6 +207,11 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
     @Override
     public final void createIndex(Long targetId) {
         createIndex(targetId, false, null);
+    }
+
+    @Override
+    public final void createIndex(Long targetId, JSONObject dataObj) {
+        createIndex(targetId, false, null, dataObj);
     }
 
     @Override

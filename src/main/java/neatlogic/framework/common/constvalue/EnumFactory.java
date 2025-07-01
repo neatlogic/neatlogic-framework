@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.common.dto.ValueTextVo;
+import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
@@ -49,9 +50,12 @@ public class EnumFactory {
                     } else {
                         instance = c.newInstance();
                     }
-                    Object name = c.getMethod("getEnumName").invoke(instance);
-                    if (name != null && StringUtils.isNotBlank(name.toString())) {
-                        namedEnumNameMap.put(name.toString(), c.getName());
+                    Object name = c.getMethod("getEnumName").invoke(instance).toString();
+                    if (name != null) {
+                        String enumName = I18nUtils.getStaticMessage(name.toString());
+                        if (StringUtils.isNotBlank(enumName)) {
+                            namedEnumNameMap.put(enumName, c.getName());
+                        }
                     }
                 } catch (Exception ex) {
                     logger.error(ex.getMessage(), ex);
@@ -77,10 +81,13 @@ public class EnumFactory {
                             } catch (Exception ignored) {
 
                             }
-                            if (name != null && StringUtils.isNotBlank(name.toString())) {
-                                //随便找到一个实现类能返回名称就退出循环，正常情况相爱getEnumName应该写在接口的default方法里。
-                                namedEnumNameMap.put(name.toString(), c.getName());
-                                break;
+                            if (name != null) {
+                                String enumName =  I18nUtils.getStaticMessage(name.toString());
+                                if (StringUtils.isNotBlank(enumName)) {
+                                    //随便找到一个实现类能返回名称就退出循环，正常情况相爱getEnumName应该写在接口的default方法里。
+                                    namedEnumNameMap.put(enumName, c.getName());
+                                    break;
+                                }
                             }
                         }
                     }

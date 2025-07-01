@@ -1,9 +1,12 @@
 package neatlogic.framework.dao.mapper;
 
+import neatlogic.framework.dao.aop.UseMasterDatabase;
+
 import java.util.List;
 
+@UseMasterDatabase
 public interface ModuleMapper {
 
-	public List<String> getModuleGroupListByTenantUuid(String tenantUuid);
+    List<String> getModuleGroupListByTenantUuid(String tenantUuid);
 
 }

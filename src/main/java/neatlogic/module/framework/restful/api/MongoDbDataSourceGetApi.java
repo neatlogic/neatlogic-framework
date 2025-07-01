@@ -22,13 +22,14 @@ import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentBase;
 import neatlogic.framework.restful.dao.mapper.NeatLogicMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 
 @Service
 @OperationType(type = OperationTypeEnum.SEARCH)
 public class MongoDbDataSourceGetApi extends PrivateApiComponentBase {
-    @Autowired
+    @Resource
     NeatLogicMapper neatlogicMapper;
 
     @Override
@@ -55,9 +56,6 @@ public class MongoDbDataSourceGetApi extends PrivateApiComponentBase {
     @Override
     public Object myDoService(JSONObject jsonObj) throws Exception {
         String tenant = TenantContext.get().getTenantUuid();
-        TenantContext.get().setUseMasterDatabase(true);
-        MongoDbVo mongodbVo = neatlogicMapper.getMongodbByTenant(tenant);
-        TenantContext.get().setUseMasterDatabase(false);
-        return mongodbVo;
+        return neatlogicMapper.getMongodbByTenant(tenant);
     }
 }

@@ -50,6 +50,7 @@ public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
         FULLTEXT_INDEX_MODULE_MAP.add("cmdb");
         FULLTEXT_INDEX_MODULE_MAP.add("autoexec");
         FULLTEXT_INDEX_MODULE_MAP.add("rdm");
+        FULLTEXT_INDEX_MODULE_MAP.add("framework");
     }
 
     @Override
@@ -60,7 +61,7 @@ public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
                 @Override
                 protected void execute() {
                     for (TenantVo tenantVo : tenantList) {
-                        TenantContext.get().switchTenant(tenantVo.getUuid()).setUseMasterDatabase(false);
+                        TenantContext.get().switchTenant(tenantVo.getUuid());
                         fullTextIndexSchemaMapper.createFullTextIndexTargetTable(moduleId);
                         fullTextIndexSchemaMapper.createFullTextIndexContentTable(moduleId);
                         fullTextIndexSchemaMapper.createFullTextIndexOffsetTable(moduleId);

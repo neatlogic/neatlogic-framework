@@ -19,10 +19,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.constvalue.InputFrom;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.common.util.RC4Util;
@@ -38,7 +40,7 @@ import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
-import neatlogic.framework.restful.dao.mapper.ApiLongCacheMapper;
+import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
@@ -74,22 +76,40 @@ public class AnonymousApiDispatcher {
     Logger logger = LoggerFactory.getLogger(AnonymousApiDispatcher.class);
 
     @Resource
-    private ApiLongCacheMapper apiLongCacheMapper;
+    private ApiMapper apiMapper;
 
     @Resource
     private ApiAccessCountService apiAccessCountService;
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+        InputFrom inputFrom = null;
+        String source = request.getHeader("source");
+        if (StringUtils.isNotBlank(source)) {
+            inputFrom = InputFrom.get(source);
+        }
+        if (inputFrom == null) {
+            inputFrom = InputFrom.UNKNOWN;
+        }
+        InputFromContext.init(inputFrom);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         RequestContext.init(request, token, response);
+        ApiVo dbApiVo = apiMapper.getApiByToken(token);
         if (interfaceVo == null) {
-            interfaceVo = apiLongCacheMapper.getApiByToken(token);
+            if (dbApiVo != null) {
+                interfaceVo = dbApiVo;
+            }
             if (interfaceVo == null || !interfaceVo.getIsActive().equals(1)) {
                 throw new ApiNotFoundException(token);
             }
-        } else if (interfaceVo.getPathVariableObj() != null) {
-            // 融合路径参数
-            paramObj.putAll(interfaceVo.getPathVariableObj());
+        } else {
+            if (interfaceVo.getPathVariableObj() != null) {
+                // 融合路径参数
+                paramObj.putAll(interfaceVo.getPathVariableObj());
+            }
+            if (dbApiVo != null) {
+                interfaceVo.setQps(dbApiVo.getQps());
+                interfaceVo.setNeedAudit(dbApiVo.getNeedAudit());
+            }
         }
 
         // 判断是否master模块接口，如果是不允许访问
@@ -102,10 +122,6 @@ public class AnonymousApiDispatcher {
             throw new ComponentNotFoundException(interfaceVo.getHandler());
         }
         Double qps = interfaceVo.getQps();
-        ApiVo apiVo = apiLongCacheMapper.getApiByToken(token);
-        if (apiVo != null) {
-            qps = apiVo.getQps();
-        }
         RequestContext.get().setApiRate(qps);
         //从令牌桶拿到令牌才能继续访问，否则直接返回，提示“系统繁忙，请稍后重试”
         if (!RateLimiterTokenBucket.tryAcquire()) {

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.restful.core.publicapi;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
@@ -169,7 +170,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setType(ApiType.OBJECT.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
+                initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
             }
         }
 
@@ -187,7 +188,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setType(ApiType.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
+                initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
             }
         }
 
@@ -205,7 +206,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setType(ApiType.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSONObject.parseObject(JSONObject.toJSONString(restComponentVo)), context.getId());
+                initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
             }
         }
 
@@ -294,7 +295,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
         @Override
         protected void execute() {
             // 切换租户数据源
-            TenantContext.get().switchTenant(tenantUuid).setUseMasterDatabase(false);
+            TenantContext.get().switchTenant(tenantUuid);//.setUseMasterDatabase(false);
             for (ApiVo apiVo : apiTokenList) {
                 //ApiVo api = apiMapper.getApiByToken(apiVo.getToken());
                 //if (api == null) {

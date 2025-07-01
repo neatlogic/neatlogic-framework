@@ -289,7 +289,7 @@ public class ScriptRunnerManager {
             statement.setInt(7, changelogAuditVo.getIgnored());
             statement.setString(8, changelogAuditVo.getErrorMsg());
             statement.setInt(9, changelogAuditVo.getSqlStatus());
-            statement.setInt(10, changelogAuditVo.getIgnored());
+            statement.setInt(10, 1);//第二次启动自动忽略
             statement.execute();
         } catch (Exception ex) {
             throw new Exception(ex);

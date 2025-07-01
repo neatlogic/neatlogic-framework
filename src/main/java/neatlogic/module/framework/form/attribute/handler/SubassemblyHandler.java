@@ -11,6 +11,7 @@ import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
+import neatlogic.framework.util.FormUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,11 @@ public class SubassemblyHandler extends FormHandlerBase {
         } else {
             return "";
         }
+    }
+
+    @Override
+    public Object getEnhanceReadabilityValue(Object originalValue, FormAttributeVo formAttributeVo) {
+        return FormUtil.getEnhanceReadabilityValue(originalValue, formAttributeVo);
     }
 
     @Override

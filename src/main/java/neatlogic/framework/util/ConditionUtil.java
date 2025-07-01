@@ -21,7 +21,7 @@ public class ConditionUtil {
                 JSONObject paramObj = new JSONObject();
                 paramObj.put("data", paramData);
                 Object returnValue = JavascriptUtil.runScript(paramObj, expression);
-                return Boolean.parseBoolean(returnValue.toString());
+                return Boolean.parseBoolean(returnValue != null ? returnValue.toString() : "false");
                 //JavascriptUtil.runExpression(paramData,)
             }
             return false;

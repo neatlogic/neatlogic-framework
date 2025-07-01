@@ -15,7 +15,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.fulltextindex.dto.fulltextindex;
 
+import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -24,9 +26,18 @@ public class FullTextIndexWordVo implements Serializable {
     private Long id;
     private String word;
     private String type;
+    private String wordHash;
 
-    public FullTextIndexWordVo() {
 
+    public String getWordHash() {
+        if (wordHash == null && StringUtils.isNotBlank(word)) {
+            wordHash = Md5Util.encryptMD5(word);
+        }
+        return wordHash;
+    }
+
+    public void setWordHash(String wordHash) {
+        this.wordHash = wordHash;
     }
 
     public FullTextIndexWordVo(String _word, String _type) {

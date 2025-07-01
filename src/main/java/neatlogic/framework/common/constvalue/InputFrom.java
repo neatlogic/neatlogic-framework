@@ -24,6 +24,8 @@ import java.util.List;
 
 public enum InputFrom implements IEnum {
     PAGE("page", "nfcc.inputfrom.page"),
+    PC("pc", "nfcc.inputfrom.pc"),
+    MOBILE("mobile", "nfcc.inputfrom.mobile"),
     IMPORT("import", "nfcc.inputfrom.excel"),
     RESTFUL("restful", "nfcc.inputfrom.api"),
     ITSM("itsm", "nfcc.inputfrom.itsm"),
@@ -32,6 +34,7 @@ public enum InputFrom implements IEnum {
     AUTOEXEC("autoexec", "nfcc.inputfrom.autocollect"),
     RELATIVE("relative", "nfcc.inputfrom.relative"),
     DIAGRAN("diagram", "term.diagram.name"),
+    EVENT("event", "事件"),
     MQ("mq", "消息队列");
 
     private final String value;

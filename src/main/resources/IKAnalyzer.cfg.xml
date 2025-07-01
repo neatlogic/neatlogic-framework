@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 <properties>
     <comment>IK Analyzer 扩展配置</comment>
     <!--用户可以在这里配置自己的扩展字典 -->
-    <entry key="ext_dict">place.dic;it.dic;neatlogic.dic;</entry>
+    <entry key="ext_dict">place.dic;it.dic;neatlogic.dic;custom.dic</entry>
 
     <!--用户可以在这里配置自己的扩展停止词字典-->
     <entry key="ext_stopwords">stopword.dic;</entry>

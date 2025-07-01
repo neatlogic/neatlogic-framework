@@ -177,12 +177,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </update>
 
     <insert id="insertLock" parameterType="neatlogic.framework.dto.globallock.GlobalLockVo">
-        INSERT INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `is_lock`, `description`, `fcd`)
+        INSERT ignore INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `is_lock`, `description`, `fcd`)
         VALUES (#{id}, #{uuid}, #{key}, #{handler}, #{handlerParamStr}, #{isLock}, #{description}, now())
     </insert>
 
     <insert id="insertLockPk" parameterType="java.lang.String">
-        INSERT IGNORE INTO `global_lock_pk` (`lock_uuid`)
+        INSERT ignore INTO `global_lock_pk` (`lock_uuid`)
         VALUES (#{value})
     </insert>
 

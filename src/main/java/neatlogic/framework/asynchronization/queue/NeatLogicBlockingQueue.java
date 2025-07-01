@@ -24,18 +24,18 @@ import java.util.concurrent.BlockingQueue;
 
 public class NeatLogicBlockingQueue<T> {
 
-    private final BlockingQueue<Task<T>> blockingQueue;
+    private final BlockingQueue<QueueTask<T>> blockingQueue;
 
-    public NeatLogicBlockingQueue(BlockingQueue<Task<T>> _blockingQueue) {
+    public NeatLogicBlockingQueue(BlockingQueue<QueueTask<T>> _blockingQueue) {
         this.blockingQueue = _blockingQueue;
     }
 
     public boolean offer(T t) {
-        return blockingQueue.offer(new Task<>(t));
+        return blockingQueue.offer(new QueueTask<>(t));
     }
 
     public T take() throws InterruptedException {
-        Task<T> task = blockingQueue.take();
+        QueueTask<T> task = blockingQueue.take();
         TenantContext tenantContext = TenantContext.get();
         UserContext userContext = task.getUserContext();
         if (tenantContext != null) {
@@ -47,31 +47,5 @@ public class NeatLogicBlockingQueue<T> {
             UserContext.init(userContext);
         }
         return task.getT();
-    }
-
-    private static class Task<T> {
-        private final T t;
-        private final String tenantUuid;
-        private UserContext userContext;
-
-        public Task(T t) {
-            this.t = t;
-            this.tenantUuid = TenantContext.get().getTenantUuid();
-            if (UserContext.get() != null) {
-                this.userContext = UserContext.get().copy();
-            }
-        }
-
-        public T getT() {
-            return t;
-        }
-
-        public UserContext getUserContext() {
-            return userContext;
-        }
-
-        public String getTenantUuid() {
-            return tenantUuid;
-        }
     }
 }

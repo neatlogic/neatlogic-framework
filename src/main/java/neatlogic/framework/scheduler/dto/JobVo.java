@@ -180,5 +180,4 @@ public class JobVo extends BasePageVo {
         }
         return 0;
     }
-
 }

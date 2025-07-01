@@ -17,6 +17,7 @@ package neatlogic.framework.fulltextindex.utils;
 
 import neatlogic.framework.fulltextindex.core.FullTextSlicerFactory;
 import neatlogic.framework.fulltextindex.core.IFullTextSlicer;
+import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexDictMapper;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordOffsetVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,8 @@ import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.wltea.analyzer.cfg.DefaultConfig;
 import org.wltea.analyzer.dic.Dictionary;
 import org.wltea.analyzer.lucene.IKAnalyzer;
@@ -39,10 +42,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Component
 public class FullTextIndexUtil {
     static Logger logger = LoggerFactory.getLogger(FullTextIndexUtil.class);
     private static final Analyzer smartAnalyzer = new IKAnalyzer(true);//分词细一点
     //private static final Analyzer termAnalyzer = new IKAnalyzer(true);//分词粗一点
+    private static FullTextIndexDictMapper fullTextIndexDictMapper;
+    private Long currentDictionaryWordId;
+
+    @Autowired
+    public FullTextIndexUtil(FullTextIndexDictMapper _fullTextIndexDictMapper) {
+        fullTextIndexDictMapper = _fullTextIndexDictMapper;
+    }
 
     static {
         //初始化字典，便于后面动态增加词
@@ -63,8 +74,6 @@ public class FullTextIndexUtil {
             if (CollectionUtils.isNotEmpty(wordList)) {
                 Set<String> newWordList = new HashSet<>();
                 for (String word : wordList) {
-                    //word = word.replace("_", "");
-                    //word = word.replace("-", "");
                     String[] newWords = word.split("\\s+");
                     for (String w : newWords) {
                         if (StringUtils.isNotBlank(w) && StringUtils.isNotBlank(w.trim())) {
@@ -101,6 +110,16 @@ public class FullTextIndexUtil {
                 Dictionary dictionary = Dictionary.getSingleton();
                 dictionary.addWords(newWordList);
             }
+        }
+    }
+
+    /*
+    刷新自定义字典
+     */
+    private void refreshDictionary() {
+        Long newMaxId = fullTextIndexDictMapper.getMaxDictionaryWordId();
+        if (newMaxId != null && newMaxId > currentDictionaryWordId) {
+
         }
     }
 
@@ -206,7 +225,6 @@ public class FullTextIndexUtil {
             smartStream.end();
             smartStream.close();
 
-
             //额外的分词器
             List<IFullTextSlicer> slicerList = FullTextSlicerFactory.getSlicerList();
             if (CollectionUtils.isNotEmpty(slicerList)) {
@@ -223,7 +241,7 @@ public class FullTextIndexUtil {
         /*dictionary.addWords(new ArrayList<String>() {{
             this.add("OBS-ABC华为云");
         }});*/
-        String content = "[ELCL]这是什么系统";
+        String content = "ELIS ABC,192::168.0.1,ABD-DE";
         //String content = "AABB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE.AA.BB.CC.DD.EE.FF.GG.HH.II.JJ.AA.BB.CC.DD.FF.EE.FF.EE";
         /*List<FullTextIndexWordOffsetVo> list = sliceWord(content);
         for (FullTextIndexWordOffsetVo vo : list) {

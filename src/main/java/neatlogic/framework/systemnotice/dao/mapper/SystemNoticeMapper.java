@@ -32,7 +32,7 @@ public interface SystemNoticeMapper {
 
     public List<SystemNoticeRecipientVo> getRecipientListByNoticeId(Long id);
 
-    public List<Long> getIssuedNoticeIdListByRecipientUuidList(List<String> uuidList);
+    public List<Long> getIssuedNoticeIdListByUserUuidAndRecipientUuidList(@Param("userUuid") String userUuid, @Param("recipientUuidList") List<String> recipientUuidList);
 
     public int searchIssuedNoticeCountByUserUuid(@Param("userUuid") String userUuid,@Param("noticeVo") SystemNoticeVo noticeVo);
 

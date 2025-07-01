@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexWordMapper">
-    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="300000" size="10"></cache>
+    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache" flushInterval="300000" size="10"></cache>
 
     <select id="getWordByWord" parameterType="java.lang.String"
             resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
@@ -24,7 +24,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `fulltextindex_word`
         WHERE word = #{value}
     </select>
-
 
     <insert id="insertWord" parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
         INSERT IGNORE

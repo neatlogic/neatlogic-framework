@@ -15,8 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.asynchronization.threadlocal;
 
+import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.restful.constvalue.RejectSource;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
 import javax.servlet.http.Cookie;
@@ -32,6 +34,7 @@ public class RequestContext implements Serializable {
     private static final ThreadLocal<RequestContext> instance = new ThreadLocal<>();
     private static final long serialVersionUID = -5420998728515359626L;
     private String url;
+    private String remoteAddr;
     private HttpServletRequest request;
     private HttpServletResponse response;
     //接口访问拒绝来源，租户或接口
@@ -51,6 +54,14 @@ public class RequestContext implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getRemoteAddr() {
+        return remoteAddr;
+    }
+
+    public void setRemoteAddr(String remoteAddr) {
+        this.remoteAddr = remoteAddr;
     }
 
     public HttpServletRequest getRequest() {
@@ -119,7 +130,16 @@ public class RequestContext implements Serializable {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
             context.setSqlAuditList(_requestContext.getSqlAuditList());
-            MDC.put("url", _requestContext.getUrl());
+            context.setRemoteAddr(_requestContext.getRemoteAddr());
+            String tempUrl = _requestContext.getUrl();
+            if (tempUrl == null) {
+                tempUrl = StringUtils.EMPTY;
+            }
+            String remoteAddr = _requestContext.getRemoteAddr();
+            if (StringUtils.isNotBlank(remoteAddr)) {
+                tempUrl += "(" + remoteAddr + ")";
+            }
+            MDC.put("url", tempUrl);
         }
         instance.set(context);
         return context;
@@ -137,7 +157,13 @@ public class RequestContext implements Serializable {
                 context.setLocale(Locale.getDefault());
             }
         }
-        MDC.put("url", url);
+        String tempUrl = url;
+        String remoteAddr = IpUtil.getIpAddr(request);
+        if (StringUtils.isNotBlank(remoteAddr)) {
+            context.setRemoteAddr(remoteAddr);
+            tempUrl += "(" + remoteAddr + ")";
+        }
+        MDC.put("url", tempUrl);
         return context;
     }
 

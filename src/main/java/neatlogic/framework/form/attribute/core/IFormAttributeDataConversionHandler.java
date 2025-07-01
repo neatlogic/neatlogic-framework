@@ -17,6 +17,7 @@ package neatlogic.framework.form.attribute.core;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.form.dto.AttributeDataVo;
+import neatlogic.framework.form.dto.FormAttributeVo;
 
 /**
  * @Author:laiwt
@@ -48,6 +49,16 @@ public interface IFormAttributeDataConversionHandler {
      * @return
      */
     default Object getSimpleValue(Object originalValue) {
+        return originalValue;
+    }
+
+    /**
+     * 获取增强可读性值，注意用于表格选择组件、表格输入组件、表单子组件
+     * @param originalValue
+     * @param formAttributeVo
+     * @return
+     */
+    default Object getEnhanceReadabilityValue(Object originalValue, FormAttributeVo formAttributeVo) {
         return originalValue;
     }
 

@@ -17,6 +17,8 @@
 
 package neatlogic.module.framework.systemnotice.login.handler;
 
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.login.core.LoginPostProcessorBase;
 import neatlogic.module.framework.systemnotice.service.SystemNoticeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,10 @@ public class LoginPullSystemNoticeProcessor extends LoginPostProcessorBase {
 
     @Override
     protected void myLoginAfterInitialization() {
+        // 系统用户登录，不需要拉取系统通知
+        if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
+            return;
+        }
         /** 清理掉system_notice_user中因删除公告或更改公告通知对象而遗留的记录 **/
 //        systemNoticeService.clearSystemNoticeUser();
 

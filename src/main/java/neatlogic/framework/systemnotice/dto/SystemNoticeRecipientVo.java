@@ -3,6 +3,8 @@ package neatlogic.framework.systemnotice.dto;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
+import java.io.Serializable;
+
 /**
  * @Title: SystemNoticeRecipientVo
  * @Package: neatlogic.framework.systemnotice.dto
@@ -10,7 +12,8 @@ import neatlogic.framework.restful.annotation.EntityField;
  * @Author: laiwt
  * @Date: 2021/1/13 17:40
  **/
-public class SystemNoticeRecipientVo{
+public class SystemNoticeRecipientVo implements Serializable {
+    private static final long serialVersionUID = 2910089979265665036L;
     @EntityField(name = "公告id", type = ApiParamType.LONG)
     private Long systemNoticeId;
     @EntityField(name = "通知对象uuid", type = ApiParamType.STRING)

@@ -7,6 +7,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.dto.BasePageVo;
+import neatlogic.framework.fulltextindex.utils.FullTextIndexUtil;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -62,6 +63,8 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
     private JSONObject headers;
     @EntityField(name = "请求头字符串", type = ApiParamType.STRING)
     private String headersStr;
+    @EntityField(name = "入参关键字", type = ApiParamType.STRING)
+    private String paramKeyword;
 
     public Long getId() {
         if (id == null) {
@@ -263,6 +266,21 @@ public class IntegrationAuditVo extends BasePageVo implements AuditVoHandler {
     public String getHeadersStr() {
         if (MapUtils.isNotEmpty(headers)) {
             return headers.toJSONString();
+        }
+        return null;
+    }
+
+    public String getParamKeyword() {
+        return paramKeyword;
+    }
+
+    public void setParamKeyword(String paramKeyword) {
+        this.paramKeyword = paramKeyword;
+    }
+
+    public final List<String> getParamWordList() {
+        if (StringUtils.isNotBlank(this.paramKeyword)) {
+            return FullTextIndexUtil.sliceKeyword(this.paramKeyword);
         }
         return null;
     }

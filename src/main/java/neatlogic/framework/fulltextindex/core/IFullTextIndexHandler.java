@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.fulltextindex.core;
 
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo;
 
 import java.util.concurrent.Semaphore;
@@ -48,6 +49,8 @@ public interface IFullTextIndexHandler {
      * @Returns: void
      **/
     void createIndex(Long targetId);
+
+    void createIndex(Long targetId, JSONObject dataObj);
 
     void createIndex(Long targetId, Semaphore lock);
 

@@ -113,6 +113,18 @@ CREATE TABLE IF NOT EXISTS `database_view_info`
   COLLATE = utf8mb4_general_ci COMMENT = '视图信息表';
 
 -- ----------------------------
+-- Table structure for database
+-- ----------------------------
+CREATE TABLE IF NOT EXISTS  `database` (
+    `id` bigint NOT NULL COMMENT '主键ID',
+    `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
+    `type` varchar(100) COLLATE utf8mb4_general_ci NOT NULL COMMENT '类型',
+    `config` text COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置信息',
+    `file_id_list` varchar(255) COLLATE utf8mb4_general_ci NOT NULL COMMENT '附件id列表',
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
 -- Table structure for datawarehouse_datasource
 -- ----------------------------
 CREATE TABLE IF NOT EXISTS `datawarehouse_datasource`
@@ -130,7 +142,8 @@ CREATE TABLE IF NOT EXISTS `datawarehouse_datasource`
     `status`           enum ('doing','done','failed','aborted') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci    NULL DEFAULT NULL COMMENT '同步状态',
     `data_count`       int                                                                                          NULL DEFAULT NULL COMMENT '数据量',
     `expire_unit`      enum ('minute','hour','day','month','year') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '过期单位',
-    `db_type`          enum ('mysql','mongodb') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci                    NULL DEFAULT 'mysql' COMMENT '数据库类型',
+    `db_type`          enum ('mysql','mongodb', 'jdbc') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci            NULL DEFAULT 'mysql' COMMENT '数据库类型',
+    `database_id`      bigint                                                                                       NULL DEFAULT NULL COMMENT '数据库ID',
     `last_fire_time`   timestamp(3)                                                                                 NULL DEFAULT NULL COMMENT '最后一次激活时间',
     `last_finish_time` timestamp(3)                                                                                 NULL DEFAULT NULL COMMENT '最后一次完成时间',
     `next_fire_time`   timestamp(3)                                                                                 NULL DEFAULT NULL COMMENT '下一次激活时间',

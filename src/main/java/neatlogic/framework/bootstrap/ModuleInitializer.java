@@ -93,6 +93,7 @@ public class ModuleInitializer implements WebApplicationInitializer {
                     sr.addMapping("/");
                     sr.setLoadOnStartup(1);
                 } else {
+                    sr.addMapping("/__internal__" + module.getId() + "/*");//增加虚拟mapping，避免加载失败
                     sr.setLoadOnStartup(2);
                 }
                 System.out.println("  ✓" + module.getId() + "·" + I18nUtils.getStaticMessage(module.getNameWithoutTranslate()));

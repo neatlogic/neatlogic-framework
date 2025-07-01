@@ -15,7 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.applicationlistener.core;
 
-import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
@@ -27,11 +26,6 @@ public abstract class ModuleInitializedListenerBase implements ApplicationListen
 
     @PostConstruct
     public final void init() {
-        //初始化TenantContext，避免子类使用TenantContext时出现空指针
-        TenantContext.init();
-        //TenantContext tenantContext = TenantContext.get();
-        //String tenant = tenantContext.getTenantUuid();
-        //tenantContext.switchTenant(tenant);
         myInit();
     }
 

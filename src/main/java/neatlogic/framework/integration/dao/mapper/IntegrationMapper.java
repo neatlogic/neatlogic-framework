@@ -18,14 +18,21 @@ package neatlogic.framework.integration.dao.mapper;
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.integration.dto.IntegrationAuditVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 public interface IntegrationMapper {
 
+    IntegrationAuditVo getIntegrationAuditById(Long id);
+
+    List<IntegrationAuditVo> getIntegrationAuditListByIdList(List<Long> idList);
+
     List<IntegrationAuditVo> searchIntegrationAudit(IntegrationAuditVo integrationAuditVo);
 
     int getIntegrationAuditCount(IntegrationAuditVo integrationAuditVo);
+
+    List<Long> getIntegrationAuditIdList(IntegrationAuditVo integrationAuditVo);
 
     IntegrationVo getIntegrationByUuid(String uuid);
 
@@ -44,6 +51,13 @@ public interface IntegrationMapper {
     int checkNameIsRepeats(IntegrationVo integrationVo);
 
     List<String> checkUuidListExists(List<String> uuidList);
+
+    List<Long> getNotIndexIntegrationAuditIdList(
+            @Param("integrationUuid") String integrationUuid,
+            @Param("id") Long startId,
+            @Param("type") String type,
+            @Param("pageSize") Integer pageSize
+    );
 
     int insertIntegration(IntegrationVo integrationVo);
 

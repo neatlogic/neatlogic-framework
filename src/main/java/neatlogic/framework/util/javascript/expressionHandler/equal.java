@@ -26,20 +26,35 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class equal {
     private static final Logger logger = LoggerFactory.getLogger(equal.class);
 
+
+    private static List<String> convertJsonArray(JSONArray list) {
+        List<String> result = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) != null) {
+                    result.add(list.getString(i).toLowerCase());
+                }
+            }
+        }
+        result.sort(Comparator.comparing(String::toLowerCase));
+        return result;
+    }
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             if (dataValueList.size() == conditionValueList.size()) {
-                dataValueList.sort(Comparator.comparing(Object::toString));
-                conditionValueList.sort(Comparator.comparing(Object::toString));
-                if (!dataValueList.toString().equals(conditionValueList.toString())) {
+                List<String> newDataList = convertJsonArray(dataValueList);
+                List<String> newConditionList = convertJsonArray(conditionValueList);
+                if (!newDataList.equals(newConditionList)) {
                     ApiRuntimeException error = new ValueIsNotEqualException(prefix, getValue(dataValueList), getValue(conditionValueList));
                     if (errorList != null) {
                         errorList.add(error);

@@ -27,7 +27,10 @@ import org.apache.poi.ss.util.CellRangeAddressList;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class ExcelBuilder {
     private static final String SHEET_ILLEGAL_SYMBOL_REGEX = "(\\*|/|:|\\\\|\\[|\\]|\\?|：|？)";
@@ -44,7 +47,7 @@ public class ExcelBuilder {
     private Integer columnWidth;
     private final List<SheetBuilder> sheetBuilderList = new ArrayList<>();
 
-    private final Map<String, SheetBuilder> sheetBuilderMap = new HashMap<>();
+    //private final Map<String, SheetBuilder> sheetBuilderMap = new HashMap<>();
     private final CellStyle cellStyle;//设置默认cellStyle，防止在每个cell里面创建导致，创建过多异常
 
     private String filePath;

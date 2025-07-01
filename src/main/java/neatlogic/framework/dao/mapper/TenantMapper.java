@@ -1,5 +1,6 @@
 package neatlogic.framework.dao.mapper;
 
+import neatlogic.framework.dao.aop.UseMasterDatabase;
 import neatlogic.framework.dto.TenantAuditVo;
 import neatlogic.framework.dto.TenantModuleGroupVo;
 import neatlogic.framework.dto.TenantModuleVo;
@@ -9,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
+@UseMasterDatabase
 public interface TenantMapper {
 
     String getTenantAuditDetailByHash(String hash);

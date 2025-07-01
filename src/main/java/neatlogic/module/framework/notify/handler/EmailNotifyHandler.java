@@ -59,7 +59,11 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
             sendEmail(notifyVo);
             return true;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            if (e instanceof NotifyNoReceiverException) {
+                logger.warn(e.getMessage(), e);
+            } else {
+                logger.error(e.getMessage(), e);
+            }
             if (!(e instanceof EmailServerNotFoundException)) {
                 if (notifyVo.getIsSendExceptionNotify() == 1) {
                     notifyVo.setIsSendExceptionNotify(0);// 防止循环调用NotifyPolicyUtil.execute方法
@@ -115,7 +119,7 @@ public class EmailNotifyHandler extends NotifyHandlerBase {
             if (StringUtils.isNotBlank(user.getEmail())) {
                 toEmailSet.add(user.getEmail());
             } else {
-                logger.error("接收对象用户：”{}({})”没有设置邮箱地址", user.getUserName(), user.getUserId());
+                logger.warn("接收对象用户：”{}({})”没有设置邮箱地址", user.getUserName(), user.getUserId());
             }
         }
         if (CollectionUtils.isEmpty(toEmailSet)) {

@@ -90,6 +90,11 @@ public class CheckboxHandler extends FormHandlerBase {
     }
 
     @Override
+    public Object getEnhanceReadabilityValue(Object originalValue, FormAttributeVo formAttributeVo) {
+        return FormUtil.getFormSelectAttributeValueByOriginalValue(originalValue);
+    }
+
+    @Override
     public Object dataTransformationForEmail(AttributeDataVo attributeDataVo, JSONObject configObj) {
         JSONObject resultObj = getMyDetailedData(attributeDataVo, configObj);
         JSONArray textArray = resultObj.getJSONArray("textList");

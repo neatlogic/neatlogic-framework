@@ -52,6 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <result column="isActive" property="isActive"/>
         <result column="dataCount" property="dataCount"/>
         <result column="dbType" property="dbType"/>
+        <result column="databaseId" property="databaseId"/>
         <collection property="fieldList" ofType="neatlogic.framework.datawarehouse.dto.DataSourceFieldVo">
             <id column="fieldId" property="id"/>
             <result column="fieldName" property="name"/>
@@ -104,6 +105,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                a.module_id       as moduleId,
                a.data_count      as dataCount,
                a.db_type         as dbType,
+               a.database_id     as databaseId,
                b.id              as fieldId,
                b.name            as fieldName,
                b.label           as fieldLabel,
@@ -203,6 +205,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             expire_unit     = #{expireUnit},
             is_active       = #{isActive},
             db_type         = #{dbType},
+            database_id     = #{databaseId},
             xml             = #{xml,typeHandler=CompressHandler}
         where id = #{id}
     </select>
@@ -238,6 +241,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                                               expire_unit,
                                               xml,
                                               db_type,
+                                              database_id,
                                               is_active)
         values (#{id},
                 #{name},
@@ -250,6 +254,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{expireUnit},
                 #{xml,typeHandler=CompressHandler},
                 #{dbType},
+                #{databaseId},
                 #{isActive})
     </select>
 

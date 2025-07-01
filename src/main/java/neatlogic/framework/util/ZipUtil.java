@@ -14,6 +14,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Objects;
@@ -36,7 +38,7 @@ public class ZipUtil {
     public static void zip(ZipOutputStream zipOutputStream, File inputFile, String fileName) throws Exception {
         if (inputFile.isDirectory()) {
             File[] files = inputFile.listFiles();
-            if (fileName.length() != 0) {
+            if (StringUtils.isNotBlank(fileName)) {
                 zipOutputStream.putNextEntry(new ZipEntry(fileName + "/"));
             }
             for (int i = 0; i < Objects.requireNonNull(files).length; i++) {

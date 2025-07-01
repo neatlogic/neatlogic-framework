@@ -1,9 +1,10 @@
 package neatlogic.framework.dto;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.restful.annotation.EntityField;
 
-public class ChangelogAuditVo {
+public class ChangelogAuditVo extends BaseEditorVo {
     @EntityField(name = "租户uuid", type = ApiParamType.STRING)
     private String tenantUuid;
 
@@ -15,6 +16,9 @@ public class ChangelogAuditVo {
 
     @EntityField(name = "sql哈希", type = ApiParamType.STRING)
     private String sqlHash;
+
+    @EntityField(name = "sql", type = ApiParamType.STRING)
+    private String sql;
 
     @EntityField(name = "sql执行状态", type = ApiParamType.INTEGER)
     private Integer sqlStatus;
@@ -77,6 +81,14 @@ public class ChangelogAuditVo {
 
     public void setSqlHash(String sqlHash) {
         this.sqlHash = sqlHash;
+    }
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
 
     public Integer getSqlStatus() {

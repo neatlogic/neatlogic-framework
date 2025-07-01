@@ -21,7 +21,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dependency.core.DependencyManager;
+import neatlogic.framework.form.attribute.core.FormAttributeDataConversionHandlerFactory;
 import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
+import neatlogic.framework.form.attribute.core.IFormAttributeDataConversionHandler;
 import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dto.AttributeDataVo;
@@ -35,10 +37,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FormUtil {
@@ -323,6 +322,48 @@ public class FormUtil {
         return originalValue;
     }
 
+    public static Object getEnhanceReadabilityValue(Object originalValue, FormAttributeVo formAttributeVo) {
+        if (originalValue == null) {
+            return originalValue;
+        }
+        Map<String, FormAttributeVo> downwardFormAttributeMap = new HashMap<>();
+        JSONObject componentObj = new JSONObject();
+        componentObj.put("handler", formAttributeVo.getHandler());
+        componentObj.put("uuid", formAttributeVo.getUuid());
+        componentObj.put("label", formAttributeVo.getLabel());
+        componentObj.put("config", formAttributeVo.getConfig());
+        componentObj.put("type", formAttributeVo.getType());
+        List<FormAttributeVo> downwardFormAttributeList = FormUtil.getFormAttributeList(componentObj, null);
+        if (CollectionUtils.isNotEmpty(downwardFormAttributeList)) {
+            for (FormAttributeVo downwardFormAttributeVo : downwardFormAttributeList) {
+                if (!downwardFormAttributeMap.containsKey(downwardFormAttributeVo.getUuid())) {
+                    downwardFormAttributeMap.put(downwardFormAttributeVo.getUuid(), downwardFormAttributeVo);
+                }
+            }
+        }
+        JSONArray dataList = new JSONArray();
+        JSONArray dataArray = JSONArray.parseArray(((JSONArray) originalValue).toJSONString());
+        for (int i = 0; i < dataArray.size(); i++) {
+            JSONObject rowObj = dataArray.getJSONObject(i);
+            if (MapUtils.isNotEmpty(rowObj)) {
+                JSONObject newRowObj = new JSONObject();
+                for (Map.Entry<String, Object> entry : rowObj.entrySet()) {
+                    String key = entry.getKey();
+                    Object value = entry.getValue();
+                    newRowObj.put(key, value);
+                    FormAttributeVo downwardFormAttributeVo = downwardFormAttributeMap.get(key);
+                    if (downwardFormAttributeVo != null) {
+                        IFormAttributeDataConversionHandler handler = FormAttributeDataConversionHandlerFactory.getHandler(downwardFormAttributeVo.getHandler());
+                        Object enhanceReadabilityValue = handler.getEnhanceReadabilityValue(value, downwardFormAttributeVo);
+                        newRowObj.put(downwardFormAttributeVo.getKey(), enhanceReadabilityValue);
+                        newRowObj.put(downwardFormAttributeVo.getLabel(), enhanceReadabilityValue);
+                    }
+                }
+                dataList.add(newRowObj);
+            }
+        }
+        return dataList;
+    }
     /**
      * 根据表单配置信息解析出表单的所有组件列表，包括子表单中的组件
      * @param formConfig
@@ -479,6 +520,16 @@ public class FormUtil {
                     JSONArray tableList2 = formConfig.getJSONArray("tableList");
                     resultList.addAll(getAllFormAttributeList(tableList2, parent2));
                 }
+            } else {
+                JSONObject config = componentObj.getJSONObject("config");
+                JSONObject formData2 = config.getJSONObject("formData");
+                if (MapUtils.isNotEmpty(formData2)) {
+                    JSONObject formConfig = formData2.getJSONObject("formConfig");
+                    if (MapUtils.isNotEmpty(formConfig)) {
+                        JSONArray tableList2 = formConfig.getJSONArray("tableList");
+                        resultList.addAll(getAllFormAttributeList(tableList2, parent2));
+                    }
+                }
             }
         } else {
             JSONArray componentArray = componentObj.getJSONArray("component");
@@ -517,7 +568,9 @@ public class FormUtil {
         if (MapUtils.isNotEmpty(config)) {
             if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
                 JSONObject formData = componentObj.getJSONObject("formData");
-                config.put("formData", formData);
+                if (MapUtils.isNotEmpty(formData)) {
+                    config.put("formData", formData);
+                }
             }
             boolean isRequired = config.getBooleanValue("isRequired");
             formAttributeVo.setRequired(isRequired);

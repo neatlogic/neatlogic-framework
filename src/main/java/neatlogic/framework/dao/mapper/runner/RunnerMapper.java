@@ -20,6 +20,7 @@ import neatlogic.framework.dto.runner.*;
 import neatlogic.framework.matrix.dto.MatrixDataVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +49,8 @@ public interface RunnerMapper {
 
     RunnerMapVo getRunnerMapByRunnerName(String runnerName);
 
+    List<RunnerMapVo> getRunnerMapByRunnerNameList(List<String> runnerNameList);
+
     List<RunnerVo> searchRunner(RunnerVo runnerVo);
 
     List<RunnerVo> getRunnerListByIdSet(@Param("runnerIdSet") Set<Long> runnerIdSet);
@@ -62,11 +65,15 @@ public interface RunnerMapper {
 
     List<RunnerGroupVo> getRunnerGroupByIdList(List<Long> idlist);
 
+    List<RunnerGroupVo> getAllRunnerGroupList();
+
     RunnerGroupVo getRunnerGroupByName(String string);
 
     List<RunnerGroupVo> getRunnerGroupByTagIdOrNameList(List<String> tagList);
 
     List<RunnerMapVo> getRunnerMapListByRunnerGroupId(Long runnerGroupId);
+
+    List<RunnerMapVo> getAllRunnerMapList();
 
     List<Map<String, Object>> searchRunnerGroupForMatrix(MatrixDataVo matrixDataVo);
 
@@ -109,6 +116,8 @@ public interface RunnerMapper {
     int updateRunnerHost(@Param("runnerHost") String runnerHost, @Param("url") String url);
 
     void updateStatusAndInfoByHost(@Param("host") String host, @Param("status") String status, @Param("info") String info);
+
+    void updateStatusById(@Param("id") Long id, @Param("status") String status, @Param("statusLcd") Date statusLcd);
 
     void deleteGroupNetWork(Long id);
 

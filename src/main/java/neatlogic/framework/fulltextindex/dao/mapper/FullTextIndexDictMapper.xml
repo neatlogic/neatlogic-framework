@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--Copyright (C) $today.year  深圳极向量科技有限公司 All Rights Reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexDictMapper">
+    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="60000" size="10"></cache>
+    <select id="getMaxDictionaryWordId" resultType="java.lang.Long">
+        select max(id)
+        from fulltextindex_dictionary
+    </select>
+
+    <sql id="searchDictionarySql">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and word like concat(#{keyword}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="searchDictionaryCount" parameterType="neatlogic.framework.common.dto.BasePageVo" resultType="int">
+        select count(1)
+        from fulltextindex_dictionary
+        <include refid="searchDictionarySql"/>
+    </select>
+
+    <select id="searchDictionary" parameterType="neatlogic.framework.common.dto.BasePageVo"
+            resultType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
+        select id, word, word_hash as wordHash
+        from fulltextindex_dictionary
+        <include refid="searchDictionarySql"/>
+        order by id desc
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertWord"
+            parameterType="neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexWordVo">
+        insert ignore into fulltextindex_dictionary (id, word, word_hash)
+        values (#{id}, #{word}, #{wordHash})
+    </insert>
+
+    <delete id="deleteWordById" parameterType="java.lang.Long">
+        delete
+        from fulltextindex_dictionary
+        where id = #{value}
+    </delete>
+</mapper>
+

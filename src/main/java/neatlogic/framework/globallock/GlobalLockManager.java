@@ -24,7 +24,6 @@ import neatlogic.framework.globallock.core.IGlobalLockHandler;
 import neatlogic.framework.globallock.dao.mapper.GlobalLockMapper;
 import neatlogic.framework.lock.core.LockManager;
 import neatlogic.framework.transaction.util.TransactionUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,11 +55,17 @@ public class GlobalLockManager {
     public static void insertLock(GlobalLockVo globalLockVo) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         try {
-            if(StringUtils.isBlank(globalLockMapper.getGlobalLockPkByUuid(globalLockVo.getUuid()))) {
-                globalLockMapper.insertLockPk(globalLockVo.getUuid());
+            globalLockMapper.insertLockPk(globalLockVo.getUuid());
+            int retry = 0;
+            while (true) {
+                try {
+                    globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
+                    break;
+                } catch (Exception e) {
+                    if (++retry > 3) throw e; // 最多重试 3 次
+                    Thread.sleep(100); // 等待 100ms 再试，避免过多的锁竞争
+                }
             }
-            //获取所有该key的锁和未上锁的队列 for update
-            globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
             globalLockMapper.insertLock(globalLockVo);
             List<GlobalLockVo> globalLockVoList = globalLockMapper.getGlobalLockByUuid(globalLockVo.getUuid());
             //执行mode 策略 验证是否允许上锁
@@ -156,7 +161,7 @@ public class GlobalLockManager {
                 globalLockMapper.getGlobalLockPkByUuidForUpdate(globalLockVo.getUuid());
                 globalLockMapper.deleteLock(lockId);
                 //只有释放已经获得锁的才notify
-                if(globalLockVo.getIsLock() == 1) {
+                if (globalLockVo.getIsLock() == 1) {
                     //获取对应uuid队列中下一个lockId notify
                     GlobalLockVo nextGlobalLockVo = globalLockMapper.getNextGlobalLockByUuid(globalLockVo.getUuid());
                     if (nextGlobalLockVo != null) {
@@ -187,8 +192,9 @@ public class GlobalLockManager {
         GlobalLockVo globalLockTmp = globalLockMapper.getGlobalLockById(globalLockVo.getId());
         if (globalLockTmp == null) {
             insertLock(globalLockVo);
+        } else {
+            globalLockVo = globalLockTmp;
         }
-        globalLockVo = globalLockTmp;
         return lock(globalLockVo);
     }
 

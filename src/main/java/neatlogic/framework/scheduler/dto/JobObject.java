@@ -28,6 +28,8 @@ public class JobObject implements Serializable {
     private Map<String, Object> dataMap;
     //用于外部作业的入参
     private Map<String, Object> propMap;
+    //用于测试作业
+    private Integer isTest = 0;
 
     private JobObject(Builder builder) {
         this.jobName = builder.jobId;
@@ -44,6 +46,7 @@ public class JobObject implements Serializable {
         this.propMap = builder.propMap;
 
         this.repeatCount = builder.repeatCount;
+        this.isTest = builder.isTest;
     }
 
     private JobObject() {
@@ -86,7 +89,11 @@ public class JobObject implements Serializable {
         return type;
     }
 
-//	public Date getLoadTime() {
+    public Integer isTest() {
+        return isTest;
+    }
+
+    //	public Date getLoadTime() {
 //		return loadTime;
 //	}
 
@@ -107,6 +114,7 @@ public class JobObject implements Serializable {
         private Integer repeatCount;
         private Map<String, Object> dataMap;
         private Map<String, Object> propMap;
+        private Integer isTest = 0;
 
         public Builder(String jobId, String jobGroup, String jobHandler, String tenantUuid) {
             this.jobId = jobId;
@@ -161,6 +169,11 @@ public class JobObject implements Serializable {
 
         public Builder withRepeatCount(Integer _repeatCount) {
             repeatCount = _repeatCount;
+            return this;
+        }
+
+        public Builder setIsTest(Integer _isTest) {
+            isTest = _isTest;
             return this;
         }
 

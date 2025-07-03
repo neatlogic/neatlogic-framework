@@ -101,7 +101,7 @@ public interface IJob extends Job {
      *
      * @param uuid 唯一标识
      */
-    default JobVo getJob(String uuid) {
+    default JobVo getJob(String uuid) throws Exception {
         return null;
     }
 

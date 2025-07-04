@@ -16,10 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.sqlrunner;
 
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.dao.plugin.LimitInterceptor;
-import neatlogic.framework.dao.plugin.PageInterceptor;
-import neatlogic.framework.dao.plugin.PageRowBounds;
-import neatlogic.framework.dao.plugin.SqlCostInterceptor;
+import neatlogic.framework.dao.plugin.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -78,6 +75,7 @@ public class SqlRunner {
         }
 
         Configuration configuration = new Configuration();
+        configuration.addInterceptor(new DataSchemaInterceptor());
         configuration.addInterceptor(new SqlCostInterceptor());
         configuration.addInterceptor(new LimitInterceptor());
         configuration.addInterceptor(new PageInterceptor());

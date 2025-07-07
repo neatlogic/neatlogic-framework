@@ -42,7 +42,7 @@ import java.util.*;
 )
 public class PageInterceptor implements Interceptor {
 
-    private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<ResultMapping>(0);
+    private static final List<ResultMapping> EMPTY_RESULTMAPPING = new ArrayList<>(0);
     private Field additionalParametersField;
 
     @Override

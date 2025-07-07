@@ -16,7 +16,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.dao.plugin;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.mysql.cj.jdbc.exceptions.MySQLQueryInterruptedException;
+import com.mysql.cj.jdbc.exceptions.MySQLTransactionRollbackException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -32,6 +33,7 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.TransactionTimedOutException;
 
 import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
@@ -46,7 +48,8 @@ import java.sql.SQLException;
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})
 })
 public class ExceptionCatchInterceptor implements Interceptor {
-    private final static Logger logger = LoggerFactory.getLogger(ExceptionCatchInterceptor.class);
+    private static final Logger defaultLogger = LoggerFactory.getLogger(ExceptionCatchInterceptor.class);
+
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         //获取拦截方法的参数
@@ -61,7 +64,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
             while (targetException instanceof InvocationTargetException) {
                 targetException = ((InvocationTargetException) targetException).getTargetException();
             }
-            if ("MySQLTransactionRollbackException".equals(targetException.getClass().getSimpleName())) {
+            if (targetException instanceof MySQLTransactionRollbackException) {
                 Logger logger = LoggerFactory.getLogger("deadlockAudit");
                 logger.error(targetException.getMessage(), targetException);
                 Configuration configuration = ms.getConfiguration();
@@ -98,19 +101,20 @@ public class ExceptionCatchInterceptor implements Interceptor {
                         logger.error(e.getMessage(), e);
                     }
                 }
-            } else if ("MySQLQueryInterruptedException".equals(targetException.getClass().getSimpleName())
-                || "TransactionTimedOutException".equals(targetException.getClass().getSimpleName())) {
+            } else if (targetException instanceof MySQLQueryInterruptedException
+                    || targetException instanceof TransactionTimedOutException
+            ) {
                 Logger logger = LoggerFactory.getLogger("sqlTimeoutAudit");
                 // 获取Sql入参
                 Object parameterObject = invocation.getArgs()[1];
-                logger.error("The error may exist in " + ms.getResource());
-                logger.error("The error may involve " + ms.getId() + " -Inline");
-                logger.error("SQL: " + ms.getBoundSql(parameterObject).getSql());
-                logger.error("parameters: " + JSONObject.toJSONString(parameterObject));
+                logger.error("The error may exist in {}", ms.getResource());
+                logger.error("The error may involve {} -Inline", ms.getId());
+                logger.error("SQL: {}", ms.getBoundSql(parameterObject).getSql());
+                logger.error("parameters: {}", JSON.toJSONString(parameterObject));
                 logger.error(targetException.getMessage(), targetException);
             }
             Object parameterObject = invocation.getArgs()[1];
-            logger.error("SQL Failed: {} with params: {}", ms.getBoundSql(parameterObject).getSql(), JSON.toJSONString(parameterObject), targetException);
+            defaultLogger.error("SQL Failed: {} with params: {}", ms.getBoundSql(parameterObject).getSql(), JSON.toJSONString(parameterObject), targetException);
             throw targetException;
         }
         return result;

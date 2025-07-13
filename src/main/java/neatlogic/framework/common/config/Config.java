@@ -236,7 +236,7 @@ public class Config {
         return DB_URL;
     }
 
-    public static String DB_TRANSACTION_TIMEOUT() {
+    public static String DB_TRANSACTION_TIMEOUT() {// root-context.xml中使用了该变量
         return DB_TRANSACTION_TIMEOUT;
     }
 

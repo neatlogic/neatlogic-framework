@@ -51,6 +51,8 @@ import java.util.regex.Matcher;
 })
 public class SqlCostInterceptor implements Interceptor {
     Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
+    // 判断是否查询了数据库
+    public static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
 
     public static class SqlIdMap {
         private static final Set<String> sqlSet = new HashSet<>();
@@ -91,13 +93,14 @@ public class SqlCostInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
+        ModifyResultMapTypeHandlerInterceptor.mappedStatementThreadLocal.set(mappedStatement);
         long starttime = 0;
         SqlAuditVo sqlAuditVo = null;
         boolean hasCacheFirstLevel = false;
         try {
             if (!SqlIdMap.isEmpty()) {
                 // Object target = invocation.getTarget();
-                MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
                 String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
                 if (SqlIdMap.isExists(sqlId)) {
                     sqlAuditVo = new SqlAuditVo();
@@ -114,9 +117,7 @@ public class SqlCostInterceptor implements Interceptor {
                         parameter = invocation.getArgs()[1];
                     }
 
-                    BoundSql boundSql = mappedStatement.getBoundSql(parameter); // BoundSql就是封装myBatis最终产生的sql类
-                    Configuration configuration = mappedStatement.getConfiguration(); // 获取节点的配置
-                    String sql = getSql(configuration, boundSql, sqlId); // 获取到最终的sql语句
+                    String sql = getSql(mappedStatement, parameter); // 获取到最终的sql语句
                     //System.out.println("#############################SQL INTERCEPTOR###############################");
                     //System.out.println("id:" + sqlId);
                     //System.out.println(sql);
@@ -142,39 +143,53 @@ public class SqlCostInterceptor implements Interceptor {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        DataSchemaInterceptor.QUERY_FROM_DATABASE_INSTANCE.set(false);
-        // 执行完上面的任务后，不改变原有的sql执行过程
-        Object val = invocation.proceed();
-        if (sqlAuditVo != null) {
-            if (DataSchemaInterceptor.QUERY_FROM_DATABASE_INSTANCE.get()) {
-                // sql语句被执行，没有使用到缓存
-                sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
-            } else {
-                if (hasCacheFirstLevel) {
-                    sqlAuditVo.setUseCacheLevel("一级缓存");
+        QUERY_FROM_DATABASE_INSTANCE.set(false);
+        try {
+            // 执行完上面的任务后，不改变原有的sql执行过程
+            Object val = invocation.proceed();
+            if (sqlAuditVo != null) {
+                if (QUERY_FROM_DATABASE_INSTANCE.get()) {
+                    // sql语句被执行，没有使用到缓存
+                    sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
                 } else {
-                    sqlAuditVo.setUseCacheLevel("二级缓存");
+                    if (hasCacheFirstLevel) {
+                        sqlAuditVo.setUseCacheLevel("一级缓存");
+                    } else {
+                        sqlAuditVo.setUseCacheLevel("二级缓存");
+                    }
                 }
-            }
-            sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
-            sqlAuditVo.setRunTime(new Date());
+                sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
+                sqlAuditVo.setRunTime(new Date());
 
-            if (val != null) {
-                if (val instanceof List) {
-                    sqlAuditVo.setRecordCount(((List) val).size());
-                } else {
-                    sqlAuditVo.setRecordCount(1);
+                if (val != null) {
+                    if (val instanceof List) {
+                        sqlAuditVo.setRecordCount(((List) val).size());
+                    } else {
+                        sqlAuditVo.setRecordCount(1);
+                    }
                 }
+                SqlAuditManager.addSqlAudit(sqlAuditVo);
+                RequestContext requestContext = RequestContext.get();
+                if (requestContext != null) {
+                    requestContext.addSqlAudit(sqlAuditVo);
+                }
+                //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
+                //System.out.println("###########################################################################");
             }
-            SqlAuditManager.addSqlAudit(sqlAuditVo);
-            RequestContext requestContext =RequestContext.get();
-            if (requestContext != null) {
-                requestContext.addSqlAudit(sqlAuditVo);
-            }
-            //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
-            //System.out.println("###########################################################################");
+            return val;
+        } finally {
+            QUERY_FROM_DATABASE_INSTANCE.remove();
         }
-        return val;
+    }
+
+    public static String getSql(MappedStatement mappedStatement, Object parameterObject) {
+        Configuration configuration = mappedStatement.getConfiguration();
+        BoundSql boundSql = mappedStatement.getBoundSql(parameterObject);
+        String sql = showSql(configuration, boundSql);
+        if (sql.contains("@{DATA_SCHEMA}")) {
+            sql = sql.replace("@{DATA_SCHEMA}", TenantContext.get().getDataDbName());
+        }
+        return sql;
     }
 
     // 封装了一下sql语句，使得结果返回完整xml路径下的sql语句节点id + sql语句

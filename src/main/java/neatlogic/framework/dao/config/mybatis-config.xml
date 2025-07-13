@@ -32,12 +32,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <typeHandler handler="neatlogic.framework.dao.plugin.LocalDateTimeTypeHandler"/>
     </typeHandlers>
     <plugins>
+        <!-- 不同类型拦截器的嵌套顺序 Executor → StatementHandler → ParameterHandler → ResultSetHandler -->
+        <!-- 每个拦截点内部的多个拦截器 按下面顺序的倒序执行 -->
         <!-- <plugin interceptor="neatlogic.framework.dao.plugin.BusinessGroupInterceptor"/>-->
         <!-- <plugin interceptor="neatlogic.framework.dao.plugin.FulltextIndexInterceptor"/>-->
-        <plugin interceptor="neatlogic.framework.dao.plugin.DataSchemaInterceptor"/>
-        <plugin interceptor="neatlogic.framework.dao.plugin.SqlCostInterceptor"/>
-        <plugin interceptor="neatlogic.framework.dao.plugin.SqlSessionCacheClearInterceptor"/>
-        <plugin interceptor="neatlogic.framework.dao.plugin.ExceptionCatchInterceptor"/>
-        <plugin interceptor="neatlogic.framework.dao.plugin.BaseEditorVoParameterInterceptor"/>
+        <plugin interceptor="neatlogic.framework.dao.plugin.ModifyResultMapTypeHandlerInterceptor"/><!-- ResultSetHandler(handleResultSets)-->
+        <plugin interceptor="neatlogic.framework.dao.plugin.DataSchemaInterceptor"/><!-- StatementHandler(prepare) -->
+        <plugin interceptor="neatlogic.framework.dao.plugin.SqlSessionCacheClearInterceptor"/><!-- StatementHandler(prepare)-->
+        <plugin interceptor="neatlogic.framework.dao.plugin.SqlCostInterceptor"/><!-- Executor(query,update) -->
+        <plugin interceptor="neatlogic.framework.dao.plugin.ExceptionCatchInterceptor"/><!-- Executor(query,update) -->
+        <plugin interceptor="neatlogic.framework.dao.plugin.BaseEditorVoParameterInterceptor"/><!-- Executor(update) -->
     </plugins>
 </configuration>

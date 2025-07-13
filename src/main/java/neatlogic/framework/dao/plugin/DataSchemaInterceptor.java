@@ -31,12 +31,10 @@ import java.sql.Connection;
  */
 @Intercepts({@Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class})})
 public class DataSchemaInterceptor implements Interceptor {
-    // 判断是否查询了数据库
-    public static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        QUERY_FROM_DATABASE_INSTANCE.set(true);
+        SqlCostInterceptor.QUERY_FROM_DATABASE_INSTANCE.set(true);
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
 
         BoundSql boundSql = statementHandler.getBoundSql();

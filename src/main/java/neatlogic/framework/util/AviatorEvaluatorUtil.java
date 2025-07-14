@@ -22,11 +22,12 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.googlecode.aviator.AviatorEvaluator;
 import com.googlecode.aviator.Expression;
+import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,6 +68,9 @@ public class AviatorEvaluatorUtil {
      * 替换变量中的非法 key，避免 Aviator 不识别
      */
     private static Map<String, Object> getFinalVariables(Map<String, Object> variables) {
+        if (MapUtils.isEmpty(variables)) {
+            return variables;
+        }
         Map<String, Object> finalVariables = new HashMap<>();
         for (Map.Entry<String, Object> entry : variables.entrySet()) {
             String safeKey = entry.getKey().replace("-", "_");

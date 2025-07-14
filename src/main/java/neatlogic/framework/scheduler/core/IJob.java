@@ -18,6 +18,7 @@ package neatlogic.framework.scheduler.core;
 import neatlogic.framework.scheduler.annotation.Param;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.dto.JobPropVo;
+import neatlogic.framework.scheduler.dto.JobVo;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.util.ClassUtils;
@@ -93,5 +94,21 @@ public interface IJob extends Job {
      */
     default Boolean isAudit() {
         return true;
+    }
+
+    /**
+     * 根据uuid到数据库对应表获取对应作业
+     *
+     * @param uuid 唯一标识
+     */
+    default JobVo getJob(String uuid) throws Exception {
+        return null;
+    }
+
+    /**
+     * 默认内部作业private
+     */
+    default String getType() {
+        return "private";
     }
 }

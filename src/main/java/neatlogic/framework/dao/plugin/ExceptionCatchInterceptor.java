@@ -109,12 +109,13 @@ public class ExceptionCatchInterceptor implements Interceptor {
                 Object parameterObject = invocation.getArgs()[1];
                 logger.error("The error may exist in {}", ms.getResource());
                 logger.error("The error may involve {} -Inline", ms.getId());
-                logger.error("SQL: {}", ms.getBoundSql(parameterObject).getSql());
+                logger.error("SQL: {}", SqlCostInterceptor.getSql(ms, parameterObject));
                 logger.error("parameters: {}", JSON.toJSONString(parameterObject));
                 logger.error(targetException.getMessage(), targetException);
             }
             Object parameterObject = invocation.getArgs()[1];
-            defaultLogger.error("SQL Failed: {} with params: {}", ms.getBoundSql(parameterObject).getSql(), JSON.toJSONString(parameterObject), targetException);
+            String sql = SqlCostInterceptor.getSql(ms, parameterObject);
+            defaultLogger.error("SQL Failed: {}: {} with params: {}", ms.getId(), sql, JSON.toJSONString(parameterObject), targetException);
             throw targetException;
         }
         return result;

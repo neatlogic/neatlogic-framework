@@ -132,6 +132,10 @@ public class RequestContext implements Serializable {
     }
 
     public RequestSqlAuditVo getRequestSqlAuditVo() {
+        if (requestSqlAuditVo != null) {
+            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
+            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
+        }
         return requestSqlAuditVo;
     }
 

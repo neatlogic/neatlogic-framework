@@ -19,4 +19,5 @@ package neatlogic.framework.constvalue;
 
 public class SystemProperty {
     public final static String LOG4J_HOME = "log4j.home";
+    public final static String INSTANCE_NAME = "instance.name";
 }

@@ -19,12 +19,14 @@ import neatlogic.framework.datawarehouse.dto.DataSourceFieldVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceParamVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import neatlogic.framework.datawarehouse.dto.ResultMapVo;
+import neatlogic.framework.datawarehouse.enums.FieldType;
 import neatlogic.framework.datawarehouse.exceptions.DataSourceXmlIrregularException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReportXmlUtil {
     //static Logger logger = LoggerFactory.getLogger(ReportXmlUtil.class);
@@ -67,6 +69,9 @@ public class ReportXmlUtil {
                 String column = sub.attributeValue("column");
                 String label = sub.attributeValue("label");
                 String type = sub.attributeValue("type");
+                if (StringUtils.isBlank(FieldType.getValue(type))) {
+                    throw new DataSourceXmlIrregularException("仅支持以下属性类型：" + Arrays.stream(FieldType.values()).map(FieldType::getValue).collect(Collectors.joining(",")));
+                }
                 String aggregate = sub.attributeValue("aggregate");
                 if (StringUtils.isBlank(sub.attributeValue("column"))) {
                     throw new DataSourceXmlIrregularException("“" + sub.getName() + "”节点必须定义唯一的“column”属性");
@@ -135,7 +140,7 @@ public class ReportXmlUtil {
         List<Node> forEachElementList = document.selectNodes("//forEach");
         List<Node> ifElementList = document.selectNodes("//if");
 
-        if (ifNotNullElementList != null && ifNotNullElementList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(ifNotNullElementList)) {
             for (Node node : ifNotNullElementList) {
                 Element e = (Element) node;
                 if (StringUtils.isBlank(e.attributeValue("parameter"))) {
@@ -144,7 +149,7 @@ public class ReportXmlUtil {
             }
         }
 
-        if (ifNullElementList != null && ifNullElementList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(ifNullElementList)) {
             for (Node node : ifNullElementList) {
                 Element e = (Element) node;
                 if (StringUtils.isBlank(e.attributeValue("parameter"))) {
@@ -153,7 +158,7 @@ public class ReportXmlUtil {
             }
         }
 
-        if (forEachElementList != null && forEachElementList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(forEachElementList)) {
             for (Node node : forEachElementList) {
                 Element e = (Element) node;
                 if (StringUtils.isBlank(e.attributeValue("parameter")) || StringUtils.isBlank(e.attributeValue("separator"))) {
@@ -162,7 +167,7 @@ public class ReportXmlUtil {
             }
         }
 
-        if (ifElementList != null && ifElementList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(ifElementList)) {
             for (Node node : ifElementList) {
                 Element e = (Element) node;
                 if (StringUtils.isBlank(e.attributeValue("test"))) {

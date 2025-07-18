@@ -41,10 +41,18 @@ public enum FieldType {
         return $.t(text.toString());
     }
 
+    public static String getValue(String name) {
+        for (FieldType s : FieldType.values()) {
+            if (s.getValue().equalsIgnoreCase(name)) {
+                return s.getValue();
+            }
+        }
+        return "";
+    }
 
     public static String getText(String name) {
         for (FieldType s : FieldType.values()) {
-            if (s.getValue().equals(name)) {
+            if (s.getValue().equalsIgnoreCase(name)) {
                 return s.getText();
             }
         }

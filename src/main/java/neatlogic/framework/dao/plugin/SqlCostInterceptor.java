@@ -80,6 +80,16 @@ public class SqlCostInterceptor implements Interceptor {
             if (sqlSet.contains(id)) {
                 return true;
             }
+            // 支持接口token作为监控目标
+            RequestContext requestContext = RequestContext.get();
+            if (requestContext != null && StringUtils.isNotBlank(requestContext.getUrl())) {
+                // 这里requestContext.getUrl()值为/neatlogic/api/rest/xxx/yyy/zzz
+                for (String element : sqlSet) {
+                    if (requestContext.getUrl().endsWith(element)) {
+                        return true;
+                    }
+                }
+            }
             if (id.contains(".")) {
                 id = id.substring(id.lastIndexOf(".") + 1);
             }

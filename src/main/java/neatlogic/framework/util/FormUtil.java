@@ -354,9 +354,14 @@ public class FormUtil {
                     FormAttributeVo downwardFormAttributeVo = downwardFormAttributeMap.get(key);
                     if (downwardFormAttributeVo != null) {
                         IFormAttributeDataConversionHandler handler = FormAttributeDataConversionHandlerFactory.getHandler(downwardFormAttributeVo.getHandler());
-                        Object enhanceReadabilityValue = handler.getEnhanceReadabilityValue(value, downwardFormAttributeVo);
-                        newRowObj.put(downwardFormAttributeVo.getKey(), enhanceReadabilityValue);
-                        newRowObj.put(downwardFormAttributeVo.getLabel(), enhanceReadabilityValue);
+                        if (handler != null) {
+                            Object enhanceReadabilityValue = handler.getEnhanceReadabilityValue(value, downwardFormAttributeVo);
+                            newRowObj.put(downwardFormAttributeVo.getKey(), enhanceReadabilityValue);
+                            newRowObj.put(downwardFormAttributeVo.getLabel(), enhanceReadabilityValue);
+                        } else {
+                            newRowObj.put(downwardFormAttributeVo.getKey(), value);
+                            newRowObj.put(downwardFormAttributeVo.getLabel(), value);
+                        }
                     }
                 }
                 dataList.add(newRowObj);

@@ -30,6 +30,7 @@ public class $sqlTest {
 
     public static void main(String[] args) {
         List<String> methodNameList = getMethodNameList($sql.class);
+        testSql(methodNameList);
         testForm(methodNameList);
         testSetSelectColumn(methodNameList);
         testAddSelectColumn(methodNameList);
@@ -60,6 +61,62 @@ public class $sqlTest {
 //        System.out.println("plainSelect = " + plainSelect);
     }
 
+    private static void testSql(List<String> methodNameList) {
+        String sql = "SELECT count(a.name) AS countName, group_concat(a.name) AS tenantName, b.module_group, count(c.module_id) AS countModuleId FROM tenant a LEFT JOIN tenant_modulegroup b ON b.tenant_uuid = a.uuid LEFT JOIN tenant_module c ON c.tenant_uuid = a.uuid WHERE a.is_active = 1 AND a.name IS NOT NULL AND b.module_group IS NOT NULL AND c.module_id IS NOT NULL GROUP BY a.name, b.module_group ORDER BY a.name, b.module_group DESC LIMIT 2, 3";
+//        public static PlainSelect addSql(SqlVo)
+        {
+            SqlVo sqlVo = new SqlVo();
+            sqlVo.withFromTable($sql.join("", "tenant", "a")
+                    .withAddWhereExpression($sql.exp("a.is_active", "=", 1))
+                    .withAddSelectColumn(new ColumnVo($sql.fun("count", "a.name"), "countName"))
+            );
+            sqlVo.withAddJoin($sql.join("left join", "tenant_modulegroup", "b")
+                    .withOn($sql.exp("b.tenant_uuid", "=", "a.uuid"))
+                    .withAddWhereExpression($sql.exp("b.module_group", "is not null"))
+                    .withAddGroupBy(new GroupByVo("b.module_group").withSort(10))
+                    .withAddOrderBy(new OrderByVo("b.module_group", "desc").withSort(10))
+                    .withAddSelectColumn(new ColumnVo("b.module_group"))
+            );
+            sqlVo.withAddJoin($sql.join("left join", "tenant_module", "c")
+                    .withOn($sql.exp("c.tenant_uuid", "=", "a.uuid"))
+                    .withAddWhereExpression($sql.exp("c.module_id", "is not null"))
+                    .withAddSelectColumn(new ColumnVo($sql.fun("count", "c.module_id"), "countModuleId")));
+            sqlVo.withAddWhereExpression($sql.exp("a.name", "is not null"));
+            sqlVo.withAddGroupBy(new GroupByVo("a.name"));
+            sqlVo.withAddOrderBy(new OrderByVo("a.name", "asc"));
+            sqlVo.withAddSelectColumn(new ColumnVo($sql.fun("group_concat", "a.name"), "tenantName"));
+            sqlVo.withLimit(new LimitVo(2, 3));
+            PlainSelect plainSelect = $sql.addSql(sqlVo);
+            Assert.isTrue(Objects.equals(plainSelect.toString(), sql), "测试失败");
+            methodNameList.remove("public static PlainSelect addSql(SqlVo)");
+        }
+//        public static void addSql(PlainSelect, SqlVo)
+        {
+            SqlVo sqlVo = new SqlVo();
+            PlainSelect plainSelect = $sql.from("tenant", "a");
+            sqlVo.withAddWhereExpression($sql.exp("a.is_active", "=", 1));
+            sqlVo.withAddSelectColumn(new ColumnVo($sql.fun("count", "a.name"), "countName"));
+            sqlVo.withAddJoin($sql.join("left join", "tenant_modulegroup", "b")
+                    .withOn($sql.exp("b.tenant_uuid", "=", "a.uuid"))
+                    .withAddWhereExpression($sql.exp("b.module_group", "is not null"))
+                    .withAddGroupBy(new GroupByVo("b.module_group").withSort(10))
+                    .withAddOrderBy(new OrderByVo("b.module_group", "desc").withSort(10))
+                    .withAddSelectColumn(new ColumnVo("b.module_group"))
+            );
+            sqlVo.withAddJoin($sql.join("left join", "tenant_module", "c")
+                    .withOn($sql.exp("c.tenant_uuid", "=", "a.uuid"))
+                    .withAddWhereExpression($sql.exp("c.module_id", "is not null"))
+                    .withAddSelectColumn(new ColumnVo($sql.fun("count", "c.module_id"), "countModuleId")));
+            sqlVo.withAddWhereExpression($sql.exp("a.name", "is not null"));
+            sqlVo.withAddGroupBy(new GroupByVo("a.name"));
+            sqlVo.withAddOrderBy(new OrderByVo("a.name", "asc"));
+            sqlVo.withAddSelectColumn(new ColumnVo($sql.fun("group_concat", "a.name"), "tenantName"));
+            sqlVo.withLimit(new LimitVo(2, 3));
+            $sql.addSql(plainSelect, sqlVo);
+            Assert.isTrue(Objects.equals(plainSelect.toString(), sql), "测试失败");
+            methodNameList.remove("public static void addSql(PlainSelect, SqlVo)");
+        }
+    }
     private static void testForm(List<String> methodNameList) {
         // public static PlainSelect from(String)
         Assert.isTrue(Objects.equals($sql.from("tenant").toString(), "SELECT  FROM tenant"), "测试失败");

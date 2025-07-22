@@ -30,10 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * <p>基本用法</p>
@@ -176,6 +173,99 @@ public class $sql {
 
     public static FunctionVo fun(String funName, Object ... parameters) {
         return new FunctionVo(funName, parameters);
+    }
+
+    public static PlainSelect addSql(SqlVo sqlVo) {
+        PlainSelect plainSelect = new PlainSelect();
+        addSql(plainSelect, sqlVo);
+        return plainSelect;
+    }
+
+    public static void addSql(PlainSelect plainSelect, SqlVo sqlVo) {
+        if (plainSelect == null || sqlVo == null) {
+            return;
+        }
+        List<GroupByVo> groupByList = new ArrayList<>();
+        List<OrderByVo> orderByList = new ArrayList<>();
+        List<ColumnVo> selectColumnList = new ArrayList<>();
+        List<ExpressionVo> whereExpressionList = new ArrayList<>();
+        JoinVo fromTable = sqlVo.getFromTable();
+        if (fromTable != null) {
+            if (CollectionUtils.isNotEmpty(fromTable.getGroupByList())) {
+                groupByList.addAll(fromTable.getGroupByList());
+            }
+            if (CollectionUtils.isNotEmpty(fromTable.getOrderByList())) {
+                orderByList.addAll(fromTable.getOrderByList());
+            }
+            if (CollectionUtils.isNotEmpty(fromTable.getSelectColumnList())) {
+                selectColumnList.addAll(fromTable.getSelectColumnList());
+            }
+            if (CollectionUtils.isNotEmpty(fromTable.getWhereExpressionList())) {
+                whereExpressionList.addAll(fromTable.getWhereExpressionList());
+            }
+            from(plainSelect, fromTable.getSchemaName(), fromTable.getTableName(), fromTable.getAlias());
+        }
+        if (CollectionUtils.isNotEmpty(sqlVo.getGroupByList())) {
+            groupByList.addAll(sqlVo.getGroupByList());
+        }
+        if (CollectionUtils.isNotEmpty(sqlVo.getOrderByList())) {
+            orderByList.addAll(sqlVo.getOrderByList());
+        }
+        if (CollectionUtils.isNotEmpty(sqlVo.getSelectColumnList())) {
+            selectColumnList.addAll(sqlVo.getSelectColumnList());
+        }
+        if (CollectionUtils.isNotEmpty(sqlVo.getWhereExpressionList())) {
+            whereExpressionList.addAll(sqlVo.getWhereExpressionList());
+        }
+        List<JoinVo> joinList = sqlVo.getJoinList();
+        for (JoinVo joinVo : joinList) {
+            if (CollectionUtils.isNotEmpty(joinVo.getGroupByList())) {
+                groupByList.addAll(joinVo.getGroupByList());
+            }
+            if (CollectionUtils.isNotEmpty(joinVo.getOrderByList())) {
+                orderByList.addAll(joinVo.getOrderByList());
+            }
+            if (CollectionUtils.isNotEmpty(joinVo.getSelectColumnList())) {
+                selectColumnList.addAll(joinVo.getSelectColumnList());
+            }
+            if (CollectionUtils.isNotEmpty(joinVo.getWhereExpressionList())) {
+                whereExpressionList.addAll(joinVo.getWhereExpressionList());
+            }
+            addJoin(plainSelect, joinVo);
+        }
+        if (CollectionUtils.isNotEmpty(selectColumnList)) {
+            for (ColumnVo selectColumn : selectColumnList) {
+                if (StringUtils.isNotBlank(selectColumn.getName())) {
+                    addSelectColumn(plainSelect, selectColumn.getName(), selectColumn.getAlias());
+                } else if (selectColumn.getFunction() != null) {
+                    addSelectColumn(plainSelect, selectColumn.getFunction(), selectColumn.getAlias());
+                }
+            }
+        }
+        if (CollectionUtils.isNotEmpty(whereExpressionList)) {
+            for (ExpressionVo whereExpression : whereExpressionList) {
+                addWhereExpression(plainSelect, whereExpression);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(groupByList)) {
+            groupByList.sort(Comparator.comparingInt(GroupByVo::getSort));
+            for (GroupByVo groupByVo : groupByList) {
+                addGroupBy(plainSelect, groupByVo.getColumnName());
+            }
+        }
+        if (CollectionUtils.isNotEmpty(orderByList)) {
+            orderByList.sort(Comparator.comparingInt(OrderByVo::getSort));
+            for (OrderByVo orderByVo : orderByList) {
+                if (StringUtils.isNotBlank(orderByVo.getColumnName())) {
+                    addOrderBy(plainSelect, orderByVo.getColumnName(), orderByVo.getAsc());
+                } else if (orderByVo.getFunction() != null) {
+                    addOrderBy(plainSelect, orderByVo.getFunction(), orderByVo.getAsc());
+                }
+            }
+        }
+        if (sqlVo.getLimit() != null) {
+            setLimit(plainSelect, sqlVo.getLimit().getOffset(), sqlVo.getLimit().getRowCount());
+        }
     }
 
     public static void from(PlainSelect plainSelect, String tableName) {

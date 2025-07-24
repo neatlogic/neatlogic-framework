@@ -45,7 +45,7 @@ public class ApiRuntimeException extends RuntimeException {
     }
 
     public ApiRuntimeException(String key, Object... values) {
-        super($.t(key, values));
+        //super($.t(key, values));
     }
 
     public String getErrorCode() {

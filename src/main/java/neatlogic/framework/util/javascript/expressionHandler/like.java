@@ -29,60 +29,38 @@ import java.util.List;
 public class like {
     private static final Logger logger = LoggerFactory.getLogger(like.class);
 
+
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
         List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-            if (dataValueList.size() == conditionValueList.size()) {
-                //单值判断
-                if (dataValueList.size() == 1) {
-                    String dataValue = dataValueList.getString(0);
-                    String conditionValue = conditionValueList.getString(0);
-                    if (StringUtils.isBlank(dataValue)) {
-                        //如果数据值为空，代表不包含任何值，直接返回false
-                        return false;
-                    }
-                    if (dataValue.contains(conditionValue)) {
-                        return true;
-                    } else {
-                        ApiRuntimeException error = new ValueIsNotContainException(prefix, dataValue, conditionValue);
-                        if (errorList != null) {
-                            errorList.add(error);
-                        } else {
-                            logger.warn(error.getMessage());
-                        }
-                        return false;
-                    }
-                } else {
-                    for (int i = 0; i < conditionValueList.size(); i++) {
-                        String cValue = conditionValueList.getString(i);
-                        if (dataValueList.stream().noneMatch(d -> d.toString().equals(cValue))) {
-                            ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
-                            if (errorList != null) {
-                                errorList.add(error);
-                            } else {
-                                logger.warn(error.getMessage());
-                            }
-                            return false;
-                        }
-                    }
-                    return true;
+            //单值判断，按照字符串匹配的方式来判断
+            if (dataValueList.size() == conditionValueList.size() && dataValueList.size() == 1) {
+                String dataValue = dataValueList.getString(0);
+                String conditionValue = conditionValueList.getString(0);
+                if (StringUtils.isBlank(dataValue)) {
+                    //如果数据值为空，代表不包含任何值，直接返回false
+                    return false;
                 }
-            } else if (dataValueList.size() > conditionValueList.size()) {
+                if (dataValue.contains(conditionValue)) {
+                    return true;
+                } else {
+                    ApiRuntimeException error = new ValueIsNotContainException(prefix, dataValue, conditionValue);
+                    if (errorList != null) {
+                        errorList.add(error);
+                    } else {
+                        logger.warn(error.getMessage());
+                    }
+                    return false;
+                }
+            } else {
+                //多值判断，数据中任意成员包含条件任意成员即可
                 for (int i = 0; i < conditionValueList.size(); i++) {
                     String cValue = conditionValueList.getString(i);
-                    if (dataValueList.stream().noneMatch(d -> d.toString().equals(cValue))) {
-                        ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
-                        if (errorList != null) {
-                            errorList.add(error);
-                        } else {
-                            logger.warn(error.getMessage());
-                        }
-                        return false;
+                    if (dataValueList.stream().anyMatch(d -> d.toString().equalsIgnoreCase(cValue))) {
+                        return true;
                     }
                 }
-                return true;
-            } else {
                 ApiRuntimeException error = new ValueIsNotContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
                 if (errorList != null) {
                     errorList.add(error);
@@ -93,7 +71,7 @@ public class like {
             }
         } else {
             if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
-                ApiRuntimeException error = new ApiRuntimeException(prefix);
+                ApiRuntimeException error = new ValueIsNotContainException(prefix);
                 if (errorList != null) {
                     errorList.add(error);
                 } else {

@@ -25,4 +25,8 @@ public class ValueIsNotContainException extends ApiRuntimeException {
     public ValueIsNotContainException(String prefix, String value, String otherValue) {
         super("{0}值{1}不包含{2}", prefix, value, otherValue);
     }
+
+    public ValueIsNotContainException(String prefix) {
+        super("{0}值为空", prefix);
+    }
 }

@@ -25,4 +25,8 @@ public class ValueContainException extends ApiRuntimeException {
     public ValueContainException(String prefix, String value, String otherValue) {
         super("{0}值{1}包含{2}", prefix, value, otherValue);
     }
+
+    public ValueContainException(String prefix) {
+        super("{0}值和条件值同时为空", prefix);
+    }
 }

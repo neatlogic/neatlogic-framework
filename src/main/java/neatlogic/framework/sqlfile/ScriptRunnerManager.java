@@ -176,6 +176,9 @@ public class ScriptRunnerManager {
             executeSqlParamVo.setLogWriter(logWriter);
             executeSqlParamVo.setErrWriter(errWriter);
             executeSqlParamVo.setErrStrWriter(errStrWriter);
+            if(executeSqlParamVo.getRunner() != null) {
+                executeSqlParamVo.getRunner().setDelimiter(";");
+            }
             while ((line = scriptBufferedReader.readLine()) != null) {
                 if (StringUtils.isBlank(line.trim())) {
                     continue;
@@ -183,6 +186,9 @@ public class ScriptRunnerManager {
                 //自定义分隔符，如：$$ 兼容存储过程
                 if (line.trim().toLowerCase(Locale.ROOT).startsWith("delimiter")) {
                     executeSqlParamVo.setDelimiter(line.substring(9).trim());
+                    if(executeSqlParamVo.getRunner() != null) {
+                        executeSqlParamVo.getRunner().setDelimiter(line.substring(9).trim());
+                    }
                     continue;
                 } else if (!line.trim().toLowerCase(Locale.ROOT).endsWith(executeSqlParamVo.getDelimiter())) {
                     sqlSb.append("\n");

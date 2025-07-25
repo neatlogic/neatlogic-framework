@@ -219,7 +219,6 @@ public class BasePageVo implements Serializable {
             } else {
                 this.keywordList = FullTextIndexUtil.sliceKeyword(keyword);
             }
-
         }
         return this.keywordList;
     }

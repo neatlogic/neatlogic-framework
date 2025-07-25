@@ -17,44 +17,50 @@
 
 package neatlogic.framework.sqlgenerator;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class JoinVo {
-    // join类型，LEFT JOIN, JOIN
-    private final String operationSymbol;
-    private final String schemaName;
-    private final String tableName;
-    private final String alias;
-    private ExpressionVo on;
+public class SqlVo {
     private List<ColumnVo> selectColumnList;
+    private JoinVo fromTable;
+    private List<JoinVo> joinList;
+    private List<ExpressionVo> whereExpressionList;
     private List<GroupByVo> groupByList;
     private List<OrderByVo> orderByList;
-    private List<ExpressionVo> whereExpressionList;
+    private LimitVo limit;
 
-    JoinVo(String operationSymbol, String schemaName, String tableName, String alias, ExpressionVo on) {
-        this.operationSymbol = operationSymbol;
-        this.schemaName = schemaName;
-        this.tableName = tableName;
-        this.alias = alias;
-        this.on = on;
+    public JoinVo getFromTable() {
+        return fromTable;
     }
 
-    JoinVo(String operationSymbol, String tableName, String alias, ExpressionVo on) {
-        this(operationSymbol, null, tableName, alias, on);
-    }
-    JoinVo(String operationType, String tableName, String alias) {
-        this(operationType, null, tableName, alias, null);
+    public SqlVo withFromTable(JoinVo fromTable) {
+        this.fromTable = fromTable;
+        return this;
     }
 
-    JoinVo(String operationType, String tableName) {
-        this(operationType, null, tableName, null, null);
+    public List<JoinVo> getJoinList() {
+        return joinList;
     }
 
-    public JoinVo withOn(ExpressionVo on) {
-        this.on = on;
+    public SqlVo withJoinList(List<JoinVo> joinList) {
+        this.joinList = joinList;
+        return this;
+    }
+
+    public SqlVo withAddJoinList(List<JoinVo> joinList) {
+        if (this.joinList == null) {
+            this.joinList = joinList;
+        } else {
+            this.joinList.addAll(joinList);
+        }
+        return this;
+    }
+
+    public SqlVo withAddJoin(JoinVo join) {
+        if (this.joinList == null) {
+            this.joinList = new ArrayList<>();
+        }
+        this.joinList.add(join);
         return this;
     }
 
@@ -62,12 +68,12 @@ public class JoinVo {
         return selectColumnList;
     }
 
-    public JoinVo withSelectColumnList(List<ColumnVo> selectColumnList) {
+    public SqlVo withSelectColumnList(List<ColumnVo> selectColumnList) {
         this.selectColumnList = selectColumnList;
         return this;
     }
 
-    public JoinVo withAddSelectColumnList(List<ColumnVo> selectColumnList) {
+    public SqlVo withAddSelectColumnList(List<ColumnVo> selectColumnList) {
         if (this.selectColumnList == null) {
             this.selectColumnList = selectColumnList;
         } else {
@@ -76,7 +82,7 @@ public class JoinVo {
         return this;
     }
 
-    public JoinVo withAddSelectColumn(ColumnVo selectColumn) {
+    public SqlVo withAddSelectColumn(ColumnVo selectColumn) {
         if (this.selectColumnList == null) {
             this.selectColumnList = new ArrayList<>();
         }
@@ -88,12 +94,12 @@ public class JoinVo {
         return groupByList;
     }
 
-    public JoinVo withGroupByList(List<GroupByVo> groupByList) {
+    public SqlVo withGroupByList(List<GroupByVo> groupByList) {
         this.groupByList = groupByList;
         return this;
     }
 
-    public JoinVo withAddGroupByList(List<GroupByVo> groupByList) {
+    public SqlVo withAddGroupByList(List<GroupByVo> groupByList) {
         if (this.groupByList == null) {
             this.groupByList = groupByList;
         } else {
@@ -102,7 +108,7 @@ public class JoinVo {
         return this;
     }
 
-    public JoinVo withAddGroupBy(GroupByVo groupBy) {
+    public SqlVo withAddGroupBy(GroupByVo groupBy) {
         if (this.groupByList == null) {
             this.groupByList = new ArrayList<>();
         }
@@ -114,12 +120,12 @@ public class JoinVo {
         return orderByList;
     }
 
-    public JoinVo withOrderByList(List<OrderByVo> orderByList) {
+    public SqlVo withOrderByList(List<OrderByVo> orderByList) {
         this.orderByList = orderByList;
         return this;
     }
 
-    public JoinVo withAddOrderByList(List<OrderByVo> orderByList) {
+    public SqlVo withAddOrderByList(List<OrderByVo> orderByList) {
         if (this.orderByList == null) {
             this.orderByList = orderByList;
         } else {
@@ -128,7 +134,7 @@ public class JoinVo {
         return this;
     }
 
-    public JoinVo withAddOrderBy(OrderByVo orderBy) {
+    public SqlVo withAddOrderBy(OrderByVo orderBy) {
         if (this.orderByList == null) {
             this.orderByList = new ArrayList<>();
         }
@@ -140,12 +146,12 @@ public class JoinVo {
         return whereExpressionList;
     }
 
-    public JoinVo withWhereExpressionList(List<ExpressionVo> whereExpressionList) {
+    public SqlVo withWhereExpressionList(List<ExpressionVo> whereExpressionList) {
         this.whereExpressionList = whereExpressionList;
         return this;
     }
 
-    public JoinVo withAddWhereExpressionList(List<ExpressionVo> whereExpressionList) {
+    public SqlVo withAddWhereExpressionList(List<ExpressionVo> whereExpressionList) {
         if (this.whereExpressionList == null) {
             this.whereExpressionList = whereExpressionList;
         } else {
@@ -154,7 +160,7 @@ public class JoinVo {
         return this;
     }
 
-    public JoinVo withAddWhereExpression(ExpressionVo whereExpression) {
+    public SqlVo withAddWhereExpression(ExpressionVo whereExpression) {
         if (this.whereExpressionList == null) {
             this.whereExpressionList = new ArrayList<>();
         }
@@ -162,48 +168,12 @@ public class JoinVo {
         return this;
     }
 
-    public String getOperationSymbol() {
-        return operationSymbol;
+    public LimitVo getLimit() {
+        return limit;
     }
 
-    public String getSchemaName() {
-        return schemaName;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public ExpressionVo getOn() {
-        return on;
-    }
-
-    @Override
-    public String toString() {
-        String result = StringUtils.EMPTY;
-        if (operationSymbol != null) {
-            result += operationSymbol.trim();
-            result += StringUtils.SPACE;
-        }
-        if (schemaName != null) {
-            result += schemaName.trim();
-            result += ".";
-        }
-        if (tableName != null) {
-            result += tableName.trim();
-            result += StringUtils.SPACE;
-        }
-        if (alias != null) {
-            result += alias.trim();
-        }
-        if (on != null) {
-            result += " ON ";
-            result += on.toString();
-        }
-        return result;
+    public SqlVo withLimit(LimitVo limit) {
+        this.limit = limit;
+        return this;
     }
 }

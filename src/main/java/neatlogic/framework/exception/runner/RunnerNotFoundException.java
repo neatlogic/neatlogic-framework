@@ -24,7 +24,11 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class RunnerNotFoundException extends ApiRuntimeException {
 
     public RunnerNotFoundException(String name) {
-        super("nfer.runnernotfoundexception.runnernotfoundexception.not",name);
+        super("nfer.runnernotfoundexception.runnernotfoundexception.not", name);
+    }
+
+    public RunnerNotFoundException(Long id) {
+        super("nfer.runnernotfoundexception.runnernotfoundexception.not", id);
     }
 
     public RunnerNotFoundException() {

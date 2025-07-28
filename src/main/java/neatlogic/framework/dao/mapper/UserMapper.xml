@@ -634,13 +634,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT
         `id`,
         `uuid`,
-        `user_id` AS userId,
-        `user_name` AS userName,
+        `user_id`        as userId,
+        `user_name`      as userName,
         `email`,
         `phone`,
-        `is_active` AS isActive,
-        `user_info` AS userInfo,
-        `vip_level` AS vipLevel
+        `pinyin`,
+        `is_active`      as isActive,
+        `is_delete`      as isDelete,
+        `user_info`      as userInfo,
+        `vip_level`      as vipLevel,
+        `is_super_admin` as isSuperAdmin
         FROM `user`
         Where `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">

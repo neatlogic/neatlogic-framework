@@ -300,7 +300,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `form_attribute` a
                  JOIN `form_version` b ON b.`uuid` = a.`formversion_uuid` AND b.`is_active` = 1
         WHERE a.`uuid` = #{value}
-        limit 1
+        LIMIT 1
     </select>
 
     <select id="getFormAttributeList" parameterType="neatlogic.framework.form.dto.FormAttributeVo"

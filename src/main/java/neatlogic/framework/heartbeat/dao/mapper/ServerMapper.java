@@ -17,6 +17,8 @@ public interface ServerMapper {
 
     List<ServerClusterVo> getAllServerList();
 
+    String getUserFunctionValue();
+
     //UPDATE
     int updateServerByServerId(ServerClusterVo server);
 

@@ -181,7 +181,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `uuid`,
         `name`,
         `description`,
-        `rule`
+        `rule`,
+        `is_delete` AS isDelete
         FROM `role`
         WHERE `is_delete` = 0 AND `uuid` IN
         <foreach collection="list" item="item" separator="," open="(" close=")">
@@ -196,9 +197,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `uuid`,
         `name`,
         `description`,
-        `rule`
+        `rule`,
+        `is_delete` AS isDelete
         FROM `role`
-        WHERE `is_delete` = 0 AND `uuid` IN
+        WHERE `uuid` IN
         <foreach collection="list" item="item" separator="," open="(" close=")">
             #{item}
         </foreach>

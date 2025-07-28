@@ -166,7 +166,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`parent_uuid` as `parentUuid`,
         a.`level`,
         a.`upward_uuid_path` AS upwardUuidPath,
-        a.`upward_name_path` AS upwardNamePath
+        a.`upward_name_path` AS upwardNamePath,
+        a.`is_delete` AS isDelete
         FROM
         `team` a
         <where>
@@ -188,6 +189,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         a.`id`,
         a.`uuid`,
         a.`name`,
+        a.`email`,
+        a.`phone`,
+        a.`parent_uuid` AS parentUuid,
+        a.`level`,
+        a.`lft`,
+        a.`rht`,
+        a.`upward_uuid_path` AS upwardUuidPath,
+        a.`upward_name_path` AS upwardNamePath,
         a.`is_delete` AS isDelete
         FROM
         `team` a
@@ -325,7 +334,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `lft`,
         `rht`,
         `upward_uuid_path` AS upwardUuidPath,
-        `upward_name_path` AS upwardNamePath
+        `upward_name_path` AS upwardNamePath,
+        `is_delete` AS isDelete
         FROM `team`
         WHERE `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">
@@ -347,7 +357,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `rht`,
         `is_delete` AS isDelete,
         `upward_uuid_path` AS upwardUuidPath,
-        `upward_name_path` AS upwardNamePath
+        `upward_name_path` AS upwardNamePath,
+        `is_delete` AS isDelete
         FROM `team`
         WHERE `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">

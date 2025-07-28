@@ -46,6 +46,8 @@ public class Config {
     private static final String SERVER_ID_FILE = "serverid.conf";
 
     public static int SCHEDULE_SERVER_ID;
+
+    private static int SCHEDULE_SERVER_ID_CHECK_ENABLE;// 启用服务器ID检查，防止两台服务器ID相同
     //    public static String SERVER_HOST;
     public static final String RESPONSE_TYPE_JSON = "application/json;charset=UTF-8";
 
@@ -209,6 +211,10 @@ public class Config {
             CHANGELOG_JDBC_SOCKETTIME = "300000";
         }
 
+    }
+
+    public static int SCHEDULE_SERVER_ID_CHECK_ENABLE() {
+        return SCHEDULE_SERVER_ID_CHECK_ENABLE;
     }
 
     public static String NEATLOGIC_HOME() {
@@ -596,6 +602,7 @@ public class Config {
 
     public static void loadNacosProperties(Properties prop) {
         try {
+            SCHEDULE_SERVER_ID_CHECK_ENABLE = Integer.parseInt(prop.getProperty("schedule.serverid.check.enable", "1"));
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             AUDIT_HOME = prop.getProperty("audit.home");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "60"));

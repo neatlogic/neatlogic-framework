@@ -13,7 +13,8 @@
             resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
         SELECT `host`,
                `server_id` AS serverId,
-               `status`
+               `status`,
+               `ip`
         FROM server_status
         WHERE `server_id` = #{serverId}
             FOR
@@ -27,11 +28,16 @@
                `heartbeat_rate`      AS heartbeatRate,
                `heartbeat_threshold` AS heartbeatThreshold,
                `heartbeat_time`      AS heartbeatTime,
+               `ip`                  AS ip,
                `fcu`,
                `fcd`,
                `lcu`,
                `lcd`
         FROM `server_status`
+    </select>
+
+    <select id="getUserFunctionValue" resultType="java.lang.String">
+        SELECT USER()
     </select>
 
     <update id="updateServerByServerId" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
@@ -61,12 +67,13 @@
 
     <insert id="insertServer" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
         INSERT INTO server_status(`server_id`, `status`, `heartbeat_rate`, `heartbeat_threshold`, `heartbeat_time`,
-                                  `fcu`, `fcd`)
-        VALUES (#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{fcu}, NOW(3))
+                                  `ip`, `fcu`, `fcd`)
+        VALUES (#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{ip}, #{fcu}, NOW(3))
         ON DUPLICATE KEY UPDATE `status`              = #{status},
                                 `heartbeat_rate`      = #{heartbeatRate},
                                 `heartbeat_threshold` = #{heartbeatThreshold},
                                 `heartbeat_time`      = NOW(3),
+                                `ip`                  = #{ip},
                                 `lcu`                 = #{lcu},
                                 `lcd`                 = NOW(3)
     </insert>

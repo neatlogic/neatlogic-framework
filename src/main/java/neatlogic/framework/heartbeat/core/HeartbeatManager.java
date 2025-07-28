@@ -30,6 +30,8 @@ import neatlogic.framework.heartbeat.dao.mapper.TenantServerMapper;
 import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
+import neatlogic.framework.util.$;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.TransactionStatus;
@@ -63,6 +65,25 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
     private static final Set<IHeartbreakHandler> set = new HashSet<>();
 
     public final void myInit() {
+        String ip = StringUtils.EMPTY;
+        if (Objects.equals(Config.SCHEDULE_SERVER_ID_CHECK_ENABLE(), 1)) {
+            String userFunctionValue = serverMapper.getUserFunctionValue(); // 获取到 root@192.168.8.240
+            if (StringUtils.isNotBlank(userFunctionValue)) {
+                int index = userFunctionValue.indexOf("@");
+                if (index != -1) {
+                    ip = userFunctionValue.substring(index + 1);
+                } else {
+                    ip = userFunctionValue;
+                }
+            }
+            ServerClusterVo serverVo = serverMapper.getServerByServerId(Config.SCHEDULE_SERVER_ID);
+            if (serverVo != null && StringUtils.isNotBlank(serverVo.getIp())) {
+                if (!Objects.equals(serverVo.getIp(), ip)) {
+                    System.err.println($.t("nfhc.heartbeatmanager.myinit.startupfailureprompt", Config.SCHEDULE_SERVER_ID, serverVo.getIp()));
+                    System.exit(1);
+                }
+            }
+        }
         // 服务器重启时，先重置与自己相关的数据
         getServerLock(Config.SCHEDULE_SERVER_ID);
         // 重新插入一条服务器信息
@@ -73,6 +94,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         server.setLcu(SystemUser.SYSTEM.getUserUuid());
         server.setHeartbeatRate(Config.SERVER_HEARTBEAT_RATE());
         server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
+        server.setIp(ip);
         serverMapper.insertServer(server);
 //        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {

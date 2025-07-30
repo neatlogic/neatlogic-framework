@@ -32,6 +32,7 @@ import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +49,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 @DependsOn("loginService")
@@ -188,13 +191,16 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         bos.close();
         jwtVo.setCc(cc);
         jwtVo.setJwtsign(jwtsign);
-        checkUserVo.setJwtVo(jwtVo);
         return jwtVo;
     }
 
-    public static String getToken(UserVo checkUserVo) throws Exception {
+    public static String getToken(UserVo checkUserVo){
         Long tokenCreateTime = System.currentTimeMillis();
-        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, new AuthenticationInfoVo());
+        //补充满足前缀的header
+        Set<String> headerSet = new HashSet<>();
+        HeaderUtil.getRulePrefixHeader(headerSet);
+        AuthenticationInfoVo authenticationInfoVo = new AuthenticationInfoVo(headerSet);
+        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, authenticationInfoVo);
         return jwtVo.getToken();
     }
 

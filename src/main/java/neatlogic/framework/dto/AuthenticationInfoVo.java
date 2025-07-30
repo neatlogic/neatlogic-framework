@@ -31,6 +31,7 @@ import java.util.Set;
  * @since 2021/8/2 20:19
  **/
 public class AuthenticationInfoVo implements Serializable {
+    private static final long serialVersionUID = -8846808868047516668L;
     private String userUuid;
     private final List<String> userUuidList = new ArrayList<>();
     private final List<String> teamUuidList = new ArrayList<>();
@@ -38,6 +39,10 @@ public class AuthenticationInfoVo implements Serializable {
     @JSONField(serialize = false)
     private final Set<String> headerSet = new HashSet<>(); //使用到的header
     private JSONObject originHeader = new JSONObject(); //原始请求的header
+
+    public AuthenticationInfoVo(Set<String> headerSet) {
+        this.headerSet.addAll(headerSet);
+    }
 
     public AuthenticationInfoVo copy() {
         AuthenticationInfoVo vo = new AuthenticationInfoVo();

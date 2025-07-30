@@ -16,8 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.service;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.RoleMapper;
@@ -26,6 +24,7 @@ import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.util.AviatorEvaluatorUtil;
+import neatlogic.framework.util.HeaderUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +32,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -146,23 +148,6 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
         return new AuthenticationInfoVo(userUuidList, new ArrayList<>(teamUuidSet), roleUuidList, headerSet);
     }
 
-    /**
-     * 获取用户上下文中或请求中的headers
-     */
-    private JSONObject getHeaders() {
-        JSONObject headers = new JSONObject();
-        if (UserContext.get() != null && UserContext.get().getJwtVo() != null) {
-            headers = UserContext.get().getJwtVo().getHeaders();
-        } else if (RequestContext.get() != null && RequestContext.get().getRequest() != null) {
-            Enumeration<String> envNames = RequestContext.get().getRequest().getHeaderNames();
-            while (envNames != null && envNames.hasMoreElements()) {
-                String key = envNames.nextElement();
-                String value = RequestContext.get().getRequest().getHeader(key);
-                headers.put(key, value);
-            }
-        }
-        return headers;
-    }
 
     /**
      * 去掉不满足规则的角色
@@ -173,7 +158,7 @@ public class AuthenticationInfoServiceImpl implements AuthenticationInfoService 
      */
     private List<String> removeInValidRoleUuidList(List<String> roleUuidList, Set<String> headerSet, JSONObject originHeader) {
         if (MapUtils.isEmpty(originHeader)) {
-            originHeader = getHeaders();
+            originHeader = HeaderUtil.getHeaders();
         }
         //只保留符合指定前缀的header
         if (MapUtils.isNotEmpty(originHeader)) {

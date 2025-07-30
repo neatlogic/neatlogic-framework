@@ -640,7 +640,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `phone`,
         `is_active` AS isActive,
         `user_info` AS userInfo,
-        `vip_level` AS vipLevel
+        `vip_level` AS vipLevel,
+        `pinyin`,
+        `is_delete` AS isDelete,
+        `is_super_admin` AS isSuperAdmin
         FROM `user`
         Where `uuid` in
         <foreach collection="list" item="item" separator="," open="(" close=")">

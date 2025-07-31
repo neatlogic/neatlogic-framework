@@ -36,17 +36,17 @@ public class SHA256Util {
 
 
     /*
-     * @Description: Sha1签名加密 32位 小写
+     * @Description: Sha1签名加密 小写
      * @Date: 2021/3/18 12:20 下午
      * @Params: [content]
      * @Returns: java.lang.String
      **/
-    public static String encrypt(String secret, String sign) {
+    public static String encrypt(String secret, String content) {
         try {
             SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(signingKey);
-            byte[] rawHmac = mac.doFinal(sign.getBytes());
+            byte[] rawHmac = mac.doFinal(content.getBytes());
             StringBuilder hexString = new StringBuilder();
             for (byte b : rawHmac) {
                 String shaHex = Integer.toHexString(b & 0xFF);

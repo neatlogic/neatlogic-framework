@@ -201,8 +201,17 @@ public class SqlRunner {
                 ResultMap resultMap = resultMaps.get(0);
                 sqlInfo.setResultMap(resultMap.getId());
                 sqlInfo.setResultType(resultMap.getType().getName());
-                sqlInfo.setColumnList(new ArrayList<>(resultMap.getMappedColumns()));
-                sqlInfo.setPropertyList(new ArrayList<>(resultMap.getMappedProperties()));
+                List<String> columnList = new ArrayList<>();
+                List<String> propertyList = new ArrayList<>();
+                List<ResultMapping> resultMappings = resultMap.getResultMappings();
+                if (CollectionUtils.isNotEmpty(resultMappings)) {
+                    for (ResultMapping resultMapping : resultMappings) {
+                        columnList.add(resultMapping.getColumn());
+                        propertyList.add(resultMapping.getProperty());
+                    }
+                }
+                sqlInfo.setColumnList(columnList);
+                sqlInfo.setPropertyList(propertyList);
             }
             Integer timeout = mappedStatement.getTimeout();
             sqlInfo.setTimeout(timeout);

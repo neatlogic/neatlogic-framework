@@ -69,7 +69,6 @@ public class AsyncTaskManager<T> {
         // 按需启动，不超过 maxWorkers
         if (activeWorkerCount.get() < maxWorkers) {
             int newCount = activeWorkerCount.incrementAndGet();
-            System.out.println("count:" + newCount);
             if (newCount <= maxWorkers) {
                 CachedThreadPool.execute(new NeatLogicThread(workerNamePrefix + "-" + (newCount - 1), false) {
                     @Override

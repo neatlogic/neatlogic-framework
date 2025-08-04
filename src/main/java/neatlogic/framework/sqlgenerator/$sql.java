@@ -79,6 +79,10 @@ public class $sql {
         return exp(null, leftExpressionVo, operationType, rightExpressionVo, null);
     }
 
+    public static ExpressionVo exp(String leftParenthesis, ExpressionVo leftExpressionVo, String rightParenthesis) {
+        return exp(leftParenthesis, leftExpressionVo, "and", null, rightParenthesis);
+    }
+
     public static ExpressionVo exp(String leftColumn, String operationSymbol, String rightColumn) {
         return new ExpressionVo(leftColumn, operationSymbol, rightColumn);
     }

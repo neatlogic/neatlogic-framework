@@ -34,6 +34,10 @@ public class ExpressionVo {
     private final String operationSymbol;
     private final String type;
 
+    ExpressionVo(String leftParenthesis, ExpressionVo leftExpressionVo, String rightParenthesis) {
+        this(leftParenthesis, leftExpressionVo, "and", null, rightParenthesis);
+    }
+
     ExpressionVo(ExpressionVo leftExpressionVo, String operationType, ExpressionVo rightExpressionVo) {
         this(null, leftExpressionVo, operationType, rightExpressionVo, null);
     }

@@ -617,7 +617,12 @@ public class $sqlTest {
         $sql.addWhereExpression(plainSelect, $sql.exp("(", $sql.exp("uuid", "=", "name"), "and", $sql.exp("name", "=", "uuid"), ")"));
         Assert.isTrue(Objects.equals(plainSelect.toString(), "SELECT  FROM tenant WHERE (uuid = name AND name = uuid)"), "测试失败");
         methodNameList.remove("public static ExpressionVo exp(String, ExpressionVo, String, ExpressionVo, String)");
-
+//        public static ExpressionVo exp(String, ExpressionVo, String)
+        plainSelect = $sql.from("tenant");
+        ExpressionVo orExp = $sql.exp($sql.exp("uuid", "=", "name"), "or", $sql.exp("name", "=", "uuid"));
+        $sql.addWhereExpression(plainSelect, $sql.exp("(", orExp, ")"));
+        Assert.isTrue(Objects.equals(plainSelect.toString(), "SELECT  FROM tenant WHERE (uuid = name OR name = uuid)"), "测试失败");
+        methodNameList.remove("public static ExpressionVo exp(String, ExpressionVo, String)");
     }
 
     private static void testFun(List<String> methodNameList) {

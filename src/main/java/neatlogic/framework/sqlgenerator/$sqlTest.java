@@ -32,6 +32,7 @@ public class $sqlTest {
         List<String> methodNameList = getMethodNameList($sql.class);
         testSql(methodNameList);
         testForm(methodNameList);
+        testSetDistinct(methodNameList);
         testSetSelectColumn(methodNameList);
         testAddSelectColumn(methodNameList);
         testAddJoin(methodNameList);
@@ -168,6 +169,19 @@ public class $sqlTest {
         methodNameList.remove("public static void from(PlainSelect, String, String, String)");
     }
 
+    private static void testSetDistinct(List<String> methodNameList) {
+//        public static void setDistinct(PlainSelect, boolean)
+        PlainSelect plainSelect = $sql.from("tenant");
+        $sql.setDistinct(plainSelect, true);
+        $sql.setSelectColumn(plainSelect, "name");
+        System.out.println("plainSelect = " + plainSelect);
+        Assert.isTrue(Objects.equals(plainSelect.toString(), "SELECT DISTINCT name FROM tenant"), "测试失败");
+
+        $sql.setDistinct(plainSelect, false);
+        $sql.setSelectColumn(plainSelect, "uuid");
+        Assert.isTrue(Objects.equals(plainSelect.toString(), "SELECT uuid FROM tenant"), "测试失败");
+        methodNameList.remove("public static void setDistinct(PlainSelect, boolean)");
+    }
     private static void testSetSelectColumn(List<String> methodNameList) {
         PlainSelect plainSelect = $sql.from("tenant");
 //        public static void setSelectColumn(PlainSelect, String)

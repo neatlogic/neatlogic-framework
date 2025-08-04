@@ -335,6 +335,17 @@ public class $sql {
         return plainSelect;
     }
 
+    public static void setDistinct(PlainSelect plainSelect, boolean distinct) {
+        if (plainSelect == null) {
+            return;
+        }
+        if (distinct) {
+            plainSelect.setDistinct(new Distinct());
+        } else {
+            plainSelect.setDistinct(null);
+        }
+    }
+
     public static void addSelectColumn(PlainSelect plainSelect, String columnName) {
         addSelectColumn(plainSelect, columnName, null);
     }

@@ -79,6 +79,10 @@ public class $sql {
         return exp(null, leftExpressionVo, operationType, rightExpressionVo, null);
     }
 
+    public static ExpressionVo exp(String leftParenthesis, ExpressionVo leftExpressionVo, String rightParenthesis) {
+        return exp(leftParenthesis, leftExpressionVo, "and", null, rightParenthesis);
+    }
+
     public static ExpressionVo exp(String leftColumn, String operationSymbol, String rightColumn) {
         return new ExpressionVo(leftColumn, operationSymbol, rightColumn);
     }
@@ -329,6 +333,17 @@ public class $sql {
         PlainSelect plainSelect = new PlainSelect();
         from(plainSelect, schemaName, tableName, alias);
         return plainSelect;
+    }
+
+    public static void setDistinct(PlainSelect plainSelect, boolean distinct) {
+        if (plainSelect == null) {
+            return;
+        }
+        if (distinct) {
+            plainSelect.setDistinct(new Distinct());
+        } else {
+            plainSelect.setDistinct(null);
+        }
     }
 
     public static void addSelectColumn(PlainSelect plainSelect, String columnName) {

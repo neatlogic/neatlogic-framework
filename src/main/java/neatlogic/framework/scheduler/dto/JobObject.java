@@ -30,6 +30,7 @@ public class JobObject implements Serializable {
     private Map<String, Object> propMap;
     //用于测试作业
     private Integer isTest = 0;
+    private String testUserUuid;
 
     private JobObject(Builder builder) {
         this.jobName = builder.jobId;
@@ -47,6 +48,7 @@ public class JobObject implements Serializable {
 
         this.repeatCount = builder.repeatCount;
         this.isTest = builder.isTest;
+        this.testUserUuid = builder.testUserUuid;
     }
 
     private JobObject() {
@@ -93,6 +95,10 @@ public class JobObject implements Serializable {
         return isTest;
     }
 
+    public String getTestUserUuid() {
+        return testUserUuid;
+    }
+
     //	public Date getLoadTime() {
 //		return loadTime;
 //	}
@@ -115,6 +121,7 @@ public class JobObject implements Serializable {
         private Map<String, Object> dataMap;
         private Map<String, Object> propMap;
         private Integer isTest = 0;
+        private String testUserUuid;
 
         public Builder(String jobId, String jobGroup, String jobHandler, String tenantUuid) {
             this.jobId = jobId;
@@ -177,6 +184,11 @@ public class JobObject implements Serializable {
             return this;
         }
 
+        public Builder setTestUser(String _testUserUuid) {
+            testUserUuid = _testUserUuid;
+            return this;
+        }
+
         public Builder addData(String key, Object data) {
             if (dataMap == null) {
                 dataMap = new HashMap<>();
@@ -219,4 +231,6 @@ public class JobObject implements Serializable {
     public Integer getRepeatCount() {
         return repeatCount;
     }
+
+
 }

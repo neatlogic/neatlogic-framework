@@ -18,6 +18,7 @@
 package neatlogic.module.framework.service;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.crossover.IScheduleCrossoverService;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.schedule.SchedulePublicAuthException;
@@ -60,6 +61,7 @@ public class ScheduleServiceImpl implements IScheduleCrossoverService {
                 .needAudit(1)
                 .withPropList(jobVo.getPropList())
                 .setIsTest(1)
+                .setTestUser(UserContext.get().getUserUuid(true))
                 .setType(jobHandler.getType()).build();
         schedulerManager.loadJob(jobObject);
     }

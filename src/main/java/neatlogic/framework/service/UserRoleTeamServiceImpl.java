@@ -26,7 +26,7 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
             if (handler.isLimit()) {
                 groupCount++;
             }
-            List<GroupSearchOptionVo> dataList = null;
+            List<GroupSearchOptionVo> dataList;
             boolean isMore = true;
             if (CollectionUtils.isEmpty(groupSearchVo.getValueList())) {
                 dataList = handler.search(groupSearchVo);

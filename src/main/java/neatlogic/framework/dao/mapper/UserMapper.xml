@@ -861,7 +861,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                b.`user_name` AS userName,
                b.`user_info` AS userInfo,
                b.`vip_level` AS vipLevel,
-               b.`pinyin`    AS pinyin
+               b.`pinyin`    AS pinyin,
+               b.`email`     as email
         FROM `user_team` a
                  JOIN `user` b ON b.`uuid` = a.`user_uuid`
         WHERE a.`team_uuid` = #{value}

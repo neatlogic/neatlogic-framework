@@ -29,6 +29,7 @@ public class ExpressionVo {
     private String rightColumn;
     private ValueVo leftValueExpression;
     private ValueVo rightValueExpression;
+    private FunctionVo rightFunctionVo;
     private ExpressionVo leftExpressionVo;
     private ExpressionVo rightExpressionVo;
     private final String operationSymbol;
@@ -60,6 +61,13 @@ public class ExpressionVo {
 
     ExpressionVo(String leftColumn, String operationSymbol) {
         this(leftColumn, operationSymbol, new ValueVo(""));
+    }
+
+    ExpressionVo(String leftColumn, String operationSymbol, FunctionVo rightFunctionVo) {
+        this.leftColumn = leftColumn;
+        this.operationSymbol = operationSymbol;
+        this.rightFunctionVo = rightFunctionVo;
+        this.type = $sql.COMPARATIVE_OPERATION;
     }
 
     ExpressionVo(String leftColumn, String operationSymbol, ValueVo rightValueExpression) {
@@ -106,6 +114,10 @@ public class ExpressionVo {
 
     public ValueVo getRightValueExpression() {
         return rightValueExpression;
+    }
+
+    public FunctionVo getRightFunctionVo() {
+        return rightFunctionVo;
     }
 
     public String getOperationSymbol() {

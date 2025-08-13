@@ -111,6 +111,10 @@ public class $sql {
         return new ExpressionVo(leftColumn, operationSymbol, rightValueExpression);
     }
 
+    public static ExpressionVo exp(String leftColumn, String operationSymbol, FunctionVo rightFunction) {
+        return new ExpressionVo(leftColumn, operationSymbol, rightFunction);
+    }
+
     public static ExpressionVo exp(String leftColumn, String operationSymbol) {
         return new ExpressionVo(leftColumn, operationSymbol, new ValueVo(""));
     }
@@ -221,6 +225,7 @@ public class $sql {
         if (CollectionUtils.isNotEmpty(sqlVo.getWhereExpressionList())) {
             whereExpressionList.addAll(sqlVo.getWhereExpressionList());
         }
+        List<String> joinAliasList = new ArrayList<>();
         List<JoinVo> joinList = sqlVo.getJoinList();
         for (JoinVo joinVo : joinList) {
             if (CollectionUtils.isNotEmpty(joinVo.getGroupByList())) {
@@ -235,7 +240,10 @@ public class $sql {
             if (CollectionUtils.isNotEmpty(joinVo.getWhereExpressionList())) {
                 whereExpressionList.addAll(joinVo.getWhereExpressionList());
             }
-            addJoin(plainSelect, joinVo);
+            if (!joinAliasList.contains(joinVo.getAlias())) {
+                addJoin(plainSelect, joinVo);
+                joinAliasList.add(joinVo.getAlias());
+            }
         }
         if (CollectionUtils.isNotEmpty(selectColumnList)) {
             for (ColumnVo selectColumn : selectColumnList) {
@@ -662,6 +670,8 @@ public class $sql {
                 } else if (rightObj instanceof ExpressionList) {
                     rightExpressionList = (ExpressionList) rightObj;
                 }
+            } else if (expressionVo.getRightFunctionVo() != null) {
+                rightExpression = parseFunction(expressionVo.getRightFunctionVo());
             }
             if (Objects.equals(operationSymbol, "=")) {
                 resultExpression = new EqualsTo(leftExpression, rightExpression);

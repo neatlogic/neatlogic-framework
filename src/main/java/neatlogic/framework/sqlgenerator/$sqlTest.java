@@ -526,6 +526,11 @@ public class $sqlTest {
         $sql.addWhereExpression(plainSelect, $sql.exp("is_active", "in", "(0, 1)"));
         Assert.isTrue(Objects.equals(plainSelect.toString(), "SELECT  FROM tenant WHERE is_active IN (0, 1)"), "测试失败");
         methodNameList.remove("public static ExpressionVo exp(String, String, String)");
+//        public static ExpressionVo exp(String, String, FunctionVo)
+        plainSelect = $sql.from("tenant");
+        $sql.addWhereExpression(plainSelect, $sql.exp("visit_time", ">=", $sql.fun("STR_TO_DATE", "'2023-11-08 09:57:01'", "'%Y-%m-%d %H:%i:%s'")));
+        Assert.isTrue(Objects.equals(plainSelect.toString(), "SELECT  FROM tenant WHERE visit_time >= STR_TO_DATE('2023-11-08 09:57:01', '%Y-%m-%d %H:%i:%s')"), "测试失败");
+        methodNameList.remove("public static ExpressionVo exp(String, String, FunctionVo)");
 //        public static ExpressionVo exp(String, String, Integer)
         plainSelect = $sql.from("tenant");
         $sql.addWhereExpression(plainSelect, $sql.exp("is_active", "=", 0));

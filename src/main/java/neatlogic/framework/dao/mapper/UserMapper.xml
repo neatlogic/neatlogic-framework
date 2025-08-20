@@ -852,6 +852,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
     </select>
 
+    <select id="getUserByUserNameList" resultType="neatlogic.framework.dto.UserVo">
+        SELECT
+        `id`,
+        `uuid`,
+        `user_name` as `userName`,
+        `user_id` as `userId`,
+        `email`,
+        `phone`,
+        `pinyin`,
+        `is_active` AS isActive
+        FROM `user`
+        WHERE `user_name` IN
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <select id="getUserListByTeamUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
             useCache="false">
         SELECT a.`team_uuid` AS teamUuid,

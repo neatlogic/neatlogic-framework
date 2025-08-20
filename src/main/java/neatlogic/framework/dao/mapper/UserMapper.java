@@ -127,6 +127,8 @@ public interface UserMapper {
 
     List<UserVo> getUserByUserIdList(List<String> list);
 
+    List<UserVo> getUserByUserNameList(List<String> list);
+
     List<UserVo> getUserListByTeamUuid(String teamUuid);
 
     UserTitleVo getUserTitleLockByName(String title);

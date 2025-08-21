@@ -29,6 +29,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <typeHandlers>
         <typeHandler jdbcType="LONGVARCHAR" javaType="String"
                      handler="neatlogic.framework.dao.plugin.CompressHandler"/>
+        <typeHandler jdbcType="LONGVARCHAR" javaType="Integer"
+                     handler="neatlogic.framework.dao.plugin.EmptyStringToNullIntegerTypeHandler"/>
+        <typeHandler jdbcType="VARCHAR" javaType="Integer"
+                     handler="neatlogic.framework.dao.plugin.EmptyStringToNullIntegerTypeHandler"/>
         <typeHandler handler="neatlogic.framework.dao.plugin.LocalDateTimeTypeHandler"/>
     </typeHandlers>
     <plugins>

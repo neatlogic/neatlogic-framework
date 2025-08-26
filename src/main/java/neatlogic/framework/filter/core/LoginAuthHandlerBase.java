@@ -246,8 +246,14 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Override
     public String logout() {
         UserSessionCache.removeItem(UserContext.get().getTokenHash());
-        //不删除session 同一个用户共用一个session
-        //userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
+        //仅删除自己创建的session
+        JwtVo jwtVo = UserContext.get().getJwtVo();
+        if(jwtVo != null){
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
+            if(userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(),jwtVo.getTokenCreateTime())){
+                userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
+            }
+        }
         String url;
         try {
             String device = CommonUtil.getDevice();

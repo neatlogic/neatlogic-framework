@@ -68,6 +68,10 @@ public interface UserSessionMapper {
 
     int deleteUserSessionByTokenHash(String tokenHash);
 
+    int deleteUserSessionByUserUuid(String userUuid);
+
+    int deleteUserSessionByUserUuidList(List<String> userUuid);
+
     int deleteUserSessionByTokenHashList(List<String> tokenHashList);
 
     int deleteUserSessionByExpireTime(Long expireTime);

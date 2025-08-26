@@ -258,6 +258,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT
             a.`uuid`
         FROM `user` a
+        <if test="isOnline != null and isOnline == 1">
+            join `user_session` us on a.uuid = us.user_uuid
+        </if>
         <if test="teamUuid != null and teamUuid != ''">
             JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
         </if>
@@ -284,6 +287,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </if>
             <if test="roleUuid != null and roleUuid != ''">
                 AND d.`role_uuid` = #{roleUuid}
+            </if>
+            <if test="isOnline != null and isOnline == 1">
+                and us.`visit_time` &lt; #{expireTime}
             </if>
         </where>
         GROUP BY a.`uuid`
@@ -498,6 +504,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         SELECT
             count(DISTINCT (a.`uuid`))
         FROM `user` a
+        <if test="isOnline != null">
+            left join `user_session` us on a.uuid = us.user_uuid
+        </if>
         <if test="teamUuid != null and teamUuid != ''">
             JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
         </if>
@@ -526,6 +535,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </if>
             <if test="roleUuid != null and roleUuid != ''">
                 AND d.`role_uuid` = #{roleUuid}
+            </if>
+            <if test="isOnline != null and isOnline == 1">
+                and us.`visit_time` &lt; #{expireTime}
+            </if>
+            <if test="isOnline != null and isOnline == 0">
+                and (us.`visit_time` &gt; #{expireTime} or us.`visit_time` is null)
             </if>
         </where>
     </select>

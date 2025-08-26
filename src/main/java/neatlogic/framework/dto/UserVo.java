@@ -17,6 +17,7 @@ package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.dto.BaseEditorVo;
@@ -34,7 +35,9 @@ import org.springframework.util.DigestUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class UserVo extends BaseEditorVo implements Serializable {
 
@@ -103,6 +106,8 @@ public class UserVo extends BaseEditorVo implements Serializable {
     private List<String> parentTeamUuidList;
     @JSONField(serialize = false)
     private List<String> rangeList;
+    @EntityField(name = "是否在线", type = ApiParamType.INTEGER)
+    private Integer isOnline;
 
     /**
      * 用户所在分组角色列表(考虑穿透)
@@ -597,5 +602,20 @@ public class UserVo extends BaseEditorVo implements Serializable {
 
     public void setJwtVo(JwtVo jwtVo) {
         this.jwtVo = jwtVo;
+    }
+
+    public Integer getIsOnline() {
+        return isOnline;
+    }
+
+    public void setIsOnline(Integer isOnline) {
+        this.isOnline = isOnline;
+    }
+
+    public Date getExpireTime() {
+        if (Objects.equals(isOnline, 1)) {
+            return new Date(System.currentTimeMillis() + Config.USER_EXPIRETIME() * 60L * 1000L);
+        }
+        return null;
     }
 }

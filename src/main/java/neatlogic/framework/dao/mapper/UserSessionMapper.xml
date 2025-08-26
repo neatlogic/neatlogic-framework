@@ -213,6 +213,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where `token_hash` = #{value}
     </delete>
 
+    <delete id="deleteUserSessionByUserUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `user_session`
+        where `user_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteUserSessionByUserUuidList" parameterType="java.lang.String">
+        DELETE
+        FROM `user_session`
+        where `user_uuid` in
+              <foreach collection="list" item="value" close=")" open="(" separator=",">
+                  #{value}
+              </foreach>
+    </delete>
+
     <delete id="deleteUserSessionByTokenHashList" parameterType="java.lang.String">
         DELETE
         FROM `user_session`

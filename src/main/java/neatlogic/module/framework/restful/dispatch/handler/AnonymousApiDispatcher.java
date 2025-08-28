@@ -81,6 +81,7 @@ public class AnonymousApiDispatcher {
     private ApiAccessCountService apiAccessCountService;
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, boolean tokenHasEncrypted, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+        request.setAttribute("userId", UserContext.get().getUserId());
         InputFrom inputFrom = null;
         String source = request.getHeader("source");
         if (StringUtils.isNotBlank(source)) {

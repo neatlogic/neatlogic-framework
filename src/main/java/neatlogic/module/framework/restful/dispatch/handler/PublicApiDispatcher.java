@@ -48,7 +48,6 @@ import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.module.framework.restful.counter.ApiAccessCountService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -91,6 +90,7 @@ public class PublicApiDispatcher {
 
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+        request.setAttribute("userId", UserContext.get().getUserId());
         InputFrom inputFrom = null;
         String source = request.getHeader("source");
         if (StringUtils.isNotBlank(source)) {

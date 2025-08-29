@@ -27,6 +27,7 @@ import neatlogic.framework.exception.user.NoUserException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -80,6 +81,7 @@ public class UserContext implements Serializable {
             context = _userContext.copy();
         }
         instance.set(context);
+        MDC.put("userId", context.getUserId());
         return context;
     }
 
@@ -102,6 +104,7 @@ public class UserContext implements Serializable {
         }
         context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList, new HashSet<>(), null));
         instance.set(context);
+        MDC.put("userId", context.getUserId());
         return context;
     }
 
@@ -130,6 +133,7 @@ public class UserContext implements Serializable {
         }
         context.setJwtVo(userVo.getJwtVo());
         instance.set(context);
+        MDC.put("userId", context.getUserId());
         return context;
     }
 

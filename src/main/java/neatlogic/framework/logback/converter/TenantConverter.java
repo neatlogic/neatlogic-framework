@@ -40,6 +40,10 @@ public class TenantConverter extends ClassicConverter implements Serializable {
         Map<String, String> map = event.getMDCPropertyMap();
         String tenant = map.get("tenant");
         if (StringUtils.isNotBlank(tenant)) {
+            String userId = map.get("userId");
+            if (StringUtils.isNotBlank(userId)) {
+                tenant += "(" + userId + ")";
+            }
             return tenant;
         }
         return StringUtils.EMPTY;

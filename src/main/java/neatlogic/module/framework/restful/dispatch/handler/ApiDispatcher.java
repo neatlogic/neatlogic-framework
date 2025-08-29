@@ -98,6 +98,11 @@ public class ApiDispatcher {
 
 
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
+        UserContext userContext = UserContext.get();
+        if (userContext != null) {
+            request.setAttribute("userId", userContext.getUserId());
+            request.setAttribute("userName", userContext.getUserName());
+        }
         InputFrom inputFrom = null;
         String source = request.getHeader("source");
         if (StringUtils.isNotBlank(source)) {

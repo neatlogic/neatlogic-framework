@@ -33,6 +33,7 @@ import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
+import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -45,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
@@ -70,7 +72,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         Cookie[] cookies = request.getCookies();
-        String timezone = "+8:00";
+        String timezone = TimeUtil.ZONE_TIME;
         //是否已过期
         boolean isExpired = false;
         UserVo userVo;
@@ -81,7 +83,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("neatlogic_timezone".equals(cookie.getName())) {
-                    timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
+                    String timezoneTmp = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
+                    try {
+                        ZoneOffset.of(timezoneTmp);
+                        timezone = timezoneTmp;
+                    } catch (Exception ignored) {
+
+                    }
                 }
             }
         }
@@ -153,7 +161,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             logger.error(ex.getMessage(), ex);
             try {
                 // 不返回跳转地址，直接到显示错误信息页面
-                returnErrorResponseJson(false,ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getMessage());
+                returnErrorResponseJson(false, ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -161,7 +169,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
-                returnErrorResponseJson(false,ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getClass().getName()+":"+ex.getMessage());
+                returnErrorResponseJson(false, ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getClass().getName() + ":" + ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -269,6 +277,4 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         }
         return true;
     }
-
-
 }

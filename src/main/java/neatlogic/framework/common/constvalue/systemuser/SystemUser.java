@@ -24,6 +24,7 @@ import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
+import neatlogic.framework.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,6 @@ public enum SystemUser implements ISystemUser {
     private final String userId;
     private final String userUuid;
     private final I18n userName;
-    private final String timezone = "+8:00";
     private final AuthenticationInfoVo authenticationInfoVo;
 
     SystemUser(String userId, String userUuid, I18n userName) {
@@ -70,7 +70,7 @@ public enum SystemUser implements ISystemUser {
 
     @Override
     public String getTimezone() {
-        return timezone;
+        return TimeUtil.ZONE_TIME;
     }
 
     @Override

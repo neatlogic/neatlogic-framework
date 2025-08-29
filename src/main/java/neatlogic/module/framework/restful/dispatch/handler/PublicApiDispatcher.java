@@ -47,8 +47,8 @@ import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.util.TimeUtil;
 import neatlogic.module.framework.restful.counter.ApiAccessCountService;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -103,7 +103,7 @@ public class PublicApiDispatcher {
         RequestContext.init(request, token, response);
         //初始化时区
         Cookie[] cookies = request.getCookies();
-        String timezone = "+8:00";
+        String timezone = TimeUtil.ZONE_TIME;
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("neatlogic_timezone".equals(cookie.getName())) {

@@ -34,6 +34,7 @@ import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
+import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -149,7 +150,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 }
             }
             userVo.setJwtVo(jwtVo);
-            UserContext.init(userVo, authenticationInfoVo, "+8:00", request, response);
+            UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME, request, response);
             if (isNeedLoginPost) {
                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                     loginPostProcessor.loginAfterInitialization();

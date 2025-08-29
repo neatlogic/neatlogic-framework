@@ -25,6 +25,7 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.user.NoUserException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,7 +48,7 @@ public class UserContext implements Serializable {
     private String userName;
     private String userId;
     private String userUuid;
-    private String timezone = "+8:00";
+    private String timezone = TimeUtil.ZONE_TIME;
     private String token;
     private AuthenticationInfoVo authenticationInfoVo;
     //是否超级管理员

@@ -44,6 +44,7 @@ import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.service.TenantService;
 import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.Md5Util;
+import neatlogic.framework.util.TimeUtil;
 import neatlogic.framework.util.UuidUtil;
 import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
@@ -161,7 +162,7 @@ public class LoginController {
                     checkUserVo = loginAuth.login(userVo, returnObj);
                 }
                 if (checkUserVo != null) {
-                    String timezone = "+8:00";
+                    String timezone = TimeUtil.ZONE_TIME;
                     authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
                     UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
                     if (TenantContext.get().getTenantUuid() != null) {

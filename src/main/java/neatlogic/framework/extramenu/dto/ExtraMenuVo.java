@@ -19,9 +19,11 @@ import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.dto.AuthorityVo;
+import neatlogic.framework.extramenu.constvalue.ExtraMenuOpenType;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,12 @@ public class ExtraMenuVo {
     private List<AuthorityVo> authorityVoList;
     @JSONField(serialize = false)
     private ExtraMenuVo parent;
+    @EntityField(name = "排序", type = ApiParamType.INTEGER)
+    private Integer sort;
+    @EntityField(name = "打开方式", type = ApiParamType.STRING)
+    private String openType;
+    @EntityField(name = "打开方式名称", type = ApiParamType.STRING)
+    private String openTypeText;
 
     public Long getId() {
         if (id == null) {
@@ -66,6 +74,30 @@ public class ExtraMenuVo {
         }
         return id;
     }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public String getOpenType() {
+        return openType;
+    }
+
+    public void setOpenType(String openType) {
+        this.openType = openType;
+    }
+
+    public String getOpenTypeText() {
+        if (StringUtils.isNotBlank(openType)) {
+            openTypeText = ExtraMenuOpenType.getText(openType);
+        }
+        return openTypeText;
+    }
+
 
     public void setId(Long id) {
         this.id = id;
@@ -152,7 +184,10 @@ public class ExtraMenuVo {
     }
 
     public Integer getChildCount() {
-        return childCount;
+        if (CollectionUtils.isNotEmpty(children)) {
+            return children.size();
+        }
+        return 0;
     }
 
     public void setChildCount(Integer childCount) {

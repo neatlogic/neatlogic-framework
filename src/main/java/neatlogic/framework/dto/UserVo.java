@@ -76,6 +76,9 @@ public class UserVo extends BaseEditorVo implements Serializable {
     @EntityField(name = "是否已删除", type = ApiParamType.ENUM)
     private Integer isDelete;
 
+    @EntityField(name = "令牌", type = ApiParamType.STRING)
+    private String token;
+
     @EntityField(name = "用户所在组的头衔", type = ApiParamType.ENUM)
     private String title;
 
@@ -409,6 +412,14 @@ public class UserVo extends BaseEditorVo implements Serializable {
 
     public void setIsDelete(Integer isDelete) {
         this.isDelete = isDelete;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getTitle() {

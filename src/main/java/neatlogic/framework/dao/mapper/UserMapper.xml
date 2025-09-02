@@ -1478,6 +1478,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `pinyin`,
         `is_active`,
         `is_delete`,
+        `token`,
         `source`,
         `fcu`,
         `fcd`,
@@ -1494,6 +1495,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{pinyin},
             #{isActive},
             0,
+            #{token},
             #{source},
             #{fcu},
             NOW(3),
@@ -1508,6 +1510,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         `pinyin` = #{pinyin},
         `is_active` = #{isActive},
         `is_delete` = 0,
+        `token` = IFNULL(`token`, #{token}),
         `source` = #{source},
         `lcu` = #{lcu},
         `lcd` = #{lcd}

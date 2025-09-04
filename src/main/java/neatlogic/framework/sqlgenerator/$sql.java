@@ -259,7 +259,7 @@ public class $sql {
         if (CollectionUtils.isNotEmpty(whereExpressionList)) {
             List<String> expressionJSONStringList = new ArrayList<>();
             for (ExpressionVo whereExpression : whereExpressionList) {
-                String expressionJSONString = JSON.toJSONString(whereExpression, SerializerFeature.MapSortField, SerializerFeature.DisableCircularReferenceDetect);
+                String expressionJSONString = JSON.toJSONString(whereExpression, SerializerFeature.MapSortField);
                 if (!expressionJSONStringList.contains(expressionJSONString)) {
                     addWhereExpression(plainSelect, whereExpression);
                     expressionJSONStringList.add(expressionJSONString);

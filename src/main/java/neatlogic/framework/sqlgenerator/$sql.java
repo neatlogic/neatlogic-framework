@@ -17,6 +17,8 @@
 
 package neatlogic.framework.sqlgenerator;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.util.TimeUtil;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -255,8 +257,13 @@ public class $sql {
             }
         }
         if (CollectionUtils.isNotEmpty(whereExpressionList)) {
+            List<String> expressionJSONStringList = new ArrayList<>();
             for (ExpressionVo whereExpression : whereExpressionList) {
-                addWhereExpression(plainSelect, whereExpression);
+                String expressionJSONString = JSON.toJSONString(whereExpression, SerializerFeature.MapSortField);
+                if (!expressionJSONStringList.contains(expressionJSONString)) {
+                    addWhereExpression(plainSelect, whereExpression);
+                    expressionJSONStringList.add(expressionJSONString);
+                }
             }
         }
         if (CollectionUtils.isNotEmpty(groupByList)) {

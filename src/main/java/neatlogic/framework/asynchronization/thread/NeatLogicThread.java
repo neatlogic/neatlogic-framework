@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicThread> {
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicThread.class);
@@ -141,12 +142,13 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
                 /* 等待所有模块加载完成后，phaser将会变成1，线程才开始执行 **/
                 ModuleInitApplicationListener.getModuleinitphaser().awaitAdvance(0);
             }
+            boolean canRun = true;
             if (this.lock != null) {
-                //System.out.println(this.getThreadName() + "尝试获取锁" + this.lock);
-                lock.acquire();
-                //System.out.println(this.getThreadName() + "成功获取锁" + this.lock);
+                canRun = lock.tryAcquire(30, TimeUnit.SECONDS);
             }
-            execute();
+            if (canRun) {
+                execute();
+            }
             Thread.currentThread().setName(oldThreadName);
         } catch (ApiRuntimeException ex) {
             logger.warn(ex.getMessage(), ex);
@@ -155,7 +157,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         } finally {
             if (this.lock != null) {
                 lock.release();
-                //System.out.println(this.getThreadName() + "成功释放锁" + this.lock);
             }
             if (countDownLatch != null) {
                 countDownLatch.countDown();

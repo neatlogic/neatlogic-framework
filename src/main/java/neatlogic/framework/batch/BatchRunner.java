@@ -145,6 +145,8 @@ public class BatchRunner<T> {
             latch = _latch;
             needTransaction = _needTransaction;
             state = _state;
+            //优先级最高
+            this.setPriority(1);
         }
 
         @Override

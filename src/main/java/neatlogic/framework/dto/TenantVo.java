@@ -115,9 +115,6 @@ public class TenantVo extends BaseEditorVo {
     @EntityField(name = "nfd.tenantvo.visittime", type = ApiParamType.LONG)
     private Date visitTime;
 
-    @EntityField(name = "创建租户时是否需要demo数据", type = ApiParamType.INTEGER)
-    private Integer isNeedDemo;
-
     private Boolean isEdit = false;
 
 
@@ -273,14 +270,6 @@ public class TenantVo extends BaseEditorVo {
 
     public void setVisitTime(Date visitTime) {
         this.visitTime = visitTime;
-    }
-
-    public Integer getIsNeedDemo() {
-        return isNeedDemo;
-    }
-
-    public void setIsNeedDemo(Integer isNeedDemo) {
-        this.isNeedDemo = isNeedDemo;
     }
 
     public Boolean getIsEdit() {

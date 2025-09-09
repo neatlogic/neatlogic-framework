@@ -113,8 +113,7 @@
                `is_active`    AS isActive,
                `expire_date`  AS expireDate,
                `status`,
-               `description`,
-               `is_need_demo` as isNeedDemo
+               `description`
         FROM `tenant`
         WHERE `uuid` = #{value}
     </select>
@@ -165,7 +164,6 @@
         INSERT INTO `tenant` (`uuid`,
                               `name`,
                               `is_active`,
-                              `is_need_demo`,
                               `expire_date`,
                               `status`,
                               `fcd`,
@@ -173,15 +171,19 @@
         VALUES (#{uuid},
                 #{name},
                 #{isActive},
-                #{isNeedDemo},
                 #{expireDate},
                 #{status},
                 now(),
                 #{description})
+        on duplicate key update
+        `is_active` = #{isActive},
+        `expire_date` = #{expireDate},
+        `status` = #{status},
+        `description` = #{description}
     </insert>
 
     <insert id="insertTenantModuleGroup">
-        INSERT INTO `tenant_modulegroup` (`tenant_uuid`, `module_group`)
+        INSERT ignore INTO `tenant_modulegroup` (`tenant_uuid`, `module_group`)
         VALUES (#{tenantUuid}, #{moduleGroup})
     </insert>
 

@@ -89,6 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </insert>
 
     <insert id="createDatabaseUser" parameterType="neatlogic.framework.dto.DatasourceVo">
+        DROP USER IF EXISTS '${tenantUuid}'@'%';
         CREATE USER '${tenantUuid}'@'%' IDENTIFIED BY '${passwordPlain}';
     </insert>
 

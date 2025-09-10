@@ -32,15 +32,6 @@ public class TenantModuleDmlSqlVo {
         this.type = type;
     }
 
-    public TenantModuleDmlSqlVo(String tenantUuid, String moduleId, String sqlMd5, int sqlStatus, String errorMsg, String type) {
-        this.tenantUuid = tenantUuid;
-        this.moduleId = moduleId;
-        this.sqlMd5 = sqlMd5;
-        this.sqlStatus = sqlStatus;
-        this.type = type;
-        this.errorMsg = errorMsg;
-    }
-
     public String getTenantUuid() {
         return tenantUuid;
     }

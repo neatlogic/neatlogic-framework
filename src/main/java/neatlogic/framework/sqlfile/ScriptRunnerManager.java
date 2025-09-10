@@ -23,7 +23,6 @@ import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
 import neatlogic.framework.store.mysql.DatasourceManager;
 import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
-import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import neatlogic.framework.util.Md5Util;
 import org.apache.commons.lang3.StringUtils;
@@ -97,7 +96,7 @@ public class ScriptRunnerManager {
     /**
      * 仅执行一次sql，执行过的sql跳过不执行
      */
-    public static void runScriptOnceWithJdbc(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
+    public static void runDmlScriptWithJdbc(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
         StringWriter logStrWriter = new StringWriter();
         PrintWriter logWriter = new PrintWriter(logStrWriter);
         StringWriter errStrWriter = new StringWriter();
@@ -120,20 +119,16 @@ public class ScriptRunnerManager {
                 // 如果没有执行过该sql，则执行
                 String sqlMd5 = Md5Util.encryptMD5(line);
                 if (!executeSqlParamVo.getDmlSqlHashList().contains(sqlMd5)) {
+                    TenantModuleDmlSqlVo tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(executeSqlParamVo.getTenant().getUuid(), executeSqlParamVo.getModuleId(), sqlMd5, executeSqlParamVo.getSqlFile());
                     runner.runScript(new StringReader(line));
-                    TenantModuleDmlSqlVo tenantModuleDmlSqlVo;
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
                         String error = "  ✖" + executeSqlParamVo.getTenant().getName() + "·" + executeSqlParamVo.getModuleId() + "." + executeSqlParamVo.getSqlFile() + ": " + errStrWriter;
-                        //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
-                        //errStrWriter.getBuffer().setLength(0);
-                        if (StringUtils.isNotBlank(executeSqlParamVo.getSqlFile()) && executeSqlParamVo.getSqlFile().equals("dml.sql")) {
-                            error += I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.failed");
-                        }
-                        throw new ModuleInitRuntimeException(error);
-                    } else {
-                        tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(executeSqlParamVo.getTenant().getUuid(), executeSqlParamVo.getModuleId(), sqlMd5, executeSqlParamVo.getSqlFile());
-                        executeSqlParamVo.getDmlSqlHashList().add(sqlMd5);
+                        System.out.println(error);
+                        executeSqlParamVo.setError(true);
+                        tenantModuleDmlSqlVo.setSqlStatus(0);
+                        tenantModuleDmlSqlVo.setErrorMsg(error);
                     }
+                    executeSqlParamVo.getDmlSqlHashList().add(sqlMd5);
                     insertTenantModuleDmlSql(tenantModuleDmlSqlVo, executeSqlParamVo.getNeatlogicConn());
                     insertTenantModuleDmlSqlDetail(sqlMd5, line, executeSqlParamVo.getNeatlogicConn());
                 }

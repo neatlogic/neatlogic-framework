@@ -234,6 +234,7 @@ public class ChangelogUtil {
     public static void initDmlSql(ResourcePatternResolver resolver, List<TenantVo> activeTenantList, List<ModuleVo> moduleVoList, Connection neatlogicConn) throws Exception {
         System.out.printf("⚡" + (I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n");
         Map<String, List<String>> allActiveTenantDmlSqlHashMap = ChangelogUtil.getAllActiveTenantDmlSqlHashMap(activeTenantList, neatlogicConn);
+        boolean isError = false;
         for (TenantVo tenantVo : activeTenantList) {
             try (Connection tenantConnection = JdbcUtil.getNeatlogicTenantConnection(tenantVo, false)) {
                 for (ModuleVo moduleVo : moduleVoList) {
@@ -244,11 +245,17 @@ public class ChangelogUtil {
                             tenantDmlSqlList = new ArrayList<>();
                         }
                         ExecuteSqlParamVo executeSqlParamVo = new ExecuteSqlParamVo(tenantVo, moduleVo.getId(), resource, tenantDmlSqlList, tenantConnection, neatlogicConn, false);
-                        ScriptRunnerManager.runScriptOnceWithJdbc(executeSqlParamVo);
+                        ScriptRunnerManager.runDmlScriptWithJdbc(executeSqlParamVo);
+                        if (executeSqlParamVo.isError()) {
+                            isError = true;
+                        }
                     }
                 }
                 System.out.println("  ✓" + tenantVo.getName());
             }
+        }
+        if (isError) {
+            System.exit(1);
         }
     }
 

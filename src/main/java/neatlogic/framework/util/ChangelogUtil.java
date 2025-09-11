@@ -169,7 +169,7 @@ public class ChangelogUtil {
         String placeholders = tenantUuidList.stream().map(id -> "?").collect(Collectors.joining(","));
         placeholders = placeholders + " , ?";
         ResultSet sqlMd5ResultSet = null;
-        try (PreparedStatement sqlMd5Statement = connection.prepareStatement("select sql_uuid,`tenant_uuid` from tenant_module_dmlsql where `tenant_uuid` in (" + placeholders + ")  and `sql_status` = 1  order by tenant_uuid")) {
+        try (PreparedStatement sqlMd5Statement = connection.prepareStatement("select sql_uuid,`tenant_uuid` from tenant_module_dmlsql where `tenant_uuid` in (" + placeholders + ")  and (`sql_status` = 1 or `ignored` = 1) order by tenant_uuid")) {
             for (int i = 0; i < tenantUuidList.size(); i++) {
                 sqlMd5Statement.setString(i + 1, tenantUuidList.get(i));
             }

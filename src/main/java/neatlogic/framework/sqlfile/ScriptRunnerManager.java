@@ -125,6 +125,7 @@ public class ScriptRunnerManager {
                         String error = "  ✖" + executeSqlParamVo.getTenant().getName() + "·" + executeSqlParamVo.getModuleId() + "." + executeSqlParamVo.getSqlFile() + ": " + errStrWriter;
                         System.out.println(error);
                         executeSqlParamVo.setError(true);
+                        tenantModuleDmlSqlVo.setIgnored(1);
                         tenantModuleDmlSqlVo.setSqlStatus(0);
                         tenantModuleDmlSqlVo.setErrorMsg(error);
                     }
@@ -320,15 +321,17 @@ public class ScriptRunnerManager {
      * @param tenantModuleDmlSqlVo dml sql对象
      */
     private static void insertTenantModuleDmlSql(TenantModuleDmlSqlVo tenantModuleDmlSqlVo, Connection neatlogicConn) throws Exception {
-        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`) VALUES (?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?")) {
+        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`, `ignored`) VALUES (?,?,?,?,?,now(),?,?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?, `ignored` = ?")) {
             statement.setString(1, tenantModuleDmlSqlVo.getTenantUuid());
             statement.setString(2, tenantModuleDmlSqlVo.getModuleId());
             statement.setString(3, tenantModuleDmlSqlVo.getSqlMd5());
             statement.setInt(4, tenantModuleDmlSqlVo.getSqlStatus());
             statement.setString(5, tenantModuleDmlSqlVo.getErrorMsg());
             statement.setString(6, tenantModuleDmlSqlVo.getType());
-            statement.setInt(7, tenantModuleDmlSqlVo.getSqlStatus());
-            statement.setString(8, tenantModuleDmlSqlVo.getErrorMsg());
+            statement.setInt(7, tenantModuleDmlSqlVo.getIgnored());
+            statement.setInt(8, tenantModuleDmlSqlVo.getSqlStatus());
+            statement.setString(9, tenantModuleDmlSqlVo.getErrorMsg());
+            statement.setInt(10, tenantModuleDmlSqlVo.getIgnored());
             statement.execute();
         } catch (Exception ex) {
             throw new Exception(ex);

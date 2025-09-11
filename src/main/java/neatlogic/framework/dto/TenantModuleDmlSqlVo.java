@@ -19,6 +19,9 @@ public class TenantModuleDmlSqlVo {
     @EntityField(name = "类型", type = ApiParamType.STRING)
     private String type;
 
+    @EntityField(name = "是否忽略", type = ApiParamType.STRING)
+    private int ignored = 0;
+
     private String errorMsg;
 
     public TenantModuleDmlSqlVo() {
@@ -78,5 +81,13 @@ public class TenantModuleDmlSqlVo {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public int getIgnored() {
+        return ignored;
+    }
+
+    public void setIgnored(int ignored) {
+        this.ignored = ignored;
     }
 }

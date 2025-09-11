@@ -547,6 +547,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <result property="teamUuid" column="teamUuid"/>
         <result property="titleId" column="titleId"/>
         <result property="title" column="title"/>
+        <result property="titleSort" column="titleSort"/>
         <collection property="userVoList" ofType="neatlogic.framework.dto.UserVo">
             <result property="userId" column="userId"/>
             <result property="uuid" column="userUuId"/>
@@ -562,11 +563,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                u.`uuid`        as userUuid,
                u.`user_info`   AS userInfo,
                ut.`id`         AS titleId,
-               ut.`name`       AS title
+               ut.`name`       AS title,
+               tut.`title_sort` as titleSort
         FROM `team_user_title` tut
                  LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
                  LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
         where tut.`team_uuid` = #{value}
+        order by tut.`title_sort`,tut.`title_id` asc
     </select>
     <select id="checkTitleIsReferenceByTitleId" resultType="java.lang.Integer">
         select count(title_id)
@@ -864,10 +867,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     <insert id="insertTeamUserTitle">
         INSERT ignore INTO `team_user_title` (`team_uuid`,
                                               `user_uuid`,
-                                              `title_id`)
+                                              `title_id`,
+                                              `title_sort`)
         VALUES (#{teamUuid},
                 #{userUuid},
-                #{titleId});
+                #{titleId},
+                #{titleSort});
     </insert>
 
     <update id="updateTeamByUuid" parameterType="neatlogic.framework.dto.TeamVo">

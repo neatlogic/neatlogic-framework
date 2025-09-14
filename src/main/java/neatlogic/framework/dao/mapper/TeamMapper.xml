@@ -552,25 +552,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <result property="userId" column="userId"/>
             <result property="uuid" column="userUuId"/>
             <result property="userName" column="userName"/>
+            <result property="phone" column="userPhone"/>
+            <result property="email" column="userEmail"/>
             <result property="userInfo" column="userInfo"/>
         </collection>
     </resultMap>
 
     <select id="getTeamUserTitleListByTeamUuid" resultMap="teamUserTitleMap">
-        SELECT tut.`team_uuid` AS teamUuid,
-               u.`user_name`   AS userName,
-               u.`user_id`     AS userId,
-               u.`uuid`        as userUuid,
-               u.`user_info`   AS userInfo,
-               ut.`id`         AS titleId,
-               ut.`name`       AS title,
+        SELECT tut.`team_uuid`  AS teamUuid,
+               u.`user_name`    AS userName,
+               u.`user_id`      AS userId,
+               u.`uuid`         as userUuid,
+               u.`user_info`    AS userInfo,
+               u.`phone`        AS userPhone,
+               u.`email`        AS userEmail,
+               ut.`id`          AS titleId,
+               ut.`name`        AS title,
                tut.`title_sort` as titleSort
         FROM `team_user_title` tut
                  LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
                  LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
         where tut.`team_uuid` = #{value}
-        order by tut.`title_sort`,tut.`title_id` asc
+        order by tut.`title_sort`, tut.`title_id` asc
     </select>
+
     <select id="checkTitleIsReferenceByTitleId" resultType="java.lang.Integer">
         select count(title_id)
         from `team_user_title`
@@ -583,6 +588,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                u.`user_id`     AS userId,
                u.`uuid`        AS userUuid,
                u.`user_info`   AS userInfo,
+               u.`phone`        AS userPhone,
+               u.`email`        AS userEmail,
                ut.`id`         AS titleId,
                ut.`name`       AS title
         FROM `team` t

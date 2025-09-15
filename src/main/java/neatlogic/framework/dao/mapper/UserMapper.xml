@@ -1052,12 +1052,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
         for update
     </select>
+
     <select id="searchUserTitleCount" resultType="java.lang.Integer">
         select count(id) from `user_title`
         <if test="keyword != null and keyword != ''">
             where `name` LIKE CONCAT(#{keyword}, '%')
         </if>
     </select>
+
     <select id="searchUserTitle" resultType="neatlogic.framework.dto.UserTitleVo">
         select `id`,`name` from `user_title`
         <if test="keyword != null and keyword != ''">

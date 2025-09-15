@@ -119,7 +119,6 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
             //System.out.println("创建索引");
             //删除索引
             fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(fullTextIndexVo, moduleId);
-
             //写入目标表
             FullTextIndexTargetVo fullTextIndexTargetVo = new FullTextIndexTargetVo();
             fullTextIndexTargetVo.setModuleId(this.getModuleId());

@@ -73,7 +73,7 @@ public class LicenseModuleVo implements Serializable {
     }
 
     public Boolean getIsInvalidPolicy() {
-        if (CollectionUtils.isNotEmpty(policy) && TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid())) {
+        if (CollectionUtils.isNotEmpty(policy) && TenantContext.get() != null && StringUtils.isNotBlank(TenantContext.get().getTenantUuid()) &&  LicenseUtil.tenantLicenseInvalidTipsMap.containsKey(TenantContext.get().getTenantUuid())) {
             return policy.stream().anyMatch(p -> LicenseUtil.tenantLicenseInvalidTipsMap.get(TenantContext.get().getTenantUuid()).containsKey(p.getKey()));
         }
         return false;

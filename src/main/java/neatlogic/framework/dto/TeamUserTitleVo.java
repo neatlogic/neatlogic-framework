@@ -15,6 +15,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dto;
 
+import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
@@ -31,6 +33,8 @@ public class TeamUserTitleVo implements Serializable {
     private String teamUuid;
     private String title;
     private Long titleId;
+    @EntityField(name = "头衔排序", type = ApiParamType.STRING)
+    private Integer titleSort;
 
     public List<UserVo> getUserVoList() {
         return userVoList;
@@ -73,5 +77,13 @@ public class TeamUserTitleVo implements Serializable {
 
     public void setTitleId(Long titleId) {
         this.titleId = titleId;
+    }
+
+    public Integer getTitleSort() {
+        return titleSort;
+    }
+
+    public void setTitleSort(Integer titleSort) {
+        this.titleSort = titleSort;
     }
 }

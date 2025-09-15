@@ -91,7 +91,7 @@ public interface TeamMapper {
 
     int insertTeamUser(TeamUserVo teamUserVo);
 
-    int insertTeamUserTitle(@Param("teamUuid") String teamUuid, @Param("userUuid") String userUuid, @Param("titleId") Long titleId);
+    int insertTeamUserTitle(@Param("teamUuid") String teamUuid, @Param("userUuid") String userUuid, @Param("titleId") Long titleId, @Param("titleSort") Integer titleSort);
 
     int updateTeamByUuid(TeamVo teamVo);
 

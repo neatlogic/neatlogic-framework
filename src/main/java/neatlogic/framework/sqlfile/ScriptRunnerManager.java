@@ -19,10 +19,8 @@ import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.ChangelogAuditVo;
 import neatlogic.framework.dto.ExecuteSqlParamVo;
 import neatlogic.framework.dto.TenantModuleDmlSqlVo;
-import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
-import neatlogic.framework.store.mysql.DatasourceManager;
-import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
+import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import neatlogic.framework.util.Md5Util;
 import org.apache.commons.lang3.StringUtils;
@@ -54,21 +52,13 @@ public class ScriptRunnerManager {
     /**
      * 执行sql文件
      *
-     * @param tenant       租户
      * @param scriptReader 脚本读取
      * @param logWriter    日志
      * @param errWriter    错误日志
      */
-    public static void runScript(TenantVo tenant, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, boolean isDataDb) throws Exception {
-        Connection conn = null;
+    public static void runScript(Connection conn, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter) throws Exception {
         ScriptRunner runner = null;
-        String tenantUuid = tenant.getUuid();
-        if (isDataDb) {
-            tenantUuid = tenantUuid + "_data";
-        }
-        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenantUuid);
         try {
-            conn = tenantDatasource.getConnection();
             runner = new ScriptRunner(conn);
             runner.setSendFullScript(false);
             runner.setAutoCommit(true);

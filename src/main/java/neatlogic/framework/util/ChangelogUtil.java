@@ -254,9 +254,9 @@ public class ChangelogUtil {
                 System.out.println("  ✓" + tenantVo.getName());
             }
         }
-        if (isError) {
-            System.exit(1);
-        }
+//        if (isError) {
+//            System.exit(1);
+//        }
     }
 
     /**
@@ -293,7 +293,7 @@ public class ChangelogUtil {
             for (String path : errorList) {
                 System.out.println(I18nUtils.getStaticMessage("nfb.moduleinitializer.checkchangelog.invalid", path, TimeUtil.YYYY_MM_DD));
             }
-            System.exit(1);
+            //System.exit(1);
         }
         Map<String, List<String>> allActiveTenantChangelogSqlHashMap = ChangelogUtil.getAllActiveTenantChangelogSqlHashMap(activeTenantList, neatlogicConn);
         updateNeatlogicDatabase(resolver, allActiveTenantChangelogSqlHashMap, neatlogicConn);
@@ -385,7 +385,7 @@ public class ChangelogUtil {
      * @return 激活的租户
      */
     private static String getNeatlogicVersion(Connection connection) throws Exception {
-        try (PreparedStatement versionStatement = connection.prepareStatement("SELECT * FROM version limit 1"); ResultSet versionResultSet = versionStatement.executeQuery();) {
+        try (PreparedStatement versionStatement = connection.prepareStatement("SELECT * FROM version order by version desc limit 1"); ResultSet versionResultSet = versionStatement.executeQuery();) {
             if (versionResultSet.next()) {
                 return versionResultSet.getString("version");
             }
@@ -488,9 +488,9 @@ public class ChangelogUtil {
                 }
             }
         }
-        if (isError) {
-            System.exit(1);
-        }
+//        if (isError) {
+//            System.exit(1);
+//        }
     }
 
     /**

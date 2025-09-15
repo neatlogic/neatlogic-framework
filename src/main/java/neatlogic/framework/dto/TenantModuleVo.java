@@ -11,10 +11,6 @@ public class TenantModuleVo {
 	private String tenantUuid;
 	@EntityField(name = "term.cmdb.moduleid", type = ApiParamType.STRING)
 	private String moduleId;
-	@EntityField(name = "nfd.tenantmodulevo.ddlstatus", type = ApiParamType.INTEGER)
-	private Integer ddlStatus;
-	@EntityField(name = "nfd.tenantmodulevo.dmlstatus", type = ApiParamType.INTEGER)
-	private Integer dmlStatus;
 	@EntityField(name = "common.createdate", type = ApiParamType.LONG)
 	private Date fcd;
 	@EntityField(name = "common.editdate", type = ApiParamType.LONG)
@@ -52,22 +48,6 @@ public class TenantModuleVo {
 
 	public void setLcd(Date lcd) {
 		this.lcd = lcd;
-	}
-
-	public Integer getDdlStatus() {
-		return ddlStatus;
-	}
-
-	public void setDdlStatus(Integer ddlStatus) {
-		this.ddlStatus = ddlStatus;
-	}
-
-	public Integer getDmlStatus() {
-		return dmlStatus;
-	}
-
-	public void setDmlStatus(Integer dmlStatus) {
-		this.dmlStatus = dmlStatus;
 	}
 
 	public String getVersion() {

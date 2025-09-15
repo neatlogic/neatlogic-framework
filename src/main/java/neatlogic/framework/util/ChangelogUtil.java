@@ -169,7 +169,7 @@ public class ChangelogUtil {
         String placeholders = tenantUuidList.stream().map(id -> "?").collect(Collectors.joining(","));
         placeholders = placeholders + " , ?";
         ResultSet sqlMd5ResultSet = null;
-        try (PreparedStatement sqlMd5Statement = connection.prepareStatement("select sql_uuid,`tenant_uuid` from tenant_module_dmlsql where `tenant_uuid` in (" + placeholders + ")  and `sql_status` = 1  order by tenant_uuid")) {
+        try (PreparedStatement sqlMd5Statement = connection.prepareStatement("select sql_uuid,`tenant_uuid` from tenant_module_dmlsql where `tenant_uuid` in (" + placeholders + ")  and (`sql_status` = 1 or `ignored` = 1) order by tenant_uuid")) {
             for (int i = 0; i < tenantUuidList.size(); i++) {
                 sqlMd5Statement.setString(i + 1, tenantUuidList.get(i));
             }
@@ -234,6 +234,7 @@ public class ChangelogUtil {
     public static void initDmlSql(ResourcePatternResolver resolver, List<TenantVo> activeTenantList, List<ModuleVo> moduleVoList, Connection neatlogicConn) throws Exception {
         System.out.printf("⚡" + (I18nUtils.getStaticMessage("nfb.moduleinitializer.initdmlsql.tenant")) + "%n");
         Map<String, List<String>> allActiveTenantDmlSqlHashMap = ChangelogUtil.getAllActiveTenantDmlSqlHashMap(activeTenantList, neatlogicConn);
+        boolean isError = false;
         for (TenantVo tenantVo : activeTenantList) {
             try (Connection tenantConnection = JdbcUtil.getNeatlogicTenantConnection(tenantVo, false)) {
                 for (ModuleVo moduleVo : moduleVoList) {
@@ -244,12 +245,18 @@ public class ChangelogUtil {
                             tenantDmlSqlList = new ArrayList<>();
                         }
                         ExecuteSqlParamVo executeSqlParamVo = new ExecuteSqlParamVo(tenantVo, moduleVo.getId(), resource, tenantDmlSqlList, tenantConnection, neatlogicConn, false);
-                        ScriptRunnerManager.runScriptOnceWithJdbc(executeSqlParamVo);
+                        ScriptRunnerManager.runDmlScriptWithJdbc(executeSqlParamVo);
+                        if (executeSqlParamVo.isError()) {
+                            isError = true;
+                        }
                     }
                 }
                 System.out.println("  ✓" + tenantVo.getName());
             }
         }
+//        if (isError) {
+//            System.exit(1);
+//        }
     }
 
     /**
@@ -286,7 +293,7 @@ public class ChangelogUtil {
             for (String path : errorList) {
                 System.out.println(I18nUtils.getStaticMessage("nfb.moduleinitializer.checkchangelog.invalid", path, TimeUtil.YYYY_MM_DD));
             }
-            System.exit(1);
+            //System.exit(1);
         }
         Map<String, List<String>> allActiveTenantChangelogSqlHashMap = ChangelogUtil.getAllActiveTenantChangelogSqlHashMap(activeTenantList, neatlogicConn);
         updateNeatlogicDatabase(resolver, allActiveTenantChangelogSqlHashMap, neatlogicConn);
@@ -378,7 +385,7 @@ public class ChangelogUtil {
      * @return 激活的租户
      */
     private static String getNeatlogicVersion(Connection connection) throws Exception {
-        try (PreparedStatement versionStatement = connection.prepareStatement("SELECT * FROM version limit 1"); ResultSet versionResultSet = versionStatement.executeQuery();) {
+        try (PreparedStatement versionStatement = connection.prepareStatement("SELECT * FROM version order by version desc limit 1"); ResultSet versionResultSet = versionStatement.executeQuery();) {
             if (versionResultSet.next()) {
                 return versionResultSet.getString("version");
             }
@@ -481,9 +488,9 @@ public class ChangelogUtil {
                 }
             }
         }
-        if (isError) {
-            System.exit(1);
-        }
+//        if (isError) {
+//            System.exit(1);
+//        }
     }
 
     /**

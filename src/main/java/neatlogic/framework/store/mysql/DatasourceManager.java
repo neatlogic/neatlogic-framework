@@ -68,6 +68,14 @@ public class DatasourceManager {
         return (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
     }
 
+    public static void removeDatasource(String tenantUuid) {
+        if (datasourceMap.containsKey(tenantUuid)) {
+            NeatLogicBasicDataSource dataSource = (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
+            dataSource.close();
+            datasourceMap.remove(tenantUuid);
+        }
+    }
+
 
     @PostConstruct
     public void init() {

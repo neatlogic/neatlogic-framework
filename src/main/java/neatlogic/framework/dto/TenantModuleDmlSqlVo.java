@@ -19,6 +19,9 @@ public class TenantModuleDmlSqlVo {
     @EntityField(name = "类型", type = ApiParamType.STRING)
     private String type;
 
+    @EntityField(name = "是否忽略", type = ApiParamType.STRING)
+    private int ignored = 0;
+
     private String errorMsg;
 
     public TenantModuleDmlSqlVo() {
@@ -30,15 +33,6 @@ public class TenantModuleDmlSqlVo {
         this.sqlMd5 = sqlMd5;
         this.sqlStatus = 1;
         this.type = type;
-    }
-
-    public TenantModuleDmlSqlVo(String tenantUuid, String moduleId, String sqlMd5, int sqlStatus, String errorMsg, String type) {
-        this.tenantUuid = tenantUuid;
-        this.moduleId = moduleId;
-        this.sqlMd5 = sqlMd5;
-        this.sqlStatus = sqlStatus;
-        this.type = type;
-        this.errorMsg = errorMsg;
     }
 
     public String getTenantUuid() {
@@ -87,5 +81,13 @@ public class TenantModuleDmlSqlVo {
 
     public void setErrorMsg(String errorMsg) {
         this.errorMsg = errorMsg;
+    }
+
+    public int getIgnored() {
+        return ignored;
+    }
+
+    public void setIgnored(int ignored) {
+        this.ignored = ignored;
     }
 }

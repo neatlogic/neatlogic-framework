@@ -19,10 +19,7 @@ import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.ChangelogAuditVo;
 import neatlogic.framework.dto.ExecuteSqlParamVo;
 import neatlogic.framework.dto.TenantModuleDmlSqlVo;
-import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
-import neatlogic.framework.store.mysql.DatasourceManager;
-import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
 import neatlogic.framework.util.I18nUtils;
 import neatlogic.framework.util.JdbcUtil;
 import neatlogic.framework.util.Md5Util;
@@ -55,21 +52,13 @@ public class ScriptRunnerManager {
     /**
      * 执行sql文件
      *
-     * @param tenant       租户
      * @param scriptReader 脚本读取
      * @param logWriter    日志
      * @param errWriter    错误日志
      */
-    public static void runScript(TenantVo tenant, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter, boolean isDataDb) throws Exception {
-        Connection conn = null;
+    public static void runScript(Connection conn, Reader scriptReader, PrintWriter logWriter, PrintWriter errWriter) throws Exception {
         ScriptRunner runner = null;
-        String tenantUuid = tenant.getUuid();
-        if (isDataDb) {
-            tenantUuid = tenantUuid + "_data";
-        }
-        NeatLogicBasicDataSource tenantDatasource = DatasourceManager.getDatasource(tenantUuid);
         try {
-            conn = tenantDatasource.getConnection();
             runner = new ScriptRunner(conn);
             runner.setSendFullScript(false);
             runner.setAutoCommit(true);
@@ -97,7 +86,7 @@ public class ScriptRunnerManager {
     /**
      * 仅执行一次sql，执行过的sql跳过不执行
      */
-    public static void runScriptOnceWithJdbc(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
+    public static void runDmlScriptWithJdbc(ExecuteSqlParamVo executeSqlParamVo) throws Exception {
         StringWriter logStrWriter = new StringWriter();
         PrintWriter logWriter = new PrintWriter(logStrWriter);
         StringWriter errStrWriter = new StringWriter();
@@ -120,20 +109,17 @@ public class ScriptRunnerManager {
                 // 如果没有执行过该sql，则执行
                 String sqlMd5 = Md5Util.encryptMD5(line);
                 if (!executeSqlParamVo.getDmlSqlHashList().contains(sqlMd5)) {
+                    TenantModuleDmlSqlVo tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(executeSqlParamVo.getTenant().getUuid(), executeSqlParamVo.getModuleId(), sqlMd5, executeSqlParamVo.getSqlFile());
                     runner.runScript(new StringReader(line));
-                    TenantModuleDmlSqlVo tenantModuleDmlSqlVo;
                     if (StringUtils.isNotBlank(errStrWriter.toString())) {
                         String error = "  ✖" + executeSqlParamVo.getTenant().getName() + "·" + executeSqlParamVo.getModuleId() + "." + executeSqlParamVo.getSqlFile() + ": " + errStrWriter;
-                        //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
-                        //errStrWriter.getBuffer().setLength(0);
-                        if (StringUtils.isNotBlank(executeSqlParamVo.getSqlFile()) && executeSqlParamVo.getSqlFile().equals("dml.sql")) {
-                            error += I18nUtils.getStaticMessage("nfs.scriptrunnermanager.runscriptoncewithjdbc.failed");
-                        }
-                        throw new ModuleInitRuntimeException(error);
-                    } else {
-                        tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(executeSqlParamVo.getTenant().getUuid(), executeSqlParamVo.getModuleId(), sqlMd5, executeSqlParamVo.getSqlFile());
-                        executeSqlParamVo.getDmlSqlHashList().add(sqlMd5);
+                        System.out.println(error);
+                        executeSqlParamVo.setError(true);
+                        tenantModuleDmlSqlVo.setIgnored(1);
+                        tenantModuleDmlSqlVo.setSqlStatus(0);
+                        tenantModuleDmlSqlVo.setErrorMsg(error);
                     }
+                    executeSqlParamVo.getDmlSqlHashList().add(sqlMd5);
                     insertTenantModuleDmlSql(tenantModuleDmlSqlVo, executeSqlParamVo.getNeatlogicConn());
                     insertTenantModuleDmlSqlDetail(sqlMd5, line, executeSqlParamVo.getNeatlogicConn());
                 }
@@ -325,15 +311,17 @@ public class ScriptRunnerManager {
      * @param tenantModuleDmlSqlVo dml sql对象
      */
     private static void insertTenantModuleDmlSql(TenantModuleDmlSqlVo tenantModuleDmlSqlVo, Connection neatlogicConn) throws Exception {
-        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`) VALUES (?,?,?,?,?,now(),?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?")) {
+        try (PreparedStatement statement = neatlogicConn.prepareStatement("insert into `tenant_module_dmlsql` (`tenant_uuid`,`module_id`,`sql_uuid`,`sql_status`,`error_msg`,`fcd`,`type`, `ignored`) VALUES (?,?,?,?,?,now(),?,?) ON DUPLICATE KEY UPDATE `sql_status` = ? , `error_msg` = ?, `ignored` = ?")) {
             statement.setString(1, tenantModuleDmlSqlVo.getTenantUuid());
             statement.setString(2, tenantModuleDmlSqlVo.getModuleId());
             statement.setString(3, tenantModuleDmlSqlVo.getSqlMd5());
             statement.setInt(4, tenantModuleDmlSqlVo.getSqlStatus());
             statement.setString(5, tenantModuleDmlSqlVo.getErrorMsg());
             statement.setString(6, tenantModuleDmlSqlVo.getType());
-            statement.setInt(7, tenantModuleDmlSqlVo.getSqlStatus());
-            statement.setString(8, tenantModuleDmlSqlVo.getErrorMsg());
+            statement.setInt(7, tenantModuleDmlSqlVo.getIgnored());
+            statement.setInt(8, tenantModuleDmlSqlVo.getSqlStatus());
+            statement.setString(9, tenantModuleDmlSqlVo.getErrorMsg());
+            statement.setInt(10, tenantModuleDmlSqlVo.getIgnored());
             statement.execute();
         } catch (Exception ex) {
             throw new Exception(ex);

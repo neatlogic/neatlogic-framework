@@ -32,7 +32,7 @@ public class CachedThreadPool {
     private static final Log logger = LogFactory.getLog(CachedThreadPool.class);
     private static final Map<Long, ThreadTaskVo> threadTaskMap = new ConcurrentHashMap<>();
     private static final Map<Long, ThreadVo> threadMap = new ConcurrentHashMap<>();
-    private static final Set<String> threadSet = new HashSet<>();
+    private static final Set<String> threadSet = ConcurrentHashMap.newKeySet();
     private static final PriorityBlockingQueue<NeatLogicThread> threadQueue = new PriorityBlockingQueue<>();
 
     static class NeatLogicThreadFactory implements ThreadFactory {

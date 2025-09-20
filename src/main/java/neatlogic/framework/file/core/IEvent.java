@@ -20,7 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 /**
  * 事件接口
  */
-public interface IEvent extends Runnable {
+public interface IEvent {
     /**
      * 线程名称
      * @return

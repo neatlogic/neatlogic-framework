@@ -16,9 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.file.core;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.thread.NeatLogicThread;
-import neatlogic.framework.file.core.appender.Appender;
-import neatlogic.framework.file.core.appender.AppenderManager;
 
 import java.util.function.Consumer;
 
@@ -28,7 +25,7 @@ import java.util.function.Consumer;
  * 经典组件（如appenders）的编写者应该知道，某些Event字段是延迟初始化的。因此，希望输出数据以供接收器稍后正确读取的附加程序必须在写出“惰性”字段之前对其进行初始化。
  * 有关确切列表，请参阅{@link#prepareForDeferredProcessing()}方法。
  */
-public class Event extends NeatLogicThread implements IEvent {
+public class Event implements IEvent {
     /**
      * 生成此日志记录事件的线程的名称。
      */
@@ -54,7 +51,6 @@ public class Event extends NeatLogicThread implements IEvent {
     private IAuditType auditType;
 
     public Event(String name, long timeStamp, JSONObject data, Consumer preProcessor, Consumer postProcessor, IAuditType auditType) {
-        super("Event");
         this.name = name;
         this.data = data;
         this.preProcessor = preProcessor;
@@ -67,12 +63,6 @@ public class Event extends NeatLogicThread implements IEvent {
     @Override
     public String getName() {
         return name;
-    }
-
-    @Override
-    protected void execute() {
-        Appender<IEvent> appender = AppenderManager.getAppender(this.auditType);
-        appender.doAppend(this);
     }
 
     @Override
@@ -136,6 +126,10 @@ public class Event extends NeatLogicThread implements IEvent {
     @Override
     public void setBeforeAppendFileSize(long fileSize) {
         this.beforeAppendFileSize = fileSize;
+    }
+
+    public IAuditType getAuditType() {
+        return auditType;
     }
 
     @Override

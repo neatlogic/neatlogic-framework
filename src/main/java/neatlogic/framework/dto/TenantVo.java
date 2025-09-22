@@ -41,7 +41,14 @@ public class TenantVo extends BaseEditorVo {
         DML_DEMO("dmldemo", "dml demo"),
         DML_DEMO_DATA("dmldemo_data", "dml demo data"),
         MONGODB("mongodb", "mongodb"),
-        ERROR("error", "nfdt.status.error");
+        ERROR("error", "nfdt.status.error"),
+        DB_INIT("db_init", "db_init"),
+        NEATLOGIC_DB("neatlogic", "neatlogic schema & data"),
+        NEATLOGIC_TENANT_DB("neatlogic tenant", "neatlogic tenant schema & data"),
+        NEATLOGIC_TENANT_DATA_DB("neatlogic tenant data", "neatlogic tenant data schema & data"),
+        CREATE_DB("create_database", "create database"),
+        CHANGE_LOG("change_log", "change log"),
+        ;
 
         private String value;
         private String text;

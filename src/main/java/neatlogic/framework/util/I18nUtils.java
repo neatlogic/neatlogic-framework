@@ -17,7 +17,7 @@ package neatlogic.framework.util;
 
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.i18n.JsonResourceBundleControl;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.MessageSourceAccessor;

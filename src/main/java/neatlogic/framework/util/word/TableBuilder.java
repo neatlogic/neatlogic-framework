@@ -16,8 +16,8 @@ package neatlogic.framework.util.word;
 
 import neatlogic.framework.util.word.enums.FontFamily;
 import neatlogic.framework.util.word.enums.TableColor;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xwpf.usermodel.*;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;

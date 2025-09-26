@@ -140,6 +140,9 @@ public class Config {
 
     private static String HEADER_RULE_PREFIX; //请求头规则，目前用于角色和执行器组规则
 
+    private static Integer RUNNER_CONNECT_TIMEOUT;// runner请求的timeout时间（毫秒）
+    private static Integer RUNNER_READ_TIMEOUT;// runner请求的读取timeout时间（毫秒）
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -488,6 +491,13 @@ public class Config {
         return HEADER_RULE_PREFIX;
     }
 
+    public static Integer RUNNER_CONNECT_TIMEOUT() {
+        return RUNNER_CONNECT_TIMEOUT;
+    }
+    public static Integer RUNNER_READ_TIMEOUT() {
+        return RUNNER_READ_TIMEOUT;
+    }
+
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
@@ -670,6 +680,8 @@ public class Config {
 
             JWT_SECRET = prop.getProperty("jwt.secret");
             HEADER_RULE_PREFIX = prop.getProperty("header.rule.prefix", "neatlogic-rule-");
+            RUNNER_CONNECT_TIMEOUT = Integer.valueOf(prop.getProperty("runner.connect.timeout","5000"));
+            RUNNER_READ_TIMEOUT = Integer.valueOf(prop.getProperty("runner.read.timeout","15000"));
             if (StringUtils.isBlank(JWT_SECRET)) {
                 System.out.println(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));

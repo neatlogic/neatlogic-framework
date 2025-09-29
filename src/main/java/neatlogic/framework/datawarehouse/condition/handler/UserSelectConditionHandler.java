@@ -35,7 +35,7 @@ public class UserSelectConditionHandler implements IDatasourceConditionHandler {
                 } else if (v.startsWith(GroupSearch.TEAM.getValuePlugin())) {
                     v = v.replace(GroupSearch.TEAM.getValuePlugin(), StringUtils.EMPTY);
                 } else if (v.startsWith(GroupSearch.COMMON.getValuePlugin())) {
-                    //暂时只支持当前登陆用户
+                    //暂时只支持当前登录用户
                     v = v.replace(GroupSearch.COMMON.getValuePlugin(), StringUtils.EMPTY);
                     if (v.equals(UserType.LOGIN_USER.getValue())) {
                         v = UserContext.get().getUserUuid();
@@ -58,7 +58,7 @@ public class UserSelectConditionHandler implements IDatasourceConditionHandler {
                     } else if (v.startsWith(GroupSearch.TEAM.getValuePlugin())) {
                         v = v.replace(GroupSearch.TEAM.getValuePlugin(), StringUtils.EMPTY);
                     } else if (v.startsWith(GroupSearch.COMMON.getValuePlugin())) {
-                        //暂时只支持当前登陆用户
+                        //暂时只支持当前登录用户
                         v = v.replace(GroupSearch.COMMON.getValuePlugin(), StringUtils.EMPTY);
                         if (v.equals(UserType.LOGIN_USER.getValue())) {
                             v = UserContext.get().getUserUuid();

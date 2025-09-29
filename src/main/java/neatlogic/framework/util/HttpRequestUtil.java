@@ -459,7 +459,7 @@ public class HttpRequestUtil {
     /**
      * 设置用户名
      *
-     * @param username 登陆用户名
+     * @param username 登录用户名
      */
     public HttpRequestUtil setUsername(String username) {
         this.username = username;
@@ -467,7 +467,7 @@ public class HttpRequestUtil {
     }
 
     /**
-     * 设置登陆密码
+     * 设置登录密码
      *
      * @param password 密码
      */

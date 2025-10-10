@@ -105,7 +105,7 @@ public class PublicApiDispatcher {
             inputFrom = InputFrom.UNKNOWN;
         }
         InputFromContext.init(inputFrom);
-        RequestContext.init(request, token, response);
+        RequestContext.init(request, token, response).setParam(paramObj.toJSONString());
         //初始化时区
         Cookie[] cookies = request.getCookies();
         String timezone = TimeUtil.ZONE_TIME;

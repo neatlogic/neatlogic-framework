@@ -112,6 +112,7 @@ public class ApiDispatcher {
             inputFrom = InputFrom.UNKNOWN;
         }
         InputFromContext.init(inputFrom);
+        RequestContext.get().setParam(paramObj.toJSONString());
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         if (paramObj == null) {
             paramObj = new JSONObject();

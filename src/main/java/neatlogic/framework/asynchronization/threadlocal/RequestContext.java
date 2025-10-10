@@ -36,6 +36,7 @@ public class RequestContext implements Serializable {
     private static final long serialVersionUID = -5420998728515359626L;
     private String url;
     private String remoteAddr;
+    private String param;
     private HttpServletRequest request;
     private HttpServletResponse response;
     //接口访问拒绝来源，租户或接口
@@ -65,6 +66,25 @@ public class RequestContext implements Serializable {
 
     public void setRemoteAddr(String remoteAddr) {
         this.remoteAddr = remoteAddr;
+    }
+
+    public String getParam() {
+        return param;
+    }
+
+    public void setParam(String param) {
+        this.param = param;
+        String tempUrl = StringUtils.EMPTY;
+        if (StringUtils.isNotBlank(this.url)) {
+            tempUrl = this.url;
+        }
+        if (StringUtils.isNotBlank(this.remoteAddr)) {
+            tempUrl += "(" + this.remoteAddr + ")";
+        }
+        if (StringUtils.isNotBlank(this.param)) {
+            tempUrl += "(param=" + this.param + ")";
+        }
+        MDC.put("url", tempUrl);
     }
 
     public HttpServletRequest getRequest() {
@@ -151,6 +171,7 @@ public class RequestContext implements Serializable {
 //            context.setSqlAuditList(_requestContext.getSqlAuditList());
             context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
             context.setRemoteAddr(_requestContext.getRemoteAddr());
+            context.setParam(_requestContext.getParam());
             String tempUrl = _requestContext.getUrl();
             if (tempUrl == null) {
                 tempUrl = StringUtils.EMPTY;
@@ -158,6 +179,10 @@ public class RequestContext implements Serializable {
             String remoteAddr = _requestContext.getRemoteAddr();
             if (StringUtils.isNotBlank(remoteAddr)) {
                 tempUrl += "(" + remoteAddr + ")";
+            }
+            String param = _requestContext.getParam();
+            if (StringUtils.isNotBlank(param)) {
+                tempUrl += "(param=" + param + ")";
             }
             MDC.put("url", tempUrl);
         }

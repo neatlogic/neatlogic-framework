@@ -574,7 +574,7 @@ public class HttpRequestUtil {
     private int responseCode;
     //用于将请求的response的header 设置到当前上下文response中
     private List<String> responseHeaderList;
-
+    private Map<String, List<String>> responseHeaderMap;
 
     public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
@@ -601,6 +601,7 @@ public class HttpRequestUtil {
                         }
                     }
                 }
+                responseHeaderMap = connection.getHeaderFields();
                 // 处理返回值
                 this.responseCode = connection.getResponseCode();
                 if (100 <= this.responseCode && this.responseCode <= 399) {
@@ -679,6 +680,9 @@ public class HttpRequestUtil {
         return responseCode;
     }
 
+    public Map<String, List<String>> getResponseHeaderMap() {
+        return responseHeaderMap;
+    }
 
     public JSONObject getResultJson() {
         if (StringUtils.isNotBlank(result)) {

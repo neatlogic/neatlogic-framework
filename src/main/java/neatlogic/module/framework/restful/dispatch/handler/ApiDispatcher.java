@@ -112,14 +112,11 @@ public class ApiDispatcher {
             inputFrom = InputFrom.UNKNOWN;
         }
         InputFromContext.init(inputFrom);
-        RequestContext requestContext = RequestContext.get();
-        if (requestContext != null && paramObj != null) {
-            requestContext.setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
-        }
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         if (paramObj == null) {
             paramObj = new JSONObject();
         }
+        RequestContext.get().setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
         ApiVo dbApiVo = apiMapper.getApiByToken(token);
         if (interfaceVo == null) {
             if (dbApiVo != null) {

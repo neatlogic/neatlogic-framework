@@ -98,7 +98,7 @@ public class LoginController {
         JSONObject jsonObj = JSON.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
         //初始化request上下文
-        RequestContext.init(request, request.getRequestURI(), response);
+        RequestContext.init(request, request.getRequestURI(), response).setParam(json);
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");

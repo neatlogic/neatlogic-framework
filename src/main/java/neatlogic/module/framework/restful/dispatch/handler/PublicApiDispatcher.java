@@ -15,8 +15,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.restful.dispatch.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONReader;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.InputFromContext;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -105,7 +107,7 @@ public class PublicApiDispatcher {
             inputFrom = InputFrom.UNKNOWN;
         }
         InputFromContext.init(inputFrom);
-        RequestContext.init(request, token, response).setParam(paramObj.toJSONString());
+        RequestContext.init(request, token, response).setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
         //初始化时区
         Cookie[] cookies = request.getCookies();
         String timezone = TimeUtil.ZONE_TIME;

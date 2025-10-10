@@ -17,6 +17,7 @@ package neatlogic.module.framework.login.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -98,7 +99,7 @@ public class LoginController {
         JSONObject jsonObj = JSON.parseObject(json);
         TenantContext tenantContext = TenantContext.init();
         //初始化request上下文
-        RequestContext.init(request, request.getRequestURI(), response).setParam(json);
+        RequestContext.init(request, request.getRequestURI(), response).setParam(JSON.toJSONString(jsonObj, SerializerFeature.PrettyFormat));
         JSONObject resultJson = new JSONObject();
         try {
             String userId = jsonObj.getString("userid");

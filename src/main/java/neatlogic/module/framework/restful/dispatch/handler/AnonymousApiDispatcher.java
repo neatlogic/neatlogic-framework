@@ -96,7 +96,7 @@ public class AnonymousApiDispatcher {
         }
         InputFromContext.init(inputFrom);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
-        RequestContext.init(request, token, response).setParam(paramObj.toJSONString());
+        RequestContext.init(request, token, response).setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
         ApiVo dbApiVo = apiMapper.getApiByToken(token);
         if (interfaceVo == null) {
             if (dbApiVo != null) {

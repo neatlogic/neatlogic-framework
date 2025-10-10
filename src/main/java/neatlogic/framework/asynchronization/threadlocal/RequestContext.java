@@ -74,17 +74,7 @@ public class RequestContext implements Serializable {
 
     public void setParam(String param) {
         this.param = param;
-        String tempUrl = StringUtils.EMPTY;
-        if (StringUtils.isNotBlank(this.url)) {
-            tempUrl = this.url;
-        }
-        if (StringUtils.isNotBlank(this.remoteAddr)) {
-            tempUrl += "(" + this.remoteAddr + ")";
-        }
-        if (StringUtils.isNotBlank(this.param)) {
-            tempUrl += "(param=" + this.param + ")";
-        }
-        MDC.put("url", tempUrl);
+        MDC.put("param", this.param);
     }
 
     public HttpServletRequest getRequest() {
@@ -180,11 +170,11 @@ public class RequestContext implements Serializable {
             if (StringUtils.isNotBlank(remoteAddr)) {
                 tempUrl += "(" + remoteAddr + ")";
             }
+            MDC.put("url", tempUrl);
             String param = _requestContext.getParam();
             if (StringUtils.isNotBlank(param)) {
-                tempUrl += "(param=" + param + ")";
+                MDC.put("param", param);
             }
-            MDC.put("url", tempUrl);
         }
         instance.set(context);
         return context;

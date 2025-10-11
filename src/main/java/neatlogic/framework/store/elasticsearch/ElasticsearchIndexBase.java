@@ -56,7 +56,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }
 
     @Override
-    public final void updateDocument(Long targetId, Map<String,Object> document, boolean isUpsert) {
+    public final void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert) {
         //myUpdateDocument(targetId, jsonObj);
         ElasticsearchClient client = ElasticsearchClientFactory.getClient();
         UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
@@ -170,7 +170,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }
 
     //创建自定义排序排序
-    protected abstract void mySortQuery(SearchRequest.Builder builder);
+    protected abstract void mySortQuery(SearchRequest.Builder builder, T targetVo);
 
     //创建自定义高亮
     protected abstract void myHighlight(SearchRequest.Builder builder);
@@ -296,7 +296,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
             this.myHighlight(builder);
 
             //排序
-            this.mySortQuery(builder);
+            this.mySortQuery(builder, targetVo);
 
             if (this.needPage(targetVo)) {
                 builder.from(resultVo.getStartNum())

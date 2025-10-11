@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.common.dto;
 
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.util.PageUtil;
@@ -82,6 +83,8 @@ public class BasePageVo implements Serializable {
     private int maxPageSize = 500;
     @EntityField(name = "最大限制数，用于拦截", type = ApiParamType.LONG)
     private int policyLimit;
+    @JSONField(serialize = false)
+    private JSONObject sortData;//分页数据
 
     public BasePageVo() {
     }
@@ -97,6 +100,13 @@ public class BasePageVo implements Serializable {
         return keywordId;
     }
 
+    public JSONObject getSortData() {
+        return sortData;
+    }
+
+    public void setSortData(JSONObject sortData) {
+        this.sortData = sortData;
+    }
 
     public int getMaxPageSize() {
         return maxPageSize;

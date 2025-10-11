@@ -588,8 +588,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                u.`user_id`     AS userId,
                u.`uuid`        AS userUuid,
                u.`user_info`   AS userInfo,
-               u.`phone`        AS userPhone,
-               u.`email`        AS userEmail,
+               u.`phone`       AS userPhone,
+               u.`email`       AS userEmail,
                ut.`id`         AS titleId,
                ut.`name`       AS title
         FROM `team` t
@@ -881,6 +881,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{titleId},
                 #{titleSort});
     </insert>
+
+    <update id="updateTeamOptionalByUuid" parameterType="neatlogic.framework.dto.TeamVo">
+        UPDATE `team`
+        SET
+        <if test="level != null and level != ''">
+            `level` = #{level},
+        </if>
+        <if test="email != null and email != ''">
+            `email` = #{email},
+        </if>
+        <if test="phone != null and phone != ''">
+            `phone` = #{phone},
+        </if>
+        `lcd` = NOW()
+        WHERE `uuid` = #{uuid}
+    </update>
 
     <update id="updateTeamByUuid" parameterType="neatlogic.framework.dto.TeamVo">
         UPDATE `team`

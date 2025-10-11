@@ -95,6 +95,8 @@ public interface TeamMapper {
 
     int updateTeamByUuid(TeamVo teamVo);
 
+    int updateTeamOptionalByUuid(TeamVo teamVo);
+
     int updateTeamIsDeleteBySourceAndLcd(@Param("source") String source, @Param("lcd") Date lcd);
 
     int updateUpwardUuidPathByLftRht(@Param("lft") Integer lft, @Param("rht") Integer rht);

@@ -3,22 +3,21 @@ package neatlogic.framework.common.constvalue;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 import java.util.List;
 
 public enum TeamLevel implements IEnum {
 
-    GROUP("group", new I18n("集团"), 1),
-    COMPANY("company", new I18n("公司"), 2),
-    CENTER("center", new I18n("中心"), 3),
-    DEPARTMENT("department", new I18n("部门"), 4),
-    TEAM("team", new I18n("组"), 5);
-    private String value;
-    private I18n text;
-    private int level;
+    GROUP("group", "集团", 1),
+    COMPANY("company", "公司", 2),
+    CENTER("center", "中心", 3),
+    DEPARTMENT("department", "部门", 4),
+    TEAM("team", "组", 5);
+    private final String value;
+    private final String text;
+    private final int level;
 
-    private TeamLevel(String value, I18n text, int level) {
+    TeamLevel(String value, String text, int level) {
         this.value = value;
         this.text = text;
         this.level = level;
@@ -29,7 +28,7 @@ public enum TeamLevel implements IEnum {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public int getLevel() {

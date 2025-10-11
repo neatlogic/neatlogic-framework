@@ -16,7 +16,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexDictMapper">
-    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="60000" size="10"></cache>
+    <cache type="neatlogic.framework.dao.cache.NeatLogicCache" flushInterval="60000" size="10">
+        <!-- 二选一：TTI 或 TTL（都配的话以 TTL 为准，见下方实现） -->
+        <property name="timeToIdleSeconds" value="600"/>
+        <!-- <property name="timeToLiveSeconds" value="300"/> -->
+        <!-- Ehcache 堆内条目数 -->
+        <property name="heapEntries" value="10"/>
+    </cache>
+
     <select id="getMaxDictionaryWordId" resultType="java.lang.Long">
         select max(id)
         from fulltextindex_dictionary

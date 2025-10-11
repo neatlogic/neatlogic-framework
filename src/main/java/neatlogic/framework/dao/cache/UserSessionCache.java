@@ -1,49 +1,54 @@
 package neatlogic.framework.dao.cache;
 
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
-import net.sf.ehcache.config.Configuration;
+import org.ehcache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
+
+import java.time.Duration;
 
 public class UserSessionCache {
-    private static CacheManager CACHE_MANAGER;
 
-    private synchronized static Ehcache getCache() {
+    private static CacheManager CACHE_MANAGER;
+    private static Cache<String, Object> CACHE;
+
+    private static synchronized Cache<String, Object> getCache() {
         if (CACHE_MANAGER == null) {
-            CacheConfiguration cacheConfiguration = new CacheConfiguration();
-            cacheConfiguration.setName("UserSessionCache");
-            cacheConfiguration.setMemoryStoreEvictionPolicy("LRU");
-            cacheConfiguration.setMaxEntriesLocalHeap(2000);
-            cacheConfiguration.internalSetTimeToIdle(900);
-            cacheConfiguration.internalSetTimeToLive(900);
-            Configuration config = new Configuration();
-            config.addCache(cacheConfiguration);
-            CACHE_MANAGER = CacheManager.newInstance(config);
+            CACHE_MANAGER = CacheManagerBuilder.newCacheManagerBuilder().build(true);
+
+            CacheConfigurationBuilder<String, Object> cacheConfig =
+                    CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                            String.class,
+                            Object.class,
+                            ResourcePoolsBuilder.heap(2000) // 最大堆内存条目数
+                    ).withExpiry(
+                            ExpiryPolicyBuilder.expiry()
+                                    .create(Duration.ofSeconds(900))  // TTL: 创建后 900s 过期
+                                    .access(Duration.ofSeconds(900))  // TTI: 最后访问后 900s 过期
+                                    .update(Duration.ofSeconds(900))  // 更新后 900s 过期（按需）
+                                    .build()
+                    );
+
+            CACHE = CACHE_MANAGER.createCache("UserSessionCache", cacheConfig);
         }
-        if (!CACHE_MANAGER.cacheExists("UserSessionCache")) {
-            CACHE_MANAGER.addCache("UserSessionCache");
-        }
-        return CACHE_MANAGER.getEhcache("UserSessionCache");
+        return CACHE;
     }
 
     public static void addItem(String key, Object item) {
-        getCache().put(new Element(key, item));
+        getCache().put(key, item);
     }
 
     public static Object getItem(String key) {
-        Element cachedElement = getCache().get(key);
-        if (cachedElement == null) {
-            return null;
-        }
-        return cachedElement.getObjectValue();
+        return getCache().get(key);
     }
 
     public static void removeItem(String key) {
         getCache().remove(key);
     }
 
-    public static boolean containsKey(String key){
-        return getCache().isKeyInCache(key);
+    public static boolean containsKey(String key) {
+        return getCache().containsKey(key);
     }
 }

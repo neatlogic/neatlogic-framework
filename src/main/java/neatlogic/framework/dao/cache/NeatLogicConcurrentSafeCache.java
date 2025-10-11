@@ -1,30 +1,17 @@
-/*Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-
 package neatlogic.framework.dao.cache;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
-import net.sf.ehcache.config.CacheConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,15 +21,36 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 高并发场景下，防止缓存击穿
+ * 高并发场景下，防止缓存击穿 (Ehcache3 版本)
  */
 public class NeatLogicConcurrentSafeCache implements Cache {
 
-    private final static Logger logger = LoggerFactory.getLogger(NeatLogicConcurrentSafeCache.class);
-    /**
-     * The cache manager reference.
-     */
-    protected static CacheManager CACHE_MANAGER = CacheManager.create();
+    private static final Logger logger = LoggerFactory.getLogger(NeatLogicConcurrentSafeCache.class);
+    private Integer heapEntries = 1000;
+    private Long timeToIdleSeconds;
+    private Long timeToLiveSeconds;
+    private boolean readOnly = false;
+
+    public void setHeapEntries(Integer heapEntries) {
+        if (heapEntries != null && heapEntries > 0) this.heapEntries = heapEntries;
+    }
+
+    public void setTimeToIdleSeconds(Long timeToIdleSeconds) {
+        this.timeToIdleSeconds = timeToIdleSeconds;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    public void setTimeToLiveSeconds(Long timeToLiveSeconds) {
+        this.timeToLiveSeconds = timeToLiveSeconds;
+    }
+
+    private static final CacheManager CACHE_MANAGER =
+            CacheManagerBuilder.newCacheManagerBuilder().build(true);
+
+    private static final ConcurrentHashMap<String, org.ehcache.Cache<Object, Object>> CACHE_MAP = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<String, ReentrantLock> LOCAL_LOCK_MAP = new ConcurrentHashMap<>();
 
     private static String generateLockKey(String id, Object key) {
@@ -53,11 +61,8 @@ public class NeatLogicConcurrentSafeCache implements Cache {
             return id + ":" + key;
         }
     }
-    /**
-     * The cache id (namespace)
-     */
-    protected final String id;
 
+    protected final String id;
 
     public NeatLogicConcurrentSafeCache(final String id) {
         if (id == null) {
@@ -66,60 +71,72 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         this.id = id;
     }
 
-    private synchronized Ehcache getCache() {
+    /*
+    private synchronized org.ehcache.Cache<Object, Object> getCache() {
         String tenant = TenantContext.get().getTenantUuid();
-        if (StringUtils.isNotBlank(tenant)) {
-            if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
-                Ehcache ehcache = CACHE_MANAGER.addCacheIfAbsent(tenant + ":" + id);
-                CacheConfiguration cacheConfiguration = ehcache.getCacheConfiguration();
-                // 缓存5分钟
-                cacheConfiguration.setTimeToIdleSeconds(300);
-                cacheConfiguration.setTimeToLiveSeconds(300);
-            }
-            return CACHE_MANAGER.getEhcache(tenant + ":" + id);
-        } else {
-            if (!CACHE_MANAGER.cacheExists(id)) {
-                Ehcache ehcache = CACHE_MANAGER.addCacheIfAbsent(id);
-                CacheConfiguration cacheConfiguration = ehcache.getCacheConfiguration();
-                // 缓存5分钟
-                cacheConfiguration.setTimeToIdleSeconds(300);
-                cacheConfiguration.setTimeToLiveSeconds(300);
-            }
-            return CACHE_MANAGER.getEhcache(id);
+        String cacheName = StringUtils.isNotBlank(tenant) ? tenant + ":" + id : id;
+
+        return CACHE_MAP.computeIfAbsent(cacheName, name -> {
+            CacheConfigurationBuilder<Object, Object> config =
+                    CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                            Object.class, Object.class,
+                            ResourcePoolsBuilder.heap(1000)
+                    ).withExpiry(ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofSeconds(300)));
+            return CACHE_MANAGER.createCache(name, config);
+        });
+    }*/
+
+    private synchronized org.ehcache.Cache<Object, Object> getCache() {
+        String tenant = TenantContext.get().getTenantUuid();
+        String cacheName = StringUtils.isNotBlank(tenant) ? tenant + ":" + id : id;
+        org.ehcache.Cache<Object, Object> cache = CACHE_MAP.get(cacheName);
+        if (cache != null) {
+            return cache;
         }
+        CacheConfigurationBuilder<Object, Object> builder =
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                        Object.class, Object.class,
+                        ResourcePoolsBuilder.heap(heapEntries)
+                );
+
+        // 过期策略：TTL 优先；否则用 TTI；都没配则不过期
+        if (timeToLiveSeconds != null) {
+            builder = builder.withExpiry(
+                    ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(timeToLiveSeconds))
+            );
+        } else if (timeToIdleSeconds != null) {
+            builder = builder.withExpiry(
+                    ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofSeconds(timeToIdleSeconds))
+            );
+        }
+        try {
+            cache = CACHE_MANAGER.createCache(cacheName, builder);
+        } catch (Exception e) {
+            // 可能已经存在同名 cache，则直接复用
+            cache = CACHE_MANAGER.getCache(cacheName, Object.class, Object.class);
+            if (cache == null) throw e;
+        }
+        CACHE_MAP.put(cacheName, cache);
+
+        return cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public void clear() {
-        getCache().removeAll();
+        getCache().clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getId() {
         return id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object getObject(Object key) {
-        Object obj = null;
-        Element cachedElement = getCache().get(key);
-        if (cachedElement != null) {
-            obj = cachedElement.getObjectValue();
-        }
+        Object obj = getCache().get(key);
         if (obj == null) {
             String lockKey = generateLockKey(getId(), key);
-            // 1.这里是锁对象放入LOCAL_LOCK_MAP的唯一入口
-            // 2.该锁对象会被第一个获取该锁的线程在putObject方法中移除LOCAL_LOCK_MAP
-            // 3.其他获取该锁的线程只要释放锁就行
             ReentrantLock lock = LOCAL_LOCK_MAP.computeIfAbsent(lockKey, k -> new ReentrantLock());
             boolean flag = false;
             try {
@@ -127,23 +144,14 @@ public class NeatLogicConcurrentSafeCache implements Cache {
             } catch (InterruptedException e) {
                 // ignore
             }
-            cachedElement = getCache().get(key);
-            if (cachedElement != null) {
-                obj = cachedElement.getObjectValue();
-            }
+            obj = getCache().get(key);
             if (flag) {
                 if (obj != null) {
                     if (LOCAL_LOCK_MAP.get(lockKey) == lock) {
                         logger.warn("NeatLogicConcurrentSafeCache.LOCAL_LOCK_MAP中的锁对象没有被正常移除，lockKey = " + lockKey);
                     }
-                    // 获取到锁后，从缓存中得到的结果不为null，不会再查询数据库，也不会调用putObject方法，所以要在这里释放该锁
                     lock.unlock();
                 } else {
-                    // 获取到锁后，从缓存中得到的结果为null，有以下3种情况：
-                    // 1.该线程是第一个获取到该锁的线程，需要去查询数据库，该线程会在putObject方法中释放该锁。
-                    // 2.有其他线程调用了clear方法，清空了缓存。
-                    // 3.该SQL语句执行报错。
-                    // 对应第2和3种情况，第一个获取到该锁的线程，在调用putObject()方法时会在LOCAL_LOCK_MAP删除锁，会出现一种场景，这里获得锁，但LOCAL_LOCK_MAP中已经删除了该锁，必须在这里释放锁
                     ReentrantLock reentrantLock = LOCAL_LOCK_MAP.get(lockKey);
                     if (reentrantLock != lock) {
                         lock.unlock();
@@ -154,26 +162,27 @@ public class NeatLogicConcurrentSafeCache implements Cache {
                 logger.warn(ex.getMessage(), ex);
             }
         }
-        return obj;
+        if (!this.readOnly) {
+            return CacheUtils.deepCopy(obj);
+        } else {
+            return obj;
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
     public int getSize() {
-        return getCache().getSize();
+        org.ehcache.Cache<Object, Object> cache = getCache();
+        int size = 0;
+        for (Object k : cache) {
+            size++;
+        }
+        return size;
     }
 
-    /**
-     * 不管SQL语句执行是否抛异常，都会调用putObject方法
-     * SQL语句执行成功得到结果为null时，value为[]
-     * SQL语句执行异常时，value为null
-     * {@inheritDoc}
-     */
     @Override
     public void putObject(Object key, Object value) {
-        getCache().put(new Element(key, value));
+        getCache().put(key, value);
         String lockKey = generateLockKey(getId(), key);
         ReentrantLock lock = LOCAL_LOCK_MAP.get(lockKey);
         if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
@@ -182,19 +191,11 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         }
     }
 
-    /**
-     * 对应二级缓存，该方法不会被调用
-     * {@inheritDoc}
-     */
     @Override
     public Object removeObject(Object key) {
-        Object obj = null;
-        Ehcache ehcache = getCache();
-        Element cachedElement = ehcache.get(key);
-        if (cachedElement != null) {
-            obj = cachedElement.getObjectValue();
-            ehcache.remove(key);
-        }
+        Object obj = getCache().get(key);
+        getCache().remove(key);
+
         String lockKey = generateLockKey(getId(), key);
         ReentrantLock lock = LOCAL_LOCK_MAP.get(lockKey);
         if (lock != null && lock.isLocked() && lock.isHeldByCurrentThread()) {
@@ -204,34 +205,17 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         return obj;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void unlock(Object key) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Cache)) {
-            return false;
-        }
-
+        if (this == obj) return true;
+        if (!(obj instanceof Cache)) return false;
         Cache otherCache = (Cache) obj;
         return id.equals(otherCache.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return id.hashCode();
@@ -242,12 +226,9 @@ public class NeatLogicConcurrentSafeCache implements Cache {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
-        return "EHCache {" + id + "}";
+        return "Ehcache3 {" + id + "}";
     }
 
     public static List<String> getAllLockKeyList() {

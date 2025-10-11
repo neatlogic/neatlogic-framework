@@ -17,10 +17,10 @@ package neatlogic.framework.util.javascript;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,13 +61,13 @@ public class JavascriptUtil {
 
     private static final NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
 
-    public static ScriptEngine getEngine(ScriptClassFilter classFilter, String... options) {
+   /* public static ScriptEngine getEngine(ScriptClassFilter classFilter, String... options) {
         ClassLoader ccl = Thread.currentThread().getContextClassLoader();
         if (ccl == null) {
             ccl = NashornScriptEngineFactory.class.getClassLoader();
         }
         return factory.getScriptEngine(options, ccl, classFilter);
-    }
+    }*/
 
     public static ScriptEngine getEngine(String... options) {
         return factory.getScriptEngine(options);
@@ -78,9 +78,9 @@ public class JavascriptUtil {
         return factory.getScriptEngine("--no-java");
     }
 
-    public static ScriptEngine getEngine(ScriptClassFilter classFilter) {
+    /*public static ScriptEngine getEngine(ScriptClassFilter classFilter) {
         return factory.getScriptEngine(classFilter);
-    }
+    }*/
 
     public static CompiledScript getCompiledScript(String script, boolean needCache) throws ScriptException {
         CacheItem item = null;

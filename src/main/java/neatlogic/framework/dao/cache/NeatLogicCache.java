@@ -1,41 +1,51 @@
-/*Copyright (C) 2024  深圳极向量科技有限公司 All Rights Reserved.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
-
 package neatlogic.framework.dao.cache;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Ehcache;
-import net.sf.ehcache.Element;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.Cache;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.config.builders.ExpiryPolicyBuilder;
+import org.ehcache.config.builders.ResourcePoolsBuilder;
 
+import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 
+/**
+ * MyBatis 二级缓存实现，基于 Ehcache3
+ */
 public class NeatLogicCache implements Cache {
-    /**
-     * The cache manager reference.
-     */
-    protected static CacheManager CACHE_MANAGER = CacheManager.create();
+    private Integer heapEntries = 1000;
+    private Long timeToIdleSeconds;
+    private Long timeToLiveSeconds;
+    private boolean readOnly = false;
 
-    /**
-     * The cache id (namespace)
-     */
-    protected final String id;
+    public void setHeapEntries(Integer heapEntries) {
+        if (heapEntries != null && heapEntries > 0) this.heapEntries = heapEntries;
+    }
 
+    public void setTimeToIdleSeconds(Long timeToIdleSeconds) {
+        this.timeToIdleSeconds = timeToIdleSeconds;
+    }
+
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
+    public void setTimeToLiveSeconds(Long timeToLiveSeconds) {
+        this.timeToLiveSeconds = timeToLiveSeconds;
+    }
+
+    private static final CacheManager CACHE_MANAGER =
+            CacheManagerBuilder.newCacheManagerBuilder().build(true);
+
+    private static final ConcurrentHashMap<String, org.ehcache.Cache<Object, Object>> CACHE_MAP =
+            new ConcurrentHashMap<>();
+
+    private final String id;
 
     public NeatLogicCache(final String id) {
         if (id == null) {
@@ -44,80 +54,81 @@ public class NeatLogicCache implements Cache {
         this.id = id;
     }
 
-    private synchronized Ehcache getCache() {
+    private synchronized org.ehcache.Cache<Object, Object> getCache() {
         String tenant = TenantContext.get().getTenantUuid();
-        if (StringUtils.isNotBlank(tenant)) {
-            if (!CACHE_MANAGER.cacheExists(tenant + ":" + id)) {
-                CACHE_MANAGER.addCache(tenant + ":" + id);
-            }
-            return CACHE_MANAGER.getEhcache(tenant + ":" + id);
-        } else {
-            if (!CACHE_MANAGER.cacheExists(id)) {
-                CACHE_MANAGER.addCache(id);
-            }
-            return CACHE_MANAGER.getEhcache(id);
+        String cacheName = StringUtils.isNotBlank(tenant) ? tenant + ":" + id : id;
+        org.ehcache.Cache<Object, Object> cache = CACHE_MAP.get(cacheName);
+        if (cache != null) {
+            return cache;
         }
+        CacheConfigurationBuilder<Object, Object> builder =
+                CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                        Object.class, Object.class,
+                        ResourcePoolsBuilder.heap(heapEntries)
+                );
+
+        // 过期策略：TTL 优先；否则用 TTI；都没配则不过期
+        if (timeToLiveSeconds != null) {
+            builder = builder.withExpiry(
+                    ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofSeconds(timeToLiveSeconds))
+            );
+        } else if (timeToIdleSeconds != null) {
+            builder = builder.withExpiry(
+                    ExpiryPolicyBuilder.timeToIdleExpiration(Duration.ofSeconds(timeToIdleSeconds))
+            );
+        }
+
+        try {
+            cache = CACHE_MANAGER.createCache(cacheName, builder);
+        } catch (Exception e) {
+            // 可能已经存在同名 cache，则直接复用
+            cache = CACHE_MANAGER.getCache(cacheName, Object.class, Object.class);
+            if (cache == null) throw e;
+        }
+        CACHE_MAP.put(cacheName, cache);
+        return cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void clear() {
-        //System.out.println(System.currentTimeMillis() + ":clear cache:" + this.id);
-        getCache().removeAll();
+        getCache().clear();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String getId() {
         return id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object getObject(Object key) {
-        Element cachedElement = getCache().get(key);
-        if (cachedElement == null) {
-            return null;
+        if (!this.readOnly) {
+            return CacheUtils.deepCopy(getCache().get(key));
+        } else {
+            return getCache().get(key);
         }
-        /*if (key.toString().contains("getAttrByCiId")) {
-            System.out.println(System.currentTimeMillis() + ":match getAttrByCiId cached,value=" + cachedElement.getObjectValue());
-        }*/
-        return cachedElement.getObjectValue();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int getSize() {
-        return getCache().getSize();
+        org.ehcache.Cache<Object, Object> cache = getCache();
+        int size = 0;
+        for (Object k : cache) {
+            size++;
+        }
+        return size;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void putObject(Object key, Object value) {
         if (value == null) {
             return;
         }
-        if (value instanceof List) {
-            if (((List) value).size() == 0) {
-                return;
-            }
+        if (value instanceof List && ((List<?>) value).isEmpty()) {
+            return;
         }
-        getCache().put(new Element(key, value));
+        getCache().put(key, value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Object removeObject(Object key) {
         Object obj = getObject(key);
@@ -125,34 +136,18 @@ public class NeatLogicCache implements Cache {
         return obj;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public void unlock(Object key) {
+        // MyBatis 接口要求，但 Ehcache3 不需要
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof Cache)) {
-            return false;
-        }
-
+        if (this == obj) return true;
+        if (!(obj instanceof Cache)) return false;
         Cache otherCache = (Cache) obj;
         return id.equals(otherCache.getId());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return id.hashCode();
@@ -160,65 +155,11 @@ public class NeatLogicCache implements Cache {
 
     @Override
     public ReadWriteLock getReadWriteLock() {
-        return null;
+        return null; // Ehcache3 内部线程安全
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
-        return "EHCache {" + id + "}";
+        return "Ehcache3 {" + id + "}";
     }
-
-    // DYNAMIC PROPERTIES
-
-    /**
-     * Sets the time to idle for an element before it expires. Is only used if
-     * the element is not eternal.
-     *
-     * @param timeToIdleSeconds the default amount of time to live for an element from its
-     *                          last accessed or modified date
-     */
-    public void setTimeToIdleSeconds(long timeToIdleSeconds) {
-        getCache().getCacheConfiguration().setTimeToIdleSeconds(timeToIdleSeconds);
-    }
-
-    /**
-     * Sets the time to idle for an element before it expires. Is only used if
-     * the element is not eternal.
-     *
-     * @param timeToLiveSeconds the default amount of time to live for an element from its
-     *                          creation date
-     */
-    public void setTimeToLiveSeconds(long timeToLiveSeconds) {
-        getCache().getCacheConfiguration().setTimeToLiveSeconds(timeToLiveSeconds);
-    }
-
-    /**
-     * Sets the maximum objects to be held in memory (0 = no limit).
-     * evicted (0 == no limit)
-     */
-    public void setMaxEntriesLocalHeap(long maxEntriesLocalHeap) {
-        getCache().getCacheConfiguration().setMaxEntriesLocalHeap(maxEntriesLocalHeap);
-    }
-
-    /**
-     * Sets the maximum number elements on Disk. 0 means unlimited.
-     * unlimited.
-     */
-    public void setMaxEntriesLocalDisk(long maxEntriesLocalDisk) {
-        getCache().getCacheConfiguration().setMaxEntriesLocalDisk(maxEntriesLocalDisk);
-    }
-
-    /**
-     * Sets the eviction policy. An invalid argument will set it to null.
-     *
-     * @param memoryStoreEvictionPolicy a String representation of the policy. One of "LRU", "LFU" or
-     *                                  "FIFO".
-     */
-    public void setMemoryStoreEvictionPolicy(String memoryStoreEvictionPolicy) {
-        getCache().getCacheConfiguration().setMemoryStoreEvictionPolicy(memoryStoreEvictionPolicy);
-    }
-
 }

@@ -140,6 +140,10 @@ public class JavascriptUtil {
         }
         String script = "function calculate(expression, dataValue, conditionValue, label){\n";
         script += "var calculateClass = Java.type('neatlogic.framework.util.javascript.expressionHandler.'+ expression); \n";
+        // 修正 JDK17 Nashorn undefined 参数
+        script += "if (typeof dataValue === 'undefined') dataValue = null;\n";
+        script += "if (typeof conditionValue === 'undefined') conditionValue = null;\n";
+        script += "if (typeof label === 'undefined') label = null;\n";
         script += "var result = calculateClass.calculate(dataValue, conditionValue, label);\n";
         script += "return result;\n";
         script += "}\n";

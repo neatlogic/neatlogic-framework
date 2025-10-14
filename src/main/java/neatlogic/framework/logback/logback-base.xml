@@ -308,7 +308,7 @@
     </appender>
 
     <appender name="AutoexecProcessAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${LOG_HOME}/process.log</File>
+        <File>${log4j.home}/process.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
             <FileNamePattern>${LOG_HOME}/process.%i</FileNamePattern>
             <MinIndex>1</MinIndex>

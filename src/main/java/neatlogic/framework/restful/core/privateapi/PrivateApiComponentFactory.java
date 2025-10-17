@@ -25,10 +25,7 @@ import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.OperationType;
-import neatlogic.framework.restful.core.IApiComponent;
-import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
-import neatlogic.framework.restful.core.IJsonStreamApiComponent;
-import neatlogic.framework.restful.core.IRawApiComponent;
+import neatlogic.framework.restful.core.*;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiKind;
@@ -56,8 +53,8 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ApiVo> apiMap = new HashMap<>();
     private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
     private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
-
     public static final Map<String, IRawApiComponent> rawComponentMap = new HashMap<>();
+    public static final Map<String, ISseApiComponent> sseComponentMap = new HashMap<>();
     // 按照token表达式长度排序，最长匹配原则
     private static final Map<String, ApiVo> regexApiMap = new TreeMap<>((o1, o2) -> {
         // 先按照长度排序，如果长度一样按照内容排序
@@ -83,6 +80,10 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 
     public static IRawApiComponent getRawInstance(String componentId) {
         return rawComponentMap.get(componentId);
+    }
+
+    public static ISseApiComponent getSseInstance(String componentId) {
+        return sseComponentMap.get(componentId);
     }
 
     public static ApiVo getApiByToken(String token) throws CloneNotSupportedException {

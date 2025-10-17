@@ -31,10 +31,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.core.NotFoundEditTargetException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.type.*;
-import neatlogic.framework.restful.core.IApiComponent;
-import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
-import neatlogic.framework.restful.core.IJsonStreamApiComponent;
-import neatlogic.framework.restful.core.IRawApiComponent;
+import neatlogic.framework.restful.core.*;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
@@ -63,7 +60,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Set;
 
@@ -290,6 +289,19 @@ public class ApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
+            } else if (apiType.equals(ApiType.FETCH)) {
+                ISseApiComponent restComponent = PrivateApiComponentFactory.getSseInstance(interfaceVo.getHandler());
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        apiAccessCountService.putToken(token);
+                        restComponent.doService(interfaceVo, paramObj, response);
+                    } else {
+                        returnObj.putAll(restComponent.help());
+                    }
+                } else {
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                }
             }
         }
     }
@@ -417,8 +429,73 @@ public class ApiDispatcher {
                 response.getWriter().print(returnObj.toJSONString());
             }
         }
-
     }
+
+    @PostMapping(value = "/fetch/**")
+    public void dispatcherForFetchPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        // ---------- 改为 fetch 可读流 ----------
+        response.setContentType("text/plain;charset=UTF-8");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Connection", "keep-alive");
+
+        PrintWriter writer = response.getWriter();
+        
+        try {
+            JSONObject paramObj;
+            if (StringUtils.isNotBlank(jsonStr)) {
+                try {
+                    paramObj = JSON.parseObject(jsonStr);
+                } catch (Exception e) {
+                    throw new ParamJSONIrregularException();
+                }
+            } else {
+                paramObj = new JSONObject();
+            }
+
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
+            }
+            // 主执行逻辑，可在内部多次写出
+            doIt(request, response, token, ApiType.OBJECT, paramObj, returnObj, "doservice");
+
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            writer.write("Error:" + ex.getMessage());
+        } catch (NotFoundEditTargetException ex) {
+            response.setStatus(ResponseCode.EDIT_TARGET_NOTFOUND.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            writer.write("Error:" + ex.getMessage());
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            writer.write("Error:" + $.t(ex.getMessage(), ex.getValues()));
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            writer.write("Error:" + Arrays.toString(ExceptionUtils.getStackFrames(ex)));
+        } finally {
+            writer.flush();
+            writer.close();
+        }
+    }
+
 
     @PostMapping(value = "/rest/**")
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {

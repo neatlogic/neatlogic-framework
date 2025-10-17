@@ -21,7 +21,8 @@ public enum ApiType {
     RAW("raw", "原始模式", "raw/"),
     OBJECT("object", "对象模式", "rest/"),
     STREAM("stream", "json流模式", "stream/"),
-    BINARY("binary", "字节流模式", "binary/");
+    BINARY("binary", "字节流模式", "binary/"),
+    FETCH("fetch", "客户端拉取模式", "fetch/");
 
     private final String name;
     private final String text;

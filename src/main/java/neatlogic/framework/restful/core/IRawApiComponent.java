@@ -65,7 +65,6 @@ public interface IRawApiComponent {
         return null;
     }
 
-    ;
 
     /**
      * 是否需要审计
@@ -79,7 +78,7 @@ public interface IRawApiComponent {
      * 服务主入口
      *
      * @param apiVo    api
-     * @param param  参数
+     * @param param    参数
      * @param response response对象
      * @return 返回值
      * @throws Exception 异常
@@ -108,7 +107,7 @@ public interface IRawApiComponent {
      * 校验入参特殊规则，如：去重
      *
      * @param interfaceVo 接口
-     * @param param    参数
+     * @param param       参数
      * @param validField  校验字段
      * @return 校验结果
      * @throws Exception 异常

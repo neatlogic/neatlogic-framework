@@ -31,7 +31,10 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.core.NotFoundEditTargetException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.type.*;
-import neatlogic.framework.restful.core.*;
+import neatlogic.framework.restful.core.IApiComponent;
+import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
+import neatlogic.framework.restful.core.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
@@ -289,19 +292,6 @@ public class ApiDispatcher {
                 } else {
                     throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
                 }
-            } else if (apiType.equals(ApiType.FETCH)) {
-                ISseApiComponent restComponent = PrivateApiComponentFactory.getSseInstance(interfaceVo.getHandler());
-                if (restComponent != null) {
-                    if (action.equals("doservice")) {
-                        /* 统计接口访问次数 */
-                        apiAccessCountService.putToken(token);
-                        restComponent.doService(interfaceVo, paramObj, response);
-                    } else {
-                        returnObj.putAll(restComponent.help());
-                    }
-                } else {
-                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
-                }
             }
         }
     }
@@ -442,7 +432,7 @@ public class ApiDispatcher {
         response.setHeader("Connection", "keep-alive");
 
         PrintWriter writer = response.getWriter();
-        
+
         try {
             JSONObject paramObj;
             if (StringUtils.isNotBlank(jsonStr)) {

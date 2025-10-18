@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <collection property="propList" ofType="neatlogic.framework.scheduler.dto.JobPropVo">
             <id column="prop_id" property="id"/>
             <result column="prop_name" property="name"/>
-            <result column="prop_value" property="value" typeHandler="compressHandler"/>
+            <result column="prop_value" property="value" typeHandler="CompressHandler"/>
         </collection>
     </resultMap>
 

@@ -29,7 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <collection property="propList" ofType="neatlogic.framework.scheduler.dto.JobPropVo">
             <id column="prop_id" property="id"/>
             <result column="prop_name" property="name"/>
-            <result column="prop_value" property="value"/>
+            <result column="prop_value" property="value" typeHandler="CompressHandler"/>
         </collection>
     </resultMap>
 
@@ -425,7 +425,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         INSERT schedule_job_prop (job_uuid, prop_name, prop_value)
         VALUES (#{jobUuid},
                 #{name},
-                #{value})
+                #{value, typeHandler=CompressHandler})
     </insert>
 
     <insert id="insertJobAudit" parameterType="neatlogic.framework.scheduler.dto.JobAuditVo">

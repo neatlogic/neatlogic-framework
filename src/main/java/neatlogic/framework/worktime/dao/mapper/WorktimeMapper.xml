@@ -225,7 +225,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
 	<insert id="insertWorktime" parameterType="neatlogic.framework.worktime.dto.WorktimeVo">
 		INSERT INTO `worktime` ( `uuid`, `name`, `is_active`, `lcu`, `lcd`, `config`, `is_delete` )
-		VALUES ( #{uuid}, #{name}, #{isActive}, #{lcu}, now(3), #{config}, 0)
+		VALUES ( #{uuid}, #{name}, #{isActive}, #{lcu}, now(3), #{config, typeHandler=CompressHandler}, 0)
 	</insert>
 
 	<insert id="insertBatchWorktimeRange" parameterType="neatlogic.framework.worktime.dto.WorktimeRangeVo">
@@ -244,7 +244,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 		`name` = #{name},
 		`is_active` = #{isActive},
 		`lcu` = #{lcu},
-		`config` = #{config},
+		`config` = #{config, typeHandler=CompressHandler},
 		`lcd` = now(3)
 		WHERE `uuid` = #{uuid}
 	</update>

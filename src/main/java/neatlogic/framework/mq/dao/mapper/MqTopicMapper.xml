@@ -46,8 +46,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <update id="saveTopicConfig" parameterType="neatlogic.framework.mq.dto.TopicVo">
         INSERT INTO mq_topic (name, label, config, is_active, handler)
-        VALUES (#{name}, #{label}, #{configStr}, 1, #{handler})
-        ON DUPLICATE KEY UPDATE config = #{configStr}
+        VALUES (#{name}, #{label}, #{configStr, typeHandler=CompressHandler}, 1, #{handler})
+        ON DUPLICATE KEY UPDATE config = #{configStr, typeHandler=CompressHandler}
     </update>
 
     <insert id="saveTopic" parameterType="neatlogic.framework.mq.dto.TopicVo">

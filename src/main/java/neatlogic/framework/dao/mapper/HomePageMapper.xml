@@ -118,9 +118,9 @@
 
     <insert id="insertHomePage" parameterType="neatlogic.framework.dto.HomePageVo">
         INSERT INTO `home_page` (`id`, `name`, `is_active`, `sort`, `config`)
-        VALUES (#{id}, #{name}, #{isActive}, #{sort}, #{configStr})
+        VALUES (#{id}, #{name}, #{isActive}, #{sort}, #{configStr, typeHandler=CompressHandler})
         ON DUPLICATE KEY
-        UPDATE `config` = #{configStr},
+        UPDATE `config` = #{configStr, typeHandler=CompressHandler},
                 `name` = #{name},
                `is_active` = #{isActive}
     </insert>

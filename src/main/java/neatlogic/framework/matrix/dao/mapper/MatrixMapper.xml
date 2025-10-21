@@ -208,12 +208,12 @@
 		) VALUES (
 			#{matrixUuid},
 			#{fileName},
-			#{config},
-			#{xml}
+			#{config, typeHandler=CompressHandler},
+			#{xml, typeHandler=CompressHandler}
 		) ON DUPLICATE KEY UPDATE
 		`file_name` = #{fileName},
-		`config` = #{config},
-		`xml` = #{xml}
+		`config` = #{config, typeHandler=CompressHandler},
+		`xml` = #{xml, typeHandler=CompressHandler}
 	</insert>
 
 	<insert id="replaceMatrixCi" parameterType="neatlogic.framework.matrix.dto.MatrixCiVo">
@@ -224,7 +224,7 @@
 		) VALUES (
 		#{matrixUuid},
 		#{ciId},
-		#{configStr}
+		#{configStr, typeHandler=CompressHandler}
 		)
 	</insert>
 
@@ -236,7 +236,7 @@
 		) VALUES (
 		#{matrixUuid},
 		#{customViewId},
-		#{configStr}
+		#{configStr, typeHandler=CompressHandler}
 		)
 	</insert>
 

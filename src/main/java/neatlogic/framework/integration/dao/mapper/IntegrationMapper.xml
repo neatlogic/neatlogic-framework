@@ -341,7 +341,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             `url`     = #{url},
             `handler` = #{handler},
             `method`  = #{method},
-            `config`  = #{configStr},
+            `config`  = #{configStr, typeHandler=CompressHandler},
             `lcd`     = NOW(3),
             `lcu`     = #{lcu}
         WHERE `uuid` = #{uuid}
@@ -364,7 +364,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{url},
                 #{handler},
                 #{method},
-                #{configStr},
+                #{configStr, typeHandler=CompressHandler},
                 #{isActive},
                 NOW(3),
                 #{fcu},
@@ -400,7 +400,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{paramFilePath},
                 #{resultFilePath},
                 #{errorFilePath},
-                #{headersStr})
+                #{headersStr, typeHandler=CompressHandler})
     </insert>
 
     <delete id="deleteIntegrationByUuid" parameterType="java.lang.String">

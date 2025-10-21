@@ -38,7 +38,7 @@
                 #{type},
                 #{isRequired},
                 #{sort},
-                #{configStr})
+                #{configStr, typeHandler=CompressHandler})
     </insert>
 
     <update id="createMatrixDynamicTable">

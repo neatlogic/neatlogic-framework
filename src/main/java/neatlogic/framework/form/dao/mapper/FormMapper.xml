@@ -445,7 +445,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             `is_active` = #{isActive},
         </if>
         <if test="formConfigStr != null and formConfigStr != ''">
-            `form_config` = #{formConfigStr},
+            `form_config` = #{formConfigStr, typeHandler=CompressHandler},
         </if>
         `lcd` = NOW(3),
         `lcu` = #{lcu}
@@ -454,7 +454,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <update id="updateFormVersionConfigByUuid" parameterType="neatlogic.framework.form.dto.FormVersionVo">
         UPDATE `form_version`
-        SET `form_config` = #{formConfigStr}
+        SET `form_config` = #{formConfigStr, typeHandler=CompressHandler}
         WHERE `uuid` = #{uuid}
     </update>
 
@@ -482,11 +482,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             label                  = #{label},
             icon=#{icon},
             is_active              =#{isActive},
-            config                 = #{configStr},
-            config_template_config = #{configTemplateConfig},
-            config_template        = #{configTemplate},
-            view_template          = #{viewTemplate},
-            view_template_config   = #{viewTemplateConfig}
+            config                 = #{configStr, typeHandler=CompressHandler},
+            config_template_config = #{configTemplateConfig, typeHandler=CompressHandler},
+            config_template        = #{configTemplate, typeHandler=CompressHandler},
+            view_template          = #{viewTemplate, typeHandler=CompressHandler},
+            view_template_config   = #{viewTemplateConfig, typeHandler=CompressHandler}
         WHERE id = #{id}
     </update>
 
@@ -506,11 +506,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{label},
                 #{icon},
                 #{isActive},
-                #{configStr},
-                #{configTemplateConfig},
-                #{configTemplate},
-                #{viewTemplate},
-                #{viewTemplateConfig})
+                #{configStr, typeHandler=CompressHandler},
+                #{configTemplateConfig, typeHandler=CompressHandler},
+                #{configTemplate, typeHandler=CompressHandler},
+                #{viewTemplate, typeHandler=CompressHandler},
+                #{viewTemplateConfig, typeHandler=CompressHandler})
     </insert>
 
     <insert id="insertForm" parameterType="neatlogic.framework.form.dto.FormVo">
@@ -538,7 +538,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{version},
                 #{isActive},
                 #{formUuid},
-                #{formConfigStr},
+                #{formConfigStr, typeHandler=CompressHandler},
                 NOW(3),
                 #{fcu},
                 NOW(3),
@@ -562,8 +562,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{label},
                 #{type},
                 #{handler},
-                #{configStr},
-                #{data})
+                #{configStr, typeHandler=CompressHandler},
+                #{data, typeHandler=CompressHandler})
     </insert>
 
     <insert id="insertFormExtendAttribute" parameterType="neatlogic.framework.form.dto.FormAttributeVo">
@@ -586,7 +586,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                 #{label},
                 #{type},
                 #{handler},
-                #{configStr})
+                #{configStr, typeHandler=CompressHandler})
     </insert>
 
     <insert id="insertFormAttributeData" parameterType="neatlogic.framework.form.dto.AttributeDataVo">

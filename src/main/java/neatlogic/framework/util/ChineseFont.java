@@ -33,8 +33,11 @@ public enum ChineseFont {
     private final String fontFileName;
     private final String fontName;
 
+    public String getPath() {
+        return "/neatlogic/resources/fonts/" + this.fontFileName;
+    }
     public URL getFontUrl() {
-        return this.getClass().getResource("/neatlogic/resources/fonts/" + this.fontFileName);
+        return this.getClass().getResource(getPath());
     }
 
     public String getFontName() {

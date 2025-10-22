@@ -167,13 +167,13 @@
 
 	<insert id="insertNotifyPolicy">
 	INSERT INTO `notify_policy` (`id`, `name`, `handler`, `is_default`, `config`, `fcu`, `fcd`, `lcu`, `lcd`)
-	VALUES (#{id}, #{name}, #{handler}, #{isDefault}, #{configStr}, #{fcu}, NOW(3), #{fcu}, NOW(3))
+	VALUES (#{id}, #{name}, #{handler}, #{isDefault}, #{configStr, typeHandler=CompressHandler}, #{fcu}, NOW(3), #{fcu}, NOW(3))
 	</insert>
 
 	<update id="updateNotifyPolicyById">
 	UPDATE `notify_policy` SET
 	`name` = #{name},
-	`config` = #{configStr},
+	`config` = #{configStr, typeHandler=CompressHandler},
 	`lcu` = #{lcu},
 	`lcd` = NOW(3)
 	WHERE `id` = #{id}

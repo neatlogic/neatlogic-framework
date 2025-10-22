@@ -3,6 +3,8 @@ package neatlogic.module.framework.importexport.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.form.attribute.core.FormAttributeHandlerFactory;
+import neatlogic.framework.form.attribute.core.IFormAttributeHandler;
 import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.FormAttributeVo;
@@ -142,6 +144,26 @@ public class FormImportExportHandler extends ImportExportHandlerBase {
         if (CollectionUtils.isNotEmpty(formAttributeList)) {
             for (FormAttributeVo formAttributeVo : formAttributeList) {
                 formMapper.insertFormAttribute(formAttributeVo);
+            }
+        }
+        // 表单扩展属性
+        formMapper.deleteFormExtendAttributeByFormUuidAndFormVersionUuid(formVersion.getFormUuid(), formVersion.getUuid());
+        List<FormAttributeVo> formExtendAttributeList = formVersion.getFormExtendAttributeList();
+        if (CollectionUtils.isNotEmpty(formExtendAttributeList)) {
+            for (FormAttributeVo formAttributeVo : formExtendAttributeList) {
+                formMapper.insertFormExtendAttribute(formAttributeVo);
+            }
+        }
+        // 表单自定义扩展属性
+        List<FormAttributeVo> formCustomExtendAttributeList = formVersion.getFormCustomExtendAttributeList();
+        if (CollectionUtils.isNotEmpty(formCustomExtendAttributeList)) {
+            for (FormAttributeVo formAttributeVo : formCustomExtendAttributeList) {
+                IFormAttributeHandler formAttributeHandler = FormAttributeHandlerFactory.getHandler(formAttributeVo.getHandler());
+                if (formAttributeHandler != null) {
+                    formAttributeHandler.validateExtendAttributeConfig(formAttributeVo.getKey(), formAttributeVo.getConfig());
+                    formAttributeVo.setConfigStr(null);
+                }
+                formMapper.insertFormExtendAttribute(formAttributeVo);
             }
         }
         return form.getUuid();

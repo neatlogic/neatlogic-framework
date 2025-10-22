@@ -1419,12 +1419,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <insert id="insertUserProfile" parameterType="neatlogic.framework.dto.UserProfileVo">
         INSERT INTO `user_profile` (`user_uuid`, `module_id`, `config`)
-        VALUES (#{userUuid}, #{moduleId}, #{config})
+        VALUES (#{userUuid}, #{moduleId}, #{config, typeHandler=CompressHandler})
     </insert>
 
     <insert id="insertUserData" parameterType="neatlogic.framework.dto.UserDataVo">
         INSERT INTO `user_data` (`user_uuid`, `data`, `type`)
-        VALUES (#{userUuid}, #{dataStr}, #{type})
+        VALUES (#{userUuid}, #{dataStr, typeHandler=CompressHandler}, #{type})
     </insert>
 
     <!--<insert id="insertUserAgent" parameterType="neatlogic.framework.dto.UserAgentVo">
@@ -1590,7 +1590,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <update id="updateUserProfileByUserUuidAndModuleId" parameterType="java.lang.String">
         UPDATE `user_profile`
-        set `config` = #{config}
+        set `config` = #{config, typeHandler=CompressHandler}
         where `user_uuid` = #{userUuid}
         <if test="moduleId !=null and moduleId !=''">
             and `module_id` = #{moduleId}
@@ -1599,7 +1599,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
 
     <update id="updateUserData" parameterType="neatlogic.framework.dto.UserDataVo">
         UPDATE `user_data`
-        SET `data` = #{dataStr}
+        SET `data` = #{dataStr, typeHandler=CompressHandler}
         WHERE `user_uuid` = #{userUuid}
           and `type` = #{type}
     </update>

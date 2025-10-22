@@ -1,9 +1,7 @@
 package neatlogic.framework.util;
 
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.PageSize;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.tool.xml.XMLWorkerHelper;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.pdf.BaseFont;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.in.xhtml.XHTMLImporterImpl;
@@ -21,11 +19,11 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
 import org.w3c.tidy.Tidy;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import javax.xml.bind.JAXBElement;
 import java.io.*;
 import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -367,14 +365,14 @@ public class ExportUtil {
      * @throws DocumentException
      */
     public static void savePdf(String content, OutputStream os, boolean landscape) throws IOException, DocumentException {
-        com.itextpdf.text.Document doc = new com.itextpdf.text.Document(landscape ? PageSize.A4 : PageSize.A4.rotate());
-        PdfWriter writer = PdfWriter.getInstance(doc, os);
-        doc.open();
-        ByteArrayInputStream bis = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
-        XMLWorkerHelper.getInstance().parseXHtml(writer, doc, bis, StandardCharsets.UTF_8);
-        bis.close();
-        doc.close();
-        writer.close();
+        ITextRenderer renderer = new ITextRenderer();
+        ChineseFont[] fonts = ChineseFont.values();
+        for (ChineseFont font : fonts) {
+            renderer.getFontResolver().addFont(font.getPath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        }
+        renderer.setDocumentFromString(content);
+        renderer.layout();
+        renderer.createPDF(os);
     }
 
 }

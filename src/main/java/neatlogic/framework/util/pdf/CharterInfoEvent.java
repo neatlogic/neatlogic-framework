@@ -15,11 +15,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.util.pdf;
 
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.PdfPageEventHelper;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.lowagie.text.Chunk;
+import com.lowagie.text.Document;
+import com.lowagie.text.Element;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfPageEventHelper;
+import com.lowagie.text.pdf.PdfWriter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
@@ -39,18 +40,20 @@ public class CharterInfoEvent extends PdfPageEventHelper {
 
     @Override
     public void onChapter (PdfWriter writer, Document document, float paragraphPosition, Paragraph title) {
-        List<Chunk> chunks = title.getChunks();
+        List<Element> chunks = title.getChunks();
         if (CollectionUtils.isNotEmpty(chunks)) {
-            for (Chunk chunk : chunks) {
-                Map<String, Object> attributes = chunk.getAttributes();
-                if (MapUtils.isEmpty(attributes)) {
-                    continue;
+            for (Element element : chunks) {
+                if (element instanceof Chunk chunk) {
+                    Map<String, Object> attributes = chunk.getChunkAttributes();
+                    if (MapUtils.isEmpty(attributes)) {
+                        continue;
+                    }
+                    String localDestination = (String) attributes.get(Chunk.LOCALDESTINATION);
+                    if (localDestination == null) {
+                        continue;
+                    }
+                    localDestinationMap.put(title.getContent(), localDestination);
                 }
-                String localDestination = (String) attributes.get(Chunk.LOCALDESTINATION);
-                if (localDestination == null) {
-                    continue;
-                }
-                localDestinationMap.put(title.getContent(), localDestination);
                 break;
             }
         }
@@ -70,7 +73,7 @@ public class CharterInfoEvent extends PdfPageEventHelper {
     public String getLocalDestination(String key) {
         return localDestinationMap.get(key);
     }
-    
+
     public Integer getDepth(String key) {
         return depthMap.get(key);
     }

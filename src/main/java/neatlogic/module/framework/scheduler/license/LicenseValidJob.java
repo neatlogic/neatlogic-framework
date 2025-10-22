@@ -65,8 +65,8 @@ public class LicenseValidJob extends JobBase {
     public void initJob(String tenantUuid) {
         //每个小时的50分执行一次
         JobObject jobObject = new JobObject.Builder("LICENSE-VALID-JOB", this.getGroupName(), this.getClassName(), tenantUuid)
-                //.withCron("0 50 * * * ?")
-                .withIntervalInSeconds(10)//TODO test后注释
+                .withCron("0 50 * * * ?")
+                //.withIntervalInSeconds(10)
                 .build();
         this.reloadJob(jobObject);
     }

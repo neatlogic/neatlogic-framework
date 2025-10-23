@@ -36,6 +36,7 @@ import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMap
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo;
 import neatlogic.framework.fulltextindex.enums.FullTextIndexHandlerType;
 import neatlogic.framework.fulltextindex.enums.Status;
+import neatlogic.framework.lock.dao.mapper.LockMapper;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -49,6 +50,9 @@ import java.util.Map;
 public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T> {
     static Logger logger = LoggerFactory.getLogger(ElasticsearchIndexBase.class);
     @Resource
+    private LockMapper lockMapper;
+
+    @Resource
     private FullTextIndexRebuildAuditMapper fullTextIndexRebuildAuditMapper;
 
     public final String getIndexName() {
@@ -57,7 +61,11 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     @Override
     public final void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert) {
-        //myUpdateDocument(targetId, jsonObj);
+        //避免并发更新同一个文档，增加全局锁
+        Integer lock = 0;
+        if (targetId != null) {
+            lock = lockMapper.getMysqlLock(targetId.toString(), 30);
+        }
         ElasticsearchClient client = ElasticsearchClientFactory.getClient();
         UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
                 .index(getIndexName())                   // 索引名称
@@ -69,6 +77,10 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
             client.update(updateRequest, Object.class);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        } finally {
+            if (lock == 1) {
+                lockMapper.releaseMysqlLock(targetId.toString());
+            }
         }
     }
 

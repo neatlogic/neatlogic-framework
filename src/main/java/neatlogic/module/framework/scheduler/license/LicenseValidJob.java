@@ -75,7 +75,7 @@ public class LicenseValidJob extends JobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception {
         //校验license是否即将过期或已过期
         if (StringUtils.isNotBlank(Config.LICENSE())) {
-            Map<String, LicenseInvalidVo> licenseInvalidVoMap = LicenseUtil.tenantLicenseInvalidTipsMap.computeIfAbsent(TenantContext.get().getTenantUuid(), k -> new HashMap<>());
+            Map<String, LicenseInvalidVo> licenseInvalidVoMap = LicenseUtil.tenantLicenseInvalidTipsMap.computeIfAbsent(jobObject.getTenantUuid(), k -> new HashMap<>());
             LicenseVo licenseVo = LicenseUtil.deLicense(Config.LICENSE(), Config.LICENSE_PK());
             if (licenseVo != null) {
                 List<LicenseModuleVo> licenseModuleVos = licenseVo.getModulesPolicy();

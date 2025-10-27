@@ -186,11 +186,6 @@ public class LoginController {
                 // 保存 user 登录访问时间
                 userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash);
                 userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(jwtVo.getTokenHash(), jwtVo.getToken()));
-                UserLoginVo userLoginVo = new UserLoginVo();
-                userLoginVo.setId(SnowflakeUtil.uniqueLong());
-                userLoginVo.setUserUuid(checkUserVo.getUuid());
-                userLoginVo.setLoginMethod("page");
-                userSessionMapper.insertUserLogin(userLoginVo);
                 //更新租户visitTime
                 if (!tenantVisitSet.contains(tenant)) {
                     tenantMapper.updateTenantVisitTime(tenant);

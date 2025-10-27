@@ -61,8 +61,6 @@ public interface UserSessionMapper {
 
     int insertUserSessionWithoutTokenCreateTime(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfoHash") String authInfoHash);
 
-    int insertUserLogin(UserLoginVo userLoginVo);
-
     int updateUserSessionAuthInfoHashByTokenHashList(@Param("tokenHashList") List<String> userSessionVoList, @Param("authInfoHash") String authInfoHash);
 
     int updateUserSessionAuthInfoHashByTokenHash(@Param("tokenHash")String tokenHash, @Param("authInfoHash") String authInfoHash);

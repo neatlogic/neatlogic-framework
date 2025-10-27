@@ -194,11 +194,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             UPDATE `visit_time` = NOW(3)
     </insert>
 
-    <insert id="insertUserLogin" parameterType="neatlogic.framework.dto.UserLoginVo">
-        INSERT INTO `user_login`(`id`, `user_uuid`, `login_time`, `login_method`)
-        VALUES (#{id}, #{userUuid}, NOW(3), #{loginMethod})
-    </insert>
-
     <update id="updateUserSession" parameterType="java.lang.String">
         UPDATE `user_session`
         set `visit_time` = now(3)

@@ -52,6 +52,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             UPDATE failed_count = (failed_count + 1)
     </insert>
 
+    <insert id="insertUserLogin" parameterType="neatlogic.framework.dto.UserLoginVo">
+        INSERT INTO `user_login`(`id`, `user_uuid`, `login_time`, `login_method`)
+        VALUES (#{id}, #{userUuid}, NOW(3), #{loginMethod})
+    </insert>
+
     <delete id="deleteLoginCaptchaBySessionId">
         delete
         from login_captcha

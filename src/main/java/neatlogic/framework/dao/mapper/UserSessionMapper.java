@@ -15,7 +15,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dao.mapper;
 
-import neatlogic.framework.dto.UserLoginVo;
 import neatlogic.framework.dto.UserSessionVo;
 import org.apache.ibatis.annotations.Param;
 

@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dao.mapper;
 
+import neatlogic.framework.dto.UserLoginVo;
 import neatlogic.framework.dto.UserSessionVo;
 import org.apache.ibatis.annotations.Param;
 
@@ -59,6 +60,8 @@ public interface UserSessionMapper {
     int insertUserSession(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfoHash") String authInfoHash);
 
     int insertUserSessionWithoutTokenCreateTime(@Param("userUuid") String userUuid, @Param("tokenHash") String tokenHash, @Param("tokenCreateTime") Long tokenCreateTime, @Param("authInfoHash") String authInfoHash);
+
+    int insertUserLogin(UserLoginVo userLoginVo);
 
     int updateUserSessionAuthInfoHashByTokenHashList(@Param("tokenHashList") List<String> userSessionVoList, @Param("authInfoHash") String authInfoHash);
 

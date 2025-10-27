@@ -43,10 +43,7 @@ import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.service.TenantService;
-import neatlogic.framework.util.CaptchaUtil;
-import neatlogic.framework.util.Md5Util;
-import neatlogic.framework.util.TimeUtil;
-import neatlogic.framework.util.UuidUtil;
+import neatlogic.framework.util.*;
 import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -189,6 +186,11 @@ public class LoginController {
                 // 保存 user 登录访问时间
                 userSessionMapper.insertUserSession(checkUserVo.getUuid(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash);
                 userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(jwtVo.getTokenHash(), jwtVo.getToken()));
+                UserLoginVo userLoginVo = new UserLoginVo();
+                userLoginVo.setId(SnowflakeUtil.uniqueLong());
+                userLoginVo.setUserUuid(checkUserVo.getUuid());
+                userLoginVo.setLoginMethod("page");
+                userSessionMapper.insertUserLogin(userLoginVo);
                 //更新租户visitTime
                 if (!tenantVisitSet.contains(tenant)) {
                     tenantMapper.updateTenantVisitTime(tenant);

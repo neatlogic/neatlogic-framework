@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dao.mapper;
 
+import neatlogic.framework.dto.UserLoginVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 
@@ -29,6 +30,8 @@ public interface LoginMapper {
     Integer updateLoginCaptcha(LoginCaptchaVo loginCaptchaVo);
 
     Integer updateLoginFailedCount(LoginFailedCountVo loginFailedCountVo);
+
+    int insertUserLogin(UserLoginVo userLoginVo);
 
     Integer deleteLoginCaptchaBySessionId(String sessionId);
 

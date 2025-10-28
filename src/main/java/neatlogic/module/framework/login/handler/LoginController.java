@@ -43,10 +43,7 @@ import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.service.TenantService;
-import neatlogic.framework.util.CaptchaUtil;
-import neatlogic.framework.util.Md5Util;
-import neatlogic.framework.util.TimeUtil;
-import neatlogic.framework.util.UuidUtil;
+import neatlogic.framework.util.*;
 import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -146,10 +143,22 @@ public class LoginController {
                 if (password.equals(maintenancePassword)) {
                     checkUserVo = MaintenanceMode.getMaintenanceUser();
                     authenticationInfoVo = new AuthenticationInfoVo(checkUserVo.getUuid());
+                    UserLoginVo userLoginVo = new UserLoginVo();
+                    userLoginVo.setId(SnowflakeUtil.uniqueLong());
+                    userLoginVo.setUserUuid(checkUserVo.getUuid());
+                    userLoginVo.setLoginMethod("maintenance");
+                    loginMapper.insertUserLogin(userLoginVo);
                 }
             } else {
-                if (Config.ENABLE_NO_SECRET()) {
+                if (!Config.ENABLE_NO_SECRET()) {
                     checkUserVo = userMapper.getActiveUserByUserId(userVo);
+                    if (checkUserVo != null) {
+                        UserLoginVo userLoginVo = new UserLoginVo();
+                        userLoginVo.setId(SnowflakeUtil.uniqueLong());
+                        userLoginVo.setUserUuid(checkUserVo.getUuid());
+                        userLoginVo.setLoginMethod("noSecret");
+                        loginMapper.insertUserLogin(userLoginVo);
+                    }
                 } else {
                     //目前仅先校验移动端
                     if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {

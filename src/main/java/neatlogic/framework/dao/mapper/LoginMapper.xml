@@ -74,5 +74,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         from login_failed_count
         where user_id = #{value}
     </delete>
+
+    <delete id="deleteUserLoginByDayBefore" parameterType="java.lang.Integer">
+        DELETE FROM `user_login`
+        WHERE `login_time` &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
 </mapper>
 

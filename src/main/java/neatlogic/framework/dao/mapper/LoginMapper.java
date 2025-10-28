@@ -38,4 +38,6 @@ public interface LoginMapper {
     Integer deleteLoginFailedCountByUserId(String userId);
 
     void deleteLoginInvalidCaptcha();
+
+    int deleteUserLoginByDayBefore(int dayBefore);
 }

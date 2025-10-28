@@ -150,7 +150,7 @@ public class LoginController {
                     loginMapper.insertUserLogin(userLoginVo);
                 }
             } else {
-                if (!Config.ENABLE_NO_SECRET()) {
+                if (Config.ENABLE_NO_SECRET()) {
                     checkUserVo = userMapper.getActiveUserByUserId(userVo);
                     if (checkUserVo != null) {
                         UserLoginVo userLoginVo = new UserLoginVo();

@@ -22,18 +22,18 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 @Component
-public class UserLoginAuditCleaner extends AuditCleanerBase {
+public class LoginAuditCleaner extends AuditCleanerBase {
 
     @Resource
     private LoginMapper loginMapper;
 
     @Override
     protected void myClean(int dayBefore) throws Exception {
-        loginMapper.deleteUserLoginByDayBefore(dayBefore);
+        loginMapper.deleteLoginAuditByDayBefore(dayBefore);
     }
 
     @Override
     public String getName() {
-        return "USER-LOGIN-AUDIT";
+        return "LOGIN-AUDIT";
     }
 }

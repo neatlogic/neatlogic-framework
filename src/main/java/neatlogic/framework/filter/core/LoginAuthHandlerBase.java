@@ -25,6 +25,7 @@ import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
+import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
@@ -316,11 +317,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         } else {//如果正常用户登录成功，则清空该用户的失败次数
             resultJson.remove("isNeedCaptcha");
             loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
-            UserLoginVo userLoginVo = new UserLoginVo();
-            userLoginVo.setId(SnowflakeUtil.uniqueLong());
-            userLoginVo.setUserUuid(checkUserVo.getUuid());
-            userLoginVo.setLoginMethod(getType());
-            loginMapper.insertUserLogin(userLoginVo);
+            LoginAuditVo loginAuditVo = new LoginAuditVo();
+            loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+            loginAuditVo.setUserUuid(checkUserVo.getUuid());
+            loginAuditVo.setLoginMethod(getType());
+            loginMapper.insertLoginAudit(loginAuditVo);
         }
         return checkUserVo;
     }

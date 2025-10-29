@@ -30,6 +30,7 @@ import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
+import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.login.LoginAuthPluginNoFoundException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
@@ -143,21 +144,21 @@ public class LoginController {
                 if (password.equals(maintenancePassword)) {
                     checkUserVo = MaintenanceMode.getMaintenanceUser();
                     authenticationInfoVo = new AuthenticationInfoVo(checkUserVo.getUuid());
-                    UserLoginVo userLoginVo = new UserLoginVo();
-                    userLoginVo.setId(SnowflakeUtil.uniqueLong());
-                    userLoginVo.setUserUuid(checkUserVo.getUuid());
-                    userLoginVo.setLoginMethod("maintenance");
-                    loginMapper.insertUserLogin(userLoginVo);
+                    LoginAuditVo loginAuditVo = new LoginAuditVo();
+                    loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+                    loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                    loginAuditVo.setLoginMethod("maintenance");
+                    loginMapper.insertLoginAudit(loginAuditVo);
                 }
             } else {
                 if (Config.ENABLE_NO_SECRET()) {
                     checkUserVo = userMapper.getActiveUserByUserId(userVo);
                     if (checkUserVo != null) {
-                        UserLoginVo userLoginVo = new UserLoginVo();
-                        userLoginVo.setId(SnowflakeUtil.uniqueLong());
-                        userLoginVo.setUserUuid(checkUserVo.getUuid());
-                        userLoginVo.setLoginMethod("noSecret");
-                        loginMapper.insertUserLogin(userLoginVo);
+                        LoginAuditVo loginAuditVo = new LoginAuditVo();
+                        loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+                        loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                        loginAuditVo.setLoginMethod("noSecret");
+                        loginMapper.insertLoginAudit(loginAuditVo);
                     }
                 } else {
                     //目前仅先校验移动端

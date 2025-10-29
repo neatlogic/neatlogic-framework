@@ -230,11 +230,12 @@ public class HttpRequestUtil {
         });
 
         OutputStreamHandlerMap.put(ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA, (out, _this) -> {
-            StringBuilder dataBuilder = new StringBuilder("\r\n");
+            StringBuilder dataBuilder = new StringBuilder();
             // strParams 1:key 2:value
             if (MapUtils.isNotEmpty(_this.formData)) {
                 Set<String> keySet = _this.formData.keySet();
                 for (String key : keySet) {
+                    dataBuilder.append("--").append(FORM_DATA_BOUNDARY).append("\r\n");
                     String type = StringUtils.EMPTY;
                     Object value = _this.formData.get(key);
                     if (value instanceof FormDataVo) {
@@ -242,16 +243,17 @@ public class HttpRequestUtil {
                         value = formDataVo.getValue();
                         type = formDataVo.type;
                     }
-                    dataBuilder.append("Content-Disposition: form-data; name=").append(key).append("\r\n");
+                    dataBuilder.append("Content-Disposition: form-data; name=\"").append(key).append("\"; filename=\"\"\r\n");
                     if (StringUtils.isNotBlank(type)) {
-                        dataBuilder.append(type).append("\r\n");
+                        dataBuilder.append(type).append("\r\n").append("\r\n").append("\r\n");
                     }
-                    dataBuilder.append("\r\n").append("\r\n").append(value).append("\r\n").append("--").append(FORM_DATA_BOUNDARY).append("--");
+                    dataBuilder.append("\r\n").append("\r\n").append(value);
                 }
+                dataBuilder.append("\r\n").append("--").append(FORM_DATA_BOUNDARY).append("--").append("\r\n");
             }
             String boundaryMessage = dataBuilder.toString();
 
-            out.write(("--" + FORM_DATA_BOUNDARY + boundaryMessage).getBytes(_this.charset));
+            out.write(boundaryMessage.getBytes(_this.charset));
         });
 
         OutputStreamHandlerMap.put(ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM, (out, _this) -> {

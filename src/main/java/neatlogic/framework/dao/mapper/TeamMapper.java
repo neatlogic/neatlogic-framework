@@ -117,4 +117,5 @@ public interface TeamMapper {
 
     int deleteTeamUserTitleByTeamUuid(String uuid);
 
+    void deleteTeamUserTitleByTeamUuidAndTitleId(@Param("teamUuid") String teamUuid, @Param("titleId") Long titleId);
 }

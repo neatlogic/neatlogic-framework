@@ -573,7 +573,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                  LEFT JOIN `user` u ON tut.`user_uuid` = u.`uuid`
                  LEFT JOIN `user_title` ut ON ut.`id` = tut.`title_id`
         where tut.`team_uuid` = #{value}
-        order by tut.`title_sort`, tut.`title_id` asc
+        order by tut.`title_sort`, tut.`title_id`
     </select>
 
     <select id="checkTitleIsReferenceByTitleId" resultType="java.lang.Integer">
@@ -871,6 +871,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         VALUES (#{teamUuid},
                 #{userUuid})
     </insert>
+
     <insert id="insertTeamUserTitle">
         INSERT ignore INTO `team_user_title` (`team_uuid`,
                                               `user_uuid`,
@@ -1003,5 +1004,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         DELETE
         FROM `team_user_title`
         WHERE `team_uuid` = #{value}
+    </delete>
+
+    <delete id="deleteTeamUserTitleByTeamUuidAndTitleId">
+        DELETE
+        FROM `team_user_title`
+        WHERE `team_uuid` = #{teamUuid}
+          and `title_id` = #{titleId}
     </delete>
 </mapper>

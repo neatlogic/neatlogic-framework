@@ -1043,6 +1043,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         from `user_title`
         where `name` = #{value}
     </select>
+
     <select id="getUserTitleListLockByTitleNameList" resultType="neatlogic.framework.dto.UserTitleVo">
         select `id`, `name`
         from `user_title`

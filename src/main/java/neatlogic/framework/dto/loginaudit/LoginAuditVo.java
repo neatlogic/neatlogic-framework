@@ -1,9 +1,11 @@
-package neatlogic.framework.dto;
+package neatlogic.framework.dto.loginaudit;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
-public class UserLoginVo implements Serializable {
+public class LoginAuditVo implements Serializable {
+    @Serial
     private static final long serialVersionUID = -977868375722886386L;
     private Long id;
     private String userUuid;

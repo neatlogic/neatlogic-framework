@@ -32,7 +32,7 @@ public class TomcatStartupListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         // 服务器启动时在日志文件输出一行记录
-        String message = "服务器正在启动...";
+        String message = "应用服务正在启动...";
         if (logger.isErrorEnabled()) {
             logger.error(message);
         }

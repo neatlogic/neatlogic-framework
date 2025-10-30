@@ -37,6 +37,55 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE `user_id` = #{value}
     </select>
 
+    <select id="getLoginAuditCount" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditSearchVo" resultType="int">
+        SELECT
+            count(1)
+        FROM `login_audit` a
+        <if test="keyword != null and keyword != ''">
+            JOIN `user` b ON b.`uuid` = a.`user_uuid`
+        </if>
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                b.`uuid` = #{keyword}
+                OR b.`user_id` = #{keyword}
+                OR b.`user_name` LIKE CONCAT(#{keyword}, '%')
+                )
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND a.`login_time` &gt;= #{startTime}
+                AND a.`login_time` &lt;= #{endTime}
+            </if>
+        </where>
+    </select>
+
+    <select id="getLoginAuditList" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditSearchVo" resultType="neatlogic.framework.dto.loginaudit.LoginAuditVo">
+        SELECT
+            a.`id`,
+            a.`user_uuid` AS userUuid,
+            a.`login_time` AS loginTime,
+            a.`login_method` AS loginMethod
+        FROM `login_audit` a
+        <if test="keyword != null and keyword != ''">
+            JOIN `user` b ON b.`uuid` = a.`user_uuid`
+        </if>
+        <where>
+            <if test="keyword != null and keyword != ''">
+            AND (
+                b.`uuid` = #{keyword}
+                OR b.`user_id` = #{keyword}
+                OR b.`user_name` LIKE CONCAT(#{keyword}, '%')
+            )
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND a.`login_time` &gt;= #{startTime}
+                AND a.`login_time` &lt;= #{endTime}
+            </if>
+        </where>
+        ORDER BY `id` DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
     <insert id="updateLoginCaptcha" parameterType="neatlogic.framework.dto.captcha.LoginCaptchaVo">
         INSERT INTO `login_captcha` (`session_id`, `code`, `expired_time`)
         VALUES (#{sessionId}, #{code}, #{expiredTime})
@@ -52,8 +101,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             UPDATE failed_count = (failed_count + 1)
     </insert>
 
-    <insert id="insertUserLogin" parameterType="neatlogic.framework.dto.UserLoginVo">
-        INSERT INTO `user_login`(`id`, `user_uuid`, `login_time`, `login_method`)
+    <insert id="insertLoginAudit" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditVo">
+        INSERT INTO `login_audit`(`id`, `user_uuid`, `login_time`, `login_method`)
         VALUES (#{id}, #{userUuid}, NOW(3), #{loginMethod})
     </insert>
 
@@ -75,8 +124,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         where user_id = #{value}
     </delete>
 
-    <delete id="deleteUserLoginByDayBefore" parameterType="java.lang.Integer">
-        DELETE FROM `user_login`
+    <delete id="deleteLoginAuditByDayBefore" parameterType="java.lang.Integer">
+        DELETE FROM `login_audit`
         WHERE `login_time` &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
     </delete>
 </mapper>

@@ -15,9 +15,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.dao.mapper;
 
-import neatlogic.framework.dto.UserLoginVo;
+import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
+import neatlogic.framework.dto.loginaudit.LoginAuditSearchVo;
+
+import java.util.List;
 
 public interface LoginMapper {
 
@@ -27,11 +30,15 @@ public interface LoginMapper {
 
     LoginFailedCountVo getLoginFailedCountVoByUserId(String userUuid);
 
+    int getLoginAuditCount(LoginAuditSearchVo searchVo);
+
+    List<LoginAuditVo> getLoginAuditList(LoginAuditSearchVo searchVo);
+
     Integer updateLoginCaptcha(LoginCaptchaVo loginCaptchaVo);
 
     Integer updateLoginFailedCount(LoginFailedCountVo loginFailedCountVo);
 
-    int insertUserLogin(UserLoginVo userLoginVo);
+    int insertLoginAudit(LoginAuditVo loginAuditVo);
 
     Integer deleteLoginCaptchaBySessionId(String sessionId);
 
@@ -39,5 +46,5 @@ public interface LoginMapper {
 
     void deleteLoginInvalidCaptcha();
 
-    int deleteUserLoginByDayBefore(int dayBefore);
+    int deleteLoginAuditByDayBefore(int dayBefore);
 }

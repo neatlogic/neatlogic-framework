@@ -35,12 +35,17 @@ import neatlogic.framework.util.ExcelUtil;
 import neatlogic.framework.util.TableResultUtil;
 import neatlogic.framework.util.TimeUtil;
 import neatlogic.framework.util.UuidUtil;
+import neatlogic.framework.util.excel.ExcelBuilder;
 import neatlogic.framework.util.excel.ExcelPagedRowIterator;
+import neatlogic.framework.util.excel.SheetBuilder;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddressList;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -276,7 +281,7 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
-        HSSFWorkbook workbook = null;
+        Workbook workbook = null;
         List<MatrixAttributeVo> attributeVoList = attributeMapper.getMatrixAttributeByMatrixUuid(matrixVo.getUuid());
         if (CollectionUtils.isNotEmpty(attributeVoList)) {
             List<String> headerList = new ArrayList<>();
@@ -292,6 +297,46 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                 decodeDataConfig(attributeVo, selectValueList);
                 columnSelectValueList.add(selectValueList);
             }
+            ExcelBuilder builder = new ExcelBuilder(SXSSFWorkbook.class);
+            SheetBuilder sheetBuilder = builder.withBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT)
+                    .withHeadFontColor(HSSFColor.HSSFColorPredefined.WHITE)
+                    .withHeadBgColor(HSSFColor.HSSFColorPredefined.DARK_BLUE)
+                    .withColumnWidth(30)
+                    .addSheet("sheet01")
+                    .withHeaderList(headerList)
+                    .withColumnList(columnList);
+            workbook = builder.build();
+            Sheet sheet = workbook.getSheet("sheet01");
+            if (CollectionUtils.isNotEmpty(columnSelectValueList)) {
+                for (int i = 0; i < columnSelectValueList.size(); i++) {
+                    List<String> defaultValueList = columnSelectValueList.get(i);
+                    //行添加下拉框
+                    if (CollectionUtils.isNotEmpty(defaultValueList)) {
+                        // 1. 创建下拉值数组
+                        String[] values = new String[defaultValueList.size()];
+                        defaultValueList.toArray(values);
+                        // 2. 设置下拉框作用范围（注意SXSSF的行限制）
+                        CellRangeAddressList regions = new CellRangeAddressList(
+                                1, // 首行（从第2行开始）
+                                SXSSFWorkbook.DEFAULT_WINDOW_SIZE - 1, // 末行（最大行数-1）
+                                i,  // 列号
+                                i   // 同一列
+                        );
+                        // 3. 创建约束（SXSSF需用XSSFDataValidationHelper）
+                        DataValidationHelper dvHelper = sheet.getDataValidationHelper();
+                        DataValidationConstraint constraint = dvHelper.createExplicitListConstraint(values);
+
+                        // 4. 创建并应用数据验证
+                        DataValidation validation = dvHelper.createValidation(constraint, regions);
+
+                        // 5. 设置Excel的兼容性选项
+                        validation.setSuppressDropDownArrow(true); // 是否显示下拉箭头
+                        validation.setShowErrorBox(true); // 输入错误时显示提示
+                        //将有效性验证添加到表单
+                        sheet.addValidationData(validation);
+                    }
+                }
+            }
             MatrixDataVo dataVo = new MatrixDataVo();
             dataVo.setMatrixUuid(matrixVo.getUuid());
             dataVo.setColumnList(columnList);
@@ -303,12 +348,11 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             while (currentPage <= pageCount) {
                 dataVo.setCurrentPage(currentPage);
                 dataVo.setStartNum(null);
-                List<Map<String, String>> dataMapList = new ArrayList<>();
                 List<Map<String, Object>> dataList = matrixDataMapper.searchDynamicTableData(dataVo);
                 /* 转换用户、分组、角色字段值为用户名、分组名、角色名 **/
                 if (CollectionUtils.isNotEmpty(dataList)) {
                     for (Map<String, Object> dataMap : dataList) {
-                        Map<String, String> map = new HashMap<>();
+                        Map<String, Object> map = new HashMap<>();
                         map.put("uuid", dataMap.get("uuid").toString());
                         map.put("sort", dataMap.get("sort").toString());
                         for (MatrixAttributeVo attributeVo : attributeVoList) {
@@ -322,10 +366,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                                 }
                             }
                         }
-                        dataMapList.add(map);
+                        sheetBuilder.addData(map);
                     }
                 }
-                workbook = ExcelUtil.createExcel(workbook, headerList, columnList, columnSelectValueList, dataMapList);
                 currentPage++;
             }
         }

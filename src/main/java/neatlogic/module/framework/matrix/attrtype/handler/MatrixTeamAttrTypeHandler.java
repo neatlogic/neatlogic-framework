@@ -50,12 +50,12 @@ public class MatrixTeamAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public String getValueWhenExport(String value) {
-        TeamVo team = teamMapper.getTeamByUuid(value);
+    public String getValueWhenExport(Object value, MatrixAttributeVo attributeVo) {
+        TeamVo team = teamMapper.getTeamByUuid(value.toString());
         if (team != null) {
             return team.getName();
         } else {
-            return value;
+            return value.toString();
         }
     }
 

@@ -53,12 +53,12 @@ public class MatrixUserAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public String getValueWhenExport(String value) {
-        UserVo user = userMapper.getUserBaseInfoByUuid(value);
+    public String getValueWhenExport(Object value, MatrixAttributeVo attributeVo) {
+        UserVo user = userMapper.getUserBaseInfoByUuid(value.toString());
         if (user != null) {
             return user.getUserName();
         } else {
-            return value;
+            return value.toString();
         }
     }
 
@@ -89,6 +89,24 @@ public class MatrixUserAttrTypeHandler extends MatrixAttrTypeBase {
                 for (Map.Entry<String, String> entry : valueMap.entrySet()) {
                     if (userIdUuidMap.containsKey(entry.getKey())) {
                         valueMap.put(entry.getKey(), userIdUuidMap.get(entry.getKey()));
+                        needSearchValue.remove(entry.getKey());
+                    }
+                }
+            }
+        }
+        //通过userName搜
+        if (CollectionUtils.isNotEmpty(needSearchValue)) {
+            List<UserVo> userVos = userMapper.getUserByUserNameList(needSearchValue);
+            if (CollectionUtils.isNotEmpty(userVos)) {
+                Map<String, String> userName2UuidMap = new HashMap<>();
+                for (UserVo userVo : userVos) {
+                    if (!userName2UuidMap.containsKey(userVo.getUserName())) {
+                        userName2UuidMap.put(userVo.getUserName(), userVo.getUuid());
+                    }
+                }
+                for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+                    if (userName2UuidMap.containsKey(entry.getKey())) {
+                        valueMap.put(entry.getKey(), userName2UuidMap.get(entry.getKey()));
                         needSearchValue.remove(entry.getKey());
                     }
                 }

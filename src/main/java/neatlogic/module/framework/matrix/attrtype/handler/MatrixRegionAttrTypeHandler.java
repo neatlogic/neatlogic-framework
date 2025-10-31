@@ -50,12 +50,12 @@ public class MatrixRegionAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public String getValueWhenExport(String value) {
-        RegionVo regionVo = regionMapper.getRegionById(Long.valueOf(value));
+    public String getValueWhenExport(Object value, MatrixAttributeVo attributeVo) {
+        RegionVo regionVo = regionMapper.getRegionById(Long.parseLong(value.toString()) );
         if (regionVo != null) {
             return regionVo.getUpwardNamePath();
         } else {
-            return value;
+            return value.toString();
         }
     }
 

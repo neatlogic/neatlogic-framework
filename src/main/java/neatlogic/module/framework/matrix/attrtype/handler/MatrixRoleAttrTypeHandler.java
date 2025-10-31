@@ -50,12 +50,12 @@ public class MatrixRoleAttrTypeHandler extends MatrixAttrTypeBase {
     }
 
     @Override
-    public String getValueWhenExport(String value) {
-        RoleVo role = roleMapper.getRoleByUuid(value);
+    public String getValueWhenExport(Object value, MatrixAttributeVo attributeVo) {
+        RoleVo role = roleMapper.getRoleByUuid(value.toString());
         if (role != null) {
             return role.getName();
         } else {
-            return value;
+            return value.toString();
         }
     }
 

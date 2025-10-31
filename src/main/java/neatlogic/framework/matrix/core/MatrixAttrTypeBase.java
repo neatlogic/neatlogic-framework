@@ -17,10 +17,12 @@
 
 package neatlogic.framework.matrix.core;
 
+import neatlogic.framework.matrix.dto.MatrixAttributeVo;
+
 public abstract class MatrixAttrTypeBase implements IMatrixAttrType{
     @Override
-    public String getValueWhenExport(String value) {
-        return value;
+    public String getValueWhenExport(Object value, MatrixAttributeVo attributeVo) {
+        return value.toString();
     }
 
 }

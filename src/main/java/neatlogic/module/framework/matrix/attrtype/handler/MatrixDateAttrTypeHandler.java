@@ -26,6 +26,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -34,6 +35,30 @@ public class MatrixDateAttrTypeHandler extends MatrixAttrTypeBase {
     @Override
     public String getHandler() {
         return MatrixAttributeType.DATE.getValue();
+    }
+
+    @Override
+    public String getValueWhenExport(Object value, MatrixAttributeVo attributeVo) {
+        String pattern = TimeUtil.YYYY_MM_DD_HH_MM_SS;
+        JSONObject config = attributeVo.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            String format = config.getString("format");
+            if (StringUtils.isNotBlank(format)) {
+                String styleType = config.getString("styleType");
+                if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
+                    if ("|".equals(styleType)) {
+                        styleType = "";
+                    }
+                    format = format.replace("-", styleType);
+                }
+                pattern = format;
+            }
+        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        if (value instanceof Date date) {
+            value = simpleDateFormat.format(date);
+        }
+        return value.toString();
     }
 
     @Override
@@ -66,7 +91,33 @@ public class MatrixDateAttrTypeHandler extends MatrixAttrTypeBase {
 
     @Override
     public Set<String> getRealValueBatch(MatrixAttributeVo matrixAttributeVo, Map<String, String> valueMap) {
-        valueMap.replaceAll((k, v) -> k);
+//        valueMap.replaceAll((k, v) -> k);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
+        String pattern = TimeUtil.YYYY_MM_DD_HH_MM_SS;
+        JSONObject config = matrixAttributeVo.getConfig();
+        if (MapUtils.isNotEmpty(config)) {
+            String format = config.getString("format");
+            if (StringUtils.isNotBlank(format)) {
+                String styleType = config.getString("styleType");
+                if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
+                    if ("|".equals(styleType)) {
+                        styleType = "";
+                    }
+                    format = format.replace("-", styleType);
+                }
+                pattern = format;
+            }
+        }
+        System.out.println("pattern = " + pattern);
+        SimpleDateFormat patternSdf = new SimpleDateFormat(pattern);
+        for (Map.Entry<String, String> entry : valueMap.entrySet()) {
+            try {
+                Date date = patternSdf.parse(entry.getKey());
+                valueMap.put(entry.getKey(), simpleDateFormat.format(date));
+            } catch (ParseException e) {
+                // ignore
+            }
+        }
         return Collections.emptySet();
     }
 }

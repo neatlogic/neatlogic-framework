@@ -40,7 +40,7 @@ public interface IMatrixAttrType {
      *
      * @param value 值
      */
-    String getValueWhenExport(String value);
+    String getValueWhenExport(Object value, MatrixAttributeVo attributeVo);
 
     /**
      * 根据导入的值转换成系统的值

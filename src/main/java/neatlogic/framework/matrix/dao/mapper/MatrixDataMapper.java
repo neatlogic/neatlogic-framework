@@ -17,7 +17,7 @@ public interface MatrixDataMapper {
 
     int getDynamicTableDataCount(MatrixDataVo dataVo);
 
-    List<Map<String, String>> searchDynamicTableData(MatrixDataVo dataVo);
+    List<Map<String, Object>> searchDynamicTableData(MatrixDataVo dataVo);
 
     int getDynamicTableDataCountForTable(MatrixDataVo dataVo);
 

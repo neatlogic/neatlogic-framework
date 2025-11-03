@@ -36,14 +36,16 @@ import neatlogic.framework.matrix.core.MatrixDataSourceHandlerBase;
 import neatlogic.framework.matrix.dto.*;
 import neatlogic.framework.matrix.exception.MatrixExternalAccessException;
 import neatlogic.framework.matrix.exception.MatrixExternalNotFoundException;
-import neatlogic.framework.util.ExcelUtil;
+import neatlogic.framework.util.excel.ExcelBuilder;
+import neatlogic.framework.util.excel.SheetBuilder;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import neatlogic.module.framework.integration.handler.FrameworkRequestFrom;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -114,7 +116,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     protected Workbook myExportMatrix2Excel(MatrixVo matrixVo) {
-        HSSFWorkbook workbook = null;
+        Workbook workbook = null;
         MatrixExternalVo externalVo = matrixMapper.getMatrixExternalByMatrixUuid(matrixVo.getUuid());
         if (externalVo == null) {
             throw new MatrixExternalNotFoundException(matrixVo.getName());
@@ -142,8 +144,24 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
                         columnList.add(obj.getString("key"));
                     }
                 }
-                List<Map<String, String>> dataMapList = (List<Map<String, String>>) transformedResult.get("tbodyList");
-                workbook = ExcelUtil.createExcel(workbook, headerList, columnList, null, dataMapList);
+//                List<Map<String, String>> dataMapList = (List<Map<String, String>>) transformedResult.get("tbodyList");
+//                workbook = ExcelUtil.createExcel(workbook, headerList, columnList, null, dataMapList);
+                ExcelBuilder builder = new ExcelBuilder(SXSSFWorkbook.class);
+                SheetBuilder sheetBuilder = builder.withBorderColor(HSSFColor.HSSFColorPredefined.GREY_40_PERCENT)
+                        .withHeadFontColor(HSSFColor.HSSFColorPredefined.WHITE)
+                        .withHeadBgColor(HSSFColor.HSSFColorPredefined.DARK_BLUE)
+                        .withColumnWidth(30)
+                        .addSheet("sheet01")
+                        .withHeaderList(headerList)
+                        .withColumnList(columnList);
+                workbook = builder.build();
+                JSONArray tbodyList = transformedResult.getJSONArray("tbodyList");
+                if (CollectionUtils.isNotEmpty(tbodyList)) {
+                    for (int i = 0; i < tbodyList.size(); i++) {
+                        JSONObject tbody = tbodyList.getJSONObject(i);
+                        sheetBuilder.addData(tbody);
+                    }
+                }
             }
         }
         return workbook;

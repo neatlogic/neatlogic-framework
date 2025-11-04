@@ -183,7 +183,11 @@ public class NeatLogicConcurrentSafeCache implements Cache {
     @Override
     public void putObject(Object key, Object value) {
         if (value != null) {
-            getCache().put(key, CacheUtils.deepCopy(value));
+            if (!this.readOnly) {
+                getCache().put(key, CacheUtils.deepCopy(value));
+            } else {
+                getCache().put(key, value);
+            }
         }
         String lockKey = generateLockKey(getId(), key);
         ReentrantLock lock = LOCAL_LOCK_MAP.get(lockKey);

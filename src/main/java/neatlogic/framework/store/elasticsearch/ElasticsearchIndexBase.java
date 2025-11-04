@@ -46,9 +46,25 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T> {
     static Logger logger = LoggerFactory.getLogger(ElasticsearchIndexBase.class);
+    private static final ConcurrentHashMap<Long, Object> LOCK_MAP = new ConcurrentHashMap<>();
+
+    private static Object getLock(Long key) {
+        // 同 key 共享同一个对象实例
+        return LOCK_MAP.computeIfAbsent(key, k -> new Object());
+    }
+
+    private static void releaseLock(Long key) {
+        Object lock = LOCK_MAP.get(key);
+        if (lock != null) {
+            // 原子删除，避免新线程在删除过程中刚创建同 key 的锁被误删
+            LOCK_MAP.remove(key, lock);
+        }
+    }
+
     @Resource
     private LockMapper lockMapper;
 
@@ -61,27 +77,24 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     @Override
     public final void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert) {
-        //避免并发更新同一个文档，增加全局锁
-        Integer lock = 0;
-        if (targetId != null) {
-            lock = lockMapper.getMysqlLock(targetId.toString(), 30);
-        }
-        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-        UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
-                .index(getIndexName())                   // 索引名称
-                .id(targetId.toString())          // 文档 ID
-                .docAsUpsert(isUpsert)
-                .doc(document)                            // 需要更新的字段
-                .build();
-        try {
-            client.update(updateRequest, Object.class);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            if (lock == 1) {
-                lockMapper.releaseMysqlLock(targetId.toString());
+        if (targetId == null) return;
+        Object lock = getLock(targetId);
+        // synchronized 保证同一 targetId 串行
+        synchronized (lock) {
+            try {
+                ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+                UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
+                        .index(getIndexName())                   // 索引名称
+                        .id(targetId.toString())          // 文档 ID
+                        .docAsUpsert(isUpsert)
+                        .doc(document)                            // 需要更新的字段
+                        .build();
+                client.update(updateRequest, Object.class);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
         }
+        releaseLock(targetId);
     }
 
 

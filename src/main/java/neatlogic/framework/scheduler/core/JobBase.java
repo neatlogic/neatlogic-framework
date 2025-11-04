@@ -50,7 +50,7 @@ import java.util.Map.Entry;
 /**
  * 1、定时任务处理模块基类，所新增的定时任务类必须继承此类。
  * 即内部作业直接继承此类，外部作业继承"PublicJobBase"类。
- * 外部作业使用声明请移步"PublicJobBase"类。
+ * 外部作业使用声明请使用"PublicJobBase"类。
  * 2、内部作业默认审计
  * 3、内部作业的相关配置（job_name,job_group,cron、是否审计、计划开始时间等）在内部作业loadJob自己定义
  * 4、`schedule_job_audit` 和  `schedule_job_audit_detail` 用于所有作业审计记录

@@ -707,6 +707,12 @@ public class ApiDispatcher {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
         JSONObject paramObj;
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String name = headerNames.nextElement();
+            String value = request.getHeader(name);
+            System.out.println(name + "=" + value);
+        }
         if (StringUtils.isNotBlank(jsonStr)) {
             try {
                 paramObj = JSON.parseObject(jsonStr);

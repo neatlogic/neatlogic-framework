@@ -25,6 +25,7 @@ import neatlogic.framework.auth.core.AuthAction;
 import neatlogic.framework.auth.core.AuthActionChecker;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
+import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
@@ -244,6 +245,10 @@ public class ApiValidateAndHelpBase {
     private boolean isApiAuth(Class<?> apiClass, List<String> authNameList, AuthAction[] actions) {
         boolean isAuth = false;
         for (AuthAction action : actions) {
+            if (action.action() == NoAuth.class) {
+                isAuth = true;
+                break;
+            }
             if (StringUtils.isNotBlank(action.action().getSimpleName())) {
                 String actionName = action.action().getSimpleName();
                 // 判断用户角色是否拥有接口权限

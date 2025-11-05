@@ -17,6 +17,8 @@
 
 package neatlogic.framework.restful.annotation;
 
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
+
 import java.lang.annotation.*;
 
 /**
@@ -25,6 +27,6 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface SystemUser {
-    String value();
+public @interface AuthUser {
+    SystemUser value();
 }

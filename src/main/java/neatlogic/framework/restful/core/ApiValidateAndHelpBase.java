@@ -282,9 +282,9 @@ public class ApiValidateAndHelpBase {
             if (!Objects.equals(TenantContext.get().getTenantUuid(), "master")) {
                 //判断是否系统用户豁免接口
                 if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
-                    SystemUser[] systemUsers = apiClass.getAnnotationsByType(SystemUser.class);
-                    for (SystemUser systemUser : systemUsers) {
-                        if (Objects.equals(systemUser.value(), UserContext.get().getUserUuid())) {
+                    AuthUser[] authUsers = apiClass.getAnnotationsByType(AuthUser.class);
+                    for (AuthUser authUser : authUsers) {
+                        if (Objects.equals(authUser.value().getUserId(), UserContext.get().getUserUuid())) {
                             isAuth = true;
                             break;
                         }

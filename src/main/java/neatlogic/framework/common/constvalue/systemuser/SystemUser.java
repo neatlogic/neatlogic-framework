@@ -36,8 +36,9 @@ import java.util.List;
  * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser implements ISystemUser {
-    SYSTEM("system", "system", new I18n("系统")),
-    ANONYMOUS("anonymous", "anonymous", new I18n("匿名用户"));
+    SYSTEM("system", "system", new I18n("nfccs.systemuser.system")),
+    ANONYMOUS("anonymous", "anonymous", new I18n("nfccs.systemuser.anonymous")),
+    AUTOEXEC("autoexec", "autoexec", new I18n("nfccs.systemuser.autoexec"));
 
     private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
 

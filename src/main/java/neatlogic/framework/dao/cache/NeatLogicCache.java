@@ -126,7 +126,11 @@ public class NeatLogicCache implements Cache {
         if (value instanceof List && ((List<?>) value).isEmpty()) {
             return;
         }
-        getCache().put(key, value);
+        if (!this.readOnly) {
+            getCache().put(key, CacheUtils.deepCopy(value));
+        } else {
+            getCache().put(key, value);
+        }
     }
 
     @Override

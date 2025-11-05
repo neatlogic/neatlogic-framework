@@ -23,6 +23,7 @@ import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
+import neatlogic.framework.restful.core.ApiValidateAndHelpBase;
 import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -71,10 +72,26 @@ public class AuthActionChecker {
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
         if (userContext != null) {
+            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null && !isApiBaseCaller()) {
+                return true;
+            }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
         } else {
             return false;
         }
+    }
+
+    /**
+     * 如果是访问接口（ApiValidateAndHelpBase调的方法），系统用户无需鉴权
+     */
+    private static boolean isApiBaseCaller() {
+        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+        for (StackTraceElement e : stack) {
+            if (!e.getClassName().equals(AuthActionChecker.class.getName()) && Objects.equals(ApiValidateAndHelpBase.class.getName(),e.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -104,10 +121,6 @@ public class AuthActionChecker {
     public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
         //维护模式下且是维护用户 || ,指定权限无需鉴权
         if (Config.ENABLE_MAINTENANCE() && userUuid.equals(Config.MAINTENANCE()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
-            return true;
-        }
-        //系统用户无需鉴权
-        if (SystemUserFactory.getUserVoByUser(userUuid) != null) {
             return true;
         }
         //超级管理员无需鉴权

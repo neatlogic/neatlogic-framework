@@ -50,7 +50,7 @@ public abstract class RawApiComponentBase extends ApiValidateAndHelpBase impleme
             try {
                 Object proxy = AopContext.currentProxy();
                 Class<?> targetClass = AopUtils.getTargetClass(proxy);
-                validApiFowRaw(targetClass);
+                validAuth(targetClass);
                 validIsReSubmitForRaw(targetClass, apiVo.getToken(), param, String.class);
                 Method method = proxy.getClass().getMethod("myDoService", String.class);
                 result = method.invoke(proxy, param);
@@ -66,7 +66,7 @@ public abstract class RawApiComponentBase extends ApiValidateAndHelpBase impleme
                 }
             } catch (IllegalStateException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException |
                      SecurityException ex) {
-                validApiFowRaw(this.getClass());
+                validAuth(this.getClass());
                 validIsReSubmitForRaw(this.getClass(), apiVo.getToken(), param, String.class);
                 result = myDoService(param);
                 if (Config.ENABLE_INTERFACE_VERIFY()) {

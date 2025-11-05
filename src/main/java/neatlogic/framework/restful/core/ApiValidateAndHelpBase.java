@@ -27,6 +27,7 @@ import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
@@ -233,96 +234,96 @@ public class ApiValidateAndHelpBase {
         }
     }
 
-    protected void validApiFowRaw(Class<?> apiClass) throws SecurityException, PermissionDeniedException {
-        // 获取目标类
+    /**
+     *
+     * @param apiClass     接口class
+     * @param authNameList 需要鉴权的权限列表
+     * @param actions      权限名列表
+     * @return 是否有权限
+     */
+    private boolean isApiAuth(Class<?> apiClass, List<String> authNameList, AuthAction[] actions) {
         boolean isAuth = false;
-        List<String> authNameList = new ArrayList<>();
-        if (apiClass != null) {
-            //AuthAction action = apiClass.getAnnotation(AuthAction.class);
-            AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
-            if (!Objects.equals(TenantContext.get().getTenantUuid(), "master") && actions.length > 0) {
-                for (AuthAction action : actions) {
-                    if (StringUtils.isNotBlank(action.action().getSimpleName())) {
-                        String actionName = action.action().getSimpleName();
-                        // 判断用户角色是否拥有接口权限
-                        if (AuthActionChecker.check(actionName)) {
-                            isAuth = true;
-                            break;
+        for (AuthAction action : actions) {
+            if (StringUtils.isNotBlank(action.action().getSimpleName())) {
+                String actionName = action.action().getSimpleName();
+                // 判断用户角色是否拥有接口权限
+                if (AuthActionChecker.check(actionName)) {
+                    isAuth = true;
+                    break;
+                }
+                AuthBase a = AuthFactory.getAuthInstance(action.action().getSimpleName());
+                if (a != null) {
+                    authNameList.add($.t(a.getAuthDisplayName()));
+                } else {
+                    try {
+                        AuthBase authGroup = action.action().newInstance();
+                        //排除接口用了没加载模块的权限时，找不到权限的情况
+                        if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
+                            throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
                         }
-                        AuthBase a = AuthFactory.getAuthInstance(action.action().getSimpleName());
-                        if (a != null) {
-                            authNameList.add($.t(a.getAuthDisplayName()));
-                        } else {
-                            try {
-                                AuthBase authGroup = action.action().newInstance();
-                                //排除接口用了没加载模块的权限时，找不到权限的情况
-                                if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
-                                    throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
-                                }
-                            } catch (Exception t) {
-                                logger.error(t.getMessage(), t);
-                            }
-                        }
+                    } catch (Exception t) {
+                        logger.error(t.getMessage(), t);
                     }
                 }
-            } else {
-                isAuth = true;
-            }
-
-            if (!isAuth) {
-                throw new PermissionDeniedException(authNameList);
             }
         }
+        return isAuth;
     }
 
-
-    protected void validApi(Class<?> apiClass, JSONObject paramObj, ApiVo apiVo, Class<?>... classes) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
+    /**
+     * 验证类用户访问执行权限
+     * @param apiClass 类
+     */
+    protected void validAuth(Class<?> apiClass) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
         // 获取目标类
         boolean isAuth = false;
         List<String> authNameList = new ArrayList<>();
         if (apiClass != null) {
-            //AuthAction action = apiClass.getAnnotation(AuthAction.class);
-            AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
-            if (!Objects.equals(TenantContext.get().getTenantUuid(), "master") && actions.length > 0) {
-                for (AuthAction action : actions) {
-                    if (StringUtils.isNotBlank(action.action().getSimpleName())) {
-                        String actionName = action.action().getSimpleName();
-                        // 判断用户角色是否拥有接口权限
-                        if (AuthActionChecker.check(actionName)) {
+            if (!Objects.equals(TenantContext.get().getTenantUuid(), "master")) {
+                //判断是否系统用户豁免接口
+                if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
+                    SystemUser[] systemUsers = apiClass.getAnnotationsByType(SystemUser.class);
+                    for (SystemUser systemUser : systemUsers) {
+                        if (Objects.equals(systemUser.value(), UserContext.get().getUserUuid())) {
                             isAuth = true;
                             break;
                         }
-                        AuthBase a = AuthFactory.getAuthInstance(action.action().getSimpleName());
-                        if (a != null) {
-                            authNameList.add($.t(a.getAuthDisplayName()));
-                        } else {
-                            try {
-                                AuthBase authGroup = action.action().newInstance();
-                                //排除接口用了没加载模块的权限时，找不到权限的情况
-                                if (ModuleUtil.getModuleGroup(authGroup.getAuthGroup()) != null) {
-                                    throw new AuthNotFoundException(apiClass.getSimpleName(), action.action().getSimpleName());
-                                }
-                            } catch (Exception t) {
-                                logger.error(t.getMessage(), t);
-                            }
-                        }
+                    }
+                }
+                if (!isAuth) {
+                    //AuthAction action = apiClass.getAnnotation(AuthAction.class);
+                    AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
+                    if (actions.length > 0) {
+                        isAuth = isApiAuth(apiClass, authNameList, actions);
+                    } else {
+                        isAuth = true;
                     }
                 }
             } else {
                 isAuth = true;
             }
-
             if (!isAuth) {
                 throw new PermissionDeniedException(authNameList);
             }
-            // 判断参数是否合法
-            Method method = apiClass.getMethod("myDoService", classes);
-            validInput(method, paramObj);
         }
     }
 
     /**
-     * @Description: 校验input注解的方法入参是否合法
+     * 验证接口类权限和参数是否合法
+     * @param apiClass 接口类
+     * @param paramObj 入参
+     * @param apiVo 接口对象
+     * @param classes 入参类
+     */
+    protected void validApi(Class<?> apiClass, JSONObject paramObj, ApiVo apiVo, Class<?>... classes) throws NoSuchMethodException, SecurityException, PermissionDeniedException {
+        validAuth(apiClass);
+        // 判断参数是否合法
+        Method method = apiClass.getMethod("myDoService", classes);
+        validInput(method, paramObj);
+    }
+
+    /**
+     * @desc: 校验input注解的方法入参是否合法
      * @Author: 89770
      * @Date: 2021/2/20 13:04
      * @Params: [method, paramObj]

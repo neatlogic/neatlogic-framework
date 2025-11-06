@@ -143,6 +143,13 @@ public class Config {
     private static Integer RUNNER_CONNECT_TIMEOUT;// runner请求的timeout时间（毫秒）
     private static Integer RUNNER_READ_TIMEOUT;// runner请求的读取timeout时间（毫秒）
 
+    private static String AUTOEXEC_TOKEN;// autoexec用户的token
+
+    public static String AUTOEXEC_TOKEN() {
+        return AUTOEXEC_TOKEN;
+    }
+
+
     static {
         NEATLOGIC_HOME = System.getenv("NEATLOGIC_HOME");
         if (StringUtils.isBlank(NEATLOGIC_HOME)) {
@@ -685,6 +692,12 @@ public class Config {
             if (StringUtils.isBlank(JWT_SECRET)) {
                 System.out.println(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
+                System.exit(1);
+            }
+            AUTOEXEC_TOKEN = prop.getProperty("autoexec.token");
+            if(StringUtils.isBlank(AUTOEXEC_TOKEN)){
+                System.out.println(I18nUtils.getStaticMessage("nmac.autoexecconfig.loadconfig.autoexectoken"));
+                logger.error(I18nUtils.getStaticMessage("nmac.autoexecconfig.loadconfig.autoexectoken"));
                 System.exit(1);
             }
 

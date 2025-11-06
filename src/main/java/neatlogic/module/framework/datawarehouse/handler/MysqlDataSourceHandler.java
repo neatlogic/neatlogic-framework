@@ -16,11 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.datawarehouse.handler;
 
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerBase;
-import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseConnectionMapper;
 import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import neatlogic.framework.datawarehouse.dto.*;
 import neatlogic.framework.datawarehouse.exceptions.ReportDataSourceSyncException;
-import neatlogic.framework.datawarehouse.service.DataSourceService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -43,11 +41,7 @@ public class MysqlDataSourceHandler extends DataSourceServiceHandlerBase {
     @Resource
     private DataSource dataSource;
     @Resource
-    private DataWarehouseConnectionMapper reportConnectionMapper;
-    @Resource
     private DataWarehouseDataSourceMapper dataSourceMapper;
-    @Resource
-    DataSourceService dataSourceService;
 
     @Override
     public String getHandler() {
@@ -147,7 +141,7 @@ public class MysqlDataSourceHandler extends DataSourceServiceHandlerBase {
                 }
             }
         } catch (SQLException | DocumentException | InstantiationException | IllegalAccessException |
-                ClassNotFoundException e) {
+                 ClassNotFoundException e) {
             logger.error(e.getMessage(), e);
             reportDataSourceAuditVo.setError(e.getMessage());
             throw new ReportDataSourceSyncException(dataSourceVo, e);

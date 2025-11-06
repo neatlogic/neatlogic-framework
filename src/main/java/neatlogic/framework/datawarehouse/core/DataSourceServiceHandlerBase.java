@@ -205,10 +205,14 @@ public abstract class DataSourceServiceHandlerBase implements IDataSourceService
                         }
                     }
                 }
-                matcher.appendTail(temp);
 
+                matcher.appendTail(temp);
                 selectVo.setParamList(paramList);
-                selectVo.setSql(temp.toString());
+                if (!reportDataSourceVo.getDbType().equalsIgnoreCase("mongodb") && !reportDataSourceVo.getDbType().equalsIgnoreCase("elasticsearch")) {
+                    selectVo.setSql(temp.toString());
+                } else {
+                    selectVo.setSql(result);
+                }
                 selectVo.setSql(selectVo.getSql().replace("&gt;", ">").replace("&lt;", "<"));
                 selectVo.setParamMap(paramMap);
                 selectList.add(selectVo);
@@ -233,7 +237,7 @@ public abstract class DataSourceServiceHandlerBase implements IDataSourceService
     /**
      * 同时拥有聚合计算字段和key字段的情况下才会进行聚合计算
      */
-    protected void aggregateAndInsertData( List<DataSourceFieldVo> aggregateFieldList,List<DataSourceFieldVo> keyFieldList, DataSourceDataVo reportDataSourceDataVo, DataSourceAuditVo reportDataSourceAuditVo) {
+    protected void aggregateAndInsertData(List<DataSourceFieldVo> aggregateFieldList, List<DataSourceFieldVo> keyFieldList, DataSourceDataVo reportDataSourceDataVo, DataSourceAuditVo reportDataSourceAuditVo) {
         if (CollectionUtils.isNotEmpty(aggregateFieldList) && CollectionUtils.isNotEmpty(keyFieldList)) {
             Map<String, Object> aggregateMap = dataSourceDataMapper.getAggregateFieldValue(reportDataSourceDataVo);
             if (aggregateMap != null) {

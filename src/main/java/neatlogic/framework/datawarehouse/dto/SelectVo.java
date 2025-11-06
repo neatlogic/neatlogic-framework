@@ -45,6 +45,7 @@ public class SelectVo {
         this.datasource = datasource;
     }
 
+
     public int getQueryTimeout() {
         return queryTimeout;
     }

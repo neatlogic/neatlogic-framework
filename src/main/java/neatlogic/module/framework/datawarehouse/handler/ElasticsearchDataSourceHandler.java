@@ -26,13 +26,14 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.json.stream.JsonParser;
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerBase;
+import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import neatlogic.framework.datawarehouse.dto.*;
 import neatlogic.framework.datawarehouse.exceptions.ReportDataSourceSyncException;
 import neatlogic.framework.store.elasticsearch.ElasticsearchClientFactory;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -49,7 +50,7 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
     static Logger logger = LoggerFactory.getLogger(ElasticsearchDataSourceHandler.class);
     static final int batchSize = 100;
     @Resource
-    MongoTemplate mongoTemplate;
+    private DataWarehouseDataSourceMapper dataSourceMapper;
 
     @Override
     public String getHandler() {
@@ -61,8 +62,11 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
         try {
             List<SelectVo> selectList = getSqlFromDataSource(dataSourceVo);
             for (SelectVo select : selectList) {
+                Map<String, Object> paramMap = select.getParamMap();
                 String queryText = select.getSql();
-                if (StringUtils.isBlank(queryText)) continue;
+                for (Map.Entry<String, Object> entry : paramMap.entrySet()) {
+                    queryText = queryText.replaceAll("#\\{" + entry.getKey() + "}", entry.getValue().toString());
+                }
 
                 // 解析 JSON
                 JSONObject queryObj = JSON.parseObject(queryText);
@@ -120,8 +124,48 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
                         List<DataSourceFieldVo> aggregateFieldList = new ArrayList<>();
                         List<DataSourceFieldVo> keyFieldList = new ArrayList<>();
 
+                        if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
+                            for (DataSourceParamVo paramVo : dataSourceVo.getParamList()) {
+                                if (source.containsKey(paramVo.getName().toLowerCase())) {
+                                    Object v = source.get(paramVo.getName().toLowerCase());
+                                    Long lv = null;
+                                    try {
+                                        lv = (Long) v;
+                                    } catch (Exception ex) {
+                                        logger.error(ex.getMessage(), ex);
+                                    }
+                                    if (lv != null) {
+                                        if (paramVo.getCurrentValue() == null) {
+                                            paramVo.setCurrentValue(lv);
+                                        } else if (lv > paramVo.getCurrentValue()) {
+                                            paramVo.setCurrentValue(lv);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+
                         for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
-                            Object v = source.get(fieldVo.getName());
+                            Object v = null;
+                            if (fieldVo.getName().contains(".")) {
+                                String[] names = fieldVo.getName().split("\\.");
+                                if (source.containsKey(names[0]) && source.get(names[0]) instanceof Map) {
+                                    Map<String, Object> sourceMap = (Map<String, Object>) source.get(names[0]);
+                                    for (int i = 1; i < names.length; i++) {
+                                        if (sourceMap.containsKey(names[i])) {
+                                            if (source.get(names[i]) instanceof Map) {
+                                                sourceMap = (Map<String, Object>) source.get(names[i]);
+                                            } else {
+                                                v = sourceMap.get(names[i]);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                v = source.get(fieldVo.getName());
+                            }
                             fieldVo.setValue(v != null ? v : "");
                             reportDataSourceDataVo.addField(fieldVo);
 
@@ -134,6 +178,12 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
                         }
 
                         aggregateAndInsertData(aggregateFieldList, keyFieldList, reportDataSourceDataVo, reportDataSourceAuditVo);
+                    }
+
+                    if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
+                        for (DataSourceParamVo param : dataSourceVo.getParamList()) {
+                            dataSourceMapper.updateDataSourceParamCurrentValue(param);
+                        }
                     }
 
                     from += size;

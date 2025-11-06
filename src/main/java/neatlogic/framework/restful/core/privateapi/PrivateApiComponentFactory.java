@@ -429,18 +429,19 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                 logger.warn(clazz.getName() + "接口没有OperationType注解");
             }
 
-            //System.out.println(clazz.getSimpleName());
+//            System.out.println(clazz.getSimpleName());
             //跳过匿名接口
-            if (component instanceof IApiComponent && ((IApiComponent) component).supportAnonymousAccess().isSupportAnonymousAccess()) {
-                return;
-            }
-            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
+//            if (component instanceof IApiComponent && ((IApiComponent) component).supportAnonymousAccess().isSupportAnonymousAccess()) {
+//                return;
+//            }
+//            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
                 AuthAction authAction = clazz.getAnnotation(AuthAction.class);
                 AuthActions authActions = clazz.getAnnotation(AuthActions.class);
                 if (authAction == null && authActions == null) {
-                    logger.warn(clazz.getName() + "接口没有AuthAction注解");
+                    System.err.println(clazz.getName() + "接口类需要加上@AuthAction注解进行权限控制, 如果未创建权限类, 可以先临时加上@AuthAction(action = NoAuth.class)使得应用服务正常启动");
+                    System.exit(1);
                 }
-            }
+//            }
         }
     }
 

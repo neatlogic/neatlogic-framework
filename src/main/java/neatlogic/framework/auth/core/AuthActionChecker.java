@@ -17,6 +17,7 @@ package neatlogic.framework.auth.core;
 
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
+import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
@@ -129,6 +130,9 @@ public class AuthActionChecker {
         }
         if (CollectionUtils.isEmpty(actionList)) {
             return false;
+        }
+        if (actionList.contains(NoAuth.class.getSimpleName())) {
+            return true;
         }
         //判断从数据库查询的用户权限是否满足
         AuthenticationInfoVo authenticationInfoVo;

@@ -60,6 +60,9 @@ public class AuthActionChecker {
             actionList.add(action.getSimpleName());
         }
         if (userContext != null) {
+            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null && !isApiBaseCaller()) {
+                return true;
+            }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
         } else {
             return false;
@@ -73,7 +76,7 @@ public class AuthActionChecker {
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
         if (userContext != null) {
-            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null && !isApiBaseCaller()) {
+            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null) {
                 return true;
             }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
@@ -105,6 +108,9 @@ public class AuthActionChecker {
     public static Boolean checkByUserUuid(String userUuid, String... action) {
         if (action == null || action.length == 0) {
             return false;
+        }
+        if ( SystemUserFactory.getUserVoByUser(userUuid) != null) {
+            return true;
         }
         List<String> actionList = Arrays.asList(action);
         return checkByUserUuid(userUuid, actionList);

@@ -438,7 +438,8 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                 AuthAction authAction = clazz.getAnnotation(AuthAction.class);
                 AuthActions authActions = clazz.getAnnotation(AuthActions.class);
                 if (authAction == null && authActions == null) {
-                    logger.warn(clazz.getName() + "接口没有AuthAction注解");
+                    System.err.println(clazz.getName() + "接口类需要加上@AuthAction注解进行权限控制, 如果未创建权限类, 可以先临时加上@AuthAction(action = NoAuth.class)使得应用服务正常启动");
+                    System.exit(1);
                 }
             }
         }

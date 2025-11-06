@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.framework.auth.core;
 
+import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.util.ModuleUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
@@ -37,7 +38,7 @@ public class AuthFactory {
         for (Class<? extends AuthBase> c : authClass) {
             try {
                 //排除抽象类
-                if (!Modifier.isAbstract(c.getModifiers())) {
+                if (!Modifier.isAbstract(c.getModifiers()) && c != NoAuth.class) {
                     AuthBase authIns = c.newInstance();
                     if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || (authIns instanceof AuthCSBase && ModuleUtil.isModuleInvalidated(authIns.getAuthModule()))) {
                         continue;

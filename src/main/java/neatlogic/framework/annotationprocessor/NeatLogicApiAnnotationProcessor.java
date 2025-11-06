@@ -1,6 +1,9 @@
 package neatlogic.framework.annotationprocessor;
 
 import neatlogic.framework.restful.core.IApiComponent;
+import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
+import neatlogic.framework.restful.core.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.IRawApiComponent;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.processing.*;
@@ -39,15 +42,28 @@ public class NeatLogicApiAnnotationProcessor extends AbstractProcessor {
         TypeElement neatLogicApiTypeElement = elementUtils.getTypeElement("neatlogic.framework.annotationprocessor.NeatLogicApi");
         Set<? extends Element> neatLogicApiElements = roundEnv.getElementsAnnotatedWith(neatLogicApiTypeElement);
         Set<TypeElement> neatLogicApiClasses = ElementFilter.typesIn(neatLogicApiElements);
-        TypeElement apiComponentTypeElement = elementUtils.getTypeElement(IApiComponent.class.getName());
-        if (apiComponentTypeElement != null
+        if (componentTypeElement != null
+                && serviceTypeElement != null
+                && repositoryTypeElement != null
+                && controllerTypeElement != null
                 && authActionTypeElement != null
                 && authActionsTypeElement != null
                 && CollectionUtils.isNotEmpty(neatLogicApiClasses)
         ) {
+            TypeElement apiComponentTypeElement = elementUtils.getTypeElement(IApiComponent.class.getName());
+            TypeElement binaryStreamApiComponentTypeElement = elementUtils.getTypeElement(IBinaryStreamApiComponent.class.getName());
+            TypeElement jsonStreamApiComponentTypeElement = elementUtils.getTypeElement(IJsonStreamApiComponent.class.getName());
+            TypeElement rawApiComponentTypeElement = elementUtils.getTypeElement(IRawApiComponent.class.getName());
             TypeMirror apiComponentTypeMirror = apiComponentTypeElement.asType();
+            TypeMirror binaryStreamApiComponentTypeMirror = binaryStreamApiComponentTypeElement.asType();
+            TypeMirror jsonStreamApiComponentTypeMirror = jsonStreamApiComponentTypeElement.asType();
+            TypeMirror rawApiComponentTypeMirror = rawApiComponentTypeElement.asType();
             for (TypeElement neatLogicApiClass : neatLogicApiClasses) {
-                if (implementsInterface(neatLogicApiClass, apiComponentTypeMirror, typeUtils)) {
+                if (implementsInterface(neatLogicApiClass, apiComponentTypeMirror, typeUtils)
+                        || implementsInterface(neatLogicApiClass, binaryStreamApiComponentTypeMirror, typeUtils)
+                        || implementsInterface(neatLogicApiClass, jsonStreamApiComponentTypeMirror, typeUtils)
+                        || implementsInterface(neatLogicApiClass, rawApiComponentTypeMirror, typeUtils)
+                ) {
                     boolean isBean = false;
                     List<? extends AnnotationMirror> annotationMirrors = neatLogicApiClass.getAnnotationMirrors();
                     for (AnnotationMirror annotationMirror : annotationMirrors) {

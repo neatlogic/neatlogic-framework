@@ -18,6 +18,7 @@
 package neatlogic.framework.common.constvalue.systemuser;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
@@ -30,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @ClassName: SystemUser
@@ -74,10 +76,6 @@ public enum SystemUser implements ISystemUser {
         return TimeUtil.ZONE_TIME;
     }
 
-    @Override
-    public String getToken() {
-        return null;
-    }
 
     @Override
     public UserVo getUserVo() {
@@ -96,6 +94,14 @@ public enum SystemUser implements ISystemUser {
             logger.error(e.getMessage(), e);
         }
         return userVo;
+    }
+
+    @Override
+    public String getToken() {
+        if (Objects.equals(userId, AUTOEXEC.getUserId())) {
+            return Config.AUTOEXEC_TOKEN();
+        }
+        return null;
     }
 
     @Override

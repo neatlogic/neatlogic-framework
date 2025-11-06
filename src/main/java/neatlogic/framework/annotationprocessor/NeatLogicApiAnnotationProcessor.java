@@ -1,5 +1,6 @@
 package neatlogic.framework.annotationprocessor;
 
+import neatlogic.framework.restful.core.IApiComponent;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.processing.*;
@@ -38,7 +39,7 @@ public class NeatLogicApiAnnotationProcessor extends AbstractProcessor {
         TypeElement neatLogicApiTypeElement = elementUtils.getTypeElement("neatlogic.framework.annotationprocessor.NeatLogicApi");
         Set<? extends Element> neatLogicApiElements = roundEnv.getElementsAnnotatedWith(neatLogicApiTypeElement);
         Set<TypeElement> neatLogicApiClasses = ElementFilter.typesIn(neatLogicApiElements);
-        TypeElement apiComponentTypeElement = elementUtils.getTypeElement("neatlogic.framework.restful.core.IApiComponent");
+        TypeElement apiComponentTypeElement = elementUtils.getTypeElement(IApiComponent.class.getName());
         if (apiComponentTypeElement != null
                 && authActionTypeElement != null
                 && authActionsTypeElement != null

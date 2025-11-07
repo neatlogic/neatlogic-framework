@@ -24,15 +24,18 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
+import neatlogic.framework.dao.mapper.LoginMapper;
 import neatlogic.framework.dao.mapper.UserSessionContentMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
+import neatlogic.framework.util.SnowflakeUtil;
 import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -53,6 +56,9 @@ import java.util.Date;
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     @Resource
     private UserSessionMapper userSessionMapper;
+
+    @Resource
+    private LoginMapper loginMapper;
 
     @Resource
     private UserSessionContentMapper userSessionContentMapper;
@@ -135,6 +141,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         userVo = loginAuth.auth(cachedRequest, response);
                         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                             logger.debug("======= getUser succeed: " + userVo.getUuid());
+                            LoginAuditVo loginAuditVo = new LoginAuditVo();
+                            loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+                            loginAuditVo.setUserUuid(userVo.getUuid());
+                            loginAuditVo.setLoginMethod(loginAuth.getType());
+                            loginMapper.insertLoginAudit(loginAuditVo);
                         } else {
                             returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth, loginAuth.getType());
                             return;

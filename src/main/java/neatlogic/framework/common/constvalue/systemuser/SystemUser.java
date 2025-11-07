@@ -24,7 +24,6 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,18 +37,18 @@ import java.util.Objects;
  * @Description: sla转交策略的定时作业执行转交逻辑时，需要验证权限，system用户拥有流程流转的所有权限
  */
 public enum SystemUser implements ISystemUser {
-    SYSTEM("system", "system", new I18n("nfccs.systemuser.system")),
-    ANONYMOUS("anonymous", "anonymous", new I18n("nfccs.systemuser.anonymous")),
-    AUTOEXEC("autoexec", "autoexec", new I18n("nfccs.systemuser.autoexec"));
+    SYSTEM("system", "system", "nfccs.systemuser.system"),
+    ANONYMOUS("anonymous", "anonymous", "nfccs.systemuser.anonymous"),
+    AUTOEXEC("autoexec", "autoexec", "nfccs.systemuser.autoexec");
 
     private final Logger logger = LoggerFactory.getLogger(SystemUser.class);
 
     private final String userId;
     private final String userUuid;
-    private final I18n userName;
+    private final String userName;
     private final AuthenticationInfoVo authenticationInfoVo;
 
-    SystemUser(String userId, String userUuid, I18n userName) {
+    SystemUser(String userId, String userUuid, String userName) {
         this.userId = userId;
         this.userUuid = userUuid;
         this.userName = userName;
@@ -68,7 +67,7 @@ public enum SystemUser implements ISystemUser {
 
     @Override
     public String getUserName() {
-        return $.t(userName.toString());
+        return $.t(userName);
     }
 
     @Override

@@ -16,7 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.filter.handler;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.hmac.HeaderIrregularException;
 import neatlogic.framework.exception.hmac.HeaderNotFoundException;
@@ -48,8 +47,6 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
 
     private final Logger logger = LoggerFactory.getLogger(HmacLoginAuthHandler.class);
 
-    @Resource
-    private UserMapper userMapper;
 
     @Resource
     private UserService userService;
@@ -115,7 +112,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
                 }
                 bodyJsonString = bodyJson.toString();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
         } else {
             StringBuilder sb = new StringBuilder();

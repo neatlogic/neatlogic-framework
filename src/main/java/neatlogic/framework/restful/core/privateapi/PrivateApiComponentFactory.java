@@ -84,6 +84,9 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         return rawComponentMap.get(componentId);
     }
 
+    public static List<ApiVo> getMcpApiList() {
+        return apiList.stream().filter(ApiVo::getIsMcp).toList();
+    }
 
     public static ApiVo getApiByToken(String token) throws CloneNotSupportedException {
         ApiVo api = apiMap.get(token);
@@ -178,6 +181,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
                     apiVo.setIsActive(1);
+                    apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.OBJECT.getValue());
@@ -244,6 +248,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
                     apiVo.setIsActive(1);
+                    apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.STREAM.getValue());
@@ -310,6 +315,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
                     apiVo.setIsActive(1);
+                    apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.BINARY.getValue());
@@ -376,6 +382,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
                     apiVo.setIsActive(1);
+                    apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
                     apiVo.setTimeout(0);// 0是default
                     apiVo.setType(ApiType.RAW.getValue());

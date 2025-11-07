@@ -65,7 +65,6 @@ public interface IApiComponent {
         return null;
     }
 
-    ;
 
     /**
      * 是否需要审计
@@ -133,6 +132,16 @@ public interface IApiComponent {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default boolean disableReturnCircularReferenceDetect() {
+        return false;
+    }
+
+    /**
+     * 是否作为MCP工具
+     *
+     * @return true false
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default boolean isMcp() {
         return false;
     }
 }

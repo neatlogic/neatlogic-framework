@@ -137,7 +137,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                a.`user_info`      as userInfo,
                a.`is_super_admin` as isSuperAdmin
         FROM `user` a
-        WHERE a.`uuid` = #{value} or a.`user_id` = #{value}
+        WHERE a.`uuid` = #{value}
+           or a.`user_id` = #{value}
+           or a.`token` = #{value}
     </select>
 
     <resultMap id="userInfoMap" type="neatlogic.framework.dto.UserVo">

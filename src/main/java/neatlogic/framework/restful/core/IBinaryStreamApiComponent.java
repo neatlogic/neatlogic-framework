@@ -53,12 +53,8 @@ public interface IBinaryStreamApiComponent {
     JSONObject help();
 
     /**
-     * @Description: 是否支持匿名访问
-     * @Author: linbq
-     * @Date: 2021/3/11 18:37
-     * @Params:[]
-     * @Returns:boolean
-     **/
+     * 是否支持匿名访问
+     */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default ApiAnonymousAccessSupportEnum supportAnonymousAccess() {
         return ApiAnonymousAccessSupportEnum.ANONYMOUS_ACCESS_FORBIDDEN;
@@ -66,6 +62,16 @@ public interface IBinaryStreamApiComponent {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default boolean disableReturnCircularReferenceDetect() {
+        return false;
+    }
+
+    /**
+     * 是否作为MCP工具
+     *
+     * @return true false
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default boolean isMcp() {
         return false;
     }
 }

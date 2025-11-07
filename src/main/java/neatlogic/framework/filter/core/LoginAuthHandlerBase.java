@@ -140,6 +140,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 InsertUserSessionThread.addInsertUserSession(userSessionVo);
                 UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr == null ? "{}" : authenticationInfoStr);
                 isNeedLoginPost = true;
+                LoginAuditVo loginAuditVo = new LoginAuditVo();
+                loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+                loginAuditVo.setUserUuid(userVo.getUuid());
+                loginAuditVo.setLoginMethod(this.getType());
+                loginMapper.insertLoginAudit(loginAuditVo);
             } else {
                 authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题

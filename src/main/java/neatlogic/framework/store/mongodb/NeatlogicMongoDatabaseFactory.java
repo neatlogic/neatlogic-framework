@@ -22,6 +22,7 @@ import com.mongodb.client.ClientSession;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.exception.database.TenantMongoClientNotFoundException;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -40,13 +41,21 @@ public class NeatlogicMongoDatabaseFactory implements MongoDatabaseFactory {
 
     @Override
     public @NonNull MongoDatabase getMongoDatabase(@NonNull String dbName) {
-        return MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid()).getDatabase(dbName);
+        MongoClient mongoClient = MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid());
+        if(mongoClient == null){
+            throw new TenantMongoClientNotFoundException();
+        }
+        return mongoClient.getDatabase(dbName);
     }
 
     @Override
     public @NonNull ClientSession getSession(@NonNull ClientSessionOptions options) {
         // 确保 MongoClient 是从租户管理中获取的
-        return MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid()).startSession(options);
+        MongoClient mongoClient = MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid());
+        if(mongoClient == null){
+            throw new TenantMongoClientNotFoundException();
+        }
+        return mongoClient.startSession(options);
     }
 
     @Override
@@ -57,7 +66,9 @@ public class NeatlogicMongoDatabaseFactory implements MongoDatabaseFactory {
     @Override
     public @NonNull MongoDatabaseFactory withSession(@NonNull ClientSession session) {
         MongoClient mongoClient = MongoDbManager.getMongoClient(TenantContext.get().getTenantUuid());
-
+        if(mongoClient == null){
+            throw new TenantMongoClientNotFoundException();
+        }
         return new MongoDatabaseFactory() {
             @Override
             public @NonNull MongoDatabase getMongoDatabase() {

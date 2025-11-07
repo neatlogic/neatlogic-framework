@@ -46,6 +46,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.util.Date;
 
@@ -83,7 +84,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("neatlogic_timezone".equals(cookie.getName())) {
-                    String timezoneTmp = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
+                    String timezoneTmp = (URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
                     try {
                         ZoneOffset.of(timezoneTmp);
                         timezone = timezoneTmp;

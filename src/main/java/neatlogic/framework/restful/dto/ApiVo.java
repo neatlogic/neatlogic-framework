@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ApiVo extends BasePageVo implements Serializable,Cloneable {
+public class ApiVo extends BasePageVo implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3689437871016436622L;
 
@@ -110,6 +110,8 @@ public class ApiVo extends BasePageVo implements Serializable,Cloneable {
 
     @JSONField(serialize = false)
     private String timezone;
+    @JSONField(serialize = false)
+    private boolean isMcp = false;
 
     //明文
     private String passwordPlain;
@@ -121,6 +123,14 @@ public class ApiVo extends BasePageVo implements Serializable,Cloneable {
             pathVariableList = new ArrayList<>();
         }
         pathVariableList.add(para);
+    }
+
+    public boolean getIsMcp() {
+        return isMcp;
+    }
+
+    public void setIsMcp(boolean mcp) {
+        isMcp = mcp;
     }
 
     public ApiVo() {
@@ -647,6 +657,7 @@ public class ApiVo extends BasePageVo implements Serializable,Cloneable {
     public void setPasswordCipher(String passwordCipher) {
         this.passwordCipher = passwordCipher;
     }
+
     @Override
     public ApiVo clone() throws CloneNotSupportedException {
         return (ApiVo) super.clone();

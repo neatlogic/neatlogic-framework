@@ -134,4 +134,14 @@ public interface IRawApiComponent {
     default boolean disableReturnCircularReferenceDetect() {
         return false;
     }
+
+    /**
+     * 是否作为MCP工具
+     *
+     * @return true false
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default boolean isMcp() {
+        return false;
+    }
 }

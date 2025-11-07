@@ -35,6 +35,15 @@ public interface IBinaryStreamApiComponent {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getName();
 
+    /**
+     * 接口描述，默认是接口名
+     *
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default String getDescription() {
+        return this.getName();
+    }
+
     // true时返回格式不再包裹固定格式
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default boolean isRaw() {

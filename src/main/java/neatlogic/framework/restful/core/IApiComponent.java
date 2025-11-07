@@ -50,10 +50,18 @@ public interface IApiComponent {
     /**
      * 接口中文名
      *
-     * @return 中文名
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getName();
+
+    /**
+     * 接口描述，默认是接口名
+     *
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default String getDescription() {
+        return this.getName();
+    }
 
     /**
      * 额外配置

@@ -33,6 +33,15 @@ public interface IJsonStreamApiComponent {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getName();
 
+    /**
+     * 接口描述，默认是接口名
+     *
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default String getDescription() {
+        return this.getName();
+    }
+
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getConfig();
 

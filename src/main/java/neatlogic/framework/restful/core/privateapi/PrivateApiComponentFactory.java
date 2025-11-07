@@ -180,6 +180,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
+                    apiVo.setDescription(component.getDescription());
                     apiVo.setIsActive(1);
                     apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
@@ -247,6 +248,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
+                    apiVo.setDescription(component.getDescription());
                     apiVo.setIsActive(1);
                     apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
@@ -314,6 +316,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
+                    apiVo.setDescription(component.getDescription());
                     apiVo.setIsActive(1);
                     apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
@@ -381,6 +384,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
                     apiVo.setName(component.getName());
+                    apiVo.setDescription(component.getDescription());
                     apiVo.setIsActive(1);
                     apiVo.setIsMcp(component.isMcp());
                     apiVo.setNeedAudit(component.needAudit());
@@ -433,7 +437,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
             Class<?> clazz = AopUtils.getTargetClass(component);
             OperationType operationType = clazz.getAnnotation(OperationType.class);
             if (operationType == null) {
-                logger.warn(clazz.getName() + "接口没有OperationType注解");
+                logger.warn("{}接口没有OperationType注解", clazz.getName());
             }
 
 //            System.out.println(clazz.getSimpleName());

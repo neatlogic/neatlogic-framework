@@ -56,6 +56,15 @@ public interface IRawApiComponent {
     String getName();
 
     /**
+     * 接口描述，默认是接口名
+     *
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default String getDescription() {
+        return this.getName();
+    }
+
+    /**
      * 额外配置
      *
      * @return 配置json

@@ -27,6 +27,7 @@ import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.enums.PublicApiAuthType;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -239,7 +240,10 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     }
 
     public String getDescription() {
-        return description;
+        if (StringUtils.isNotBlank(description)) {
+            return $.t(description);
+        }
+        return null;
     }
 
     public void setDescription(String description) {

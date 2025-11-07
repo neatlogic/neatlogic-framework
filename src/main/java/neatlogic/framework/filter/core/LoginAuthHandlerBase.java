@@ -149,6 +149,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 }
             }
             userVo.setJwtVo(jwtVo);
+            assert authenticationInfoVo != null;
+            authenticationInfoVo.setUserUuid(userVo.getUuid());
             UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME, request, response);
             if (isNeedLoginPost) {
                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {

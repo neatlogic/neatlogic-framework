@@ -17,6 +17,7 @@ package neatlogic.framework.auth.core;
 
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.init.MaintenanceMode;
+import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
@@ -59,6 +60,9 @@ public class AuthActionChecker {
             actionList.add(action.getSimpleName());
         }
         if (userContext != null) {
+            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null && !isApiBaseCaller()) {
+                return true;
+            }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
         } else {
             return false;
@@ -72,7 +76,7 @@ public class AuthActionChecker {
         UserContext userContext = UserContext.get();
         List<String> actionList = new ArrayList<>(Arrays.asList(action));
         if (userContext != null) {
-            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null && !isApiBaseCaller()) {
+            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null) {
                 return true;
             }
             return checkByUserUuid(userContext.getUserUuid(), actionList);
@@ -105,6 +109,9 @@ public class AuthActionChecker {
         if (action == null || action.length == 0) {
             return false;
         }
+        if ( SystemUserFactory.getUserVoByUser(userUuid) != null) {
+            return true;
+        }
         List<String> actionList = Arrays.asList(action);
         return checkByUserUuid(userUuid, actionList);
     }
@@ -129,6 +136,9 @@ public class AuthActionChecker {
         }
         if (CollectionUtils.isEmpty(actionList)) {
             return false;
+        }
+        if (actionList.contains(NoAuth.class.getSimpleName())) {
+            return true;
         }
         //判断从数据库查询的用户权限是否满足
         AuthenticationInfoVo authenticationInfoVo;

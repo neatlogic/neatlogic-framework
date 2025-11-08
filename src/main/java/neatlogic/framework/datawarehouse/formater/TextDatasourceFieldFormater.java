@@ -20,6 +20,7 @@ package neatlogic.framework.datawarehouse.formater;
 import neatlogic.framework.datawarehouse.dto.DataSourceFieldVo;
 import neatlogic.framework.datawarehouse.enums.FieldType;
 import neatlogic.framework.datawarehouse.formater.core.IDatasourceFieldFormater;
+import neatlogic.framework.util.GzipUtil;
 import org.apache.commons.lang3.StringUtils;
 
 public class TextDatasourceFieldFormater implements IDatasourceFieldFormater {
@@ -33,8 +34,11 @@ public class TextDatasourceFieldFormater implements IDatasourceFieldFormater {
         if (value == null) {
             return null;
         }
-        String str = value.toString().trim();
-        // 空字符串一律返回 null，避免插入空白占位符
+        String str = value.toString();
+        if (StringUtils.isNotBlank(str) && str.startsWith("GZIP:")) {
+            str = GzipUtil.uncompress(str.substring(5));
+        }
+        str = str.trim();
         if (StringUtils.isBlank(str)) {
             return null;
         }

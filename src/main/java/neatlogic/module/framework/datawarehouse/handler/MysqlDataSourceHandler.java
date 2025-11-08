@@ -15,10 +15,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 
 package neatlogic.module.framework.datawarehouse.handler;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerBase;
 import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import neatlogic.framework.datawarehouse.dto.*;
 import neatlogic.framework.datawarehouse.exceptions.ReportDataSourceSyncException;
+import neatlogic.framework.util.GzipUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -120,10 +123,43 @@ public class MysqlDataSourceHandler extends DataSourceServiceHandlerBase {
                         }
                     }
                     for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
-                        if (fieldMap.containsKey(fieldVo.getName().toLowerCase())) {
-                            Object v = resultSet.getObject(fieldMap.get(fieldVo.getName().toLowerCase()));
-                            fieldVo.setValue(v != null ? v : "");//把所有的null值都转成空字符串
+                        Object v = null;
+                        if (fieldVo.getName().contains(".")) {
+                            String[] names = fieldVo.getName().split("\\.");
+                            if (names.length > 0) {
+                                Object content = resultSet.getObject(names[0]);
+                                if (content != null) {
+                                    String contentStr = content.toString();
+                                    if (StringUtils.isNotBlank(contentStr) && contentStr.startsWith("GZIP:")) {
+                                        contentStr = GzipUtil.uncompress(contentStr.substring(5));
+                                    }
+                                    try {
+                                        JSONObject contentObj = JSON.parseObject(contentStr);
+                                        for (int i = 1; i < names.length; i++) {
+                                            if (contentObj.containsKey(names[i])) {
+                                                if (contentObj.get(names[i]) instanceof JSONObject) {
+                                                    contentObj = contentObj.getJSONObject(names[i]);
+                                                } else {
+                                                    v = contentObj.get(names[i]);
+                                                    break;
+                                                }
+                                            } else {
+                                                break;
+                                            }
+                                        }
+                                    } catch (Exception ex) {
+                                        logger.warn(ex.getMessage(), ex);
+                                    }
+                                }
+                            }
+                        } else {
+                            if (fieldMap.containsKey(fieldVo.getName().toLowerCase())) {
+                                v = resultSet.getObject(fieldMap.get(fieldVo.getName().toLowerCase()));
+                            }
                         }
+
+                        fieldVo.setValue(v != null ? v : "");//把所有的null值都转成空字符串
+
                         reportDataSourceDataVo.addField(fieldVo);
                         if (StringUtils.isNotBlank(fieldVo.getAggregate())) {
                             aggregateFieldList.add(fieldVo);

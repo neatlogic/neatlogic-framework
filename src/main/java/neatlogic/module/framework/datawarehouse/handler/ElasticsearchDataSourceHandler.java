@@ -161,7 +161,6 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
                         }
                     }
 
-
                     for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
                         Object v = null;
                         if (fieldVo.getName().contains(".")) {
@@ -176,12 +175,15 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
                                             v = sourceMap.get(names[i]);
                                             break;
                                         }
+                                    } else {
+                                        break;
                                     }
                                 }
                             }
                         } else {
                             v = source.get(fieldVo.getName());
                         }
+
                         fieldVo.setValue(v != null ? v : "");
                         reportDataSourceDataVo.addField(fieldVo);
 

@@ -25,6 +25,7 @@ import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.json.stream.JsonParser;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerBase;
 import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import neatlogic.framework.datawarehouse.dto.*;
@@ -74,6 +75,8 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
                 if (StringUtils.isBlank(index)) {
                     throw new ReportDataSourceSyncException(dataSourceVo, new RuntimeException("index未定义"));
                 }
+                //索引增加租户前缀，避免跨租户查询索引
+                index = TenantContext.get().getTenantUuid() + "_" + index;
 
                 ElasticsearchClient client = ElasticsearchClientFactory.getClient();
                 int total = 0;

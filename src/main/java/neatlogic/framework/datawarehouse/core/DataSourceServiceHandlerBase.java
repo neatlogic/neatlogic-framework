@@ -20,6 +20,8 @@ import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceDataM
 import neatlogic.framework.datawarehouse.dto.*;
 import neatlogic.framework.datawarehouse.enums.AggregateType;
 import neatlogic.framework.datawarehouse.enums.Mode;
+import neatlogic.framework.datawarehouse.formater.core.DataSourceFieldFormaterFactory;
+import neatlogic.framework.datawarehouse.formater.core.IDatasourceFieldFormater;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -261,7 +263,15 @@ public abstract class DataSourceServiceHandlerBase implements IDataSourceService
                 }
             }
         }
-        dataSourceDataMapper.insertDataSourceData(reportDataSourceDataVo);
+        if (CollectionUtils.isNotEmpty(reportDataSourceDataVo.getFieldList())) {
+            for (DataSourceFieldVo field : reportDataSourceDataVo.getFieldList()) {
+                IDatasourceFieldFormater formater = DataSourceFieldFormaterFactory.getFormater(field.getType());
+                if (formater != null) {
+                    field.setValue(formater.format(field, field.getValue()));
+                }
+            }
+            dataSourceDataMapper.insertDataSourceData(reportDataSourceDataVo);
+        }
         reportDataSourceAuditVo.addCount();
     }
 }

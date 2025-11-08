@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.datawarehouse.handler;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
@@ -23,6 +24,7 @@ import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonpMapper;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import jakarta.json.stream.JsonParser;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -80,120 +82,125 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
 
                 ElasticsearchClient client = ElasticsearchClientFactory.getClient();
                 int total = 0;
-                int from = 0;
 
                 // 默认分页
                 int size = queryObj.getInteger("size") != null ? queryObj.getInteger("size") : batchSize;
-                if (size > batchSize) size = batchSize;
 
-                do {
-                    queryObj.put("from", from);
-                    queryObj.put("size", size);
-
-                    // 构建请求
-                    SearchRequest.Builder reqBuilder = new SearchRequest.Builder().index(index);
-
-                    // 解析 query
-                    if (queryObj.containsKey("query")) {
-                        String queryJson = queryObj.getJSONObject("query").toJSONString();
-                        try (InputStream is = new ByteArrayInputStream(queryJson.getBytes(StandardCharsets.UTF_8))) {
-                            JsonpMapper mapper = new JacksonJsonpMapper();
-                            JsonParser parser = mapper.jsonProvider().createParser(is);
-                            Query query = new Query.Builder().withJson(parser, mapper).build();
-                            reqBuilder.query(query);
-                        }
+                // 构建请求
+                SearchRequest.Builder reqBuilder = new SearchRequest.Builder().index(index);
+                reqBuilder.size(size);
+                // 解析 query
+                if (queryObj.containsKey("query")) {
+                    String queryJson = queryObj.getJSONObject("query").toJSONString();
+                    try (InputStream is = new ByteArrayInputStream(queryJson.getBytes(StandardCharsets.UTF_8))) {
+                        JsonpMapper mapper = new JacksonJsonpMapper();
+                        JsonParser parser = mapper.jsonProvider().createParser(is);
+                        Query query = new Query.Builder().withJson(parser, mapper).build();
+                        reqBuilder.query(query);
                     }
+                }
 
-                    // 解析 _source
-                    if (queryObj.containsKey("_source")) {
-                        List<String> srcFields = queryObj.getJSONArray("_source").toJavaList(String.class);
-                        reqBuilder.source(s -> s.filter(f -> f.includes(srcFields)));
-                    }
-
-                    // 执行查询
-                    SearchResponse<Map> resp = client.search(reqBuilder.build(), Map.class);
-                    List<Hit<Map>> hits = resp.hits().hits();
-                    if (hits.isEmpty()) break;
-
-                    total += hits.size();
-
-                    // 处理结果
-                    for (Hit<Map> hit : hits) {
-                        Map<String, Object> source = hit.source();
-                        if (source == null) continue;
-
-                        DataSourceDataVo reportDataSourceDataVo = new DataSourceDataVo(dataSourceVo.getId());
-                        reportDataSourceDataVo.setExpireMinute(dataSourceVo.getExpireMinute());
-                        List<DataSourceFieldVo> aggregateFieldList = new ArrayList<>();
-                        List<DataSourceFieldVo> keyFieldList = new ArrayList<>();
-
-                        if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
-                            for (DataSourceParamVo paramVo : dataSourceVo.getParamList()) {
-                                if (source.containsKey(paramVo.getName().toLowerCase())) {
-                                    Object v = source.get(paramVo.getName().toLowerCase());
-                                    Long lv = null;
-                                    try {
-                                        lv = (Long) v;
-                                    } catch (Exception ex) {
-                                        logger.error(ex.getMessage(), ex);
-                                    }
-                                    if (lv != null) {
-                                        if (paramVo.getCurrentValue() == null) {
-                                            paramVo.setCurrentValue(lv);
-                                        } else if (lv > paramVo.getCurrentValue()) {
-                                            paramVo.setCurrentValue(lv);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-
-                        for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
-                            Object v = null;
-                            if (fieldVo.getName().contains(".")) {
-                                String[] names = fieldVo.getName().split("\\.");
-                                if (source.containsKey(names[0]) && source.get(names[0]) instanceof Map) {
-                                    Map<String, Object> sourceMap = (Map<String, Object>) source.get(names[0]);
-                                    for (int i = 1; i < names.length; i++) {
-                                        if (sourceMap.containsKey(names[i])) {
-                                            if (source.get(names[i]) instanceof Map) {
-                                                sourceMap = (Map<String, Object>) source.get(names[i]);
-                                            } else {
-                                                v = sourceMap.get(names[i]);
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
+                // 解析 _source
+                if (queryObj.containsKey("_source")) {
+                    List<String> srcFields = queryObj.getJSONArray("_source").toJavaList(String.class);
+                    reqBuilder.source(s -> s.filter(f -> f.includes(srcFields)));
+                }
+                // 解析 sort
+                if (queryObj.containsKey("sort")) {
+                    JSONArray sortArray = queryObj.getJSONArray("sort");
+                    for (int i = 0; i < sortArray.size(); i++) {
+                        JSONObject sortObj = sortArray.getJSONObject(i);
+                        for (String field : sortObj.keySet()) {
+                            JSONObject sortDetail = sortObj.getJSONObject(field);
+                            String order = sortDetail.getString("order");
+                            if (StringUtils.isBlank(order)) {
+                                order = "asc";
                             } else {
-                                v = source.get(fieldVo.getName());
+                                order = order.toLowerCase();
                             }
-                            fieldVo.setValue(v != null ? v : "");
-                            reportDataSourceDataVo.addField(fieldVo);
-
-                            if (StringUtils.isNotBlank(fieldVo.getAggregate())) {
-                                aggregateFieldList.add(fieldVo);
-                            }
-                            if (Objects.equals(fieldVo.getIsKey(), 1)) {
-                                keyFieldList.add(fieldVo);
+                            if (Objects.equals(order, "desc")) {
+                                reqBuilder.sort(s -> s.field(f -> f.field(field).order(SortOrder.Desc)));
+                            } else {
+                                reqBuilder.sort(s -> s.field(f -> f.field(field).order(SortOrder.Asc)));
                             }
                         }
-
-                        aggregateAndInsertData(aggregateFieldList, keyFieldList, reportDataSourceDataVo, reportDataSourceAuditVo);
                     }
+                }
+
+                // 执行查询
+                SearchResponse<Map> resp = client.search(reqBuilder.build(), Map.class);
+                List<Hit<Map>> hits = resp.hits().hits();
+                // 处理结果
+                for (Hit<Map> hit : hits) {
+                    Map<String, Object> source = hit.source();
+                    if (source == null) continue;
+
+                    DataSourceDataVo reportDataSourceDataVo = new DataSourceDataVo(dataSourceVo.getId());
+                    reportDataSourceDataVo.setExpireMinute(dataSourceVo.getExpireMinute());
+                    List<DataSourceFieldVo> aggregateFieldList = new ArrayList<>();
+                    List<DataSourceFieldVo> keyFieldList = new ArrayList<>();
 
                     if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
-                        for (DataSourceParamVo param : dataSourceVo.getParamList()) {
-                            dataSourceMapper.updateDataSourceParamCurrentValue(param);
+                        for (DataSourceParamVo paramVo : dataSourceVo.getParamList()) {
+                            if (source.containsKey(paramVo.getName().toLowerCase())) {
+                                Object v = source.get(paramVo.getName().toLowerCase());
+                                Long lv = null;
+                                try {
+                                    lv = (Long) v;
+                                } catch (Exception ex) {
+                                    logger.error(ex.getMessage(), ex);
+                                }
+                                if (lv != null) {
+                                    if (paramVo.getCurrentValue() == null) {
+                                        paramVo.setCurrentValue(lv);
+                                    } else if (lv > paramVo.getCurrentValue()) {
+                                        paramVo.setCurrentValue(lv);
+                                    }
+                                }
+                            }
                         }
                     }
 
-                    from += size;
-                    if (hits.size() < size) break;
 
-                } while (true);
+                    for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
+                        Object v = null;
+                        if (fieldVo.getName().contains(".")) {
+                            String[] names = fieldVo.getName().split("\\.");
+                            if (source.containsKey(names[0]) && source.get(names[0]) instanceof Map) {
+                                Map<String, Object> sourceMap = (Map<String, Object>) source.get(names[0]);
+                                for (int i = 1; i < names.length; i++) {
+                                    if (sourceMap.containsKey(names[i])) {
+                                        if (source.get(names[i]) instanceof Map) {
+                                            sourceMap = (Map<String, Object>) source.get(names[i]);
+                                        } else {
+                                            v = sourceMap.get(names[i]);
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            v = source.get(fieldVo.getName());
+                        }
+                        fieldVo.setValue(v != null ? v : "");
+                        reportDataSourceDataVo.addField(fieldVo);
 
+                        if (StringUtils.isNotBlank(fieldVo.getAggregate())) {
+                            aggregateFieldList.add(fieldVo);
+                        }
+                        if (Objects.equals(fieldVo.getIsKey(), 1)) {
+                            keyFieldList.add(fieldVo);
+                        }
+                    }
+
+                    aggregateAndInsertData(aggregateFieldList, keyFieldList, reportDataSourceDataVo, reportDataSourceAuditVo);
+                }
+
+                if (CollectionUtils.isNotEmpty(dataSourceVo.getParamList())) {
+                    for (DataSourceParamVo param : dataSourceVo.getParamList()) {
+                        dataSourceMapper.updateDataSourceParamCurrentValue(param);
+                    }
+                }
                 logger.info("索引 {} 同步完成，共 {} 条记录", index, total);
             }
         } catch (Exception e) {

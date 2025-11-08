@@ -16,19 +16,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.datawarehouse.enums;
 
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 public enum FieldType {
-    TEXT("text", new I18n("文本")),
-    DATETIME("datetime", new I18n("日期时间")),
-    DATE("date", new I18n("日期")),
-    TIME("time", new I18n("时间")),
-    NUMBER("number", new I18n("数字"));
+    TEXT("text", "common.text"),
+    DATETIME("datetime", "common.datetime"),
+    DATE("date", "common.date"),
+    TIME("time", "common.time"),
+    NUMBER("number", "common.number");
 
     private final String value;
-    private final I18n text;
+    private final String text;
 
-    FieldType(String _value, I18n _text) {
+    FieldType(String _value, String _text) {
         this.value = _value;
         this.text = _text;
     }
@@ -38,7 +37,7 @@ public enum FieldType {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public static String getValue(String name) {

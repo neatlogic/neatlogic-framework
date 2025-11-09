@@ -70,7 +70,7 @@ As far as the law allows, the software comes “as is,” without any warranty o
 	•	Use: anything you do with the software requiring your license.
 	•	Trademark: trademarks, service marks, and similar rights.
 
-### Notice:
+### Notice
 This license is source-available but not an open-source license approved by the Open Source Initiative (OSI).
 It is designed to ensure sustainable use, transparency, and fair compensation for the creators of NeatLogic.
 

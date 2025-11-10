@@ -15,6 +15,7 @@ package neatlogic.framework.apiparam.validator;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
 import neatlogic.framework.util.$;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringApiParam extends ApiParamValidatorBase {
 
@@ -30,7 +31,20 @@ public class StringApiParam extends ApiParamValidatorBase {
 
     @Override
     public boolean validate(Object param, String rule) {
-        return true;
+        if (StringUtils.isNotBlank(rule)) {
+            if (rule.contains(",")) {
+                for (String r : rule.split(",")) {
+                    if (param.toString().equalsIgnoreCase(r)) {
+                        return true;
+                    }
+                }
+                return false;
+            } else {
+                return param.toString().equalsIgnoreCase(rule);
+            }
+        } else {
+            return true;
+        }
     }
 
 }

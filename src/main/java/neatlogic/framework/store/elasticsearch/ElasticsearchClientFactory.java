@@ -33,6 +33,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.message.BasicHeader;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
@@ -78,6 +79,10 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
                             .builder(httpHosts.toArray(new HttpHost[0]))
                             .setHttpClientConfigCallback(httpClientBuilder -> {
                                 httpClientBuilder.disableAuthCaching();
+                                httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
+                                        .setIoThreadCount(Runtime.getRuntime().availableProcessors())
+                                        .setSoKeepAlive(true)
+                                        .build());
                                 httpClientBuilder.setDefaultHeaders(Collections.singletonList(
                                         new BasicHeader(
                                                 HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));

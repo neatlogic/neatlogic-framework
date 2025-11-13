@@ -277,6 +277,36 @@
         <includeCallerData>true</includeCallerData>
     </appender>
 
+    <appender name="SQLTransientConnectionExceptionAuditAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${log4j.home}/SQLTransientConnectionException.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${log4j.home}/SQLTransientConnectionException.log.%i</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>100MB</MaxFileSize>
+        </triggeringPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] [%tenant] %requestUrl- %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <!--异步输出 -->
+    <appender name="SQLTransientConnectionExceptionAuditAsyncAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>50</queueSize>
+        <appender-ref ref="SQLTransientConnectionExceptionAuditAppender"/>
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
     <appender name="sqlTimeoutAuditAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${log4j.home}/sqlTimeout.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -356,6 +386,9 @@
     <!-- mysql死锁日志 -->
     <logger name="deadlockAudit" level="ERROR" additivity="false">
         <appender-ref ref="deadlockAuditAsyncAppender"/>
+    </logger>
+    <logger name="SQLTransientConnectionExceptionAudit" level="ERROR" additivity="false">
+        <appender-ref ref="SQLTransientConnectionExceptionAuditAsyncAppender"/>
     </logger>
     <!-- mysql事务超时日志 -->
     <logger name="sqlTimeoutAudit" level="ERROR" additivity="false">

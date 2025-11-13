@@ -41,7 +41,6 @@ public enum FormHandler implements IFormHandler {
     FORMTAB("formtab", "选项卡"),
     FORMCOLLAPSE("formcollapse", "折叠面板"),
     FORMSUBASSEMBLY("formsubassembly", "子表单"),
-    FORMAUTOEXECSERVICE("formautoexecservice", "自动化服务组件"),
     FORMCUSTOM("formcustom", "自定义组件");
 
     private final String handler;

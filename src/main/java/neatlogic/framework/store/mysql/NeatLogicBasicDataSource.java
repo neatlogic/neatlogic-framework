@@ -106,10 +106,14 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         Connection conn = null;
         try {
             conn = super.getConnection();
-            addHoldingConnectionThreadByConnection(conn);
-            conn = new NeatLogicConnection(conn);
+            if (Config.DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE()) {
+                addHoldingConnectionThreadByConnection(conn);
+                conn = new NeatLogicConnection(conn);
+            }
         } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
-            audit(new HashMap<>(holdingConnectionThreadMap));
+            if (Config.DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE()) {
+                audit(new HashMap<>(holdingConnectionThreadMap));
+            }
             throw ex;
         }
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);

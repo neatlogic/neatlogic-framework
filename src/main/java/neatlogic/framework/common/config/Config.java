@@ -54,7 +54,7 @@ public class Config {
     private static String DB_HOST;
     private static Integer DB_PORT;
     private static String DB_URL;
-    private static String DB_TRANSACTION_TIMEOUT;// 事务超时时间
+    private static Integer DB_TRANSACTION_TIMEOUT;// 事务超时时间
     private static int DATASOURCE_CONNECT_TIMEOUT;//连接池连接超时时间
     private static Integer DATASOURCE_MAXIMUM_POOL_SIZE;//连接数
     private static Integer DATASOURCE_MAX_LIFETIME;//控制池中连接的最大生存期
@@ -62,6 +62,7 @@ public class Config {
     private static Integer DATASOURCE_VALIDATION_TIMEOUT;//此属性控制测试连接是否活跃的最长时间。此值必须小于 connectionTimeout
     private static Integer DATASOURCE_IDLE_TIMEOUT;//此属性控制允许连接在池中处于空闲状态的最长时间
     private static Long DATASOURCE_KEEPALIVE_TIME;//此属性控制允许连接在池中心跳时间，不能比DATASOURCE_MAX_LIFETIME大
+    private static Boolean DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE; // 数据库连接持有者(线程)跟踪开启
     private static String DATA_HOME;// 存储文件路径
     private static String AUDIT_HOME;// 审计日志存储文件路径
     private static int SERVER_HEARTBEAT_RATE;// 心跳频率
@@ -249,7 +250,7 @@ public class Config {
         return DB_URL;
     }
 
-    public static String DB_TRANSACTION_TIMEOUT() {// root-context.xml中使用了该变量
+    public static Integer DB_TRANSACTION_TIMEOUT() {// root-context.xml中使用了该变量
         return DB_TRANSACTION_TIMEOUT;
     }
 
@@ -279,6 +280,10 @@ public class Config {
 
     public static Integer DATASOURCE_IDLE_TIMEOUT() {
         return DATASOURCE_IDLE_TIMEOUT;
+    }
+
+    public static boolean DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE() {
+        return DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE;
     }
 
     public static String JMS_URL() {
@@ -628,7 +633,7 @@ public class Config {
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
-            DB_TRANSACTION_TIMEOUT = prop.getProperty("db.transaction.timeout");
+            DB_TRANSACTION_TIMEOUT = Integer.parseInt(prop.getProperty("db.transaction.timeout"));
             DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));
             DATASOURCE_MAXIMUM_POOL_SIZE = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size", "250"));
             DATASOURCE_KEEPALIVE_TIME = Long.parseLong(prop.getProperty("datasource.keepalive.time", "180000"));
@@ -636,6 +641,7 @@ public class Config {
             DATASOURCE_MINIMUM_IDLE = Integer.parseInt(prop.getProperty("datasource.minimum.idle", "20"));
             DATASOURCE_VALIDATION_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.validation.timeout", "5000"));
             DATASOURCE_IDLE_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.idle.timeout", "600000"));
+            DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE = Boolean.parseBoolean(prop.getProperty("datasource.connection.holder.track.enable", "true"));
             DB_URL = prop.getProperty("db.url");
             DB_HOST = prop.getProperty("db.host", "localhost");
             DB_PORT = Integer.parseInt(prop.getProperty("db.port", "3306"));

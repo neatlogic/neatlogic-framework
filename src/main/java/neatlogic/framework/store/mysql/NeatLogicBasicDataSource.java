@@ -37,7 +37,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
 
     // 保存上次查询ShowProcesslist命令的时间毫秒数
     private static volatile long lastShowProcesslistMilliseconds = -1;
-    private static volatile int count = -1;
+    private static volatile int count = 0;
 
     /**
      * 五分钟内只打印三次日志
@@ -47,7 +47,8 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         long currentTimeMillis = System.currentTimeMillis();
         long interval = currentTimeMillis - lastShowProcesslistMilliseconds;
         if (interval > TimeUnit.MINUTES.toMillis(5)) {
-            count = 0;
+            lastShowProcesslistMilliseconds = currentTimeMillis;
+            count = 1;
             flag = true;
         } else {
             if (count < 3) {

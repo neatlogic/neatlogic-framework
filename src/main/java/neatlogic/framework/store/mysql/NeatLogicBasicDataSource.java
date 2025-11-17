@@ -35,8 +35,8 @@ import java.util.concurrent.TimeUnit;
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
 
-    // 保存上次查询ShowProcesslist命令的时间毫秒数
-    private static volatile long lastShowProcesslistMilliseconds = -1;
+    // 保存上次输出日志的时间毫秒数
+    private static volatile long lastAuditMilliseconds = -1;
     private static volatile int count = 0;
 
     /**
@@ -45,9 +45,9 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
     private synchronized void audit() {
         boolean flag = false;
         long currentTimeMillis = System.currentTimeMillis();
-        long interval = currentTimeMillis - lastShowProcesslistMilliseconds;
+        long interval = currentTimeMillis - lastAuditMilliseconds;
         if (interval > TimeUnit.MINUTES.toMillis(5)) {
-            lastShowProcesslistMilliseconds = currentTimeMillis;
+            lastAuditMilliseconds = currentTimeMillis;
             count = 1;
             flag = true;
         } else {

@@ -20,5 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         show engine innodb status
     </select>
 
+    <select id="selectListBySql" parameterType="java.lang.String" resultType="java.util.LinkedHashMap">
+        ${sql}
+    </select>
 </mapper>
 

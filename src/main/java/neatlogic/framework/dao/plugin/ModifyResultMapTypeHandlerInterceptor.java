@@ -12,6 +12,7 @@
 
 package neatlogic.framework.dao.plugin;
 
+import neatlogic.framework.asynchronization.threadlocal.InterceptorContext;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -43,12 +44,15 @@ import java.util.List;
 public class ModifyResultMapTypeHandlerInterceptor implements Interceptor {
 
     Logger logger = LoggerFactory.getLogger(ModifyResultMapTypeHandlerInterceptor.class);
-    public static final ThreadLocal<MappedStatement> mappedStatementThreadLocal = new ThreadLocal<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         try {
-            MappedStatement mappedStatement = mappedStatementThreadLocal.get();
+            MappedStatement mappedStatement = null;
+            InterceptorContext interceptorContext = InterceptorContext.get();
+            if (interceptorContext != null) {
+                mappedStatement = interceptorContext.getMappedStatement();
+            }
             if (mappedStatement != null) {
                 Configuration configuration = mappedStatement.getConfiguration();
                 int resultMappingSize = 0;
@@ -79,8 +83,6 @@ public class ModifyResultMapTypeHandlerInterceptor implements Interceptor {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
-        } finally {
-            mappedStatementThreadLocal.remove();
         }
         return invocation.proceed();
     }

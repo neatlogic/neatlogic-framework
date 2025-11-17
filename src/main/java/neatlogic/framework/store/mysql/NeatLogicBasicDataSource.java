@@ -14,24 +14,22 @@ package neatlogic.framework.store.mysql;
 
 import com.zaxxer.hikari.HikariDataSource;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.RC4Util;
+import neatlogic.framework.dao.plugin.ExecutingSQLInterceptor;
+import neatlogic.framework.util.ThreadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
@@ -39,65 +37,41 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
 
     // 保存上次查询ShowProcesslist命令的时间毫秒数
     private static volatile long lastShowProcesslistMilliseconds = -1;
-    // 持有数据库连接的线程Map
-    private final static Map<Connection, Thread> holdingConnectionThreadMap = new ConcurrentHashMap<>();
+    private static volatile int count = -1;
 
-    public static void addHoldingConnectionThreadByConnection(Connection connection) {
-        int size = holdingConnectionThreadMap.size();
-        if (size <= Config.DATASOURCE_MAXIMUN_POOL_SIZE()) {
-            holdingConnectionThreadMap.put(connection, Thread.currentThread());
-        } else {
-            logger.error("持有数据库连接的线程Map大小为{}, 数据库连接池最大数量为{}", size, Config.DATASOURCE_MAXIMUN_POOL_SIZE());
-        }
-    }
-
-    public static Thread removeHoldingConnectionThreadByConnection(Connection connection) {
-        return holdingConnectionThreadMap.remove(connection);
-    }
-
-    public static String getHoldingConnectionThreadStackTrace(Map<Connection, Thread> holdingConnectionThreadMap) {
-        ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
-        ThreadInfo[] threadInfos = mxBean.getThreadInfo(mxBean.getAllThreadIds(), 0);
-        Map<Long, ThreadInfo> threadInfoMap = new HashMap<>();
-        for (ThreadInfo threadInfo : threadInfos) {
-            threadInfoMap.put(threadInfo.getThreadId(), threadInfo);
-        }
-        StringBuilder stringBuilder = new StringBuilder(System.lineSeparator());
-        stringBuilder.append("总线程数为: ").append(holdingConnectionThreadMap.size()).append(System.lineSeparator());
-        for (Map.Entry<Connection, Thread> entry : holdingConnectionThreadMap.entrySet()) {
-            Thread thread = entry.getValue();
-            stringBuilder.append("[").append(thread.getName()).append("] prio=").append(thread.getPriority())
-                    .append(" tid=").append(thread.getId())
-                    .append(" ").append(thread.getState())
-                    .append(" ").append(thread.isDaemon() ? "deamon" : "worker");
-            ThreadInfo threadInfo = threadInfoMap.get(thread.getId());
-            if (threadInfo != null) {
-                stringBuilder.append(" native=").append(threadInfo.isInNative())
-                        .append(", suspended=").append(threadInfo.isSuspended())
-                        .append(", block=").append(threadInfo.getBlockedCount())
-                        .append(", wait=").append(threadInfo.getWaitedCount())
-                        .append(" lock=").append(threadInfo.getLockName())
-                        .append(" owned by ").append(threadInfo.getLockOwnerName())
-                        .append(" (").append(threadInfo.getLockOwnerId())
-                        .append("), cpu=").append(mxBean.getThreadCpuTime(threadInfo.getThreadId()) / 1000000L)
-                        .append(", user=").append(mxBean.getThreadUserTime(threadInfo.getThreadId()) / 1000000L);
-            }
-            stringBuilder.append(System.lineSeparator());
-            StackTraceElement[] stackTrace = thread.getStackTrace();
-            for (StackTraceElement stackTraceElement : stackTrace) {
-                stringBuilder.append("    at ").append(stackTraceElement).append(System.lineSeparator());
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    private synchronized void audit(Map<Connection, Thread> holdingConnectionThreadMap) {
+    /**
+     * 五分钟内只打印三次日志
+     */
+    private synchronized void audit() {
+        boolean flag = false;
         long currentTimeMillis = System.currentTimeMillis();
         long interval = currentTimeMillis - lastShowProcesslistMilliseconds;
         if (interval > TimeUnit.MINUTES.toMillis(1)) {
-            lastShowProcesslistMilliseconds = currentTimeMillis;
-            Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");
-            SQLTransientConnectionExceptionAuditLogger.error(getHoldingConnectionThreadStackTrace(holdingConnectionThreadMap));
+            count = 0;
+            flag = true;
+        } else {
+            if (count < 3) {
+                count++;
+                flag = true;
+            }
+        }
+        if (flag) {
+            try {
+                Map<Thread, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
+                StringWriter writer = new StringWriter();
+                ThreadUtil.dumpTraces(writer);
+                writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
+                for (Map.Entry<Thread, String> entry : thread2ExecutingSQLMap.entrySet()) {
+                    Thread thread = entry.getKey();
+                    String value = entry.getValue();
+                    writer.write("[" + thread.getName() + "] 线程正在执行 " + value);
+                    writer.write(System.lineSeparator());
+                }
+                Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");
+                SQLTransientConnectionExceptionAuditLogger.error(writer.toString());
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 
@@ -106,14 +80,8 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         Connection conn = null;
         try {
             conn = super.getConnection();
-            if (Config.DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE()) {
-                addHoldingConnectionThreadByConnection(conn);
-                conn = new NeatLogicConnection(conn);
-            }
         } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
-            if (Config.DATASOURCE_CONNECTION_HOLDER_TRACK_ENABLE()) {
-                audit(new HashMap<>(holdingConnectionThreadMap));
-            }
+            audit();
             throw ex;
         }
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);

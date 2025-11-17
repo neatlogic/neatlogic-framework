@@ -12,6 +12,7 @@
 
 package neatlogic.framework.dao.plugin;
 
+import neatlogic.framework.asynchronization.threadlocal.InterceptorContext;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -48,8 +49,6 @@ import java.util.regex.Matcher;
 })
 public class SqlCostInterceptor implements Interceptor {
     Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
-    // 判断是否查询了数据库
-    public static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
 
     public static class SqlIdMap {
         private static final Set<String> sqlSet = new HashSet<>();
@@ -101,7 +100,6 @@ public class SqlCostInterceptor implements Interceptor {
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
-        ModifyResultMapTypeHandlerInterceptor.mappedStatementThreadLocal.set(mappedStatement);
         long starttime = 0;
         SqlAuditVo sqlAuditVo = null;
         boolean hasCacheFirstLevel = false;
@@ -150,43 +148,42 @@ public class SqlCostInterceptor implements Interceptor {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        QUERY_FROM_DATABASE_INSTANCE.set(false);
-        try {
-            // 执行完上面的任务后，不改变原有的sql执行过程
-            Object val = invocation.proceed();
-            if (sqlAuditVo != null) {
-                if (QUERY_FROM_DATABASE_INSTANCE.get()) {
-                    // sql语句被执行，没有使用到缓存
-                    sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
-                } else {
-                    if (hasCacheFirstLevel) {
-                        sqlAuditVo.setUseCacheLevel("一级缓存");
-                    } else {
-                        sqlAuditVo.setUseCacheLevel("二级缓存");
-                    }
-                }
-                sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
-                sqlAuditVo.setRunTime(new Date());
-
-                if (val != null) {
-                    if (val instanceof List) {
-                        sqlAuditVo.setRecordCount(((List) val).size());
-                    } else {
-                        sqlAuditVo.setRecordCount(1);
-                    }
-                }
-                SqlAuditManager.addSqlAudit(sqlAuditVo);
-                RequestContext requestContext = RequestContext.get();
-                if (requestContext != null) {
-                    requestContext.addSqlAudit(sqlAuditVo);
-                }
-                //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
-                //System.out.println("###########################################################################");
-            }
-            return val;
-        } finally {
-            QUERY_FROM_DATABASE_INSTANCE.remove();
+        InterceptorContext interceptorContext = InterceptorContext.get();
+        if (interceptorContext != null) {
+            interceptorContext.setQueryFromDatabase(false);
         }
+        // 执行完上面的任务后，不改变原有的sql执行过程
+        Object val = invocation.proceed();
+        if (sqlAuditVo != null) {
+            if (interceptorContext != null && interceptorContext.getQueryFromDatabase()) {
+                // sql语句被执行，没有使用到缓存
+                sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
+            } else {
+                if (hasCacheFirstLevel) {
+                    sqlAuditVo.setUseCacheLevel("一级缓存");
+                } else {
+                    sqlAuditVo.setUseCacheLevel("二级缓存");
+                }
+            }
+            sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
+            sqlAuditVo.setRunTime(new Date());
+
+            if (val != null) {
+                if (val instanceof List) {
+                    sqlAuditVo.setRecordCount(((List) val).size());
+                } else {
+                    sqlAuditVo.setRecordCount(1);
+                }
+            }
+            SqlAuditManager.addSqlAudit(sqlAuditVo);
+            RequestContext requestContext = RequestContext.get();
+            if (requestContext != null) {
+                requestContext.addSqlAudit(sqlAuditVo);
+            }
+            //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
+            //System.out.println("###########################################################################");
+        }
+        return val;
     }
 
     public static String getSql(MappedStatement mappedStatement, Object parameterObject) {

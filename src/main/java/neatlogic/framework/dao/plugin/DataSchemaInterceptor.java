@@ -12,6 +12,7 @@
 
 package neatlogic.framework.dao.plugin;
 
+import neatlogic.framework.asynchronization.threadlocal.InterceptorContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
@@ -31,7 +32,10 @@ public class DataSchemaInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        SqlCostInterceptor.QUERY_FROM_DATABASE_INSTANCE.set(true);
+        InterceptorContext interceptorContext = InterceptorContext.get();
+        if (interceptorContext != null) {
+            interceptorContext.setQueryFromDatabase(true);
+        }
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
 
         BoundSql boundSql = statementHandler.getBoundSql();

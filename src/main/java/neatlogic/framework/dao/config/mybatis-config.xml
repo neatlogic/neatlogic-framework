@@ -46,5 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <plugin interceptor="neatlogic.framework.dao.plugin.SqlCostInterceptor"/><!-- Executor(query,update) -->
         <plugin interceptor="neatlogic.framework.dao.plugin.ExceptionCatchInterceptor"/><!-- Executor(query,update) -->
         <plugin interceptor="neatlogic.framework.dao.plugin.BaseEditorVoParameterInterceptor"/><!-- Executor(update) -->
+        <plugin interceptor="neatlogic.framework.dao.plugin.ThreadLocalInterceptor"/><!-- Executor(query,update) -->
     </plugins>
 </configuration>

@@ -46,7 +46,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         boolean flag = false;
         long currentTimeMillis = System.currentTimeMillis();
         long interval = currentTimeMillis - lastShowProcesslistMilliseconds;
-        if (interval > TimeUnit.MINUTES.toMillis(1)) {
+        if (interval > TimeUnit.MINUTES.toMillis(5)) {
             count = 0;
             flag = true;
         } else {

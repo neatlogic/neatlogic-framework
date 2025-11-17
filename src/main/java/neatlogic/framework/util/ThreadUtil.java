@@ -14,6 +14,7 @@ package neatlogic.framework.util;
 
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.common.config.Config;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -36,7 +37,14 @@ public class ThreadUtil {
         }
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         long now = System.currentTimeMillis();
-        writer.write("=================" + stacks.size() + " thread of " + RequestContext.get().getRequest().getLocalAddr() + " at " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(now)) + " start.serverId is " + Config.SCHEDULE_SERVER_ID + "=================\n\n");
+        String localAddr = StringUtils.EMPTY;
+        String url = StringUtils.EMPTY;
+        RequestContext requestContext = RequestContext.get();
+        if (requestContext != null) {
+            localAddr = requestContext.getRequest().getLocalAddr();
+            url = requestContext.getUrl();
+        }
+        writer.write("\n=================" + stacks.size() + " thread of " + localAddr + " at " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(now)) + " start.serverId is " + Config.SCHEDULE_SERVER_ID + "=================\n\n");
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {
             Thread thread = entry.getKey();
             writer.write("\"" + thread.getName() + "\" prio=" + thread.getPriority() + " tid=" + thread.getId() + " " + thread.getState() + " " + (thread.isDaemon() ? "deamon" : "worker"));
@@ -52,6 +60,6 @@ public class ThreadUtil {
             }
             writer.write("\n");
         }
-        writer.write("=================" + stacks.size() + " thread of " + RequestContext.get().getUrl() + " at " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(now)) + " end.=================\n\n");
+        writer.write("=================" + stacks.size() + " thread of " + url + " at " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(now)) + " end.=================\n\n");
     }
 }

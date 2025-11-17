@@ -3,6 +3,7 @@ package neatlogic.framework.scheduler.dto;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 public class JobObject implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -8409651508383155447L;
     private String jobName;
     private String jobGroup;

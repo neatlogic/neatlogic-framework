@@ -41,6 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         <!-- <plugin interceptor="neatlogic.framework.dao.plugin.BusinessGroupInterceptor"/>-->
         <!-- <plugin interceptor="neatlogic.framework.dao.plugin.FulltextIndexInterceptor"/>-->
         <plugin interceptor="neatlogic.framework.dao.plugin.ModifyResultMapTypeHandlerInterceptor"/><!-- ResultSetHandler(handleResultSets)-->
+        <plugin interceptor="neatlogic.framework.dao.plugin.ExecutingSQLInterceptor"/><!-- StatementHandler(batch,update,query,queryCursor) -->
         <plugin interceptor="neatlogic.framework.dao.plugin.DataSchemaInterceptor"/><!-- StatementHandler(prepare) -->
         <plugin interceptor="neatlogic.framework.dao.plugin.SqlSessionCacheClearInterceptor"/><!-- StatementHandler(prepare)-->
         <plugin interceptor="neatlogic.framework.dao.plugin.SqlCostInterceptor"/><!-- Executor(query,update) -->

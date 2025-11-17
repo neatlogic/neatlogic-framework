@@ -15,8 +15,12 @@ package neatlogic.framework.dao.mapper.healthcheck;
 
 import neatlogic.framework.dto.healthcheck.InnoDbStatusVo;
 
+import java.util.List;
+import java.util.Map;
+
 public interface SqlStatusMapper {
     InnoDbStatusVo getInnodbStatus();
 
+    List<Map<String, Object>> selectListBySql(String sql);
 }
 

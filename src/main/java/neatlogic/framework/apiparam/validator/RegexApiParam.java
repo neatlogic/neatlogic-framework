@@ -31,12 +31,10 @@ public class RegexApiParam extends ApiParamValidatorBase {
     public boolean validate(Object param, String rule) {
         if (StringUtils.isNotBlank(rule)) {
             Pattern pattern = RegexUtils.regexPatternMap.get(rule);
-            if (pattern != null) {
-                return pattern.matcher(param.toString()).matches();
-            } else {
+            if (pattern == null) {
                 pattern = Pattern.compile(rule);
-                return pattern.matcher(param.toString()).matches();
             }
+            return pattern.matcher(param.toString()).matches();
         } else {
             return true;
         }

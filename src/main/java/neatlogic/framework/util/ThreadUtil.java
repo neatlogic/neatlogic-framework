@@ -41,8 +41,12 @@ public class ThreadUtil {
         String url = StringUtils.EMPTY;
         RequestContext requestContext = RequestContext.get();
         if (requestContext != null) {
-            localAddr = requestContext.getRequest().getLocalAddr();
-            url = requestContext.getUrl();
+            if (requestContext.getRequest() != null && StringUtils.isNotBlank(requestContext.getRequest().getLocalAddr())) {
+                localAddr = requestContext.getRequest().getLocalAddr();
+            }
+            if (StringUtils.isNotBlank(requestContext.getUrl())) {
+                url = requestContext.getUrl();
+            }
         }
         writer.write("\n=================" + stacks.size() + " thread of " + localAddr + " at " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss z").format(new Date(now)) + " start.serverId is " + Config.SCHEDULE_SERVER_ID + "=================\n\n");
         for (Map.Entry<Thread, StackTraceElement[]> entry : stacks.entrySet()) {

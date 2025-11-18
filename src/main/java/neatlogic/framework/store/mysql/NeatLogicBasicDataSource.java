@@ -34,58 +34,20 @@ import java.sql.Statement;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
 
     // 保存上次输出日志的时间毫秒数
-    private static volatile long lastAuditMilliseconds = -1;
-    private static volatile int count = 0;
-
+    private final static AtomicLong lastAuditMilliseconds = new AtomicLong(0);
+    private final static AtomicInteger count = new AtomicInteger(3);
     /**
      * 五分钟内只打印三次日志
      */
-    private synchronized void audit(DataSourceInfoVo dataSourceInfoVo, Map<String, String> thread2ExecutingSQLMap) {
-        boolean flag = false;
-        long currentTimeMillis = System.currentTimeMillis();
-        long interval = currentTimeMillis - lastAuditMilliseconds;
-        if (interval > TimeUnit.MINUTES.toMillis(5)) {
-            lastAuditMilliseconds = currentTimeMillis;
-            count = 1;
-            flag = true;
-        } else {
-            if (count < 3) {
-                count++;
-                flag = true;
-            }
-        }
-        if (flag) {
-            try {
-                StringWriter writer = new StringWriter();
-                ThreadUtil.dumpTraces(writer);
-                writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
-                writer.write(System.lineSeparator());
-                for (Map.Entry<String, String> entry : thread2ExecutingSQLMap.entrySet()) {
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-                    writer.write("[" + key + "] 线程正在执行 " + value);
-                    writer.write(System.lineSeparator());
-                }
-                writer.write("连接池信息: " + JSON.toJSONString(dataSourceInfoVo));
-                Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");
-                SQLTransientConnectionExceptionAuditLogger.error(writer.toString());
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-    }
-
-    @Override
-    public Connection getConnection() throws SQLException {
-        Connection conn = null;
+    private synchronized void audit() {
         try {
-            conn = super.getConnection();
-        } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
             DataSourceInfoVo dataSourceInfoVo = new DataSourceInfoVo();
             dataSourceInfoVo.setPoolName(this.getPoolName());
             HikariPoolMXBean hikariPoolMXBean = this.getHikariPoolMXBean();
@@ -96,7 +58,47 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
                 dataSourceInfoVo.setTotalConnections(hikariPoolMXBean.getTotalConnections());
             }
             Map<String, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
-            audit(dataSourceInfoVo, thread2ExecutingSQLMap);
+            StringWriter writer = new StringWriter();
+            ThreadUtil.dumpTraces(writer);
+            writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
+            writer.write(System.lineSeparator());
+            for (Map.Entry<String, String> entry : thread2ExecutingSQLMap.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                writer.write("[" + key + "] 线程正在执行 " + value);
+                writer.write(System.lineSeparator());
+            }
+            writer.write("连接池信息: " + JSON.toJSONString(dataSourceInfoVo));
+            Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");
+            SQLTransientConnectionExceptionAuditLogger.error(writer.toString());
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public Connection getConnection() throws SQLException {
+        Connection conn = null;
+        try {
+            conn = super.getConnection();
+        } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
+            // 五分钟内只打印三次日志
+            boolean flag = false;
+            long currentTimeMillis = System.currentTimeMillis();
+            long l = lastAuditMilliseconds.getAndUpdate(operand -> currentTimeMillis);
+            long interval = currentTimeMillis - l;
+            if (interval > TimeUnit.MINUTES.toMillis(5)) {
+                count.compareAndSet(3, 1);
+                flag = true;
+            } else {
+                if (count.get() < 3) {
+                    count.incrementAndGet();
+                    flag = true;
+                }
+            }
+            if (flag) {
+                audit();
+            }
             throw ex;
         }
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);

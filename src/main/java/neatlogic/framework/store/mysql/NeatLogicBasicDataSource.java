@@ -12,10 +12,13 @@
 
 package neatlogic.framework.store.mysql;
 
+import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.HikariPoolMXBean;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dao.plugin.ExecutingSQLInterceptor;
+import neatlogic.framework.dto.healthcheck.DataSourceInfoVo;
 import neatlogic.framework.util.ThreadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -42,7 +45,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
     /**
      * 五分钟内只打印三次日志
      */
-    private synchronized void audit() {
+    private synchronized void audit(DataSourceInfoVo dataSourceInfoVo, Map<String, String> thread2ExecutingSQLMap) {
         boolean flag = false;
         long currentTimeMillis = System.currentTimeMillis();
         long interval = currentTimeMillis - lastAuditMilliseconds;
@@ -58,7 +61,6 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         }
         if (flag) {
             try {
-                Map<String, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
                 StringWriter writer = new StringWriter();
                 ThreadUtil.dumpTraces(writer);
                 writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
@@ -69,6 +71,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
                     writer.write("[" + key + "] 线程正在执行 " + value);
                     writer.write(System.lineSeparator());
                 }
+                writer.write("连接池信息: " + JSON.toJSONString(dataSourceInfoVo));
                 Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");
                 SQLTransientConnectionExceptionAuditLogger.error(writer.toString());
             } catch (IOException e) {
@@ -83,7 +86,17 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         try {
             conn = super.getConnection();
         } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
-            audit();
+            DataSourceInfoVo dataSourceInfoVo = new DataSourceInfoVo();
+            dataSourceInfoVo.setPoolName(this.getPoolName());
+            HikariPoolMXBean hikariPoolMXBean = this.getHikariPoolMXBean();
+            if (hikariPoolMXBean != null) {
+                dataSourceInfoVo.setIdleConnections(hikariPoolMXBean.getIdleConnections());
+                dataSourceInfoVo.setActiveConnections(hikariPoolMXBean.getActiveConnections());
+                dataSourceInfoVo.setThreadsAwaitingConnection(hikariPoolMXBean.getThreadsAwaitingConnection());
+                dataSourceInfoVo.setTotalConnections(hikariPoolMXBean.getTotalConnections());
+            }
+            Map<String, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
+            audit(dataSourceInfoVo, thread2ExecutingSQLMap);
             throw ex;
         }
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);

@@ -58,15 +58,15 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         }
         if (flag) {
             try {
-                Map<Thread, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
+                Map<String, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
                 StringWriter writer = new StringWriter();
                 ThreadUtil.dumpTraces(writer);
                 writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
                 writer.write(System.lineSeparator());
-                for (Map.Entry<Thread, String> entry : thread2ExecutingSQLMap.entrySet()) {
-                    Thread thread = entry.getKey();
+                for (Map.Entry<String, String> entry : thread2ExecutingSQLMap.entrySet()) {
+                    String key = entry.getKey();
                     String value = entry.getValue();
-                    writer.write("[" + thread.getName() + "] 线程正在执行 " + value);
+                    writer.write("[" + key + "] 线程正在执行 " + value);
                     writer.write(System.lineSeparator());
                 }
                 Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");

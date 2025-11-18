@@ -34,9 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
 })
 public class ExecutingSQLInterceptor implements Interceptor {
 
-    private final static Map<Thread, String> thread2ExecutingSQLMap = new ConcurrentHashMap<>();
+    private final static Map<String, String> thread2ExecutingSQLMap = new ConcurrentHashMap<>();
 
-    public static Map<Thread, String> getThread2ExecutingSQLMap() {
+    public static Map<String, String> getThread2ExecutingSQLMap() {
         return new HashMap<>(thread2ExecutingSQLMap);
     }
 
@@ -51,11 +51,11 @@ public class ExecutingSQLInterceptor implements Interceptor {
             if (interceptorContext != null) {
                 MappedStatement mappedStatement = interceptorContext.getMappedStatement();
                 String sqlId = mappedStatement.getId();
-                thread2ExecutingSQLMap.put(Thread.currentThread(), sqlId);
+                thread2ExecutingSQLMap.put(Thread.currentThread().getName(), sqlId);
             }
             return invocation.proceed();
         } finally {
-            thread2ExecutingSQLMap.remove(Thread.currentThread());
+            thread2ExecutingSQLMap.remove(Thread.currentThread().getName());
         }
     }
 }

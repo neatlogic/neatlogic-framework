@@ -12,6 +12,7 @@
 
 package neatlogic.module.framework.scheduler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.exception.integration.IntegrationHandlerNotFoundException;
 import neatlogic.framework.integration.core.IIntegrationHandler;
@@ -48,6 +49,7 @@ public class IntegrationJob extends PublicJobBase {
     public String getName() {
         return "定时调用集成作业";
     }
+
     @Prop({
             @Param(name = "supplierIntegrationName", controlType = "text", dataType = "string", required = false, description = "获取数据集成名称", help = "每次执行作业时调用该集成", sort = 0),
             @Param(name = "supplierIntegrationParam", controlType = "json", dataType = "json", required = false, description = "获取数据集成参数", help = "只支持json格式的参数，调用集成时传入该参数", sort = 1),
@@ -67,7 +69,7 @@ public class IntegrationJob extends PublicJobBase {
                 }
                 Object supplierIntegrationParam = jobObject.getProp("supplierIntegrationParam");
                 if (supplierIntegrationParam != null) {
-                    supplierIntegrationVo.getParamObj().putAll(JSONObject.parseObject(supplierIntegrationParam.toString()));
+                    supplierIntegrationVo.getParamObj().putAll(JSON.parseObject(supplierIntegrationParam.toString()));
                 }
                 IntegrationResultVo resultVo = handler.sendRequest(supplierIntegrationVo, FrameworkRequestFrom.SCHEDULE);
                 if (StringUtils.isNotBlank(resultVo.getError())) {

@@ -8,6 +8,7 @@ import java.lang.annotation.*;
 public @interface Param {
     String name() default "";
     String dataType() default "";
+    @Deprecated
     String controlType() default "text";
     String controlValue() default "";
     String description() default "";

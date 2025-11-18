@@ -40,9 +40,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private static final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
 
-    // 保存上次输出日志的时间毫秒数
-    private final static AtomicLong lastAuditMilliseconds = new AtomicLong(0);
-    private final static AtomicInteger count = new AtomicInteger(3);
+    // 保存上次抛异常的时间毫秒数
+    private final static AtomicLong lastThrowExceptionMillisecondsAtomicLong = new AtomicLong(0);
+    private final static AtomicInteger countAtomicInteger = new AtomicInteger(3);
     /**
      * 五分钟内只打印三次日志
      */
@@ -85,14 +85,21 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
             // 五分钟内只打印三次日志
             boolean flag = false;
             long currentTimeMillis = System.currentTimeMillis();
-            long l = lastAuditMilliseconds.getAndUpdate(operand -> currentTimeMillis);
-            long interval = currentTimeMillis - l;
+            long lastThrowExceptionMilliseconds = lastThrowExceptionMillisecondsAtomicLong.getAndUpdate(operand -> currentTimeMillis);
+            long interval = currentTimeMillis - lastThrowExceptionMilliseconds;
             if (interval > TimeUnit.MINUTES.toMillis(5)) {
-                count.compareAndSet(3, 1);
-                flag = true;
+                if (countAtomicInteger.compareAndSet(3, 0)) {
+                    flag = true;
+                }
             } else {
-                if (count.get() < 3) {
-                    count.incrementAndGet();
+                int count = countAtomicInteger.updateAndGet(operand -> {
+                    if (operand < 3) {
+                        return operand + 1;
+                    } else {
+                        return operand;
+                    }
+                });
+                if (count < 3) {
                     flag = true;
                 }
             }

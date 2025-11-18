@@ -62,6 +62,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
                 StringWriter writer = new StringWriter();
                 ThreadUtil.dumpTraces(writer);
                 writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
+                writer.write(System.lineSeparator());
                 for (Map.Entry<Thread, String> entry : thread2ExecutingSQLMap.entrySet()) {
                     Thread thread = entry.getKey();
                     String value = entry.getValue();

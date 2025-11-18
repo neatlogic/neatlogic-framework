@@ -33,7 +33,9 @@ public class ThreadUtil {
         ThreadInfo[] threadInfos = mxBean.getThreadInfo(mxBean.getAllThreadIds(), 0);
         Map<Long, ThreadInfo> threadInfoMap = new HashMap<>();
         for (ThreadInfo threadInfo : threadInfos) {
-            threadInfoMap.put(threadInfo.getThreadId(), threadInfo);
+            if (threadInfo != null) {
+                threadInfoMap.put(threadInfo.getThreadId(), threadInfo);
+            }
         }
         Map<Thread, StackTraceElement[]> stacks = Thread.getAllStackTraces();
         long now = System.currentTimeMillis();

@@ -12,69 +12,22 @@
 
 package neatlogic.framework.store.mysql;
 
-import com.alibaba.fastjson.JSON;
 import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.HikariPoolMXBean;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.util.RC4Util;
-import neatlogic.framework.dao.plugin.ExecutingSQLInterceptor;
-import neatlogic.framework.dto.healthcheck.DataSourceInfoVo;
-import neatlogic.framework.util.ThreadUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
-    private static final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
-
-    // 保存上次抛异常的时间毫秒数
-    private final static AtomicLong lastThrowExceptionMillisecondsAtomicLong = new AtomicLong(0);
-    private final static AtomicInteger countAtomicInteger = new AtomicInteger(3);
-    /**
-     * 五分钟内只打印三次日志
-     */
-    private synchronized void audit() {
-        try {
-            DataSourceInfoVo dataSourceInfoVo = new DataSourceInfoVo();
-            dataSourceInfoVo.setPoolName(this.getPoolName());
-            HikariPoolMXBean hikariPoolMXBean = this.getHikariPoolMXBean();
-            if (hikariPoolMXBean != null) {
-                dataSourceInfoVo.setIdleConnections(hikariPoolMXBean.getIdleConnections());
-                dataSourceInfoVo.setActiveConnections(hikariPoolMXBean.getActiveConnections());
-                dataSourceInfoVo.setThreadsAwaitingConnection(hikariPoolMXBean.getThreadsAwaitingConnection());
-                dataSourceInfoVo.setTotalConnections(hikariPoolMXBean.getTotalConnections());
-            }
-            Map<String, String> thread2ExecutingSQLMap = ExecutingSQLInterceptor.getThread2ExecutingSQLMap();
-            StringWriter writer = new StringWriter();
-            ThreadUtil.dumpTraces(writer);
-            writer.write("=================正在执行的SQL语句有" + thread2ExecutingSQLMap.size() + "条=================");
-            writer.write(System.lineSeparator());
-            for (Map.Entry<String, String> entry : thread2ExecutingSQLMap.entrySet()) {
-                String key = entry.getKey();
-                String value = entry.getValue();
-                writer.write("[" + key + "] 线程正在执行 " + value);
-                writer.write(System.lineSeparator());
-            }
-            writer.write("连接池信息: " + JSON.toJSONString(dataSourceInfoVo));
-            Logger SQLTransientConnectionExceptionAuditLogger = LoggerFactory.getLogger("SQLTransientConnectionExceptionAudit");
-            SQLTransientConnectionExceptionAuditLogger.error(writer.toString());
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-    }
+    private final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
 
     @Override
     public Connection getConnection() throws SQLException {
@@ -82,30 +35,7 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
         try {
             conn = super.getConnection();
         } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
-            // 五分钟内只打印三次日志
-            boolean flag = false;
-            long currentTimeMillis = System.currentTimeMillis();
-            long lastThrowExceptionMilliseconds = lastThrowExceptionMillisecondsAtomicLong.getAndUpdate(operand -> currentTimeMillis);
-            long interval = currentTimeMillis - lastThrowExceptionMilliseconds;
-            if (interval > TimeUnit.MINUTES.toMillis(5)) {
-                if (countAtomicInteger.compareAndSet(3, 0)) {
-                    flag = true;
-                }
-            } else {
-                int count = countAtomicInteger.updateAndGet(operand -> {
-                    if (operand < 3) {
-                        return operand + 1;
-                    } else {
-                        return operand;
-                    }
-                });
-                if (count < 3) {
-                    flag = true;
-                }
-            }
-            if (flag) {
-                audit();
-            }
+            SQLTransientConnectionExceptionAudit.audit();
             throw ex;
         }
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);

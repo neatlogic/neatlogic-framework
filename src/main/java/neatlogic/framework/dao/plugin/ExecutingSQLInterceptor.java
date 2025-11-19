@@ -13,6 +13,9 @@
 package neatlogic.framework.dao.plugin;
 
 import neatlogic.framework.asynchronization.threadlocal.InterceptorContext;
+import neatlogic.framework.common.config.Config;
+import neatlogic.framework.store.mysql.SQLTransientConnectionExceptionAudit;
+import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.Interceptor;
@@ -22,9 +25,6 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Intercepts({
         @Signature(type = StatementHandler.class, method = "batch", args = {Statement.class}),
@@ -34,28 +34,23 @@ import java.util.concurrent.ConcurrentHashMap;
 })
 public class ExecutingSQLInterceptor implements Interceptor {
 
-    private final static Map<String, String> thread2ExecutingSQLMap = new ConcurrentHashMap<>();
-
-    public static Map<String, String> getThread2ExecutingSQLMap() {
-        return new HashMap<>(thread2ExecutingSQLMap);
-    }
-
-    public static void clearThread2ExecutingSQLMap() {
-        thread2ExecutingSQLMap.clear();
-    }
-
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        try {
-            InterceptorContext interceptorContext = InterceptorContext.get();
-            if (interceptorContext != null) {
-                MappedStatement mappedStatement = interceptorContext.getMappedStatement();
-                String sqlId = mappedStatement.getId();
-                thread2ExecutingSQLMap.put(Thread.currentThread().getName(), sqlId);
+        if (Config.DATASOURCE_SQL_TRANSIENT_CONNECTION_EXCEPTION_AUDIT_ENABLE()) {
+            String key = Thread.currentThread().getName() + "#" + SnowflakeUtil.uniqueLong();
+            try {
+                InterceptorContext interceptorContext = InterceptorContext.get();
+                if (interceptorContext != null) {
+                    MappedStatement mappedStatement = interceptorContext.getMappedStatement();
+                    String sqlId = mappedStatement.getId();
+                    SQLTransientConnectionExceptionAudit.putExecutingSQL(key, sqlId);
+                }
+                return invocation.proceed();
+            } finally {
+                SQLTransientConnectionExceptionAudit.removeExecutingSQL(key);
             }
+        } else {
             return invocation.proceed();
-        } finally {
-            thread2ExecutingSQLMap.remove(Thread.currentThread().getName());
         }
     }
 }

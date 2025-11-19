@@ -55,8 +55,10 @@ public class ExceptionAuditInterceptor implements Interceptor {
                 String key = Thread.currentThread().getName() + "#" + SnowflakeUtil.uniqueLong();
                 try {
                     MappedStatement mappedStatement = mappedStatementThreadLocal.get();
-                    String sqlId = mappedStatement.getId();
-                    SQLTransientConnectionExceptionAudit.putExecutingSQL(key, sqlId);
+                    if (mappedStatement != null) {
+                        String sqlId = mappedStatement.getId();
+                        SQLTransientConnectionExceptionAudit.putExecutingSQL(key, sqlId);
+                    }
                     return invocation.proceed();
                 } finally {
                     SQLTransientConnectionExceptionAudit.removeExecutingSQL(key);

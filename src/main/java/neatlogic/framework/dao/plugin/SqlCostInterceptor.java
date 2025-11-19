@@ -162,7 +162,7 @@ public class SqlCostInterceptor implements Interceptor {
                 // 执行完上面的任务后，不改变原有的sql执行过程
                 Object val = invocation.proceed();
                 if (sqlAuditVo != null) {
-                    if (QUERY_FROM_DATABASE_INSTANCE.get()) {
+                    if (Boolean.TRUE.equals(QUERY_FROM_DATABASE_INSTANCE.get())) {
                         // sql语句被执行，没有使用到缓存
                         sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
                     } else {

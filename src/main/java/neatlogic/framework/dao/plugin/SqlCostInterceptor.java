@@ -21,6 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
@@ -34,6 +35,8 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -44,13 +47,13 @@ import java.util.regex.Matcher;
 @Intercepts({
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
         @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}),
-        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class})
+        @Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class}),
+        @Signature(type = StatementHandler.class, method = "prepare", args = {Connection.class, Integer.class}),
 })
 public class SqlCostInterceptor implements Interceptor {
     Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
     // 判断是否查询了数据库
-    public static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
-
+    private static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
     public static class SqlIdMap {
         private static final Set<String> sqlSet = new HashSet<>();
 
@@ -100,92 +103,97 @@ public class SqlCostInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
-        ModifyResultMapTypeHandlerInterceptor.mappedStatementThreadLocal.set(mappedStatement);
-        long starttime = 0;
-        SqlAuditVo sqlAuditVo = null;
-        boolean hasCacheFirstLevel = false;
-        try {
-            if (!SqlIdMap.isEmpty()) {
-                // Object target = invocation.getTarget();
-                String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
-                if (SqlIdMap.isExists(sqlId)) {
-                    sqlAuditVo = new SqlAuditVo();
-                    if (TenantContext.get() != null) {
-                        sqlAuditVo.setTenant(TenantContext.get().getTenantUuid());
-                    }
-                    if (UserContext.get() != null) {
-                        sqlAuditVo.setUserId(UserContext.get().getUserId());
-                    }
-                    starttime = System.currentTimeMillis();
-                    Object parameter = null;
-                    // 获取参数，if语句成立，表示sql语句有参数，参数格式是map形式
-                    if (invocation.getArgs().length > 1) {
-                        parameter = invocation.getArgs()[1];
-                    }
-
-                    String sql = getSql(mappedStatement, parameter); // 获取到最终的sql语句
-                    //System.out.println("#############################SQL INTERCEPTOR###############################");
-                    //System.out.println("id:" + sqlId);
-                    //System.out.println(sql);
-                    sqlAuditVo.setSql(sql);
-                    sqlAuditVo.setId(sqlId);
-                    if (Objects.equals(invocation.getMethod().getName(), "query")) {
-                        CacheKey key = null;
-                        Executor executor = (Executor) invocation.getTarget();
-                        Object[] args = invocation.getArgs();
-                        if (args.length > 4) {
-                            key = (CacheKey) args[4];
-                        } else if (args.length == 4) {
-                            Object parameterObject = args[1];
-                            RowBounds rowBounds = (RowBounds) args[2];
-                            key = executor.createCacheKey(mappedStatement, parameterObject, rowBounds, mappedStatement.getBoundSql(parameterObject));
+        Method method = invocation.getMethod();
+        if (Objects.equals(method.getName(), "prepare")) {
+            QUERY_FROM_DATABASE_INSTANCE.set(true);
+            return invocation.proceed();
+        } else {
+            MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
+            long starttime = 0;
+            SqlAuditVo sqlAuditVo = null;
+            boolean hasCacheFirstLevel = false;
+            try {
+                if (!SqlIdMap.isEmpty()) {
+                    // Object target = invocation.getTarget();
+                    String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
+                    if (SqlIdMap.isExists(sqlId)) {
+                        sqlAuditVo = new SqlAuditVo();
+                        if (TenantContext.get() != null) {
+                            sqlAuditVo.setTenant(TenantContext.get().getTenantUuid());
                         }
-                        if (executor.isCached(mappedStatement, key)) {
-                            hasCacheFirstLevel = true;
+                        if (UserContext.get() != null) {
+                            sqlAuditVo.setUserId(UserContext.get().getUserId());
+                        }
+                        starttime = System.currentTimeMillis();
+                        Object parameter = null;
+                        // 获取参数，if语句成立，表示sql语句有参数，参数格式是map形式
+                        if (invocation.getArgs().length > 1) {
+                            parameter = invocation.getArgs()[1];
+                        }
+
+                        String sql = getSql(mappedStatement, parameter); // 获取到最终的sql语句
+                        //System.out.println("#############################SQL INTERCEPTOR###############################");
+                        //System.out.println("id:" + sqlId);
+                        //System.out.println(sql);
+                        sqlAuditVo.setSql(sql);
+                        sqlAuditVo.setId(sqlId);
+                        if (Objects.equals(invocation.getMethod().getName(), "query")) {
+                            CacheKey key = null;
+                            Executor executor = (Executor) invocation.getTarget();
+                            Object[] args = invocation.getArgs();
+                            if (args.length > 4) {
+                                key = (CacheKey) args[4];
+                            } else if (args.length == 4) {
+                                Object parameterObject = args[1];
+                                RowBounds rowBounds = (RowBounds) args[2];
+                                key = executor.createCacheKey(mappedStatement, parameterObject, rowBounds, mappedStatement.getBoundSql(parameterObject));
+                            }
+                            if (executor.isCached(mappedStatement, key)) {
+                                hasCacheFirstLevel = true;
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        }
-        QUERY_FROM_DATABASE_INSTANCE.set(false);
-        try {
-            // 执行完上面的任务后，不改变原有的sql执行过程
-            Object val = invocation.proceed();
-            if (sqlAuditVo != null) {
-                if (QUERY_FROM_DATABASE_INSTANCE.get()) {
-                    // sql语句被执行，没有使用到缓存
-                    sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
-                } else {
-                    if (hasCacheFirstLevel) {
-                        sqlAuditVo.setUseCacheLevel("一级缓存");
+            try {
+                QUERY_FROM_DATABASE_INSTANCE.set(false);
+                // 执行完上面的任务后，不改变原有的sql执行过程
+                Object val = invocation.proceed();
+                if (sqlAuditVo != null) {
+                    if (QUERY_FROM_DATABASE_INSTANCE.get()) {
+                        // sql语句被执行，没有使用到缓存
+                        sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
                     } else {
-                        sqlAuditVo.setUseCacheLevel("二级缓存");
+                        if (hasCacheFirstLevel) {
+                            sqlAuditVo.setUseCacheLevel("一级缓存");
+                        } else {
+                            sqlAuditVo.setUseCacheLevel("二级缓存");
+                        }
                     }
-                }
-                sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
-                sqlAuditVo.setRunTime(new Date());
+                    sqlAuditVo.setTimeCost(System.currentTimeMillis() - starttime);
+                    sqlAuditVo.setRunTime(new Date());
 
-                if (val != null) {
-                    if (val instanceof List) {
-                        sqlAuditVo.setRecordCount(((List) val).size());
-                    } else {
-                        sqlAuditVo.setRecordCount(1);
+                    if (val != null) {
+                        if (val instanceof List) {
+                            sqlAuditVo.setRecordCount(((List) val).size());
+                        } else {
+                            sqlAuditVo.setRecordCount(1);
+                        }
                     }
+                    SqlAuditManager.addSqlAudit(sqlAuditVo);
+                    RequestContext requestContext = RequestContext.get();
+                    if (requestContext != null) {
+                        requestContext.addSqlAudit(sqlAuditVo);
+                    }
+                    //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
+                    //System.out.println("###########################################################################");
                 }
-                SqlAuditManager.addSqlAudit(sqlAuditVo);
-                RequestContext requestContext = RequestContext.get();
-                if (requestContext != null) {
-                    requestContext.addSqlAudit(sqlAuditVo);
-                }
-                //System.out.println("time cost:" + (System.currentTimeMillis() - starttime) + "ms");
-                //System.out.println("###########################################################################");
+                return val;
+            } finally {
+                QUERY_FROM_DATABASE_INSTANCE.remove();
             }
-            return val;
-        } finally {
-            QUERY_FROM_DATABASE_INSTANCE.remove();
         }
     }
 

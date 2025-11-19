@@ -31,7 +31,6 @@ public class DataSchemaInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        SqlCostInterceptor.QUERY_FROM_DATABASE_INSTANCE.set(true);
         StatementHandler statementHandler = (StatementHandler) invocation.getTarget();
 
         BoundSql boundSql = statementHandler.getBoundSql();

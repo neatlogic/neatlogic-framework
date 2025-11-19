@@ -18,9 +18,11 @@ import neatlogic.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
 import java.util.Objects;
 
@@ -29,7 +31,13 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
 
     @Override
     public Connection getConnection() throws SQLException {
-        Connection conn = super.getConnection();
+        Connection conn = null;
+        try {
+            conn = super.getConnection();
+        } catch (CannotGetJdbcConnectionException | SQLTransientConnectionException ex) {
+            SQLTransientConnectionExceptionAudit.audit();
+            throw ex;
+        }
         conn.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         try (Statement statement = conn.createStatement()) {
             if (Objects.equals(DatasourceManager.getDatabaseId(), DatabaseVendor.MYSQL.getDatabaseId())) {

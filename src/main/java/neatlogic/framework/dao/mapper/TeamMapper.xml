@@ -153,7 +153,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </if>
         </where>
     </select>
-
+    <!-- 分组编辑页面用到该语句，不能使用缓存-->
     <select id="getTeam" parameterType="neatlogic.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
         SELECT
         a.`id`,
@@ -225,7 +225,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE a.`uuid` = #{uuid}
           and a.`is_delete` = 0
     </select>
-
+    <!-- 分组编辑页面用到该语句，不能使用缓存-->
     <select id="checkTeamIsExists" parameterType="string" resultType="int" useCache="false">
         SELECT COUNT(1)
         FROM `team`
@@ -320,7 +320,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `user_team`
         WHERE `team_uuid` = #{value}
     </select>
-
+    <!-- AuthenticationInfo用到该语句，不能使用缓存-->
+    <!-- 角色编辑页面用到该语句，不能使用缓存-->
     <select id="getTeamByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TeamVo"
             useCache="false">
         SELECT
@@ -387,17 +388,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
         and `is_delete` = 0
     </select>
-
+    <!-- AuthenticationInfo用到该语句，不能使用缓存-->
     <select id="getTeamUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String"
-            useCache="true">
+            useCache="false">
         SELECT ut.`team_uuid`
         FROM `user_team` ut
                  JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0
         WHERE ut.`user_uuid` = #{userUuid};
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能使用缓存-->
     <select id="getTeamListByUserUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.TeamVo"
-            useCache="true">
+            useCache="false">
         SELECT t.uuid, t.name, t.lft, t.rht
         FROM `user_team` ut
                  JOIN team t ON t.`uuid` = ut.`team_uuid` and t.`is_delete` = 0

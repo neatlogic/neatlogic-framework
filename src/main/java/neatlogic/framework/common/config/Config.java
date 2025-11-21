@@ -633,7 +633,7 @@ public class Config {
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
-            DB_TRANSACTION_TIMEOUT = Integer.parseInt(prop.getProperty("db.transaction.timeout"));
+            DB_TRANSACTION_TIMEOUT = Integer.parseInt(prop.getProperty("db.transaction.timeout", "180"));
             DATASOURCE_CONNECT_TIMEOUT = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));
             DATASOURCE_MAXIMUM_POOL_SIZE = Integer.parseInt(prop.getProperty("datasource.maximum.pool.size", "250"));
             DATASOURCE_KEEPALIVE_TIME = Long.parseLong(prop.getProperty("datasource.keepalive.time", "180000"));

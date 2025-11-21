@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         from `user`
         where user_id = #{value}
     </select>
-
-    <select id="getUserTokenByUser" parameterType="java.lang.String" resultType="java.lang.String">
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
+    <select id="getUserTokenByUser" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
         select token
         from `user`
         where uuid = #{value} or user_id = #{value}
@@ -166,7 +166,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <result property="upwardNamePath" column="upwardNamePath"/>
         </collection>
     </resultMap>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="getUserByUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo" useCache="false">
         SELECT a.`id`,
         a.`uuid`,
@@ -452,7 +452,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         WHERE b.`auth` = #{auth}
         ORDER BY b.`id`
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="searchUserAuthByUserUuid" parameterType="String" resultType="neatlogic.framework.dto.UserAuthVo"
             useCache="false">
         SELECT `user_uuid`  as `userUid`,
@@ -491,7 +491,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             </foreach>
         </if>
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="searchUserRoleAuthByUserUuid" parameterType="String" resultType="neatlogic.framework.dto.RoleAuthVo"
             useCache="false">
         SELECT a.`role_uuid`  as `roleUuid`,
@@ -688,7 +688,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
         ORDER BY `id` DESC
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="getUserCountByAuth" resultType="neatlogic.framework.dto.AuthVo" useCache="false">
         SELECT a.`auth`                        as `name`,
                COUNT(DISTINCT (a.`user_uuid`)) as `userCount`
@@ -696,7 +696,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
                  LEFT JOIN `user` b ON a.`user_uuid` = b.`uuid`
         GROUP BY a.`auth`
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="getUserProfileByUserUuidAndModuleId" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.UserProfileVo" useCache="false">
         SELECT

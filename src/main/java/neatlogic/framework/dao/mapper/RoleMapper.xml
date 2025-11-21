@@ -103,7 +103,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `role_authority`
         WHERE `role_uuid` = #{roleUuid}
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="searchRoleAuthByRoleUuidList" parameterType="String" resultType="neatlogic.framework.dto.RoleAuthVo"
             useCache="false">
         SELECT `role_uuid`  as `roleUuid`,
@@ -173,7 +173,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         FROM `role`
         WHERE `uuid` = #{value}
     </select>
-
+    <!-- AuthenticationInfo用到该语句，不能用户缓存-->
     <select id="getRoleByUuidList" parameterType="java.lang.String" resultType="neatlogic.framework.dto.RoleVo"
             useCache="false">
         SELECT
@@ -232,7 +232,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{item}
         </foreach>
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="getRoleCountByAuth" resultType="neatlogic.framework.dto.AuthVo" useCache="false">
         SELECT `auth`                        as `name`,
                COUNT(DISTINCT (`role_uuid`)) as `roleCount`
@@ -287,8 +287,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{userUuid}
         </foreach>
     </select>
-
-    <select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String">
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
+    <!-- AuthenticationInfo用到该语句，不能用户缓存-->
+    <select id="getRoleUuidListByUserUuid" parameterType="java.lang.String" resultType="java.lang.String" useCache="false">
         select ur.`role_uuid`
         from `user_role` ur join `role` r on ur.`role_uuid` = r.`uuid`
         where ur.`user_uuid` = #{value}
@@ -333,7 +334,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{roleUuid}
         </foreach>
     </select>
-
+    <!-- AuthenticationInfo用到该语句，不能用户缓存-->
     <select id="getRoleUuidListByTeamUuidListAndCheckedChildren" resultType="java.lang.String" useCache="false">
         select tr.`role_uuid`
         FROM `team_role` tr  join `role` r on tr.`role_uuid` = r.`uuid`
@@ -343,7 +344,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
         </foreach>
         AND tr.`checked_children` = #{checkedChildren}
     </select>
-
+    <!-- AuthenticationInfo用到该语句，不能用户缓存-->
     <select id="getRoleUuidListByTeamUuidList" resultType="java.lang.String" useCache="false">
         select tr.`role_uuid`
         FROM `team_role` tr  join `role` r on tr.`role_uuid` = r.`uuid`
@@ -363,8 +364,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             <result property="childrenTeamName" column="childrenTeamName"/>
         </collection>
     </resultMap>
-
-    <select id="getRoleListWithTeamByTeamUuidList" resultMap="roleTeamMap">
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
+    <select id="getRoleListWithTeamByTeamUuidList" resultMap="roleTeamMap" useCache="false">
         SELECT t.uuid as parentTeamUuid,
         t.`name` as parentTeamName,
         tr.role_uuid as roleUuid,
@@ -377,9 +378,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
             #{uuid}
         </foreach>
     </select>
-
+    <!-- 用户编辑页面用到该语句，不能用户缓存-->
     <select id="getParentTeamRoleListWithCheckedChildrenByTeam" resultMap="roleTeamMap"
-            parameterType="neatlogic.framework.dto.TeamVo">
+            parameterType="neatlogic.framework.dto.TeamVo" useCache="false">
         SELECT t.uuid       as parentTeamUuid,
                t.`name`     as parentTeamName,
                tr.role_uuid as roleUuid,

@@ -283,7 +283,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             connection.connect();
         } catch (Exception e) {
             String errorMsg = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
-            logger.error(e.getMessage(), e);
+            logger.error(url + ", " + e.getMessage(), e);
             integrationAuditVo.appendError(errorMsg);
             resultVo.appendError(errorMsg);
             integrationAuditVo.setStatus("failed");

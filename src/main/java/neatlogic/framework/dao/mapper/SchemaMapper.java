@@ -12,12 +12,15 @@
 
 package neatlogic.framework.dao.mapper;
 
+import neatlogic.framework.dto.schema.TableColumnVo;
+import neatlogic.framework.dto.schema.TableVo;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
 
 public interface SchemaMapper {
+    List<TableColumnVo> getColumnInfoByTableName(TableVo table);
 
     List<Map<String, String>> testCiViewSql(String sql);
 

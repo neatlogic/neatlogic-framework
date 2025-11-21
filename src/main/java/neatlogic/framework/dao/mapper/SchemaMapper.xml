@@ -1,37 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!--Copyright (C) $today.year  深圳极向量科技有限公司 All Rights Reserved.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
-
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.SchemaMapper">
+
+    <select id="getColumnInfoByTableName" parameterType="neatlogic.framework.dto.schema.TableVo"
+            resultType="neatlogic.framework.dto.schema.TableColumnVo">
+        select
+        table_name as tableName,
+        column_name as columnName,
+        column_type as columnType,
+        column_comment as columnComment
+        from information_schema.COLUMNS
+        where table_schema = #{schema}
+        and table_name in
+        <foreach collection="nameList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
     <select id="testCiViewSql" parameterType="java.lang.String" resultType="java.util.Map">
         ${value}
     </select>
 
-    <!--<select id="checkTableHasData" parameterType="java.lang.String" resultType="int">
-        SELECT COUNT(1)
-        FROM ${value}
-        LIMIT 1
-    </select>-->
-
-    <!--<select id="checkTableIsExists" resultType="int">
-        select count(1)
-        from information_schema.tables a
-        where a.TABLE_SCHEMA = #{schemaName}
-          and a.TABLE_NAME = #{tableName}
-    </select>-->
 
     <select id="checkSchemaIsExists" parameterType="java.lang.String" resultType="int">
         SELECT COUNT(1)
@@ -40,45 +29,24 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.-->
     </select>
 
     <select id="checkTableOrViewIsExists" resultType="java.lang.String">
-        SELECT `table_type` FROM `information_schema`.`tables`
+        SELECT `table_type`
+        FROM `information_schema`.`tables`
         WHERE `table_schema` = #{tableSchema}
           AND `table_name` = #{tableName}
     </select>
 
     <select id="getTableOrViewAllColumnNameList" resultType="java.lang.String">
-        SELECT `column_name` FROM `information_schema`.`COLUMNS`
+        SELECT `column_name`
+        FROM `information_schema`.`COLUMNS`
         WHERE `table_schema` = #{tableSchema}
           AND `table_name` = #{tableName}
     </select>
 
-    <!--<insert id="insertAttrToCiTable">
-        ALTER TABLE ${tableName}
-            ADD COLUMN `${attrVo.id}`      TEXT     NULL COMMENT '${attrVo.label}',
-            ADD COLUMN `${attrVo.id}_hash` CHAR(32) NULL COMMENT '${attrVo.label}值散列码',
-            ADD KEY `index_${attrVo.id}_hash` (`${attrVo.id}_hash`);
-    </insert>-->
-
-    <!--<insert id="insertCiTable">
-        CREATE TABLE IF NOT EXISTS ${tableName}
-        (
-            `cientity_id` bigint(20) NOT NULL COMMENT '配置项id',
-            PRIMARY KEY (`cientity_id`)
-            ) ENGINE = INNODB
-            DEFAULT CHARSET = utf8mb4
-    </insert>-->
 
     <insert id="insertView" parameterType="java.lang.String">
         ${value}
     </insert>
 
-
-    <!--<delete id="deleteAttrFromCiTable">
-        ALTER TABLE ${tableName}
-            DROP
-                COLUMN `${attrVo.id}_hash`,
-            DROP
-                COLUMN `${attrVo.id}`
-    </delete>-->
 
     <delete id="deleteTable" parameterType="java.lang.String">
         DROP TABLE IF EXISTS ${value}

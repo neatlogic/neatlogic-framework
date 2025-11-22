@@ -60,6 +60,8 @@ public class SqlInfo {
      */
     private Integer pageSize = 20;
 
+    private String tableContent;
+
     public String getId() {
         return id;
     }
@@ -146,5 +148,13 @@ public class SqlInfo {
 
     public void setPageSize(Integer pageSize) {
         this.pageSize = pageSize;
+    }
+
+    public String getTableContent() {
+        return tableContent;
+    }
+
+    public void setTableContent(String tableContent) {
+        this.tableContent = tableContent;
     }
 }

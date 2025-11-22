@@ -30,10 +30,7 @@ import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -59,16 +56,16 @@ public class SqlRunner {
         this(mapperXml, namespace, null);
     }
 
-    public SqlRunner(String mapperXml, DataSource dataSource) {
-        this(mapperXml, null, dataSource);
+    public SqlRunner(String mapperXml, DataSource _dataSource) {
+        this(mapperXml, null, _dataSource);
     }
 
-    public SqlRunner(String mapperXml, String namespace, DataSource dataSource) {
+    public SqlRunner(String mapperXml, String namespace, DataSource _dataSource) {
         if (StringUtils.isNotBlank(namespace)) {
             this.namespace = namespace;
         }
-        if (dataSource != null) {
-            this.dataSource = dataSource;
+        if (_dataSource != null) {
+            dataSource = _dataSource;
         }
 
         Configuration configuration = new Configuration();
@@ -76,9 +73,10 @@ public class SqlRunner {
         configuration.addInterceptor(new SqlCostInterceptor());
         configuration.addInterceptor(new LimitInterceptor());
         configuration.addInterceptor(new PageInterceptor());
-        Environment environment = new Environment("", new SpringManagedTransactionFactory(), this.dataSource);
+        Environment environment = new Environment("", new SpringManagedTransactionFactory(), dataSource);
         configuration.setEnvironment(environment);
         configuration.setDefaultStatementTimeout(Config.SQLRUNNER_QUERY_TIMEOUT());
+        configuration.setCallSettersOnNulls(true);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(DOCTYPE);
         stringBuilder.append("<mapper namespace=\"").append(this.namespace).append("\">");

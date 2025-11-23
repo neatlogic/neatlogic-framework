@@ -105,6 +105,10 @@ public class ElasticsearchDataSourceHandler extends DataSourceServiceHandlerBase
                     List<String> srcFields = queryObj.getJSONArray("_source").toJavaList(String.class);
                     reqBuilder.source(s -> s.filter(f -> f.includes(srcFields)));
                 }
+
+                // 解析args
+
+
                 // 解析 sort
                 if (queryObj.containsKey("sort")) {
                     JSONArray sortArray = queryObj.getJSONArray("sort");

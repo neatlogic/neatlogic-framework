@@ -17,10 +17,28 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import java.util.List;
 
 public class TableVo {
-    private String schema;
+    private String tableSchema;
+    private String tableName;
+    private String tableComment;
     private List<String> nameList;
 
-    public String getSchema() {
+    public String getTableComment() {
+        return tableComment;
+    }
+
+    public void setTableComment(String tableComment) {
+        this.tableComment = tableComment;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
+    }
+
+    public String getTableSchema() {
         return TenantContext.get().getDbName();
     }
 

@@ -2,6 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.SchemaMapper">
 
+    <select id="getTableInfo" parameterType="neatlogic.framework.dto.schema.TableVo" resultType="neatlogic.framework.dto.schema.TableVo">
+        select table_name    as tableName,
+               table_comment as tableComment
+        FROM information_schema.`TABLES`
+        where table_schema = #{tableSchema}
+    </select>
+
     <select id="getColumnInfoByTableName" parameterType="neatlogic.framework.dto.schema.TableVo"
             resultType="neatlogic.framework.dto.schema.TableColumnVo">
         select
@@ -9,8 +16,8 @@
         column_name as columnName,
         column_type as columnType,
         column_comment as columnComment
-        from information_schema.COLUMNS
-        where table_schema = #{schema}
+        from information_schema.`COLUMNS`
+        where table_schema = #{tableSchema}
         and table_name in
         <foreach collection="nameList" item="item" open="(" close=")" separator=",">
             #{item}

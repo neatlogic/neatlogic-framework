@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface SchemaMapper {
+    List<TableVo> getTableInfo(TableVo table);
+
     List<TableColumnVo> getColumnInfoByTableName(TableVo table);
 
     List<Map<String, String>> testCiViewSql(String sql);

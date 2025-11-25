@@ -33,7 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor;
+import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,8 +62,8 @@ public class TenantController {
 
     private void getCommercialModule() {
         Reflections reflections = new Reflections("neatlogic");
-        Set<Class<? extends InstantiationAwareBeanPostProcessor>> authClass = reflections.getSubTypesOf(InstantiationAwareBeanPostProcessor.class);
-        for (Class<? extends InstantiationAwareBeanPostProcessor> c : authClass) {
+        Set<Class<? extends BeanDefinitionRegistryPostProcessor>> authClass = reflections.getSubTypesOf(BeanDefinitionRegistryPostProcessor.class);
+        for (Class<? extends BeanDefinitionRegistryPostProcessor> c : authClass) {
             try {
                 if (!c.getSimpleName().endsWith("AuthBean")) {
                     continue;

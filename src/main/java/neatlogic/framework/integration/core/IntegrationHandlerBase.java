@@ -299,7 +299,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                     }
                     out.flush();
                 } catch (Exception e) {
-                    logger.error(e.getMessage(), e);
+                    logger.error(url + ", " + e.getMessage(), e);
                     resultVo.appendError(e.getMessage());
                     integrationAuditVo.appendError(e.getMessage());
                     integrationAuditVo.setStatus("failed");
@@ -335,7 +335,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                     throw new RuntimeException(writer.toString());
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error(url + ", " + e.getMessage(), e);
                 resultVo.appendError(e.getMessage());
                 integrationAuditVo.appendError(e.getMessage());
                 integrationAuditVo.setStatus("failed");
@@ -352,7 +352,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                         }
                         hasTransferred = true;
                     } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
+                        logger.error(url + ", " + ex.getMessage(), ex);
                         resultVo.appendError(ex.getMessage());
                         integrationAuditVo.appendError(ex.getMessage());
                         integrationAuditVo.setStatus("failed");

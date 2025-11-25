@@ -25,7 +25,9 @@ import neatlogic.framework.exception.file.FileNotFoundException;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileTypeHandlerNotFoundException;
 import neatlogic.framework.exception.server.ServerHostIsBankException;
+import neatlogic.framework.exception.server.ServerHostRepeatException;
 import neatlogic.framework.exception.server.ServerNotFoundException;
+import neatlogic.framework.exception.server.ServerStopException;
 import neatlogic.framework.exception.user.NoTenantException;
 import neatlogic.framework.file.core.FileOperationType;
 import neatlogic.framework.file.core.FileTypeHandlerFactory;
@@ -219,6 +221,14 @@ public class FileServiceImpl implements IFileCrossoverService {
         }
         if (StringUtils.isBlank(host)) {
             throw new ServerHostIsBankException(serverId);
+        }
+        if (Objects.equals(serverClusterVo.getStatus(), ServerClusterVo.STOP)) {
+            throw new ServerStopException(serverClusterVo.getServerId(), serverClusterVo.getHost());
+        }
+        if (Objects.equals(paramObj.getInteger("forwardCount"), 1)) {
+            throw new ServerHostRepeatException(serverId, host, Config.SCHEDULE_SERVER_ID);
+        } else {
+            paramObj.put("forwardCount", 1);
         }
         HttpServletRequest request = RequestContext.get().getRequest();
         String url = host + request.getRequestURI();

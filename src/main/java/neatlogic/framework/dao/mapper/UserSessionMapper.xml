@@ -10,6 +10,20 @@
         <!-- Ehcache 堆内条目数 -->
         <property name="heapEntries" value="100"/>
     </cache>
+    <select id="getUserSessionDetailListByUserUuid" resultType="neatlogic.framework.dto.UserSessionVo">
+        SELECT
+            us.user_uuid AS userUuid,
+            us.token_hash as tokenHash,
+            usc.content AS token ,
+            usc1.content as authInfoStr,
+            us.token_create_time as createTime,
+            us.visit_time as visitTime
+        FROM
+            user_session us
+                LEFT JOIN user_session_content usc ON us.token_hash = usc.`hash`
+                LEFT JOIN user_session_content usc1 ON us.auth_info_hash = usc1.`hash`
+        where us.user_uuid = #{userUuid}
+    </select>
 
     <select id="getUserSessionByTokenHash" parameterType="java.lang.String"
             resultType="neatlogic.framework.dto.UserSessionVo" useCache="false">
@@ -152,7 +166,7 @@
         FROM `user_session`
         WHERE `user_uuid` = #{value}
     </select>
-    <select id="getUserSessionByUuidList" resultType="neatlogic.framework.dto.UserSessionVo">
+    <select id="getUserSessionByUuidList" resultType="neatlogic.framework.dto.UserSessionVo" useCache="false">
         SELECT `user_uuid`         as userUuid,
                `visit_time`        as sessionTime,
                `auth_info_hash`    as authInfoHash,

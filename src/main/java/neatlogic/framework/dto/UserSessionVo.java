@@ -5,11 +5,15 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
 public class UserSessionVo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -155200071487424860L;
+
     private String userUuid;
     private Date sessionTime;
     @EntityField(name = "权限字符串", type = ApiParamType.STRING)
@@ -27,6 +31,9 @@ public class UserSessionVo implements Serializable {
 
     @EntityField(name = "token", type = ApiParamType.STRING)
     private String token;
+
+    @EntityField(name = "最近一次缓存失效后的访问时间", type = ApiParamType.STRING)
+    private Date visitTime;
 
     public UserSessionVo(String userUuid, Date sessionTime) {
         this.userUuid = userUuid;
@@ -114,6 +121,14 @@ public class UserSessionVo implements Serializable {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Date getVisitTime() {
+        return visitTime;
+    }
+
+    public void setVisitTime(Date visitTime) {
+        this.visitTime = visitTime;
     }
 
     @Override

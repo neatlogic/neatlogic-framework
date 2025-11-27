@@ -30,6 +30,7 @@ import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.service.UserSessionService;
 import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
@@ -48,10 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
 @DependsOn("loginService")
@@ -71,6 +69,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     protected static UserSessionContentMapper userSessionContentMapper;
 
     protected static AuthenticationInfoService authenticationInfoService;
+
+    protected static UserSessionService userSessionService;
 
     @Autowired
     public void setUserMapper(UserMapper _userMapper) {
@@ -95,6 +95,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Autowired
     public void setUserSessionContentMapper(UserSessionContentMapper _userSessionContentMapper) {
         userSessionContentMapper = _userSessionContentMapper;
+    }
+
+    @Autowired
+    public void setUserSessionService(UserSessionService _userSessionService) {
+        userSessionService = _userSessionService;
     }
 
     @Autowired
@@ -252,6 +257,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public String logout() {
+        //调取其它节点的接口删除UserSessionCache
+        userSessionService.deleteOtherClusterUserSessionByTokenList(Collections.singletonList(UserContext.get().getTokenHash()));
         UserSessionCache.removeItem(UserContext.get().getTokenHash());
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();

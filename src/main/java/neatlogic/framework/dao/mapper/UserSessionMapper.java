@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface UserSessionMapper {
+    List<UserSessionVo>  getUserSessionDetailListByUserUuid(@Param("userUuid") String userUuid);
+
     UserSessionVo getUserSessionByTokenHash(String userUuid);
 
     List<UserSessionVo> getUserSessionByUuid(String userUuid);

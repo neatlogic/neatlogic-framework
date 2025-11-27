@@ -35,4 +35,11 @@ public interface UserSessionService {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void updateUserSessionAuthInfoHashByTokenHash(String tokenHash, String authInfoHash);
+
+    /**
+     * 调取其它节点的接口删除UserSessionCache
+     *
+     * @param removeTokenList 需要删除的用户token列表
+     */
+    void deleteOtherClusterUserSessionByTokenList(List<String> removeTokenList);
 }

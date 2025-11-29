@@ -178,6 +178,7 @@ public class ScriptRunnerManager {
                     continue;
                 }
 
+                sqlSb.append("\n");
                 sqlSb.append(line);
                 String sql = sqlSb.toString();
                 if (!executeSqlParamVo.isAll()) {

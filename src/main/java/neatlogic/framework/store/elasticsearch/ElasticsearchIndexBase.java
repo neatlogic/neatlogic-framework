@@ -26,12 +26,12 @@ import neatlogic.framework.dto.ElasticsearchVo;
 import neatlogic.framework.dto.elasticsearch.IndexResultHighlightVo;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.elasticsearch.ElasticSearchCreateDocumentException;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchDeleteIndexException;
 import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper;
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo;
 import neatlogic.framework.fulltextindex.enums.FullTextIndexHandlerType;
 import neatlogic.framework.fulltextindex.enums.Status;
-import neatlogic.framework.lock.dao.mapper.LockMapper;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -60,8 +60,6 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         }
     }
 
-    @Resource
-    private LockMapper lockMapper;
 
     @Resource
     private FullTextIndexRebuildAuditMapper fullTextIndexRebuildAuditMapper;
@@ -216,6 +214,25 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         this.myCreateDocument(targetId);
     }
 
+    protected final void createDocument(Long id, Map<String, Object> document) {
+        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+        // 创建或更新文档
+        IndexRequest<Map<String, Object>> request = new IndexRequest.Builder<Map<String, Object>>()
+                .index(getIndexName()) // 索引名称
+                .id(id.toString())      // 文档 ID
+                .document(document) // 文档内容
+                .build();
+
+        // 执行请求
+        try {
+            client.index(request);
+        } catch (Exception ex) {
+            //logger.error(ex.getMessage(), ex);
+            throw new ElasticSearchCreateDocumentException(ex);
+        }
+    }
+
+
     @Override
     public final void deleteDocument(Long targetId) {
         this.myDeleteDocument(targetId);
@@ -224,29 +241,6 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     protected abstract void myDeleteDocument(Long targetId);
 
-    /*private static Query buildQuery(Map<String, Object> conditionObj) {
-        // 如果条件为空，使用 match_all
-        if (MapUtils.isEmpty(conditionObj)) {
-            return new Query.Builder()
-                    .matchAll(ma -> ma)
-                    .build();
-        }
-
-        // 构建查询条件列表
-        List<Query> queries = new ArrayList<>();
-        conditionObj.forEach((key, value) -> {
-            if (value != null && StringUtils.isNotBlank(value.toString())) { // 跳过空值
-                queries.add(new Query.Builder()
-                        .match(ma -> ma.field(key).query(FieldValue.of(value)))
-                        .build());
-            }
-        });
-
-        // 构建 bool 查询
-        return new Query.Builder()
-                .bool(b -> b.must(queries))
-                .build();
-    }*/
 
     @Override
     public final long searchDocumentCount(T targetVo) {

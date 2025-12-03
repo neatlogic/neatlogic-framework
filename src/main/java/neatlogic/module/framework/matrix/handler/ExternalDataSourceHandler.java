@@ -367,7 +367,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             paramObj.put("filterList", filterList);
             IntegrationResultVo resultVo = handler.sendRequest(integrationVo, RequestFrom.MATRIX);
             if (StringUtils.isNotBlank(resultVo.getError())) {
-                logger.error(resultVo.getError());
+                logger.error(integrationVo.getUrl() + ", " + resultVo.getError());
                 throw new MatrixExternalAccessException(integrationVo.getName());
             }
             handler.validate(resultVo);

@@ -192,7 +192,7 @@ public abstract class JobBase implements IJob {
             // 例如：A Server 修改cron 每天0点跑作业，B Server 修改cron每分钟跑。 当A Server 发现not healthy 则会unload 并删除status，lock。后续判断会导致B Server 也不会再跑作业。
             // 应该有jobHandler来自行判断是否需要unloadJob
             //schedulerManager.unloadJob(jobObject);
-            logger.error("执行定时作业(jobName={},jobGroup={})时，isHealthy()方法检查出作业不正常", jobName, jobGroup);
+//            logger.error("执行定时作业(jobName={},jobGroup={})时，isHealthy()方法检查出作业不正常", jobName, jobGroup);
             return;
         }
         Date currentFireTime = context.getFireTime();// 本次执行激活时间

@@ -13,13 +13,10 @@ package neatlogic.framework.exception.util.javascript;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-/**
- * @author longrf
- * @date 2023/4/11 15:26
- */
 
 public class ValueNotWithinRangeException extends ApiRuntimeException {
     public ValueNotWithinRangeException(String prefix, String dataValue, String valueBefore, String valueAfter) {
         super("{0}值{1}不在{2}和{3}范围内", prefix, dataValue, valueBefore, valueAfter);
     }
+
 }

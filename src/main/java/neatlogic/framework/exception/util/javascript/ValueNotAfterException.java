@@ -13,14 +13,11 @@ package neatlogic.framework.exception.util.javascript;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-/**
- * @author longrf
- * @date 2023/4/11 15:26
- */
 
 public class ValueNotAfterException extends ApiRuntimeException {
 
     public ValueNotAfterException(String prefix, String dataValue, String valueBefore) {
         super("{0}值{1}不在{2}之后", prefix, dataValue, valueBefore);
     }
+
 }

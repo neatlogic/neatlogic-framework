@@ -22,13 +22,14 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * 区间运算支持数字型、日期型、时间型和日期时间型
@@ -51,6 +52,17 @@ public class between {
                         valueBefore = range[0];
                         valueAfter = range[1];
                         return compare(dataValue, valueBefore, valueAfter, label);
+                    } else if (range.length == 1) {
+                        valueBefore = range[0];
+                        valueAfter = "";
+                        return compare(dataValue, valueBefore, valueAfter, label);
+                    } else {
+                        ApiRuntimeException error = new ConditionIsNullException(prefix);
+                        if (errorList != null) {
+                            errorList.add(error);
+                        } else {
+                            logger.warn(error.getMessage());
+                        }
                     }
                 }
             } else {
@@ -63,11 +75,6 @@ public class between {
                 return false;
             }
         }
-        ApiRuntimeException error = new ValueIsNullException(prefix);
-        if (errorList != null) {
-            errorList.add(error);
-        }
-        logger.warn(error.getMessage());
         return false;
     }
 
@@ -109,22 +116,43 @@ public class between {
                 Date transferValueBefore = null;
                 Date transferValueAfter = null;
                 if (StringUtils.isNotBlank(valueBefore)) {
-                    try {
-                        transferValueBefore = DateUtils.parseDate(valueBefore, format);
-                    } catch (Exception ignored) {
+                    if (isDate(valueBefore) || isDateTime(valueBefore) || isTime(valueBefore)) {
+                        try {
+                            transferValueBefore = DateUtils.parseDate(valueBefore, format);
+                        } catch (Exception ignored) {
 
+                        }
+                    } else if (isNumber(valueBefore)) {
+                        try {
+                            Calendar cal = Calendar.getInstance();
+                            cal.add(Calendar.DAY_OF_MONTH, -Integer.parseInt(valueBefore));
+                            transferValueBefore = cal.getTime();
+                        } catch (Exception ignored) {
+
+                        }
                     }
                 }
                 if (StringUtils.isNotBlank(valueAfter)) {
-                    try {
-                        transferValueAfter = DateUtils.parseDate(valueAfter, format);
-                    } catch (Exception ignored) {
+                    if (isDate(valueAfter) || isDateTime(valueAfter) || isTime(valueAfter)) {
+                        try {
+                            transferValueAfter = DateUtils.parseDate(valueAfter, format);
+                        } catch (Exception ignored) {
 
+                        }
+                    } else if (isNumber(valueAfter)) {
+                        try {
+                            Calendar cal = Calendar.getInstance();
+                            cal.add(Calendar.DAY_OF_MONTH, Integer.parseInt(valueAfter));
+                            transferValueAfter = cal.getTime();
+                        } catch (Exception ignored) {
+
+                        }
                     }
                 }
+                SimpleDateFormat sdf = new SimpleDateFormat(format);
                 if (transferValueBefore != null && transferValueAfter != null) {
                     if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
-                        ApiRuntimeException error = new ValueNotWithinRangeException(prefix, dataValue, valueBefore, valueAfter);
+                        ApiRuntimeException error = new ValueNotWithinRangeException(prefix, sdf.format(transferValue), sdf.format(transferValueBefore), sdf.format(transferValueAfter));
                         if (errorList != null) {
                             errorList.add(error);
                         }
@@ -134,7 +162,7 @@ public class between {
                     return true;
                 } else if (transferValueBefore != null) {
                     if (!transferValue.after(transferValueBefore)) {
-                        ApiRuntimeException error = new ValueNotAfterException(prefix, dataValue, valueBefore);
+                        ApiRuntimeException error = new ValueNotAfterException(prefix, sdf.format(transferValue), sdf.format(transferValueBefore));
                         if (errorList != null) {
                             errorList.add(error);
                         }
@@ -144,7 +172,7 @@ public class between {
                     return true;
                 } else if (transferValueAfter != null) {
                     if (!transferValue.before(transferValueAfter)) {
-                        ApiRuntimeException error = new ValueNotBeforeException(prefix, dataValue, valueAfter);
+                        ApiRuntimeException error = new ValueNotBeforeException(prefix, sdf.format(transferValue), sdf.format(transferValueAfter));
                         if (errorList != null) {
                             errorList.add(error);
                         }
@@ -160,32 +188,16 @@ public class between {
         return false;
     }
 
-    private static final Set<Character> numberCharSet = new HashSet<>();
-
-    static {
-        numberCharSet.add('0');
-        numberCharSet.add('1');
-        numberCharSet.add('2');
-        numberCharSet.add('3');
-        numberCharSet.add('4');
-        numberCharSet.add('5');
-        numberCharSet.add('6');
-        numberCharSet.add('7');
-        numberCharSet.add('8');
-        numberCharSet.add('9');
-        numberCharSet.add('.');
-    }
-
     private static boolean isNumber(String value) {
-        if (StringUtils.isNotBlank(value)) {
-            for (char c : value.toCharArray()) {
-                if (!numberCharSet.contains(c)) {
-                    return false;
-                }
-            }
-            return true;
+        if (StringUtils.isBlank(value)) {
+            return false;
         }
-        return false;
+        try {
+            new BigDecimal(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 

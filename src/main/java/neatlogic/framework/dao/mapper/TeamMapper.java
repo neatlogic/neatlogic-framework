@@ -77,6 +77,8 @@ public interface TeamMapper {
 
     List<TeamVo> getTeamByNameList(List<String> needSearchValue);
 
+    List<TeamVo> getTeamWithoutDeletedByNameList(List<String> needSearchValue);
+
     List<TeamVo> getTeamByUpwardNamePathList(List<String> needSearchValue);
 
     int checkTitleIsReferenceByTitleId(Long id);

@@ -90,6 +90,14 @@ public class LimitInterceptor implements Interceptor {
         if (limited) {
             return invocation.proceed();
         }
+        // 以 'show '、'explain '、'describe '、'desc '开头的查询语句不需要增加limit 10000
+        if (sql.trim().toLowerCase().startsWith("show ")
+                || sql.trim().toLowerCase().startsWith("explain ")
+                || sql.trim().toLowerCase().startsWith("describe ")
+                || sql.trim().toLowerCase().startsWith("desc ")
+        ) {
+            return invocation.proceed();
+        }
         //反射获取动态参数
         Map<String, Object> additionalParameters = new HashMap<>();
         try {

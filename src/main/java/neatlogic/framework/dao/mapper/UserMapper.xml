@@ -450,7 +450,8 @@
         WHERE `user_uuid` = #{userUuid}
     </select>
 
-    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="true">
+    <!-- 页面实时获取用户权限，不能使用缓存-->
+    <select id="searchUserAllAuthByUserAuth" resultType="neatlogic.framework.dto.UserAuthVo" useCache="false">
         SELECT
         `auth_group` AS authGroup,
         `auth`

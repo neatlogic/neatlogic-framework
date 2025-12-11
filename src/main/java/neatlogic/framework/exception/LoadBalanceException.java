@@ -26,6 +26,6 @@ public class LoadBalanceException extends ApiRuntimeException {
     private static final long serialVersionUID = -260889166393833441L;
 
     public LoadBalanceException(int sourceServerId, int targetServerId){
-        super("后端节点漂移，权限服务器ID“{0}”，当前服务器ID“{1}”,请联系管理员！",sourceServerId,targetServerId);
+        super("nfe.loadbalanceexception.loadbalanceexception",sourceServerId,targetServerId);
     }
 }

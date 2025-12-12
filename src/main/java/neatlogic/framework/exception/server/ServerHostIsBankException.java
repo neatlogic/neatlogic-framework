@@ -17,6 +17,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class ServerHostIsBankException extends ApiRuntimeException {
 
     public ServerHostIsBankException(Integer serverId) {
-        super("serverId为{0}的应用服务器的服务器地址为空，请到服务器管理页设置", serverId);
+        super("serverId为{0}的应用服务器的服务器地址为空，请到系统配置->服务节点状态页面设置", serverId);
     }
 }

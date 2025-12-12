@@ -157,7 +157,7 @@
     <appender name="tagentRegisterAndNettyAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${log4j.home}/tagentRegisterAndNetty.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${log4j.home}/tagentRegisterAndNetty.%i</FileNamePattern>
+            <FileNamePattern>${log4j.home}/tagentRegisterAndNetty.log.%i</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>5</MaxIndex>
         </rollingPolicy>
@@ -191,7 +191,7 @@
     <appender name="MethodTimingAspectAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${log4j.home}/methodTimingAspect.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${log4j.home}/methodTimingAspect.%i</FileNamePattern>
+            <FileNamePattern>${log4j.home}/methodTimingAspect.log.%i</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>5</MaxIndex>
         </rollingPolicy>
@@ -340,7 +340,7 @@
     <appender name="AutoexecProcessAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${log4j.home}/process.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${LOG_HOME}/process.%i</FileNamePattern>
+            <FileNamePattern>${LOG_HOME}/process.log.%i</FileNamePattern>
             <MinIndex>1</MinIndex>
             <MaxIndex>5</MaxIndex>
         </rollingPolicy>

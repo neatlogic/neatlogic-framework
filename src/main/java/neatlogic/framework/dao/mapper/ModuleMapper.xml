@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.ModuleMapper">
-    <!--<cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache" flushInterval="300000" size="10"></cache>-->
 
     <select id="getModuleGroupListByTenantUuid" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT tm.module_group

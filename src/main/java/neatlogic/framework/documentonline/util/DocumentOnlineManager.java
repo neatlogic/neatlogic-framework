@@ -45,6 +45,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.*;
@@ -176,8 +177,7 @@ public class DocumentOnlineManager {
                     }
                     String path = resource.getURL().toString();
                     mdResourceURLList.add(path);
-                    int separatorIndex = path.lastIndexOf("/neatlogic/resources/");
-                    String filePath = path.substring(separatorIndex + 1);
+                    String filePath = DocumentOnlineManager.getWithinJarAbsoluteFilePathByURL(resource.getURL());
                     if (existingFilePathList.contains(filePath)) {
                         logger.error($.t("nmfs.documentonlineinitializeindexhandler.executeforalltenant.error", filePath));
                         System.exit(1);
@@ -446,6 +446,21 @@ public class DocumentOnlineManager {
         return directory;
     }
 
+    public static String getResourceLocationPatternByFilePath(String filePath) {
+        String locationPattern = null;
+        if (filePath.startsWith("jar:file:")) {
+            locationPattern = filePath;
+        } else {
+            locationPattern = "classpath:" + filePath;
+        }
+        return locationPattern;
+    }
+
+    public static String getWithinJarAbsoluteFilePathByURL(URL url) {
+        String path = url.toString();
+        int separatorIndex = path.lastIndexOf("/neatlogic/resources/");
+        return path.substring(separatorIndex + 1);
+    }
 
     /**
      * 从war包外部加载在线文档

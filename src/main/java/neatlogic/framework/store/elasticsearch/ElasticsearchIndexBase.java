@@ -23,7 +23,6 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.dto.ElasticsearchVo;
-import neatlogic.framework.dto.elasticsearch.IndexResultHighlightVo;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchCreateDocumentException;
@@ -32,7 +31,6 @@ import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMap
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo;
 import neatlogic.framework.fulltextindex.enums.FullTextIndexHandlerType;
 import neatlogic.framework.fulltextindex.enums.Status;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,28 +242,22 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     @Override
     public final long searchDocumentCount(T targetVo) {
-        // 构建查询
         Query queryBuilder = this.myBuildQuery(targetVo);
-
-        // 执行搜索
         ElasticsearchClient client = ElasticsearchClientFactory.getClient();
 
-        // 创建搜索请求总数
-        SearchRequest requestCount = new SearchRequest.Builder()
-                .index(this.getIndexName())
-                .query(queryBuilder) // 搜索条件
-                .size(0)      // 设置 size 为 0，仅获取总量
-                .build();
-
         try {
-            SearchResponse<Object> responseCount = client.search(requestCount, Object.class);
-            return responseCount.hits().total().value();
+            CountResponse resp = client.count(c -> c
+                    .index(this.getIndexName())
+                    .query(queryBuilder)
+            );
+            return resp.count();
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return 0;
         }
     }
 
+    /*
     @Override
     public final IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize) {
 
@@ -339,6 +331,59 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                 }
             }
             resultVo.setHighlightList(highlightList);
+            resultVo.setIdList(idList);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        return resultVo;
+    }*/
+
+    @Override
+    public final IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize) {
+
+        // 构建查询
+        Query queryBuilder = this.myBuildQuery(targetVo);
+
+        // 执行搜索
+        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+
+
+        IndexResultVo resultVo = new IndexResultVo();
+        if (this.needPage(targetVo)) {
+            resultVo.setCurrentPage(currentPage);
+            resultVo.setPageSize(pageSize);
+        }
+        try {
+            SearchRequest.Builder builder = new SearchRequest.Builder()
+                    .index(this.getIndexName())
+                    .source(s -> s.fetch(false))        // 不返回 _source
+                    .fields(f -> f.field("id"));       //只取id字段
+            //.trackTotalHits(th -> th.enabled(true)); // 加上可以突破10000的限制
+
+            if (queryBuilder != null) {
+                builder.query(queryBuilder);
+            }
+
+            //排序
+            this.mySortQuery(builder, targetVo);
+
+            if (this.needPage(targetVo)) {
+                builder.from(resultVo.getStartNum())
+                        .size(resultVo.getPageSize());
+            } else {
+                builder.size(100);
+            }
+
+            SearchResponse<Void> response = client.search(builder.build(), Void.class);
+
+            long total = (response.hits().total() == null) ? 0L : response.hits().total().value();
+            resultVo.setRowNum((int) total);
+
+            // 提取符合条件的 id 列表
+            List<String> idList = new ArrayList<>();
+            for (Hit<Void> hit : response.hits().hits()) {
+                idList.add(hit.id());
+            }
             resultVo.setIdList(idList);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

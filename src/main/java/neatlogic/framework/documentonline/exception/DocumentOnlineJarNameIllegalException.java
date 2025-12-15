@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2025  TechSure Co., Ltd.  All Rights Reserved.
  * This file is part of the NeatLogic software.
  * Licensed under the NeatLogic Sustainable Use License (NSUL), Version 4.x – 2025.
@@ -7,21 +6,16 @@
  * See the LICENSE file distributed with this work for the full license text.
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *
  */
 
-package neatlogic.framework.documentonline.crossover;
+package neatlogic.framework.documentonline.exception;
 
-import neatlogic.framework.crossover.ICrossoverService;
-import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 
-import java.util.List;
+public class DocumentOnlineJarNameIllegalException extends ApiRuntimeException {
 
-public interface IDocumentOnlineCrossoverMapper extends ICrossoverService {
+    public DocumentOnlineJarNameIllegalException(String name) {
+        super("nfde.documentonlinejarnameillegalexception.documentonlinejarnameillegalexception", name);
+    }
 
-    List<DocumentOnlineConfigVo> getAllDocumentOnlineConfigList();
-
-    int insertDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);
-
-    int deleteDocumentOnlineConfig(DocumentOnlineConfigVo documentOnlineConfigVo);
 }

@@ -16,7 +16,6 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.util.$;
 
 public class ApiRuntimeException extends RuntimeException {
-    private static final long serialVersionUID = 9206337410118158624L;
     private String errorCode;
 
     private JSONObject param;

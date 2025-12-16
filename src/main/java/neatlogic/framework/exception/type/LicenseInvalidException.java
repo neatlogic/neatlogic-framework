@@ -21,4 +21,7 @@ public class LicenseInvalidException extends ApiRuntimeException {
         super("nfet.licenseinvalidexception.licenseinvalidexception", moduleId);
     }
 
+    public LicenseInvalidException() {
+        super("nfet.licenseinvalidexception.licenseinvalidexceptiona");
+    }
 }

@@ -588,6 +588,24 @@ public class Config {
         return false;
     }
 
+    /**
+     * 主动刷新本地配置文件
+     */
+    public synchronized void reloadLocalConfig() {
+        Properties prop = new Properties();
+        try (InputStream in =
+                     Objects.requireNonNull(
+                             Config.class.getClassLoader()
+                                     .getResourceAsStream(CONFIG_FILE))) {
+
+            prop.load(new InputStreamReader(in, StandardCharsets.UTF_8));
+            logger.info("Reload local config.properties manually");
+            loadNacosProperties(prop);
+        } catch (IOException e) {
+            logger.error("Reload local config failed", e);
+        }
+    }
+
     @PostConstruct
     public void init() {
         try {

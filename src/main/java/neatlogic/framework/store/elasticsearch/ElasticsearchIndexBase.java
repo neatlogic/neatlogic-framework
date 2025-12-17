@@ -356,8 +356,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
         try {
             SearchRequest.Builder builder = new SearchRequest.Builder()
                     .index(this.getIndexName())
-                    .source(s -> s.fetch(false))        // 不返回 _source
-                    .fields(f -> f.field("id"));       //只取id字段
+                    .source(s -> s.fetch(false));//不返回 _source
             //.trackTotalHits(th -> th.enabled(true)); // 加上可以突破10000的限制
 
             if (queryBuilder != null) {

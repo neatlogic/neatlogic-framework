@@ -77,7 +77,7 @@ public class BasePageVo implements Serializable {
 
     @EntityField(name = "最大分页", type = ApiParamType.INTEGER)
     @JSONField(serialize = false)
-    private int maxPageSize = 500;
+    private int maxPageSize = 1000;
     @EntityField(name = "最大限制数，用于拦截", type = ApiParamType.LONG)
     private int policyLimit;
     @JSONField(serialize = false)

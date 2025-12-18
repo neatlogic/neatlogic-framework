@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class SheetBuilder {
     private final String id;
@@ -185,7 +184,11 @@ public class SheetBuilder {
     }
 
     public void addData(Map<String, Object> dataMap) {
-        Map<String, DataCell> dataCellMap = dataMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new DataCell(entry.getValue())));
+        //Map<String, DataCell> dataCellMap = dataMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new DataCell(entry.getValue())));
+        Map<String, DataCell> dataCellMap = new HashMap<>(dataMap.size() * 2);
+        for (Map.Entry<String, Object> e : dataMap.entrySet()) {
+            dataCellMap.put(e.getKey(), new DataCell(e.getValue()));
+        }
         this.addDataCell(dataCellMap);
     }
 
@@ -268,7 +271,11 @@ public class SheetBuilder {
     public void addDataList(List<Map<String, Object>> dataMapList) {
         if (CollectionUtils.isNotEmpty(dataMapList)) {
             for (Map<String, Object> dataMap : dataMapList) {
-                Map<String, DataCell> dataCellMap = dataMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new DataCell(entry.getValue())));
+                //Map<String, DataCell> dataCellMap = dataMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> new DataCell(entry.getValue())));
+                Map<String, DataCell> dataCellMap = new HashMap<>(dataMap.size() * 2);
+                for (Map.Entry<String, Object> e : dataMap.entrySet()) {
+                    dataCellMap.put(e.getKey(), new DataCell(e.getValue()));
+                }
                 this.addDataCell(dataCellMap);
             }
             //dataMapList.forEach(this::addData);

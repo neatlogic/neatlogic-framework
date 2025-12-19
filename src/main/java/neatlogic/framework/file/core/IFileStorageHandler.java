@@ -22,7 +22,17 @@ public interface IFileStorageHandler {
 
     String saveData(String tenantUuid, InputStream inputStream, FileVo file) throws Exception;
 
-    InputStream getData(String path) throws Exception;
+    /**
+     * 上传文件到固定路径
+     * @param inputStream 流
+     * @param contentType 文件类型
+     * @param filePath 目标路径
+     * @return
+     * @throws Exception
+     */
+    String saveData(InputStream inputStream, String contentType, String filePath) throws Exception;
+
+    InputStream getData(String filePath) throws Exception;
 
     void deleteData(String filePath) throws Exception;
 

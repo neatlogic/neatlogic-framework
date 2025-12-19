@@ -507,48 +507,57 @@ public class Config {
     public static Properties properties = new Properties();
 
     private void initConfigFile() {
-        try {
-            StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
-            BufferedReader br;
-            try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {
-                if (is != null) {
-                    try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
-                        br = new BufferedReader(in);
-                        String inLine = "";
-                        while ((inLine = br.readLine()) != null) {
-                            sid.append(inLine);
-                        }
-                    }
-                } else {
-                    String classpath = System.getenv("CLASSPATH");
-                    String[] split = classpath.split(":");
-                    System.out.println("配置文件目录：" + split[0]);
-                    File file = new File(split[0] + File.separator + SERVER_ID_FILE);
-                    if (!file.getParentFile().exists()) {
-                        file.getParentFile().mkdirs();
-                    }
-                    file.createNewFile();
-                    try (FileWriter fw = new FileWriter(file)) {
-                        Random random = new Random();
-                        int i = random.nextInt();
-                        if (i < 0) {
-                            i = Math.abs(i);
-                        }
-                        sid.append(i);
-                        fw.write(sid.toString());
-                        fw.flush();
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
-            } catch (Exception e) {
-                // logger.error(e.getMessage(), e);
+        //本地开发测试多节点
+        if (StringUtils.isNotBlank(System.getProperty("serverId"))) {
+            try {
+                SCHEDULE_SERVER_ID = Integer.parseInt(System.getProperty("serverId"));
+            } catch (Exception ex) {
+                SCHEDULE_SERVER_ID = 9999;
             }
-            SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
-        } catch (Exception ex) {
-            logger.error("【缺少服务唯一标识】请在classpath所在目录创建文件：" + SERVER_ID_FILE + "，并填入一个正整数，正常启动后不要随意修改此数字，如果采用多活方式部署，唯一标识不能重复。");
-            System.out.println("【缺少服务唯一标识】请在classpath所在目录创建文件：" + SERVER_ID_FILE + "，并填入一个正整数，正常启动后不要随意修改此数字，如果采用多活方式部署，唯一标识不能重复。");
-            throw ex;
+        } else {
+            try {
+                StringBuilder sid = new StringBuilder(StringUtils.EMPTY);
+                BufferedReader br;
+                try (InputStream is = Config.class.getClassLoader().getResourceAsStream(SERVER_ID_FILE);) {
+                    if (is != null) {
+                        try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);) {
+                            br = new BufferedReader(in);
+                            String inLine = "";
+                            while ((inLine = br.readLine()) != null) {
+                                sid.append(inLine);
+                            }
+                        }
+                    } else {
+                        String classpath = System.getenv("CLASSPATH");
+                        String[] split = classpath.split(":");
+                        System.out.println("配置文件目录：" + split[0]);
+                        File file = new File(split[0] + File.separator + SERVER_ID_FILE);
+                        if (!file.getParentFile().exists()) {
+                            file.getParentFile().mkdirs();
+                        }
+                        file.createNewFile();
+                        try (FileWriter fw = new FileWriter(file)) {
+                            Random random = new Random();
+                            int i = random.nextInt();
+                            if (i < 0) {
+                                i = Math.abs(i);
+                            }
+                            sid.append(i);
+                            fw.write(sid.toString());
+                            fw.flush();
+                        } catch (Exception e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                    }
+                } catch (Exception e) {
+                    // logger.error(e.getMessage(), e);
+                }
+                SCHEDULE_SERVER_ID = Integer.parseInt(sid.toString());
+            } catch (Exception ex) {
+                logger.error("【缺少服务唯一标识】请在classpath所在目录创建文件：" + SERVER_ID_FILE + "，并填入一个正整数，正常启动后不要随意修改此数字，如果采用多活方式部署，唯一标识不能重复。");
+                System.out.println("【缺少服务唯一标识】请在classpath所在目录创建文件：" + SERVER_ID_FILE + "，并填入一个正整数，正常启动后不要随意修改此数字，如果采用多活方式部署，唯一标识不能重复。");
+                throw ex;
+            }
         }
 
 //        try {

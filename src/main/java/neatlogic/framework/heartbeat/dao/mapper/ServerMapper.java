@@ -13,7 +13,9 @@ public interface ServerMapper {
     //SELECT
     List<Integer> getInactivatedServerIdList(@Param("fromServerId") int fromServerId, @Param("threshold") int threshold);
 
-    ServerClusterVo getServerByServerId(Integer serverId);
+    ServerClusterVo getServerLockByServerId(Integer serverId);
+
+    List<ServerClusterVo> getOtherStartUpServerByServerId(Integer serverId);
 
     List<ServerClusterVo> getAllServerList();
 

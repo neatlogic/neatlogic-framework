@@ -8,7 +8,7 @@
           AND `counter` >= #{threshold}
     </select>
 
-    <select id="getServerByServerId" parameterType="java.lang.Integer" useCache="false"
+    <select id="getServerLockByServerId" parameterType="java.lang.Integer" useCache="false"
             resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
         SELECT `host`,
                `server_id` AS serverId,
@@ -18,6 +18,16 @@
         WHERE `server_id` = #{serverId}
             FOR
         UPDATE
+    </select>
+
+    <select id="getOtherStartUpServerByServerId" parameterType="java.lang.Integer" useCache="false"
+            resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
+        SELECT `host`,
+               `server_id` AS serverId,
+               `status`,
+               `ip`
+        FROM server_status
+        WHERE `server_id` != #{serverId} and `status` = 'startup'
     </select>
 
     <select id="getAllServerList" useCache="true" resultType="neatlogic.framework.heartbeat.dto.ServerClusterVo">

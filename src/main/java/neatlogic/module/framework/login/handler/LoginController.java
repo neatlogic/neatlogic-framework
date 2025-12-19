@@ -26,6 +26,7 @@ import neatlogic.framework.common.ReturnJson;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.util.CommonUtil;
+import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.*;
@@ -147,6 +148,7 @@ public class LoginController {
                     LoginAuditVo loginAuditVo = new LoginAuditVo();
                     loginAuditVo.setId(SnowflakeUtil.uniqueLong());
                     loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                    loginAuditVo.setIp(IpUtil.getIpAddr(request));
                     loginAuditVo.setLoginMethod("maintenance");
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
@@ -157,6 +159,7 @@ public class LoginController {
                         LoginAuditVo loginAuditVo = new LoginAuditVo();
                         loginAuditVo.setId(SnowflakeUtil.uniqueLong());
                         loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                        loginAuditVo.setIp(IpUtil.getIpAddr(request));
                         loginAuditVo.setLoginMethod("noSecret");
                         loginMapper.insertLoginAudit(loginAuditVo);
                     }

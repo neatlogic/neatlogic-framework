@@ -315,9 +315,6 @@ public class Config {
     }
 
     public static String AUDIT_HOME() {
-        if (AUDIT_HOME == null) {
-            AUDIT_HOME = DATA_HOME();
-        }
         if (!AUDIT_HOME.endsWith(File.separator)) {
             AUDIT_HOME += File.separator;
         }
@@ -641,7 +638,7 @@ public class Config {
         try {
             SCHEDULE_SERVER_ID_CHECK_ENABLE = Integer.parseInt(prop.getProperty("schedule.serverid.check.enable", "1"));
             DATA_HOME = prop.getProperty("data.home", "/app/data");
-            AUDIT_HOME = prop.getProperty("audit.home");
+            AUDIT_HOME = prop.getProperty("audit.home", "/app/logs/audit");
             SERVER_HEARTBEAT_RATE = Integer.parseInt(prop.getProperty("heartbeat.rate", "60"));
             SERVER_HEARTBEAT_THRESHOLD = Integer.parseInt(prop.getProperty("heartbeat.threshold", "3"));
             MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "60"));

@@ -14,6 +14,7 @@ package neatlogic.framework.filter.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
@@ -145,6 +146,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     LoginAuditVo loginAuditVo = new LoginAuditVo();
                     loginAuditVo.setId(SnowflakeUtil.uniqueLong());
                     loginAuditVo.setUserUuid(userVo.getUuid());
+                    loginAuditVo.setIp(RequestContext.get().getRemoteAddr());
                     loginAuditVo.setLoginMethod(this.getType());
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
@@ -331,6 +333,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 LoginAuditVo loginAuditVo = new LoginAuditVo();
                 loginAuditVo.setId(SnowflakeUtil.uniqueLong());
                 loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                loginAuditVo.setIp(RequestContext.get().getRemoteAddr());
                 loginAuditVo.setLoginMethod(getType());
                 loginMapper.insertLoginAudit(loginAuditVo);
             }

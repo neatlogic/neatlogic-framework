@@ -59,6 +59,7 @@
         SELECT
             a.`id`,
             a.`user_uuid` AS userUuid,
+            a.`ip`,
             a.`login_time` AS loginTime,
             a.`login_method` AS loginMethod
         FROM `login_audit` a
@@ -71,6 +72,8 @@
                 b.`uuid` = #{keyword}
                 OR b.`user_id` = #{keyword}
                 OR b.`user_name` LIKE CONCAT(#{keyword}, '%')
+                OR a.`ip` LIKE CONCAT(#{keyword}, '%')
+                OR a.`login_method` LIKE CONCAT(#{keyword}, '%')
             )
             </if>
             <if test="startTime != null and endTime != null">
@@ -98,8 +101,8 @@
     </insert>
 
     <insert id="insertLoginAudit" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditVo">
-        INSERT INTO `login_audit`(`id`, `user_uuid`, `login_time`, `login_method`)
-        VALUES (#{id}, #{userUuid}, NOW(3), #{loginMethod})
+        INSERT INTO `login_audit`(`id`, `user_uuid`, `ip`, `login_time`, `login_method`)
+        VALUES (#{id}, #{userUuid}, #{ip}, NOW(3), #{loginMethod})
     </insert>
 
     <delete id="deleteLoginCaptchaBySessionId">

@@ -9,6 +9,7 @@ public class LoginAuditVo implements Serializable {
     private static final long serialVersionUID = -977868375722886386L;
     private Long id;
     private String userUuid;
+    private String ip;
     private Date loginTime;
     private String loginMethod;
 
@@ -26,6 +27,14 @@ public class LoginAuditVo implements Serializable {
 
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 
     public Date getLoginTime() {

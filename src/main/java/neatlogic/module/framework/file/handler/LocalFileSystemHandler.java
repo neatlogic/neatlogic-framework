@@ -40,25 +40,53 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
 
     @Override
     public String saveData(String tenantUuid, InputStream inputStream, FileVo fileParam) throws Exception {
+//        SimpleDateFormat format = new SimpleDateFormat("yyyy" + File.separator + "MM" + File.separator + "dd");
+//        String filePath = tenantUuid + File.separator + fileParam.getType() + File.separator + format.format(new Date()) + File.separator + fileParam.getPathName();
+//        String finalPath = Config.DATA_HOME() + filePath;
+//        File file = new File(finalPath);
+//        if (!file.getParentFile().exists()) {
+//            file.getParentFile().mkdirs();
+//        }
+//        FileOutputStream fos = new FileOutputStream(file);
+//        IOUtils.copyLarge(inputStream, fos);
+//        fos.flush();
+//        fos.close();
+////		fileVo.setPath("file:" + filePath);
+//        return LocalFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
         SimpleDateFormat format = new SimpleDateFormat("yyyy" + File.separator + "MM" + File.separator + "dd");
         String filePath = tenantUuid + File.separator + fileParam.getType() + File.separator + format.format(new Date()) + File.separator + fileParam.getPathName();
-        String finalPath = Config.DATA_HOME() + filePath;
-        File file = new File(finalPath);
+        filePath = Config.DATA_HOME() + filePath;
+        return saveData(inputStream, fileParam.getContentType(), filePath);
+    }
+
+    /**
+     * 上传文件到固定路径
+     *
+     * @param inputStream 流
+     * @param contentType 文件类型
+     * @param filePath    目标路径
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public String saveData(InputStream inputStream, String contentType, String filePath) throws Exception {
+        File file = new File(filePath);
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-        FileOutputStream fos = new FileOutputStream(file);
-        IOUtils.copyLarge(inputStream, fos);
-        fos.flush();
-        fos.close();
-//		fileVo.setPath("file:" + filePath);
-        return LocalFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            IOUtils.copyLarge(inputStream, fos);
+            fos.flush();
+        }
+        return LocalFileSystemHandler.NAME.toLowerCase() + ":" + filePath;
     }
 
     @Override
-    public InputStream getData(String path) throws Exception {
+    public InputStream getData(String filePath) throws Exception {
         InputStream in = null;
-        File file = new File(path.substring(5));
+        filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+        filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+        File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             in = Files.newInputStream(file.toPath());
         }
@@ -67,7 +95,9 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
 
     @Override
     public void deleteData(String filePath) throws Exception {
-        if (StringUtils.isNotBlank(filePath) && filePath.startsWith(LocalFileSystemHandler.NAME.toLowerCase() + ":")) {
+        if (StringUtils.isNotBlank(filePath)) {
+            filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+            filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
             File file = new File(filePath.substring(5));
             if (file.exists()) {
                 file.delete();
@@ -80,7 +110,9 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
     @Override
     public long getDataLength(String filePath) {
         long length = 0;
-        File file = new File(filePath.substring(5));
+        filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+        filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+        File file = new File(filePath);
         if (file.exists() && file.isFile()) {
             length = file.length();
         }
@@ -89,7 +121,12 @@ public class LocalFileSystemHandler implements IFileStorageHandler {
 
     @Override
     public boolean isExit(String filePath) throws Exception {
-        File file = new File(filePath.substring(5));
-        return file.exists();
+        if (StringUtils.isNotBlank(filePath)) {
+            filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+            filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+            File file = new File(filePath);
+            return file.exists();
+        }
+        return false;
     }
 }

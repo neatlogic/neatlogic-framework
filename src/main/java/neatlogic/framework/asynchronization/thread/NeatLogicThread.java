@@ -44,6 +44,10 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
         return Integer.compare(this.priority, other.priority); // 优先级高的先出队,priority越小代表优先级越高
     }
 
+    public String getTenantUuid() {
+        return tenantUuid;
+    }
+
     public Semaphore getLock() {
         return lock;
     }

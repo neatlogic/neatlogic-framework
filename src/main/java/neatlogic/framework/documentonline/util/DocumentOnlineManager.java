@@ -15,11 +15,14 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.documentonline.crossover.IDocumentOnlineCrossoverMapper;
 import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
 import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.dto.DocumentOnlineVo;
+import neatlogic.framework.documentonline.exception.DocumentOnlineJarNameIllegalException;
+import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.HtmlUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,17 +45,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.web.multipart.MultipartFile;
 import org.wltea.analyzer.lucene.IKAnalyzer;
 
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
 public class DocumentOnlineManager {
 
     private final static Logger logger = LoggerFactory.getLogger(DocumentOnlineManager.class);
+
+    private static final String COMMERCIAL_JAR_NAME_PREFIX = "neatlogic-document-online-commercial";
+
+    private static final String COMMUNITY_JAR_NAME_PREFIX = "neatlogic-document-online";
+
+    private static final String SUFFIX = ".jar";
+
     /**
      * War包外部在线帮助文档Jar包目录
      */
@@ -467,22 +480,63 @@ public class DocumentOnlineManager {
      * @return
      */
     public static JSONObject LoadDocumentsOutsideWar() {
-        List<String> mappingJsonLocationPatternList = new ArrayList<>();
-        List<String> mdFileLocationPatternList = new ArrayList<>();
-        String classpathRoot = Config.DATA_HOME() + OUTSIDE_WAR_DOCUMENTS_ONLINE_JARS;
-        File documentOnlineHome = new File(classpathRoot);
-        if (documentOnlineHome.exists()) {
+        String documentOnlineHomeDirPath = Config.DATA_HOME() + OUTSIDE_WAR_DOCUMENTS_ONLINE_JARS;
+        File documentOnlineHome = new File(documentOnlineHomeDirPath);
+        if (!documentOnlineHome.exists()) {
+            if (!documentOnlineHome.mkdirs()) {
+                throw new RuntimeException("没有创建文件(" + documentOnlineHomeDirPath + ")权限");
+            }
+        }
+        {
             File[] listFiles = documentOnlineHome.listFiles();
             if (listFiles != null) {
+                List<String> filePathList = new ArrayList<>();
+                filePathList.add(new File(documentOnlineHomeDirPath + "/" + COMMERCIAL_JAR_NAME_PREFIX + SUFFIX).getPath());
+                filePathList.add(new File(documentOnlineHomeDirPath + "/" + COMMUNITY_JAR_NAME_PREFIX + SUFFIX).getPath());
                 for (File file : listFiles) {
-                    mappingJsonLocationPatternList.add("jar:file:" + classpathRoot + "/" + file.getName() + "!/neatlogic/**/documentonline-mapping.json");
-                    mdFileLocationPatternList.add("jar:file:" + classpathRoot + "/" +  file.getName() + "!/neatlogic/**/*.md");
+                    if (!filePathList.contains(file.getPath())) {
+                        boolean delete = file.delete();
+                    }
                 }
-                // 先查询出数据库中数据
-                IDocumentOnlineCrossoverMapper documentOnlineCrossoverMapper = CrossoverServiceFactory.getApi(IDocumentOnlineCrossoverMapper.class);
-                List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineCrossoverMapper.getAllDocumentOnlineConfigList();
-                return DocumentOnlineManager.initializeIndex(documentOnlineConfigList, mappingJsonLocationPatternList, mdFileLocationPatternList);
             }
+        }
+        try {
+            List<String> filePathList = new ArrayList<>();
+            filePathList.add(documentOnlineHomeDirPath + "/" + COMMERCIAL_JAR_NAME_PREFIX + SUFFIX);
+            filePathList.add(documentOnlineHomeDirPath + "/" + COMMUNITY_JAR_NAME_PREFIX + SUFFIX);
+            for (String filePath : filePathList) {
+                boolean exists = FileUtil.exists(Config.FILE_HANDLER() + ":" + filePath);
+                if (exists) {
+                    Path targetPath = Paths.get(filePath);
+                    File file = targetPath.toFile();
+                    if (file.exists()) {
+                        long dataLength = FileUtil.getDataLength(Config.FILE_HANDLER() + ":" + filePath);
+                        if (dataLength == file.length()) {
+                            continue;
+                        } else {
+                            boolean delete = file.delete();
+                        }
+                    }
+                    try (InputStream inputStream = FileUtil.getData(Config.FILE_HANDLER() + ":" + filePath)) {
+                        long length = Files.copy(inputStream, targetPath);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+        List<String> mappingJsonLocationPatternList = new ArrayList<>();
+        List<String> mdFileLocationPatternList = new ArrayList<>();
+        File[] listFiles = documentOnlineHome.listFiles();
+        if (listFiles != null) {
+            for (File file : listFiles) {
+                mappingJsonLocationPatternList.add("jar:file:" + documentOnlineHomeDirPath + "/" + file.getName() + "!/neatlogic/**/documentonline-mapping.json");
+                mdFileLocationPatternList.add("jar:file:" + documentOnlineHomeDirPath + "/" +  file.getName() + "!/neatlogic/**/*.md");
+            }
+            // 先查询出数据库中数据
+            IDocumentOnlineCrossoverMapper documentOnlineCrossoverMapper = CrossoverServiceFactory.getApi(IDocumentOnlineCrossoverMapper.class);
+            List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineCrossoverMapper.getAllDocumentOnlineConfigList();
+            return DocumentOnlineManager.initializeIndex(documentOnlineConfigList, mappingJsonLocationPatternList, mdFileLocationPatternList);
         }
         return new JSONObject();
     }
@@ -499,5 +553,44 @@ public class DocumentOnlineManager {
         IDocumentOnlineCrossoverMapper documentOnlineCrossoverMapper = CrossoverServiceFactory.getApi(IDocumentOnlineCrossoverMapper.class);
         List<DocumentOnlineConfigVo> documentOnlineConfigList = documentOnlineCrossoverMapper.getAllDocumentOnlineConfigList();
         return DocumentOnlineManager.initializeIndex(documentOnlineConfigList, List.of(mappingJsonLocationPattern), List.of(mdFileLocationPattern));
+    }
+
+    public static JSONObject importJar(MultipartFile multipartFile) throws Exception {
+        String documentOnlineHomeDirPath = Config.DATA_HOME() + OUTSIDE_WAR_DOCUMENTS_ONLINE_JARS;
+        // neatlogic-document-online-0.4.0.0-SNAPSHOT.jar neatlogic-document-online-commercial-0.4.0.0-SNAPSHOT.jar
+        String oldFileName = multipartFile.getOriginalFilename();
+        if (StringUtils.isNotBlank(oldFileName) && oldFileName.endsWith(SUFFIX)) {
+            if (oldFileName.startsWith(COMMERCIAL_JAR_NAME_PREFIX)) {
+                JSONObject jsonObj = new JSONObject();
+                String filePath = documentOnlineHomeDirPath + "/" + COMMERCIAL_JAR_NAME_PREFIX + SUFFIX;
+                boolean exists = FileUtil.exists(Config.FILE_HANDLER() + ":" + filePath);
+                if (exists) {
+                    FileUtil.deleteData(Config.FILE_HANDLER() + ":" + filePath);
+                    jsonObj.put("exists", true);
+                }
+                try (InputStream inputStream = multipartFile.getInputStream()) {
+                    String path = FileUtil.saveData(inputStream, "application/zip", filePath);
+                    jsonObj.put("path", path);
+                }
+                return jsonObj;
+            } else if (oldFileName.startsWith(COMMUNITY_JAR_NAME_PREFIX)) {
+                JSONObject jsonObj = new JSONObject();
+                String filePath = documentOnlineHomeDirPath + "/" + COMMUNITY_JAR_NAME_PREFIX + SUFFIX;
+                boolean exists = FileUtil.exists(Config.FILE_HANDLER() + ":" + filePath);
+                if (exists) {
+                    FileUtil.deleteData(Config.FILE_HANDLER() + ":" + filePath);
+                    jsonObj.put("exists", true);
+                }
+                try (InputStream inputStream = multipartFile.getInputStream()) {
+                    String path = FileUtil.saveData(inputStream, "application/zip", filePath);
+                    jsonObj.put("path", path);
+                }
+                return jsonObj;
+            } else {
+                throw new DocumentOnlineJarNameIllegalException(oldFileName);
+            }
+        } else {
+            throw new DocumentOnlineJarNameIllegalException(oldFileName);
+        }
     }
 }

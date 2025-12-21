@@ -22,6 +22,7 @@ public class ThreadTaskVo {
     private String poolName;
     private String status;
     private int priority;
+    private String tenantUuid;
 
     public Long getId() {
         return id;
@@ -75,5 +76,13 @@ public class ThreadTaskVo {
 
     public void setPoolName(String poolName) {
         this.poolName = poolName;
+    }
+
+    public String getTenantUuid() {
+        return tenantUuid;
+    }
+
+    public void setTenantUuid(String tenantUuid) {
+        this.tenantUuid = tenantUuid;
     }
 }

@@ -18,6 +18,8 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     API_QPS("apiqps", null, "nfc.frameworktenantconfig.apiqps"),
     DISABLED_MODULEGROUPLIST("diabled.modulegrouplist", null,"nfc.frameworktenantconfig.disabledmodulegrouplist"),
     MOBILE_FILE_DOWNLOAD_ENABLED("mobile.file.download.enabled", "0","nfc.frameworktenantconfig.mobilefiledownloadenabled"),
+    LOGIN_LOCKED_FAILED_COUNT("login.locked.failed.count", "5","登录失败次数限制(次)。超过次数则锁定用户，无法登录，等自动解锁"),
+    LOGIN_LOCKED_TIME("login.locked.times.limit", "10","登录锁定时长(分钟)。锁定用户后，超过这个时间后才允许登录"),
     ;
 
     String key;

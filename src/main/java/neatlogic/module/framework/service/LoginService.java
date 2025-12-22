@@ -13,17 +13,8 @@
 package neatlogic.module.framework.service;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.dto.UserVo;
 
 public interface LoginService {
-    /**
-     * 通过账号密码校验用户
-     *
-     * @param userParam 登录入参
-     * @param resultJson 目前用于告知前端是否需要重新获取验证码，此处如果登录成功，则设置无需验证码
-     * @return 合法用户
-     */
-    UserVo loginWithUserIdAndPassword(UserVo userParam, JSONObject resultJson);
 
     /**
      * 验证码验证是否合法

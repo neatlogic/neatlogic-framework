@@ -18,10 +18,7 @@ package neatlogic.module.framework.service;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.LoginMapper;
-import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
-import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.exception.captcha.LoginCaptchaIsEmptyException;
 import neatlogic.framework.exception.captcha.LoginCaptchaNotInvalidException;
 import neatlogic.framework.util.CaptchaUtil;
@@ -37,28 +34,7 @@ import java.util.Objects;
 @Service
 public class LoginServiceImpl implements LoginService {
     @Resource
-    UserMapper userMapper;
-    @Resource
     LoginMapper loginMapper;
-
-    @Override
-    public UserVo loginWithUserIdAndPassword(UserVo userParam, JSONObject resultJson) {
-        UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userParam);
-        LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
-        if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
-            int failedCount = 1;
-            loginFailedCountVo = loginMapper.getLoginFailedCountVoByUserId(userParam.getUserId());
-            if (loginFailedCountVo != null) {
-                failedCount = loginFailedCountVo.getFailedCount();
-            }
-            loginFailedCountVo = new LoginFailedCountVo(userParam.getUserId(), failedCount);
-            loginMapper.updateLoginFailedCount(loginFailedCountVo);
-        } else {//如果正常用户登录成功，则清空该用户的失败次数
-            resultJson.remove("isNeedCaptcha");
-            loginMapper.deleteLoginFailedCountByUserId(userParam.getUserId());
-        }
-        return checkUserVo;
-    }
 
     @Override
     public void loginCaptchaValid(JSONObject jsonObj, JSONObject resultJson) {

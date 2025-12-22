@@ -19,6 +19,8 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.CommonUtil;
+import neatlogic.framework.config.ConfigManager;
+import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.AuthenticationInfoVo;
@@ -31,6 +33,7 @@ import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
@@ -41,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.transaction.TransactionStatus;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -49,10 +53,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 
 @DependsOn("loginService")
@@ -204,7 +207,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return jwtVo;
     }
 
-    public static String getToken(UserVo checkUserVo){
+    public static String getToken(UserVo checkUserVo) {
         Long tokenCreateTime = System.currentTimeMillis();
         //补充满足前缀的header
         Set<String> headerSet = new HashSet<>();
@@ -258,9 +261,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         UserSessionCache.removeItem(UserContext.get().getTokenHash());
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();
-        if(jwtVo != null){
+        if (jwtVo != null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
-            if(userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(),jwtVo.getTokenCreateTime())){
+            if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {
                 userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
             }
         }
@@ -315,25 +318,38 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Override
     public UserVo login(UserVo userVo, JSONObject resultJson) {
         UserVo checkUserVo = myLogin(userVo, resultJson);
-        LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
-        if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
-            int failedCount = 1;
-            loginFailedCountVo = loginMapper.getLoginFailedCountVoByUserId(userVo.getUserId());
-            if (loginFailedCountVo != null) {
-                failedCount = loginFailedCountVo.getFailedCount();
+        TransactionStatus tx = TransactionUtil.openTx();
+        try {
+            LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(checkUserVo.getUserId());
+            if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
+                int failedCount = 1;
+                Date lockedUtil = null;
+                if (loginFailedCountVo != null) {
+                    if (loginFailedCountVo.getFailedCount() + 1 > Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_FAILED_COUNT))) {
+                        lockedUtil = Date.from(
+                                Instant.now().plus(Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_TIME)), ChronoUnit.MINUTES)
+                        );
+                    }
+                    failedCount = loginFailedCountVo.getFailedCount();
+                }
+                Date lastFailedTime = Date.from(Instant.now());
+                loginFailedCountVo = new LoginFailedCountVo(userVo.getUserId(), failedCount+1, lockedUtil, lastFailedTime);
+                loginMapper.updateLoginFailedCount(loginFailedCountVo);
+            } else {//如果正常用户登录成功，则清空该用户的失败次数
+                resultJson.remove("isNeedCaptcha");
+                loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
+                if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
+                    LoginAuditVo loginAuditVo = new LoginAuditVo();
+                    loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+                    loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                    loginAuditVo.setLoginMethod(getType());
+                    loginMapper.insertLoginAudit(loginAuditVo);
+                }
             }
-            loginFailedCountVo = new LoginFailedCountVo(userVo.getUserId(), failedCount);
-            loginMapper.updateLoginFailedCount(loginFailedCountVo);
-        } else {//如果正常用户登录成功，则清空该用户的失败次数
-            resultJson.remove("isNeedCaptcha");
-            loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
-            if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
-                LoginAuditVo loginAuditVo = new LoginAuditVo();
-                loginAuditVo.setId(SnowflakeUtil.uniqueLong());
-                loginAuditVo.setUserUuid(checkUserVo.getUuid());
-                loginAuditVo.setLoginMethod(getType());
-                loginMapper.insertLoginAudit(loginAuditVo);
-            }
+            TransactionUtil.commitTx(tx);
+        } catch (Exception ex) {
+            TransactionUtil.rollbackTx(tx);
+            throw ex;
         }
         return checkUserVo;
     }

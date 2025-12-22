@@ -16,6 +16,7 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class LoginFailedCountVo implements Serializable {
     private static final long serialVersionUID = -1911666621870552499L;
@@ -23,8 +24,17 @@ public class LoginFailedCountVo implements Serializable {
     private String userId;
     @EntityField(name = "登录失败次数", type = ApiParamType.INTEGER)
     private Integer failedCount;
+    @EntityField(name = "最近一次登录失败时间", type = ApiParamType.INTEGER)
+    private Date lastFailedTime;
+    @EntityField(name = "自动解锁时间", type = ApiParamType.INTEGER)
+    private Date lockedUtil;
 
-    public LoginFailedCountVo() {
+    public LoginFailedCountVo(String userId, int failedCount, Date lockedUtil, Date lastFailedTime) {
+        this.failedCount = failedCount;
+        this.userId = userId;
+        this.lockedUtil = lockedUtil;
+        this.lastFailedTime = lastFailedTime;
+
     }
 
     public LoginFailedCountVo(String userId, int count) {
@@ -46,5 +56,21 @@ public class LoginFailedCountVo implements Serializable {
 
     public void setFailedCount(Integer failedCount) {
         this.failedCount = failedCount;
+    }
+
+    public Date getLastFailedTime() {
+        return lastFailedTime;
+    }
+
+    public void setLastFailedTime(Date lastFailedTime) {
+        this.lastFailedTime = lastFailedTime;
+    }
+
+    public Date getLockedUtil() {
+        return lockedUtil;
+    }
+
+    public void setLockedUtil(Date lockedUtil) {
+        this.lockedUtil = lockedUtil;
     }
 }

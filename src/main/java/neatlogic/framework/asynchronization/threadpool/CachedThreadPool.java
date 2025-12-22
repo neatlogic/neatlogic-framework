@@ -65,6 +65,7 @@ public class CachedThreadPool {
                 threadVo.setPoolName("main");
                 threadVo.setStartTime(new Date());
                 threadVo.setPriority(nt.getPriority());
+                threadVo.setTenantUuid(nt.getTenantUuid());
                 threadTaskMap.put(nt.getId(), threadVo);
                 threadSet.add(nt.getThreadName());
             }

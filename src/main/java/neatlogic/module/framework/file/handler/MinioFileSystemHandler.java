@@ -62,6 +62,53 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
      */
     @Override
     public String saveData(String tenantUuid, InputStream inputStream, FileVo fileParam) throws Exception {
+//        if (minioClient == null) {
+//            throw new FileStorageMediumHandlerNotFoundException("minio");
+//        }
+//        // 检查存储桶是否已经存在
+//        String bucket = Config.getConfigProperty("minio.bucket", "neatlogic");
+//        //boolean bucketExists = minioClient.bucketExists(Config.getConfigProperty("minio.bucket", "neatlogic"));
+//        boolean bucketExists =
+//                minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+//        if (!bucketExists) {
+//            // 创建一个名为bucketName的存储桶，用于存储照片等zip文件。
+//            //minioClient.makeBucket(Config.getConfigProperty("minio.bucket", "neatlogic"));
+//            minioClient.makeBucket(
+//                    MakeBucketArgs.builder().bucket(bucket).build()
+//            );
+//        }
+//
+//
+//        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
+//        String finalPath = "/" + tenantUuid + "/upload/" + fileParam.getType() + "/" + format.format(new Date()) + "/" + fileParam.getPathName();
+//        // 使用putObject上传一个文件到存储桶中
+//        //minioClient.putObject(Config.getConfigProperty("minio.bucket", "neatlogic"), finalPath, inputStream, fileParam.getContentType());
+//        minioClient.putObject(
+//                PutObjectArgs.builder()
+//                        .bucket(bucket)
+//                        .object(finalPath)
+//                        .stream(inputStream, inputStream.available(), -1)
+//                        .contentType(fileParam.getContentType())
+//                        .build());
+////		fileVo.setPath("minio:" + finalPath);
+//        return MinioFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
+        String finalPath = tenantUuid + "/upload/" + fileParam.getType() + "/" + format.format(new Date()) + "/" + fileParam.getPathName();
+        return saveData(inputStream, fileParam.getContentType(), finalPath);
+    }
+
+    /**
+     * 上传文件到固定路径
+     *
+     * @param inputStream 流
+     * @param contentType 文件类型
+     * @param filePath    目标路径
+     * @return
+     * @throws Exception
+     */
+    @Override
+    public String saveData(InputStream inputStream, String contentType, String filePath) throws Exception {
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
@@ -77,21 +124,19 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
                     MakeBucketArgs.builder().bucket(bucket).build()
             );
         }
-
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmm");
-        String finalPath = "/" + tenantUuid + "/upload/" + fileParam.getType() + "/" + format.format(new Date()) + "/" + fileParam.getPathName();
+        if (filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
         // 使用putObject上传一个文件到存储桶中
         //minioClient.putObject(Config.getConfigProperty("minio.bucket", "neatlogic"), finalPath, inputStream, fileParam.getContentType());
         minioClient.putObject(
                 PutObjectArgs.builder()
                         .bucket(bucket)
-                        .object(finalPath)
+                        .object(filePath)
                         .stream(inputStream, inputStream.available(), -1)
-                        .contentType(fileParam.getContentType())
+                        .contentType(contentType)
                         .build());
-//		fileVo.setPath("minio:" + finalPath);
-        return MinioFileSystemHandler.NAME.toLowerCase() + ":" + finalPath;
+        return MinioFileSystemHandler.NAME.toLowerCase() + ":" + filePath;
     }
 
     /**
@@ -103,11 +148,15 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
-        if (StringUtils.isNotBlank(filePath) && filePath.startsWith(NAME.toLowerCase() + ":")) {
-            String path = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+        if (StringUtils.isNotBlank(filePath)) {
+            filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+            filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+            if (filePath.startsWith("/")) {
+                filePath = filePath.substring(1);
+            }
             //minioClient.removeObject(Config.getConfigProperty("minio.bucket", "neatlogic"), path);
             minioClient.removeObject(RemoveObjectArgs.builder().bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
-                    .object(path).build());
+                    .object(filePath).build());
 
         } else {
             throw new FilePathIllegalException(filePath);
@@ -118,18 +167,23 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
     /**
      * 获取附件输入流
      *
-     * @param path 附件路径
+     * @param filePath 附件路径
      * @return 附件输入流
      */
     @Override
-    public InputStream getData(String path) throws Exception {
+    public InputStream getData(String filePath) throws Exception {
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
+        }
+        filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+        filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+        if (filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
         }
         //return minioClient.getObject(Config.getConfigProperty("minio.bucket", "neatlogic"), path.replaceAll(NAME.toLowerCase() + ":", ""));
         return minioClient.getObject(GetObjectArgs.builder()
                 .bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
-                .object(path.replaceAll(NAME.toLowerCase() + ":", "")).build()
+                .object(filePath).build()
         );
     }
 
@@ -138,9 +192,14 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
+        filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+        filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+        if (filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
         //return minioClient.statObject(Config.getConfigProperty("minio.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", "")).length();
         return minioClient.statObject(StatObjectArgs.builder().bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
-                .object(filePath.replaceAll(NAME.toLowerCase() + ":", "")).build()).size();
+                .object(filePath).build()).size();
     }
 
     @Override
@@ -148,10 +207,15 @@ public class MinioFileSystemHandler implements InitializingBean, IFileStorageHan
         if (minioClient == null) {
             throw new FileStorageMediumHandlerNotFoundException("minio");
         }
+        filePath = filePath.replaceAll(NAME.toLowerCase() + ":", "");
+        filePath = filePath.replaceAll(NAME.toUpperCase() + ":", "");
+        if (filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
         //minioClient.statObject(Config.getConfigProperty("minio.bucket", "neatlogic"), filePath.replaceAll(NAME.toLowerCase() + ":", ""));
         try {
             minioClient.statObject(StatObjectArgs.builder().bucket(Config.getConfigProperty("minio.bucket", "neatlogic"))
-                    .object(filePath.replaceAll(NAME.toLowerCase() + ":", "")).build());
+                    .object(filePath).build());
             return true;
         } catch (ErrorResponseException e) {
             if (e.errorResponse().code().equals("NoSuchKey")) {

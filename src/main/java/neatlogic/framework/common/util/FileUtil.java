@@ -53,8 +53,42 @@ public class FileUtil {
                 handler = FileStorageMediumFactory.getHandler("FILE");
                 filePath = handler.saveData(tenantUuid, inputStream, file);
             }
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
         }
         return filePath;
+    }
+
+    /**
+     * 根据storageMediumHandler获取存储介质Handler，从而上传到对应的存储介质中
+     *
+     * @param inputStream 文件流
+     * @param contentType 文件类型
+     * @param filePath 目标路径
+     * @return 附件路径
+     * @throws Exception 异常
+     */
+    public static String saveData(InputStream inputStream, String contentType, String filePath) throws Exception {
+        try {
+            IFileStorageHandler handler = FileStorageMediumFactory.getHandler(Config.FILE_HANDLER());
+            if (handler == null) {
+                throw new FileStorageMediumHandlerNotFoundException(Config.FILE_HANDLER());
+            }
+            return handler.saveData(inputStream, contentType, filePath);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            if (!Objects.equals(Config.FILE_HANDLER(), "FILE")) {
+                IFileStorageHandler handler = FileStorageMediumFactory.getHandler("FILE");
+                return handler.saveData(inputStream, contentType, filePath);
+            }
+        } finally {
+            if (inputStream != null) {
+                inputStream.close();
+            }
+        }
+        return null;
     }
 
     /**
@@ -112,4 +146,21 @@ public class FileUtil {
         return handler.getDataLength(filePath);
     }
 
+    /**
+     * 判断附件是否存在
+     * @param filePath 附件路径
+     * @return
+     * @throws Exception
+     */
+    public static boolean exists(String filePath) throws Exception {
+        if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
+            throw new FilePathIllegalException(filePath);
+        }
+        String prefix = filePath.split(":")[0];
+        IFileStorageHandler handler = FileStorageMediumFactory.getHandler(prefix);
+        if (handler == null) {
+            throw new FileStorageMediumHandlerNotFoundException(prefix);
+        }
+        return handler.isExit(filePath);
+    }
 }

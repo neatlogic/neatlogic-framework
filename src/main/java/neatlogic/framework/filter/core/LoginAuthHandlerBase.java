@@ -14,6 +14,8 @@ package neatlogic.framework.filter.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
@@ -152,6 +154,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     LoginAuditVo loginAuditVo = new LoginAuditVo();
                     loginAuditVo.setId(SnowflakeUtil.uniqueLong());
                     loginAuditVo.setUserUuid(userVo.getUuid());
+                    loginAuditVo.setIp(RequestContext.get().getRemoteAddr());
                     loginAuditVo.setLoginMethod(this.getType());
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
@@ -211,7 +214,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return jwtVo;
     }
 
-    public static String getToken(UserVo checkUserVo) {
+    public static String getToken(UserVo checkUserVo){
         Long tokenCreateTime = System.currentTimeMillis();
         //补充满足前缀的header
         Set<String> headerSet = new HashSet<>();
@@ -265,9 +268,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         UserSessionCache.removeItem(UserContext.get().getTokenHash());
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();
-        if (jwtVo != null) {
+        if(jwtVo != null){
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
-            if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {
+            if(userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(),jwtVo.getTokenCreateTime())){
                 userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
             }
         }
@@ -327,12 +330,12 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             LoginAuditVo loginAuditVo = new LoginAuditVo();
             loginAuditVo.setId(SnowflakeUtil.uniqueLong());
             loginAuditVo.setUserUuid(checkUserVo.getUuid());
+            loginAuditVo.setIp(RequestContext.get().getRemoteAddr());
             loginAuditVo.setLoginMethod(getType());
             loginMapper.insertLoginAudit(loginAuditVo);
         }
         return checkUserVo;
     }
-
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
         return userMapper.getUserByUserIdAndPassword(userVo);

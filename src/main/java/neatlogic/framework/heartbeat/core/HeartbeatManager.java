@@ -73,7 +73,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     ip = userFunctionValue;
                 }
             }
-            ServerClusterVo serverVo = serverMapper.getServerByServerId(Config.SCHEDULE_SERVER_ID);
+            ServerClusterVo serverVo = serverMapper.getServerLockByServerId(Config.SCHEDULE_SERVER_ID);
             if (serverVo != null && StringUtils.isNotBlank(serverVo.getIp())) {
                 if (!Objects.equals(serverVo.getIp(), ip)) {
                     System.err.println($.t("nfhc.heartbeatmanager.myinit.startupfailureprompt", Config.SCHEDULE_SERVER_ID, serverVo.getIp()));
@@ -150,7 +150,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         boolean returnVal = false;
         try {
-            ServerClusterVo serverVo = serverMapper.getServerByServerId(serverId);
+            ServerClusterVo serverVo = serverMapper.getServerLockByServerId(serverId);
             if (serverVo != null) {
                 if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
                     serverVo.setStatus(ServerClusterVo.STOP);

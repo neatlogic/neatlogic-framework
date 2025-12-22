@@ -161,6 +161,8 @@ public class LoginController {
                         loginMapper.insertLoginAudit(loginAuditVo);
                     }
                 } else {
+                    //校验用户锁定
+                    loginService.checkLockUser(userVo);
                     //目前仅先校验移动端
                     if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
                         loginService.loginCaptchaValid(jsonObj, resultJson);

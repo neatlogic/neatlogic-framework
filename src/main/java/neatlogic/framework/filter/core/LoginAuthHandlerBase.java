@@ -19,32 +19,28 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.CommonUtil;
-import neatlogic.framework.config.ConfigManager;
-import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
-import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
-import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
 import neatlogic.framework.util.TimeUtil;
+import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.transaction.TransactionStatus;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -53,9 +49,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Base64;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 @DependsOn("loginService")
@@ -75,6 +72,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     protected static UserSessionContentMapper userSessionContentMapper;
 
     protected static AuthenticationInfoService authenticationInfoService;
+
+    protected static LoginService loginService;
 
     @Autowired
     public void setUserMapper(UserMapper _userMapper) {
@@ -104,6 +103,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Autowired
     public void setAuthenticationInfoService(AuthenticationInfoService _authenticationInfoService) {
         authenticationInfoService = _authenticationInfoService;
+    }
+
+    @Autowired
+    public void setLoginService(LoginService _loginService) {
+        loginService = _loginService;
     }
 
     @Override
@@ -318,41 +322,17 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Override
     public UserVo login(UserVo userVo, JSONObject resultJson) {
         UserVo checkUserVo = myLogin(userVo, resultJson);
-        TransactionStatus tx = TransactionUtil.openTx();
-        try {
-            LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(checkUserVo.getUserId());
-            if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
-                int failedCount = 1;
-                Date lockedUtil = null;
-                if (loginFailedCountVo != null) {
-                    if (loginFailedCountVo.getFailedCount() + 1 > Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_FAILED_COUNT))) {
-                        lockedUtil = Date.from(
-                                Instant.now().plus(Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_TIME)), ChronoUnit.MINUTES)
-                        );
-                    }
-                    failedCount = loginFailedCountVo.getFailedCount();
-                }
-                Date lastFailedTime = Date.from(Instant.now());
-                loginFailedCountVo = new LoginFailedCountVo(userVo.getUserId(), failedCount+1, lockedUtil, lastFailedTime);
-                loginMapper.updateLoginFailedCount(loginFailedCountVo);
-            } else {//如果正常用户登录成功，则清空该用户的失败次数
-                resultJson.remove("isNeedCaptcha");
-                loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
-                if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
-                    LoginAuditVo loginAuditVo = new LoginAuditVo();
-                    loginAuditVo.setId(SnowflakeUtil.uniqueLong());
-                    loginAuditVo.setUserUuid(checkUserVo.getUuid());
-                    loginAuditVo.setLoginMethod(getType());
-                    loginMapper.insertLoginAudit(loginAuditVo);
-                }
-            }
-            TransactionUtil.commitTx(tx);
-        } catch (Exception ex) {
-            TransactionUtil.rollbackTx(tx);
-            throw ex;
+        loginService.updateFailCount(userVo, resultJson, checkUserVo);
+        if (checkUserVo != null && SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
+            LoginAuditVo loginAuditVo = new LoginAuditVo();
+            loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+            loginAuditVo.setUserUuid(checkUserVo.getUuid());
+            loginAuditVo.setLoginMethod(getType());
+            loginMapper.insertLoginAudit(loginAuditVo);
         }
         return checkUserVo;
     }
+
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
         return userMapper.getUserByUserIdAndPassword(userVo);

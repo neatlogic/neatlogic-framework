@@ -190,6 +190,8 @@ public interface UserMapper {
 
     List<Map<String, Object>> searchUserListForMatrix(MatrixDataVo searchVo);
 
+    UserPasswordVo getActivePasswordByUserUuid(@Param("userUuid") String userUuid);
+
     int insertUserAuth(UserAuthVo userAuthVo);
 
     int insertUser(UserVo userVo);
@@ -269,4 +271,5 @@ public interface UserMapper {
     void deleteUserDataByUserUuid(String userUuid);
 
     void deleteUserDataByUserUuidAndType(@Param("userUuid") String userUuid, @Param("type") String type);
+
 }

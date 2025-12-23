@@ -191,7 +191,7 @@ public class LoginController {
 
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
-                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo, authType);
                 String authenticationInfoStr = null;
                 String authInfoHash = null;
                 if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
@@ -249,7 +249,7 @@ public class LoginController {
             }
             tenantContext.switchTenant(tenant);
             // 还原回租户库
-           // tenantContext.setUseMasterDatabase(false);
+            // tenantContext.setUseMasterDatabase(false);
         }
         String sessionId = jsonObj.getString("sessionId");
         JSONObject result = CaptchaUtil.getCaptcha();

@@ -130,6 +130,7 @@ public class TenantController {
                 ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
                 if (loginAuth != null) {
                     data.put("isNeedAuth", loginAuth.isNeedAuth());
+                    data.put("pwdExpiredDirectUrl", loginAuth.pwdExpiredDirectUrl());
                 }
             }
 
@@ -142,6 +143,7 @@ public class TenantController {
 
             // 会话有效时间
             data.put("userExpireTime",Config.USER_EXPIRETIME());
+
             ReturnJson.success(data, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -21,6 +21,8 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     LOGIN_LOCKED_FAILED_COUNT("login.locked.failed.count", "5","nfc.frameworktenantconfig.loginlockedfailedcount"),
     LOGIN_LOCKED_TIME("login.locked.times.limit", "10","nfc.frameworktenantconfig.loginlockedtime"),
     LOGIN_NEED_LOCK("login.need.lock", "0","nfc.frameworktenantconfig.loginneedlock"),
+    PASSWORD_NEED_EXPIRED_CHECK("password.need.expired.check", "0","nfc.frameworktenantconfig.passwordneedexpiredcheck"),
+    PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
     ;
 
     String key;

@@ -15,7 +15,6 @@ package neatlogic.framework.filter.core;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
@@ -136,7 +135,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 String authInfoHash = null;
                 String authenticationInfoStr = null;
                 authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                jwtVo = buildJwt(userVo, authenticationInfoVo);
+                jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
                 if (isNeedCookie()) {
                     setResponseAuthCookie(response, request, tenant, jwtVo);
                 }
@@ -162,7 +161,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
                 if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
-                    jwtVo = buildJwt(userVo, authenticationInfoVo);
+                    jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
                     setResponseAuthCookie(response, request, tenant, jwtVo);
                 }
             }
@@ -191,9 +190,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @return jwt对象
      * @throws Exception 异常
      */
-    public static JwtVo buildJwt(UserVo checkUserVo, AuthenticationInfoVo authenticationInfoVo) throws Exception {
+    public static JwtVo buildJwt(UserVo checkUserVo, AuthenticationInfoVo authenticationInfoVo, String authType) throws Exception {
         Long tokenCreateTime = System.currentTimeMillis();
-        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, authenticationInfoVo);
+        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, authenticationInfoVo, authType);
         SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
         Mac mac;
         mac = Mac.getInstance("HmacSHA1");
@@ -214,7 +213,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return jwtVo;
     }
 
-    public static String getToken(UserVo checkUserVo){
+    public static String getToken(UserVo checkUserVo) {
         Long tokenCreateTime = System.currentTimeMillis();
         //补充满足前缀的header
         Set<String> headerSet = new HashSet<>();
@@ -232,7 +231,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @throws Exception 异常
      */
     public static JwtVo buildJwt(UserVo checkUserVo) throws Exception {
-        return buildJwt(checkUserVo, new AuthenticationInfoVo());
+        return buildJwt(checkUserVo, new AuthenticationInfoVo(), null);
     }
 
     /**
@@ -268,9 +267,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         UserSessionCache.removeItem(UserContext.get().getTokenHash());
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();
-        if(jwtVo != null){
+        if (jwtVo != null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
-            if(userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(),jwtVo.getTokenCreateTime())){
+            if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {
                 userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
             }
         }
@@ -341,4 +340,23 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return userMapper.getUserByUserIdAndPassword(userVo);
     }
 
+    @Override
+    public String pwdExpiredDirectUrl() {
+        String directUrl;
+        String device = CommonUtil.getDevice();
+        if (StringUtils.isNotBlank(device) && Objects.equals(DeviceType.MOBILE.getValue(), device)) {
+            directUrl = mobilePwdExpiredDirectUrl();
+        } else {
+            directUrl = myPwdExpiredDirectUrl();
+        }
+        return directUrl;
+    }
+
+    String mobilePwdExpiredDirectUrl() {
+        return null;
+    }
+
+    String myPwdExpiredDirectUrl() {
+        return null;
+    }
 }

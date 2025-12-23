@@ -6,6 +6,10 @@ import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.config.ConfigManager;
+import neatlogic.framework.config.FrameworkTenantConfig;
+import neatlogic.framework.filter.core.ILoginAuthHandler;
+import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.Md5Util;
 import org.apache.commons.collections4.CollectionUtils;
@@ -38,7 +42,7 @@ public class JwtVo implements Serializable {
 
     }
 
-    public JwtVo(UserVo checkUserVo, Long tokenCreateTime, AuthenticationInfoVo authenticationInfoVo) {
+    private JSONObject getJwtBodyObj(UserVo checkUserVo, Long tokenCreateTime, AuthenticationInfoVo authenticationInfoVo) {
         JSONObject jwtBodyObj = new JSONObject();
         jwtBodyObj.put("useruuid", checkUserVo.getUuid());
         jwtBodyObj.put("userid", checkUserVo.getUserId());
@@ -67,6 +71,28 @@ public class JwtVo implements Serializable {
             this.headers = headers;
         }
         this.setTokenCreateTime(tokenCreateTime);
+
+        return jwtBodyObj;
+    }
+
+
+    public JwtVo(UserVo checkUserVo, Long tokenCreateTime, AuthenticationInfoVo authenticationInfoVo) {
+        JSONObject jwtBodyObj = getJwtBodyObj(checkUserVo, tokenCreateTime, authenticationInfoVo);
+        jwtbody = Base64.getUrlEncoder().encodeToString(jwtBodyObj.toJSONString().getBytes());
+    }
+
+    public JwtVo(UserVo checkUserVo, Long tokenCreateTime, AuthenticationInfoVo authenticationInfoVo, String authType) {
+        JSONObject jwtBodyObj = getJwtBodyObj(checkUserVo, tokenCreateTime, authenticationInfoVo);
+        String needPwdExpiredCheck = ConfigManager.getConfig(FrameworkTenantConfig.PASSWORD_NEED_EXPIRED_CHECK);
+        if (Objects.equals(needPwdExpiredCheck, "1") && StringUtils.isNotBlank(authType)) {
+            ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
+            if (loginAuth != null) {
+                if (loginAuth.checkPwdExpired(checkUserVo)) {
+                    jwtBodyObj.put("pwdExpired", true);
+                }
+            }
+        }
+
         jwtbody = Base64.getUrlEncoder().encodeToString(jwtBodyObj.toJSONString().getBytes());
     }
 

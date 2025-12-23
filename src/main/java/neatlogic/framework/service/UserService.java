@@ -72,11 +72,4 @@ public interface UserService {
      */
     UserVo getUserByUser(String userId);
 
-    /**
-     * 更新用户会话cache
-     *
-     * @param userUuid 用户uuid
-     */
-    void updateUserCacheAndSessionByUserUuid(String userUuid);
-
 }

@@ -28,6 +28,7 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.user.UserPasswordExpiredException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.util.TimeUtil;
@@ -107,14 +108,19 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             TenantContext.get().switchTenant(tenant);
             logger.debug("======= defaultLoginAuth: ");
             //先按 default 认证，不存在才根据具体 AuthType 认证用户
-            userVo = defaultLoginAuth.auth(cachedRequest, response);
-            if (userVo != null) {
-                logger.debug("======= getUser succeed: " + userVo.getUuid());
-                isExpired = userExpirationValid(userVo, timezone, request, response);
-                //用户如果过期则抛弃
-                if (isExpired) {
-                    userVo = null;
+            try {
+                userVo = defaultLoginAuth.auth(cachedRequest, response);
+                if (userVo != null) {
+                    logger.debug("======= getUser succeed: " + userVo.getUuid());
+                    isExpired = userExpirationValid(userVo, timezone, request, response);
+                    //用户如果过期则抛弃
+                    if (isExpired) {
+                        userVo = null;
+                    }
                 }
+            } catch (UserPasswordExpiredException e) {
+                returnErrorResponseJson(ResponseCode.PASSWORD_EXPIRED, response, false, defaultLoginAuth, e.getMessage());
+                return;
             }
             //default认证获取不到有效用户
             if (userVo == null) {
@@ -153,7 +159,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             } catch (Exception ex) {
                 //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
                 logger.error(ex.getMessage(), ex);
-                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, ex.getMessage());
+                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
             }
         } catch (ApiRuntimeException ex) {
             logger.error(ex.getMessage(), ex);
@@ -224,8 +230,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, boolean isRemoveCookie, Object... args) throws Exception {
-        returnErrorResponseJson(isRemoveCookie, responseCode, response, null, null, args);
+    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, boolean isRemoveCookie, ILoginAuthHandler loginAuth, Object... args) throws Exception {
+        returnErrorResponseJson(isRemoveCookie, responseCode, response, loginAuth, null, args);
     }
 
     /**

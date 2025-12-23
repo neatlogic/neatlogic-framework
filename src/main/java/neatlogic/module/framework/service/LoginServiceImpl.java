@@ -77,7 +77,7 @@ public class LoginServiceImpl implements LoginService {
         TransactionStatus tx = null;
         try {
             tx = TransactionUtil.openTx();
-            LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(checkUserVo.getUserId());
+            LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(userVo.getUserId());
             if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
                 int failedCount = 1;
                 Date lockedUtil = null;
@@ -112,11 +112,12 @@ public class LoginServiceImpl implements LoginService {
             try {
                 tx = TransactionUtil.openTx();
                 LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(paramUser.getUserId());
-                if (loginFailedCountVo != null && loginFailedCountVo.getLockedUtil() != null && loginFailedCountVo.getLockedUtil().before(new Date())) {
+                if (loginFailedCountVo != null && loginFailedCountVo.getLockedUntil() != null && new Date().before(loginFailedCountVo.getLockedUntil())) {
                     int failedCountLimit = Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_FAILED_COUNT));
-                    String lockUtil = TimeUtil.convertDateToString(loginFailedCountVo.getLockedUtil(),TimeUtil.YYYYMMDD_HHMMSS);
+                    String lockUtil = TimeUtil.convertDateToString(loginFailedCountVo.getLockedUntil(),TimeUtil.YYYY_MM_DD_HH_MM_SS);
                     throw new LoginLockedException(failedCountLimit, lockUtil);
                 }
+                TransactionUtil.commitTx(tx);
             } catch (Exception ex) {
                 if (tx != null) {
                     TransactionUtil.rollbackTx(tx);

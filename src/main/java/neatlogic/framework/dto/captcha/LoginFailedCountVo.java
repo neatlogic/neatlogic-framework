@@ -15,24 +15,30 @@ package neatlogic.framework.dto.captcha;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 public class LoginFailedCountVo implements Serializable {
-    private static final long serialVersionUID = -1911666621870552499L;
-    @EntityField(name = "用户uuid", type = ApiParamType.STRING)
+    @Serial
+    private static final long serialVersionUID = 8938457938146343100L;
+
+    @EntityField(name = "用户id", type = ApiParamType.STRING)
     private String userId;
     @EntityField(name = "登录失败次数", type = ApiParamType.INTEGER)
     private Integer failedCount;
-    @EntityField(name = "最近一次登录失败时间", type = ApiParamType.INTEGER)
+    @EntityField(name = "最近一次登录失败时间", type = ApiParamType.LONG)
     private Date lastFailedTime;
-    @EntityField(name = "自动解锁时间", type = ApiParamType.INTEGER)
-    private Date lockedUtil;
+    @EntityField(name = "自动解锁时间", type = ApiParamType.LONG)
+    private Date lockedUntil;
 
-    public LoginFailedCountVo(String userId, int failedCount, Date lockedUtil, Date lastFailedTime) {
+    public LoginFailedCountVo() {
+    }
+
+    public LoginFailedCountVo(String userId, int failedCount, Date lockedUntil, Date lastFailedTime) {
         this.failedCount = failedCount;
         this.userId = userId;
-        this.lockedUtil = lockedUtil;
+        this.lockedUntil = lockedUntil;
         this.lastFailedTime = lastFailedTime;
 
     }
@@ -66,11 +72,11 @@ public class LoginFailedCountVo implements Serializable {
         this.lastFailedTime = lastFailedTime;
     }
 
-    public Date getLockedUtil() {
-        return lockedUtil;
+    public Date getLockedUntil() {
+        return lockedUntil;
     }
 
-    public void setLockedUtil(Date lockedUtil) {
-        this.lockedUtil = lockedUtil;
+    public void setLockedUntil(Date lockedUntil) {
+        this.lockedUntil = lockedUntil;
     }
 }

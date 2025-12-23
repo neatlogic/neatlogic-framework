@@ -212,6 +212,7 @@ public class LoginController {
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());
+                returnObj.put("TokenHash", jwtVo.getTokenHash());
                 response.getWriter().print(returnObj);
             } else {
                 throw new UserAuthFailedException();

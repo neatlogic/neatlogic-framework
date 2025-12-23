@@ -139,6 +139,9 @@ public class TenantController {
             }
             // 是否允许移动端下载附件
             data.put("mobileFileDownloadEnabled", ConfigManager.getConfig(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED));
+
+            // 会话有效时间
+            data.put("userExpireTime",Config.USER_EXPIRETIME());
             ReturnJson.success(data, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

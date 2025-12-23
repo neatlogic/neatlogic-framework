@@ -26,7 +26,7 @@ public class UserSessionCache {
                     ).withExpiry(
                             ExpiryPolicyBuilder.expiry()
                                     .create(Duration.ofSeconds(900))  // TTL: 创建后 900s 过期
-                                    .access(Duration.ofSeconds(900))  // TTI: 最后访问后 900s 过期
+                                    //.access(Duration.ofSeconds(900))  // TTI: 最后访问后 900s 过期
                                     .update(Duration.ofSeconds(900))  // 更新后 900s 过期（按需）
                                     .build()
                     );

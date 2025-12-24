@@ -21,6 +21,7 @@ import neatlogic.framework.auth.core.AuthActions;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.restful.annotation.NoPasswordExpiredCheck;
 import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
@@ -54,6 +55,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
     private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
     public static final Map<String, IRawApiComponent> rawComponentMap = new HashMap<>();
+    public static final List<String> ExemptTokenMap = new ArrayList<>();
     // 按照token表达式长度排序，最长匹配原则
     private static final Map<String, ApiVo> regexApiMap = new TreeMap<>((o1, o2) -> {
         // 先按照长度排序，如果长度一样按照内容排序
@@ -443,13 +445,19 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
 //                return;
 //            }
 //            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
-                AuthAction authAction = clazz.getAnnotation(AuthAction.class);
-                AuthActions authActions = clazz.getAnnotation(AuthActions.class);
-                if (authAction == null && authActions == null) {
-                    System.err.println(clazz.getName() + "接口类需要加上@AuthAction注解进行权限控制, 如果未创建权限类, 可以先临时加上@AuthAction(action = NoAuth.class)使得应用服务正常启动");
-                    System.exit(1);
-                }
+            AuthAction authAction = clazz.getAnnotation(AuthAction.class);
+            AuthActions authActions = clazz.getAnnotation(AuthActions.class);
+            if (authAction == null && authActions == null) {
+                System.err.println(clazz.getName() + "接口类需要加上@AuthAction注解进行权限控制, 如果未创建权限类, 可以先临时加上@AuthAction(action = NoAuth.class)使得应用服务正常启动");
+                System.exit(1);
+            }
 //            }
+            // 查找标注了 @NoPasswordExpiredCheck 注解的方法
+            if (clazz.isAnnotationPresent(NoPasswordExpiredCheck.class)) {
+                if (component instanceof IPrivateApiComponent) {
+                    ExemptTokenMap.add(((IPrivateApiComponent) component).getToken());
+                }
+            }
         }
     }
 

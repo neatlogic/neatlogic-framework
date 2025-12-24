@@ -14,6 +14,7 @@ package neatlogic.module.framework.filter.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.config.ConfigManager;
 import neatlogic.framework.config.FrameworkTenantConfig;
@@ -23,6 +24,7 @@ import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.tenant.TenantInvalidException;
 import neatlogic.framework.exception.user.UserPasswordExpiredException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -125,7 +127,9 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                             }
                             //用户密码是否过期
                             String needPwdExpiredCheck = ConfigManager.getConfig(FrameworkTenantConfig.PASSWORD_NEED_EXPIRED_CHECK);
-                            if (Objects.equals(needPwdExpiredCheck, "1") && Boolean.TRUE.equals(jwtBodyObj.getBoolean("pwdExpired"))) {
+                            if (PrivateApiComponentFactory.ExemptTokenMap.stream().noneMatch(o -> Objects.equals("/neatlogic/api/" + o, RequestContext.get().getRequest().getRequestURI()))
+                                    && Objects.equals(needPwdExpiredCheck, "1")
+                                    && Boolean.TRUE.equals(jwtBodyObj.getBoolean("pwdExpired"))) {
                                 throw new UserPasswordExpiredException();
                             }
                             userVo.setUuid(jwtBodyObj.getString("useruuid"));

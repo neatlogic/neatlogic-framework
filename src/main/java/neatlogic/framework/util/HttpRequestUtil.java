@@ -15,6 +15,7 @@ package neatlogic.framework.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.httprequest.HttpMethodIrregularException;

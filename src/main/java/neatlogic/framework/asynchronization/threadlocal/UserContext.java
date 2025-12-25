@@ -12,8 +12,6 @@
 
 package neatlogic.framework.asynchronization.threadlocal;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
@@ -27,12 +25,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 public class UserContext implements Serializable {
@@ -75,27 +70,6 @@ public class UserContext implements Serializable {
         if (_userContext != null) {
             context = _userContext.copy();
         }
-        instance.set(context);
-        MDC.put("userId", context.getUserId());
-        return context;
-    }
-
-    public static UserContext init_bak(JSONObject jsonObj, String token, String timezone, HttpServletRequest request, HttpServletResponse response) {
-        UserContext context = new UserContext();
-        context.setUserId(jsonObj.getString("userid"));
-        context.setUserUuid(jsonObj.getString("useruuid"));
-        context.setUserName(jsonObj.getString("username"));
-        context.setTenant(jsonObj.getString("tenant"));
-        context.setToken(token);
-        context.setTimezone(timezone);
-        List<String> roleUuidList = new ArrayList<>();
-        JSONArray roleList = jsonObj.getJSONArray("rolelist");
-        if (roleList != null && !roleList.isEmpty()) {
-            for (int i = 0; i < roleList.size(); i++) {
-                roleUuidList.add(roleList.getString(i));
-            }
-        }
-        context.setAuthenticationInfoVo(new AuthenticationInfoVo(context.getUserUuid(), new ArrayList<>(), roleUuidList, new HashSet<>(), null));
         instance.set(context);
         MDC.put("userId", context.getUserId());
         return context;

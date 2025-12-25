@@ -20,11 +20,9 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.CommonUtil;
-import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
 import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.loginaudit.LoginAuditVo;
-import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
@@ -148,7 +146,6 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 if (StringUtils.isNotBlank(userSessionVo.getAuthInfoHash())) {
                     userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(userSessionVo.getAuthInfoHash(), userSessionVo.getAuthInfoStr()));
                 }
-                UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr == null ? "{}" : authenticationInfoStr);
                 isNeedLoginPost = true;
                 if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
                     LoginAuditVo loginAuditVo = new LoginAuditVo();
@@ -159,8 +156,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
             } else {
-                userSessionContentMapper.getUserSessionContentByHash()
-                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
+                String autoInfoStr = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
+                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(autoInfoStr), AuthenticationInfoVo.class);
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
                 if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
                     jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
@@ -266,7 +263,6 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public String logout() {
-        UserSessionCache.removeItem(UserContext.get().getTokenHash());
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();
         if (jwtVo != null) {

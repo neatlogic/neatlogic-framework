@@ -3,10 +3,9 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.UserSessionMapper">
-    <cache type="neatlogic.framework.dao.cache.NeatLogicCache">
+    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache">
         <!-- 二选一：TTI 或 TTL（都配的话以 TTL 为准，见下方实现） -->
-        <property name="timeToIdleSeconds" value="30"/>
-        <property name="timeToLiveSeconds" value="300"/>
+        <property name="timeToLiveSeconds" value="30"/>
         <!-- <property name="timeToLiveSeconds" value="300"/> -->
         <!-- Ehcache 堆内条目数 -->
         <property name="heapEntries" value="100"/>
@@ -26,7 +25,8 @@
             resultType="neatlogic.framework.dto.UserSessionVo">
         SELECT `user_uuid`         as userUuid,
                `visit_time`        as sessionTime,
-               `auth_info_hash`         as authInfoHash,
+               `auth_info_hash`    as authInfoHash,
+               `token_hash`        as tokenHash,
                `token_create_time` as tokenCreateTime
         FROM `user_session`
         WHERE `token_hash` = #{value}

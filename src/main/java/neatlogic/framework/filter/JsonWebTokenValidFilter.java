@@ -19,10 +19,10 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
-import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.UserSessionContentMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
@@ -111,7 +111,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 if (userVo != null) {
                     logger.debug("======= getUser succeed: " + userVo.getUuid());
                     UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
-                    isExpired = userExpirationValid(userSessionVo, userVo.getJwtVo().getTokenHash());
+                    isExpired = userExpirationValid(userSessionVo, userVo.getJwtVo());
                     //用户如果过期则抛弃
                     if (isExpired) {
                         userVo = null;
@@ -252,7 +252,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      *
      * @return 不超时返回权限信息，否则返回null
      */
-    private boolean userExpirationValid(UserSessionVo userSessionVo, String tokenHash) {
+    private boolean userExpirationValid(UserSessionVo userSessionVo, JwtVo jwtVo) {
         if (userSessionVo != null) {
             Date visitTime = userSessionVo.getSessionTime();
             Date now = new Date();
@@ -260,13 +260,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             long expireTime = expire * 60L * 1000L + visitTime.getTime();
             if (now.getTime() > expireTime) {
                 userSessionMapper.deleteUserSessionByTokenHash(userSessionVo.getTokenHash());
-                UserSessionCache.removeItem(tokenHash);
                 return true;
             }
-        } else {
-            UserSessionCache.removeItem(tokenHash);
+            return false;
         }
-        return false;
+        return true;
 
     }
 

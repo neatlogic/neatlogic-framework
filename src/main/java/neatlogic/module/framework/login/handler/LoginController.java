@@ -180,7 +180,7 @@ public class LoginController {
                 if (checkUserVo != null) {
                     String timezone = TimeUtil.ZONE_TIME;
                     authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
-                    UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
+                    UserContext.init(checkUserVo, authenticationInfoVo, timezone);
                     if (TenantContext.get().getTenantUuid() != null) {
                         for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                             loginPostProcessor.loginAfterInitialization();

@@ -14,7 +14,6 @@ package neatlogic.framework.util.javascript;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
@@ -25,10 +24,11 @@ import javax.script.*;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class JavascriptUtil {
     private static final Logger logger = LoggerFactory.getLogger(JavascriptUtil.class);
-    private static final ThreadLocal<List<ApiRuntimeException>> instance = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, JavascriptResult>> instance = new ThreadLocal<>();
     private static int MAX_CACHE_SIZE = 10;
 
     static class CacheItem {
@@ -129,19 +129,19 @@ public class JavascriptUtil {
      * @param expression 表达式
      * @return 执行结果
      */
-    public static boolean runExpression(JSONObject paramObj, String expression, List<ApiRuntimeException> errorList) throws ScriptException {
+    public static boolean runExpression(JSONObject paramObj, String expression, Map<String, JavascriptResult> resultMap) throws ScriptException {
         expression = expression.replace("-", "");
         Bindings params = new SimpleBindings();
         if (MapUtils.isNotEmpty(paramObj)) {
             params.putAll(paramObj);
         }
-        String script = "function calculate(expression, dataValue, conditionValue, label){\n";
+        String script = "function calculate(expression, dataValue, conditionValue, label, uuid){\n";
         script += "var calculateClass = Java.type('neatlogic.framework.util.javascript.expressionHandler.'+ expression); \n";
         // 修正 JDK17 Nashorn undefined 参数
         script += "if (typeof dataValue === 'undefined') dataValue = null;\n";
         script += "if (typeof conditionValue === 'undefined') conditionValue = null;\n";
         script += "if (typeof label === 'undefined') label = null;\n";
-        script += "var result = calculateClass.calculate(dataValue, conditionValue, label);\n";
+        script += "var result = calculateClass.calculate(dataValue, conditionValue, label, uuid);\n";
         script += "return result;\n";
         script += "}\n";
         script += expression + ";";
@@ -149,8 +149,8 @@ public class JavascriptUtil {
         CompiledScript compiledScript = getCompiledScript(script, true);
 
         //由于表达式不能直接抛异常，创建threadlocal传递errorList
-        if (errorList != null) {
-            instance.set(errorList);
+        if (resultMap != null) {
+            instance.set(resultMap);
         }
         try {
             Object rv = compiledScript.eval(params);
@@ -240,7 +240,7 @@ public class JavascriptUtil {
         return y * 3 - n;
     }*/
 
-    public static List<ApiRuntimeException> getErrorList() {
+    public static Map<String, JavascriptResult> getResultMap() {
         return instance.get();
     }
 

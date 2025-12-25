@@ -15,6 +15,7 @@ package neatlogic.framework.util.javascript.expressionHandler;
 import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.*;
+import neatlogic.framework.util.javascript.JavascriptResult;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +30,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
 /**
  * 区间运算支持数字型、日期型、时间型和日期时间型
@@ -37,9 +38,14 @@ import java.util.List;
 public class between {
     private static final Logger logger = LoggerFactory.getLogger(between.class);
 
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label, String uuid) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
+        JavascriptResult javascriptResult = new JavascriptResult();
+        Map<String, JavascriptResult> errorMap = JavascriptUtil.getResultMap();
+
+        if (errorMap != null) {
+            errorMap.put(uuid, javascriptResult);
+        }
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             if (dataValueList.size() == conditionValueList.size()) {
                 String dataValue = dataValueList.getString(0);
@@ -51,36 +57,45 @@ public class between {
                     if (range.length == 2) {
                         valueBefore = range[0];
                         valueAfter = range[1];
-                        return compare(dataValue, valueBefore, valueAfter, label);
+                        boolean result = compare(dataValue, valueBefore, valueAfter, label, uuid);
+                        javascriptResult.setResult(result);
+                        return result;
                     } else if (range.length == 1) {
                         valueBefore = range[0];
                         valueAfter = "";
-                        return compare(dataValue, valueBefore, valueAfter, label);
+                        boolean result = compare(dataValue, valueBefore, valueAfter, label, uuid);
+                        javascriptResult.setResult(result);
+                        return result;
                     } else {
                         ApiRuntimeException error = new ConditionIsNullException(prefix);
-                        if (errorList != null) {
-                            errorList.add(error);
-                        } else {
+                        javascriptResult.setError(error);
+                        javascriptResult.setResult(false);
+                        if (errorMap == null) {
                             logger.warn(error.getMessage());
                         }
                     }
                 }
             } else {
                 ApiRuntimeException error = new ValueNumberIsNotEqualException(prefix);
-                if (errorList != null) {
-                    errorList.add(error);
-                } else {
+                javascriptResult.setError(error);
+                javascriptResult.setResult(false);
+                if (errorMap == null) {
                     logger.warn(error.getMessage());
                 }
                 return false;
             }
         }
+        javascriptResult.setResult(false);
         return false;
     }
 
-    private static boolean compare(String dataValue, String valueBefore, String valueAfter, String label) {
+    private static boolean compare(String dataValue, String valueBefore, String valueAfter, String label, String uuid) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
+        Map<String, JavascriptResult> errorMap = JavascriptUtil.getResultMap();
+        JavascriptResult javascriptResult = null;
+        if (errorMap != null) {
+            javascriptResult = errorMap.get(uuid);
+        }
         if (isNumber(dataValue)) {
             double transferValue = Double.parseDouble(dataValue);
             double transferValueBefore = Double.MIN_VALUE;
@@ -153,8 +168,8 @@ public class between {
                 if (transferValueBefore != null && transferValueAfter != null) {
                     if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
                         ApiRuntimeException error = new ValueNotWithinRangeException(prefix, sdf.format(transferValue), sdf.format(transferValueBefore), sdf.format(transferValueAfter));
-                        if (errorList != null) {
-                            errorList.add(error);
+                        if (javascriptResult != null) {
+                            javascriptResult.setError(error);
                         }
                         logger.warn(error.getMessage());
                         return false;
@@ -163,8 +178,8 @@ public class between {
                 } else if (transferValueBefore != null) {
                     if (!transferValue.after(transferValueBefore)) {
                         ApiRuntimeException error = new ValueNotAfterException(prefix, sdf.format(transferValue), sdf.format(transferValueBefore));
-                        if (errorList != null) {
-                            errorList.add(error);
+                        if (javascriptResult != null) {
+                            javascriptResult.setError(error);
                         }
                         logger.warn(error.getMessage());
                         return false;
@@ -173,8 +188,8 @@ public class between {
                 } else if (transferValueAfter != null) {
                     if (!transferValue.before(transferValueAfter)) {
                         ApiRuntimeException error = new ValueNotBeforeException(prefix, sdf.format(transferValue), sdf.format(transferValueAfter));
-                        if (errorList != null) {
-                            errorList.add(error);
+                        if (javascriptResult != null) {
+                            javascriptResult.setError(error);
                         }
                         logger.warn(error.getMessage());
                         return false;

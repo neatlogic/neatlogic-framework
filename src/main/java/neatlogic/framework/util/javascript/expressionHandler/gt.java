@@ -13,32 +13,38 @@
 package neatlogic.framework.util.javascript.expressionHandler;
 
 import com.alibaba.fastjson.JSONArray;
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ConditionIsIrregularException;
 import neatlogic.framework.exception.util.javascript.ValueIsIrregularException;
 import neatlogic.framework.exception.util.javascript.ValueIsNotGtException;
+import neatlogic.framework.util.javascript.JavascriptResult;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
+import java.util.Map;
 
 public class gt {
 
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label, String uuid) {
+        JavascriptResult javascriptResult = new JavascriptResult();
+        Map<String, JavascriptResult> errorMap = JavascriptUtil.getResultMap();
+        if (errorMap != null) {
+            errorMap.put(uuid, javascriptResult);
+        }
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             for (int i = 0; i < dataValueList.size(); i++) {
                 Double d;
                 try {
                     d = dataValueList.getDouble(i);
                 } catch (Exception e) {
-                    errorList.add(new ValueIsIrregularException(prefix));
+                    javascriptResult.setError(new ValueIsIrregularException(prefix));
+                    javascriptResult.setResult(false);
                     return false;
                 }
                 if (d == null) {
-                    errorList.add(new ConditionIsIrregularException(prefix));
+                    javascriptResult.setError(new ConditionIsIrregularException(prefix));
+                    javascriptResult.setResult(false);
                     return false;
                 }
                 for (int j = 0; j < conditionValueList.size(); j++) {
@@ -46,17 +52,21 @@ public class gt {
                     try {
                         c = conditionValueList.getDouble(i);
                     } catch (Exception e) {
-                        errorList.add(new ConditionIsIrregularException(prefix));
+                        javascriptResult.setError(new ConditionIsIrregularException(prefix));
+                        javascriptResult.setResult(false);
                         return false;
                     }
                     if (d <= c) {
-                        errorList.add(new ValueIsNotGtException(prefix, d, c));
+                        javascriptResult.setError(new ValueIsNotGtException(prefix, d, c));
+                        javascriptResult.setResult(false);
                         return false;
                     }
                 }
             }
+            javascriptResult.setResult(true);
             return true;
         }
+        javascriptResult.setResult(false);
         return false;
     }
 

@@ -15,33 +15,39 @@ package neatlogic.framework.util.javascript.expressionHandler;
 import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ValueContainException;
+import neatlogic.framework.util.javascript.JavascriptResult;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Map;
 
 public class notlike {
     private static final Logger logger = LoggerFactory.getLogger(notlike.class);
 
 
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label, String uuid) {
+        JavascriptResult javascriptResult = new JavascriptResult();
+        Map<String, JavascriptResult> errorMap = JavascriptUtil.getResultMap();
+        if (errorMap != null) {
+            errorMap.put(uuid, javascriptResult);
+        }
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         if (CollectionUtils.isNotEmpty(dataValueList) && CollectionUtils.isNotEmpty(conditionValueList)) {
             //单值判断，按照字符串匹配的方式来判断
             if (dataValueList.size() == conditionValueList.size() && dataValueList.size() == 1) {
                 String dataValue = dataValueList.getString(0);
                 String conditionValue = conditionValueList.getString(0);
                 if (!dataValue.contains(conditionValue)) {
+                    javascriptResult.setResult(true);
                     return true;
                 } else {
                     ApiRuntimeException error = new ValueContainException(prefix, dataValue, conditionValue);
-                    if (errorList != null) {
-                        errorList.add(error);
-                    } else {
+                    javascriptResult.setError(error);
+                    javascriptResult.setResult(false);
+                    if (errorMap == null) {
                         logger.warn(error.getMessage());
                     }
                     return false;
@@ -52,25 +58,27 @@ public class notlike {
                     String cValue = conditionValueList.getString(i);
                     if (dataValueList.stream().anyMatch(d -> d.toString().equalsIgnoreCase(cValue))) {
                         ApiRuntimeException error = new ValueContainException(prefix, getValue(dataValueList), getValue(conditionValueList));
-                        if (errorList != null) {
-                            errorList.add(error);
-                        } else {
+                        javascriptResult.setError(error);
+                        javascriptResult.setResult(false);
+                        if (errorMap == null) {
                             logger.warn(error.getMessage());
                         }
                         return false;
                     }
                 }
+                javascriptResult.setResult(true);
                 return true;
             }
         } else if (CollectionUtils.isEmpty(dataValueList) && CollectionUtils.isEmpty(conditionValueList)) {
             ApiRuntimeException error = new ValueContainException(prefix);
-            if (errorList != null) {
-                errorList.add(error);
-            } else {
+            javascriptResult.setError(error);
+            javascriptResult.setResult(false);
+            if (errorMap == null) {
                 logger.warn(error.getMessage());
             }
             return false;
         } else {
+            javascriptResult.setResult(true);
             return true;
         }
     }

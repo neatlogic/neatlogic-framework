@@ -13,10 +13,10 @@
 package neatlogic.framework.util.javascript.expressionHandler;
 
 import com.alibaba.fastjson.JSONArray;
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ConditionIsNullException;
 import neatlogic.framework.exception.util.javascript.ValueIsIrregularException;
 import neatlogic.framework.exception.util.javascript.ValueIsNullException;
+import neatlogic.framework.util.javascript.JavascriptResult;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import neatlogic.framework.worktime.dao.mapper.WorktimeMapper;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.Map;
 
 @Component
 public class inworktime {
@@ -36,14 +36,19 @@ public class inworktime {
         this.worktimeMapper = _worktimeMapper;
     }
 
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label, String uuid) {
+        JavascriptResult javascriptResult = new JavascriptResult();
+        Map<String, JavascriptResult> errorMap = JavascriptUtil.getResultMap();
+        if (errorMap != null) {
+            errorMap.put(uuid, javascriptResult);
+        }
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
         String worktimeUuid;
         if (CollectionUtils.isNotEmpty(conditionValueList)) {
             worktimeUuid = conditionValueList.getString(0);
         } else {
-            errorList.add(new ConditionIsNullException(prefix));
+            javascriptResult.setError(new ConditionIsNullException(prefix));
+            javascriptResult.setResult(false);
             return false;
         }
 
@@ -52,16 +57,20 @@ public class inworktime {
                 long date = dataValueList.getLong(0);
                 int count = worktimeMapper.checkIsWithinWorktimeRange(worktimeUuid, date);
                 if (count > 0) {
+                    javascriptResult.setResult(true);
                     return true;
                 } else {
+                    javascriptResult.setResult(false);
                     return false;
                 }
             } catch (Exception e) {
-                errorList.add(new ValueIsIrregularException(prefix));
+                javascriptResult.setError(new ValueIsIrregularException(prefix));
+                javascriptResult.setResult(false);
                 return false;
             }
         } else {
-            errorList.add(new ValueIsNullException(prefix));
+            javascriptResult.setError(new ValueIsNullException(prefix));
+            javascriptResult.setResult(false);
             return false;
         }
     }

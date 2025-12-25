@@ -15,28 +15,34 @@ package neatlogic.framework.util.javascript.expressionHandler;
 import com.alibaba.fastjson.JSONArray;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.util.javascript.ValueConNotNullException;
+import neatlogic.framework.util.javascript.JavascriptResult;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Map;
 
 public class isnotnull {
     private static final Logger logger = LoggerFactory.getLogger(isnotnull.class);
 
-    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label) {
+    public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label, String uuid) {
+        JavascriptResult javascriptResult = new JavascriptResult();
+        Map<String, JavascriptResult> errorMap = JavascriptUtil.getResultMap();
+        if (errorMap != null) {
+            errorMap.put(uuid, javascriptResult);
+        }
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
-        List<ApiRuntimeException> errorList = JavascriptUtil.getErrorList();
 
         if (CollectionUtils.isEmpty(dataValueList)) {
             ApiRuntimeException error = new ValueConNotNullException(prefix);
-            if (errorList != null) {
-                errorList.add(error);
-            } else {
+            javascriptResult.setError(error);
+            javascriptResult.setResult(false);
+            if (errorMap == null) {
                 logger.warn(error.getMessage());
             }
+            javascriptResult.setResult(false);
             return false;
         } else {
             boolean hasValue = false;
@@ -49,12 +55,13 @@ public class isnotnull {
             }
             if (!hasValue) {
                 ApiRuntimeException error = new ValueConNotNullException(prefix);
-                if (errorList != null) {
-                    errorList.add(error);
-                } else {
+                javascriptResult.setError(error);
+                javascriptResult.setResult(false);
+                if (errorMap == null) {
                     logger.warn(error.getMessage());
                 }
             }
+            javascriptResult.setResult(hasValue);
             return hasValue;
         }
     }

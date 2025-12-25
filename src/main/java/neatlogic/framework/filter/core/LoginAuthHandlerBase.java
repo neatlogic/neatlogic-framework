@@ -268,7 +268,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();
         if (jwtVo != null) {
-            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHashWithoutCache(jwtVo.getTokenHash());
             if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {
                 userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
             }

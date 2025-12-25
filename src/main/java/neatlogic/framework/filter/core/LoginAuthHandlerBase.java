@@ -22,10 +22,7 @@ import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.CommonUtil;
 import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
-import neatlogic.framework.dto.AuthenticationInfoVo;
-import neatlogic.framework.dto.JwtVo;
-import neatlogic.framework.dto.UserSessionVo;
-import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
@@ -128,9 +125,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             JwtVo jwtVo = new JwtVo();
             AuthenticationInfoVo authenticationInfoVo;
             jwtVo.setToken(getToken(userVo));
-            Object authenticationInfo = UserSessionCache.getItem(jwtVo.getTokenHash());
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
             boolean isNeedLoginPost = false;
-            if (authenticationInfo == null) {
+            if (userSessionVo == null) {
                 logger.debug("======= tokenHash: {}", jwtVo.getTokenHash());
                 String authInfoHash = null;
                 String authenticationInfoStr = null;
@@ -145,8 +142,12 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                         authInfoHash = Md5Util.encryptMD5(authenticationInfoStr);
                     }
                 }
-                UserSessionVo userSessionVo = new UserSessionVo(userVo.getUuid(), jwtVo.getToken(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash, authenticationInfoStr);
-                InsertUserSessionThread.addInsertUserSession(userSessionVo);
+                userSessionVo = new UserSessionVo(userVo.getUuid(), jwtVo.getToken(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash, authenticationInfoStr);
+                userSessionMapper.insertUserSession(userSessionVo.getUserUuid(), userSessionVo.getTokenHash(), userSessionVo.getTokenCreateTime(), userSessionVo.getAuthInfoHash());
+                userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(userSessionVo.getTokenHash(), userSessionVo.getToken()));
+                if (StringUtils.isNotBlank(userSessionVo.getAuthInfoHash())) {
+                    userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(userSessionVo.getAuthInfoHash(), userSessionVo.getAuthInfoStr()));
+                }
                 UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr == null ? "{}" : authenticationInfoStr);
                 isNeedLoginPost = true;
                 if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
@@ -158,6 +159,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
             } else {
+                userSessionContentMapper.getUserSessionContentByHash()
                 authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
                 if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
@@ -168,7 +170,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             userVo.setJwtVo(jwtVo);
             assert authenticationInfoVo != null;
             authenticationInfoVo.setUserUuid(userVo.getUuid());
-            UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME, request, response);
+            UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
             if (isNeedLoginPost) {
                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                     loginPostProcessor.loginAfterInitialization();

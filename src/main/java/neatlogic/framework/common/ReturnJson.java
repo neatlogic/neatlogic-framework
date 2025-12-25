@@ -1,19 +1,16 @@
 package neatlogic.framework.common;
 
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import neatlogic.framework.common.config.Config;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
-import com.alibaba.fastjson.JSONObject;
-
-import neatlogic.framework.asynchronization.threadlocal.UserContext;
-import neatlogic.framework.common.config.Config;
 
 public final class ReturnJson {
 
@@ -71,7 +68,7 @@ public final class ReturnJson {
 	}
 
 	public static void page(JSONObject data, HttpServletResponse response) {
-		UserContext context = UserContext.get();
+		RequestContext context = RequestContext.get();
 		HttpServletRequest request;
 		if (context != null) {
 			request = context.getRequest();

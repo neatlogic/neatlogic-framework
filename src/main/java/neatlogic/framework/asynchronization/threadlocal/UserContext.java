@@ -29,19 +29,17 @@ import org.slf4j.MDC;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 public class UserContext implements Serializable {
+    @Serial
     private static final long serialVersionUID = -578199115176786224L;
     @JSONField(serialize = false)
     private static final ThreadLocal<UserContext> instance = new ThreadLocal<>();
-    @JSONField(serialize = false)
-    private transient HttpServletRequest request;
-    @JSONField(serialize = false)
-    private transient HttpServletResponse response;
     private String tenant;
     private String userName;
     private String userId;
@@ -58,7 +56,6 @@ public class UserContext implements Serializable {
 
     public UserContext copy() {
         UserContext userContext = new UserContext();
-        userContext.setRequest(request);
         userContext.setToken(token);
         if (authenticationInfoVo != null) {
             userContext.setAuthenticationInfoVo(authenticationInfoVo.copy());
@@ -89,9 +86,7 @@ public class UserContext implements Serializable {
         context.setUserUuid(jsonObj.getString("useruuid"));
         context.setUserName(jsonObj.getString("username"));
         context.setTenant(jsonObj.getString("tenant"));
-        context.setRequest(request);
         context.setToken(token);
-        context.setResponse(response);
         context.setTimezone(timezone);
         List<String> roleUuidList = new ArrayList<>();
         JSONArray roleList = jsonObj.getJSONArray("rolelist");
@@ -106,7 +101,7 @@ public class UserContext implements Serializable {
         return context;
     }
 
-    public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
+    public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone) {
         UserContext context = new UserContext();
         context.setUserId(userVo.getUserId());
         context.setUserUuid(userVo.getUuid());
@@ -122,8 +117,6 @@ public class UserContext implements Serializable {
         }
         context.setToken(token);
         context.setIsSuperAdmin(userVo.getIsSuperAdmin());
-        context.setRequest(request);
-        context.setResponse(response);
         context.setTimezone(timezone);
         context.setAuthenticationInfoVo(authenticationInfoVo);
         if (userVo.getJwtVo() != null) {
@@ -135,17 +128,10 @@ public class UserContext implements Serializable {
         return context;
     }
 
-    public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone) {
-        return init(userVo, authenticationInfoVo, timezone, null, null);
-    }
-
     public static UserContext init(ISystemUser systemUser) {
-        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone(), null, null);
+        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone());
     }
 
-    public static UserContext init(ISystemUser systemUser, HttpServletRequest request, HttpServletResponse response) {
-        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone(), request, response);
-    }
 
     public String getTimezone() {
         return timezone;
@@ -226,22 +212,6 @@ public class UserContext implements Serializable {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
-    }
-
-    public HttpServletRequest getRequest() {
-        return request;
-    }
-
-    public void setRequest(HttpServletRequest request) {
-        this.request = request;
-    }
-
-    public HttpServletResponse getResponse() {
-        return response;
-    }
-
-    public void setResponse(HttpServletResponse response) {
-        this.response = response;
     }
 
     public String getToken() {

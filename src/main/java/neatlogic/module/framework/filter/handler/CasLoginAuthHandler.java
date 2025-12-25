@@ -111,7 +111,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Override
     protected String myLogout() {
-        HttpServletRequest request = UserContext.get().getRequest();
+        HttpServletRequest request = RequestContext.get().getRequest();
 
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();

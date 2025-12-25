@@ -288,7 +288,8 @@ public class AnonymousApiDispatcher {
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS, request, response);
+            RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
         }
         JSONObject returnObj = new JSONObject();
         try {
@@ -324,7 +325,8 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS, request, response);
+                RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -400,7 +402,8 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS, request, response);
+                RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -486,7 +489,8 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS, request, response);
+                RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -549,7 +553,8 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS, request, response);
+                RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -622,7 +627,8 @@ public class AnonymousApiDispatcher {
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS, request, response);
+            RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
         }
         JSONObject returnObj = new JSONObject();
         try {
@@ -670,7 +676,8 @@ public class AnonymousApiDispatcher {
             if (TenantUtil.hasTenant(tenant)) {
                 TenantContext.init();
                 TenantContext.get().switchTenant(tenant);
-                UserContext.init(SystemUser.ANONYMOUS, request, response);
+                RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
             } else {
                 throw new TenantNotFoundException(tenant);
             }
@@ -770,7 +777,8 @@ public class AnonymousApiDispatcher {
         if (TenantUtil.hasTenant(tenant)) {
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
-            UserContext.init(SystemUser.ANONYMOUS, request, response);
+            RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.ANONYMOUS);
         }
         JSONObject returnObj = new JSONObject();
         try {

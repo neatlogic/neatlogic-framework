@@ -6,6 +6,8 @@
     <cache type="neatlogic.framework.dao.cache.NeatLogicCache">
         <!-- 二选一：TTI 或 TTL（都配的话以 TTL 为准，见下方实现） -->
         <property name="timeToIdleSeconds" value="30"/>
+        <property name="timeToLiveSeconds" value="300"/>
+        <!-- <property name="timeToLiveSeconds" value="300"/> -->
         <!-- Ehcache 堆内条目数 -->
         <property name="heapEntries" value="100"/>
     </cache>

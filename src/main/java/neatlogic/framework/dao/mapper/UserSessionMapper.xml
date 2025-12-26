@@ -3,7 +3,7 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.UserSessionMapper">
-    <cache type="neatlogic.framework.dao.cache.NeatLogicConcurrentSafeCache">
+    <cache type="neatlogic.framework.dao.cache.NeatLogicCache">
         <!-- 二选一：TTI 或 TTL（都配的话以 TTL 为准，见下方实现） -->
         <property name="timeToLiveSeconds" value="30"/>
         <!-- <property name="timeToLiveSeconds" value="300"/> -->

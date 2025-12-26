@@ -114,7 +114,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     isExpired = userExpirationValid(userSessionVo, userVo.getJwtVo());
                     //用户如果过期则抛弃
                     if (isExpired) {
-                        userVo = null;
+                        logger.debug("======= login expired: " + userVo.getUuid());
+                        returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
+                        return;
                     } else {
                         initUserContext(userSessionVo, userVo, timezone);
                     }

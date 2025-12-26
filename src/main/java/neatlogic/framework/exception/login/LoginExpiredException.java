@@ -13,9 +13,18 @@ package neatlogic.framework.exception.login;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
+import java.io.Serial;
+
 public class LoginExpiredException extends ApiRuntimeException {
 
+    @Serial
+    private static final long serialVersionUID = -2759790625283616257L;
+
     public LoginExpiredException() {
+        super("nff.jsonwebtokenvalidfilter.dofilterinternal.unexpired");
+    }
+
+    public LoginExpiredException(String tmp) {
         super("nff.jsonwebtokenvalidfilter.dofilterinternal.unexpired");
     }
 }

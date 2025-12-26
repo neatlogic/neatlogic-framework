@@ -142,7 +142,11 @@
         </encoder>
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
             <evaluator class="neatlogic.framework.logback.boolex.ConsoleFilterEvaluator">
-                <debugWhitelist>neatlogic.framework.dao.mapper.UserSessionMapper</debugWhitelist>
+                <infoWhitelist>neatlogic.**</infoWhitelist>
+                <debugWhitelist>neatlogic.**</debugWhitelist>
+                <debugBlacklist>neatlogic.**.dao.mapper.**</debugBlacklist>
+                <traceWhitelist>neatlogic.**</traceWhitelist>
+                <traceBlacklist>neatlogic.**.dao.mapper.**</traceBlacklist>
             </evaluator>
             <OnMatch>NEUTRAL</OnMatch>
             <OnMismatch>DENY</OnMismatch>
@@ -361,11 +365,14 @@
         <includeCallerData>true</includeCallerData>
     </appender>
 
-    <root level="DEBUG">
-        <appender-ref ref="STDOUT"/>
+    <root level="${log4j.priority}">
+        <appender-ref ref="DEBUG"/>
+        <appender-ref ref="INFO"/>
+        <appender-ref ref="WARN"/>
+        <appender-ref ref="ERROR"/>
     </root>
 
-
+    <logger name="org.mybatis" level="INFO" additivity="false"/>
     <logger name="ch.qos.logback" level="OFF" additivity="false"/>
     <logger name="java.sql.Connection" level="WARN" additivity="false"/>
     <logger name="java.sql.Statement" level="INFO" additivity="false"/>

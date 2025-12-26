@@ -72,6 +72,7 @@ public class Config {
     private static String MASTER_HOME_URL;// 前端租户管理服务器地址，例如：http://192.168.0.10:9099
     private static String BACK_END_URL;// 后端服务器地址，例如：http://192.168.0.25:8282/neatlogic
     private static String USER_EXPIRETIME; // 会话超时时间(分)
+    private static String WEB_HEARTBEAT_INTERVAL; // 前端心跳时间间隔(秒)
     private static int LOGIN_CAPTCHA_EXPIRED_TIME; //验证码超时时间(秒)
     private static int LOGIN_FAILED_TIMES_CAPTCHA; //设置需要验证码的登录错误次数
 
@@ -350,6 +351,10 @@ public class Config {
 
     public static int USER_EXPIRETIME() {
         return Integer.parseInt(USER_EXPIRETIME);
+    }
+
+    public static int WEB_HEARTBEAT_INTERVAL() {
+        return Integer.parseInt(WEB_HEARTBEAT_INTERVAL);
     }
 
     public static int LOGIN_CAPTCHA_EXPIRED_TIME() {
@@ -655,6 +660,7 @@ public class Config {
             MASTER_HOME_URL = prop.getProperty("master.home.url");
             BACK_END_URL = prop.getProperty("back.end.url");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
+            WEB_HEARTBEAT_INTERVAL = prop.getProperty("web.heartbeat.interval", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
             DB_TRANSACTION_TIMEOUT = Integer.parseInt(prop.getProperty("db.transaction.timeout", "180"));

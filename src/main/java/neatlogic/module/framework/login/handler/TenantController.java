@@ -141,8 +141,7 @@ public class TenantController {
             // 是否允许移动端下载附件
             data.put("mobileFileDownloadEnabled", ConfigManager.getConfig(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED));
 
-            // 会话有效时间
-            data.put("userExpireTime",Config.USER_EXPIRETIME());
+            data.put("webHeartbeatInterval",Config.WEB_HEARTBEAT_INTERVAL());
 
             ReturnJson.success(data, response);
         } catch (Exception e) {

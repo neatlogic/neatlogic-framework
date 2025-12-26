@@ -258,8 +258,10 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         if (userSessionVo != null) {
             Date visitTime = userSessionVo.getSessionTime();
             Date now = new Date();
-            int expire = Config.USER_EXPIRETIME();
-            long expireTime = expire * 60L * 1000L + visitTime.getTime();
+            //超时时间需加上前端定时心跳的缓冲时间，否则再快超时的极限情况下用户又继续操作，又没到下次定时 heartbeat 会导致误登出
+            long expireTime = (Config.USER_EXPIRETIME() * 60L + Config.WEB_HEARTBEAT_INTERVAL()) * 1000L + visitTime.getTime();
+            //System.out.println(TimeUtil.millisecondsFormat(now.getTime(), 4, TimeUnit.SECONDS, " ") + "  now");
+            //System.out.println(TimeUtil.millisecondsFormat(expireTime, 4, TimeUnit.SECONDS, " ") + "  expire");
             if (now.getTime() > expireTime) {
                 userSessionMapper.deleteUserSessionByTokenHash(userSessionVo.getTokenHash());
                 return true;

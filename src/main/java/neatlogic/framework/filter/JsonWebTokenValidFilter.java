@@ -12,7 +12,6 @@
 
 package neatlogic.framework.filter;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
@@ -20,7 +19,6 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ResponseCode;
 import neatlogic.framework.common.util.TenantUtil;
-import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.UserSessionContentMapper;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
@@ -28,6 +26,7 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserSessionVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.user.UserPasswordExpiredException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.util.TimeUtil;
@@ -48,6 +47,9 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
+    //前端定时心跳的时间
+    private static final int WEB_HEARTBEAT_INTERVAL= 60;
+
     @Resource
     private UserSessionMapper userSessionMapper;
 
@@ -107,14 +109,24 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             TenantContext.get().switchTenant(tenant);
             logger.debug("======= defaultLoginAuth: ");
             //先按 default 认证，不存在才根据具体 AuthType 认证用户
-            userVo = defaultLoginAuth.auth(cachedRequest, response);
-            if (userVo != null) {
-                logger.debug("======= getUser succeed: " + userVo.getUuid());
-                isExpired = userExpirationValid(userVo, timezone, request, response);
-                //用户如果过期则抛弃
-                if (isExpired) {
-                    userVo = null;
+            try {
+                userVo = defaultLoginAuth.auth(cachedRequest, response);
+                if (userVo != null) {
+                    logger.debug("======= getUser succeed: " + userVo.getUuid());
+                    UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
+                    isExpired = userExpirationValid(userSessionVo, userVo.getJwtVo());
+                    //用户如果过期则抛弃
+                    if (isExpired) {
+                        logger.debug("======= login expired: " + userVo.getUuid());
+                        returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
+                        return;
+                    } else {
+                        initUserContext(userSessionVo, userVo, timezone);
+                    }
                 }
+            } catch (UserPasswordExpiredException e) {
+                returnErrorResponseJson(ResponseCode.PASSWORD_EXPIRED, response, false, defaultLoginAuth, e.getMessage());
+                return;
             }
             //default认证获取不到有效用户
             if (userVo == null) {
@@ -153,7 +165,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             } catch (Exception ex) {
                 //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
                 logger.error(ex.getMessage(), ex);
-                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, ex.getMessage());
+                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
             }
         } catch (ApiRuntimeException ex) {
             logger.error(ex.getMessage(), ex);
@@ -224,8 +236,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      * @param args         异常码构造入参
      * @throws IOException 异常
      */
-    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, boolean isRemoveCookie, Object... args) throws Exception {
-        returnErrorResponseJson(isRemoveCookie, responseCode, response, null, null, args);
+    private void returnErrorResponseJson(ResponseCode responseCode, HttpServletResponse response, boolean isRemoveCookie, ILoginAuthHandler loginAuth, Object... args) throws Exception {
+        returnErrorResponseJson(isRemoveCookie, responseCode, response, loginAuth, null, args);
     }
 
     /**
@@ -242,37 +254,41 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     /**
      * 校验用户登录超时
+     * - 用户没有点击或滚动鼠标超过会话有效期（默认 60分）
+     * - 在别的浏览器登录同个用户默认是会互相挤退
      *
      * @return 不超时返回权限信息，否则返回null
      */
-    private boolean userExpirationValid(UserVo userVo, String timezone, HttpServletRequest request, HttpServletResponse response) {
-        JwtVo jwt = userVo.getJwtVo();
-        Object authenticationInfoStr = UserSessionCache.getItem(jwt.getTokenHash());
-        if (authenticationInfoStr == null) {
-            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwt.getTokenHash());
-            if (null != userSessionVo && (jwt.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
-                Date visitTime = userSessionVo.getSessionTime();
-                Date now = new Date();
-                int expire = Config.USER_EXPIRETIME();
-                long expireTime = expire * 60L * 1000L + visitTime.getTime();
-                if (now.getTime() < expireTime) {
-                    String authInfo = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
-                    userSessionVo.setAuthInfoStr(authInfo);
-                    userSessionMapper.updateUserSession(jwt.getTokenHash());
-                    AuthenticationInfoVo authenticationInfo = userSessionVo.getAuthInfo();
-                    authenticationInfo.setUserUuid(userVo.getUuid());
-                    UserSessionCache.addItem(jwt.getTokenHash(), JSON.toJSONString(authenticationInfo));
-                    UserContext.init(userVo, authenticationInfo, timezone, request, response);
-                    return false;
-                }
-                userSessionMapper.deleteUserSessionByTokenHash(jwt.getTokenHash());
+    private boolean userExpirationValid(UserSessionVo userSessionVo, JwtVo jwtVo) {
+        if (userSessionVo != null && (jwtVo.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
+            Date visitTime = userSessionVo.getSessionTime();
+            Date now = new Date();
+            //超时时间需加上前端定时心跳间隔时间，否则在快超时的极限情况下用户又继续操作，又没到下次定时 heartbeat 会导致误登出
+            long expireTime = (Config.USER_EXPIRETIME() * 60L + WEB_HEARTBEAT_INTERVAL) * 1000L + visitTime.getTime();
+            //System.out.println(TimeUtil.millisecondsFormat(now.getTime(), 4, TimeUnit.SECONDS, " ") + "  now");
+            //System.out.println(TimeUtil.millisecondsFormat(expireTime, 4, TimeUnit.SECONDS, " ") + "  expire");
+            if (now.getTime() > expireTime) {
+                userSessionMapper.deleteUserSessionByTokenHash(userSessionVo.getTokenHash());
+                return true;
             }
-        } else {
-            AuthenticationInfoVo authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfoStr.toString()), AuthenticationInfoVo.class);
-            authenticationInfoVo.setUserUuid(userVo.getUuid());
-            UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
             return false;
         }
         return true;
+
+    }
+
+    /**
+     * 跟新userSessionCache和用户上下文
+     *
+     * @param userSessionVo 最新用户回话信息（数据库）
+     * @param userVo        用户
+     * @param timezone      时区
+     */
+    private void initUserContext(UserSessionVo userSessionVo, UserVo userVo, String timezone) {
+        String authInfo = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
+        userSessionVo.setAuthInfoStr(authInfo);
+        AuthenticationInfoVo authenticationInfoVo = userSessionVo.getAuthInfo();
+        authenticationInfoVo.setUserUuid(userVo.getUuid());
+        UserContext.init(userVo, authenticationInfoVo, timezone);
     }
 }

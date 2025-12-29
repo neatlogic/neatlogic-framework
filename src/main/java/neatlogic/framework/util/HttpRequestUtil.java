@@ -15,6 +15,7 @@ package neatlogic.framework.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.httprequest.HttpMethodIrregularException;
@@ -589,14 +590,14 @@ public class HttpRequestUtil {
                 //默认使用原来的Content-Disposition，保留原来文件名
                 String contentDisPosition = connection.getHeaderField("Content-Disposition");
                 if (StringUtils.isNotBlank(contentDisPosition)) {
-                    UserContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
+                    RequestContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
                 }
                 if (CollectionUtils.isNotEmpty(responseHeaderList)) {
                     Map<String, List<String>> headersMap = connection.getHeaderFields();
                     for (String header : responseHeaderList) {
                         List<String> buildStatusList = headersMap.get(header);
                         if (CollectionUtils.isNotEmpty(buildStatusList)) {
-                            UserContext.get().getResponse().setHeader(header, buildStatusList.get(0));
+                            RequestContext.get().getResponse().setHeader(header, buildStatusList.get(0));
                         }
                     }
                 }
@@ -640,8 +641,8 @@ public class HttpRequestUtil {
                 this.errorMsg = e.getMessage();
             } finally {
                 connection.disconnect();
-                if (UserContext.get() != null && UserContext.get().getResponse() != null && !UserContext.get().getResponse().isCommitted()) {
-                    resetResponse(UserContext.get().getResponse());
+                if (UserContext.get() != null && RequestContext.get().getResponse() != null && !RequestContext.get().getResponse().isCommitted()) {
+                    resetResponse(RequestContext.get().getResponse());
                 }
                 IOUtils.closeQuietly(input); // 关闭输入流
                 IOUtils.closeQuietly(this.outputStream); // 关闭输出流

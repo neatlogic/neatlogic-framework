@@ -1362,6 +1362,11 @@
         </where>
         LIMIT #{startNum}, #{pageSize}
     </select>
+    <select id="getActivePasswordByUserUuid" resultType="neatlogic.framework.dto.UserPasswordVo" useCache="false">
+        select id, user_uuid as userUuid, user_id as userId, create_time as createTime
+        from user_password
+        where user_uuid = #{userUuid} and is_active = 1  limit 1
+    </select>
 
     <insert id="insertUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo">
         REPLACE INTO `user_authority`(`user_uuid`,

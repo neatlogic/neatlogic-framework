@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.annotationprocessor.NeatLogicApi;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.core.AuthAction;
@@ -65,13 +66,12 @@ public class ApiValidateAndHelpBase {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
 
     protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
-        UserContext userContext = UserContext.get();
-        HttpServletRequest request = userContext.getRequest();
+        HttpServletRequest request = RequestContext.get().getRequest();
         String requestIp = IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
         data.put("authtype", apiVo.getAuthtype());
-        data.put("userUuid", userContext.getUserUuid());
+        data.put("userUuid", UserContext.get().getUserUuid());
         data.put("ip", requestIp);
         if (MapUtils.isNotEmpty(paramObj)) {
             data.put("param", JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat, SerializerFeature.WriteDateUseDateFormat));
@@ -91,7 +91,7 @@ public class ApiValidateAndHelpBase {
 
     protected void saveAudit(ApiVo apiVo, String param, Object result, String error, Long startTime, Long endTime) {
         UserContext userContext = UserContext.get();
-        HttpServletRequest request = userContext.getRequest();
+        HttpServletRequest request = RequestContext.get().getRequest();
         String requestIp = IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());

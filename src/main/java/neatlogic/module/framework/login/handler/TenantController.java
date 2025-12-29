@@ -130,6 +130,7 @@ public class TenantController {
                 ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
                 if (loginAuth != null) {
                     data.put("isNeedAuth", loginAuth.isNeedAuth());
+                    data.put("pwdExpiredDirectUrl", loginAuth.pwdExpiredDirectUrl());
                 }
             }
 
@@ -139,6 +140,7 @@ public class TenantController {
             }
             // 是否允许移动端下载附件
             data.put("mobileFileDownloadEnabled", ConfigManager.getConfig(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED));
+
             ReturnJson.success(data, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

@@ -12,7 +12,7 @@
 
 package neatlogic.framework.util;
 
-import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.dto.RestVo;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
 import neatlogic.framework.file.core.FileStorageMediumFactory;
@@ -110,7 +110,7 @@ public class RestUtil {
      * @param restVo 请求入参
      */
     public static String sendPostRequestForStream(RestVo restVo) {
-        HttpServletResponse response = UserContext.get().getResponse();
+        HttpServletResponse response = RequestContext.get().getResponse();
         HttpURLConnection connection = null;
         String result = "";
         try {

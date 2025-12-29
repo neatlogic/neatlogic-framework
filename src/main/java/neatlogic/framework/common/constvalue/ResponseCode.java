@@ -23,6 +23,7 @@ import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.type.LicenseInvalidException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
+import neatlogic.framework.exception.user.UserPasswordExpiredException;
 
 
 public enum ResponseCode {
@@ -37,6 +38,7 @@ public enum ResponseCode {
     EDIT_TARGET_NOTFOUND(526, "对象不存在", NotFoundEditTargetException.class),
     LOGIN_EXPIRED(527, "登录会话超时或已终止", LoginExpiredException.class),
     API_FIELD_INVALID(530, "入参校验失败", ApiFieldValidException.class),
+    PASSWORD_EXPIRED(533, "密码过期", UserPasswordExpiredException.class),
     LICENSE_INVALID(550, "license认证失败", LicenseInvalidException.class);
 
 

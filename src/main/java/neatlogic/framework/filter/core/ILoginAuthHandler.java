@@ -76,4 +76,17 @@ public interface ILoginAuthHandler {
     default boolean isNeedCookie() {
         return true;
     }
+
+    /**
+     * 检查密码失效
+     */
+    default boolean checkPwdExpired(UserVo checkUserVo){
+        return false;
+    }
+
+    /**
+     * 密码失效后跳转的 url
+     */
+    String pwdExpiredDirectUrl();
+
 }

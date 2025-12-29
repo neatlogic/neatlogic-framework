@@ -93,7 +93,7 @@ public class Config {
     private static String MAINTENANCE_PASSWORD;//运维用户密码
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码以及用户token创建时间
-    private static Boolean ENABLE_VALID_TOKEN_FCD;//校验用户token创建时间
+    private static Boolean ENABLE_CONCURRENT_SESSION;//是否允许同个用户多浏览器同时登录
     private static Boolean ENABLE_VALID_LICENSE;//校验license
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
@@ -167,14 +167,14 @@ public class Config {
             ENABLE_NO_SECRET = false;
         }
 
-        if (StringUtils.isNotBlank(System.getProperty("enableValidTokenFcd"))) {
+        if (StringUtils.isNotBlank(System.getProperty("enableConcurrentSession"))) {
             try {
-                ENABLE_VALID_TOKEN_FCD = Boolean.valueOf(System.getProperty("enableValidTokenFcd"));
+                ENABLE_CONCURRENT_SESSION = Boolean.valueOf(System.getProperty("enableConcurrentSession"));
             } catch (Exception ex) {
-                ENABLE_VALID_TOKEN_FCD = true;
+                ENABLE_CONCURRENT_SESSION = false;
             }
         } else {
-            ENABLE_VALID_TOKEN_FCD = true;
+            ENABLE_CONCURRENT_SESSION = false;
         }
 
         if (StringUtils.isNotBlank(System.getProperty("enableValidLicense"))) {
@@ -381,8 +381,8 @@ public class Config {
         return ENABLE_NO_SECRET;
     }
 
-    public static boolean ENABLE_VALID_TOKEN_FCD() {
-        return ENABLE_VALID_TOKEN_FCD;
+    public static boolean ENABLE_CONCURRENT_SESSION() {
+        return ENABLE_CONCURRENT_SESSION;
     }
 
     public static boolean ENABLE_VALID_LICENSE() {

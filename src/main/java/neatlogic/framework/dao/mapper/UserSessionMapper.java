@@ -21,6 +21,8 @@ import java.util.List;
 public interface UserSessionMapper {
     UserSessionVo getUserSessionByTokenHash(String userUuid);
 
+    UserSessionVo getUserSessionByTokenHashWithoutCache(String userUuid);
+
     List<UserSessionVo> getUserSessionByUuid(String userUuid);
 
     List<UserSessionVo> getUserSessionByUuidList(List<String> userUuidList);

@@ -20,15 +20,9 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.DeviceType;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.CommonUtil;
-import neatlogic.framework.dao.cache.UserSessionCache;
 import neatlogic.framework.dao.mapper.*;
-import neatlogic.framework.dto.AuthenticationInfoVo;
-import neatlogic.framework.dto.JwtVo;
-import neatlogic.framework.dto.UserSessionVo;
-import neatlogic.framework.dto.UserVo;
-import neatlogic.framework.dto.captcha.LoginFailedCountVo;
+import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.loginaudit.LoginAuditVo;
-import neatlogic.framework.filter.InsertUserSessionThread;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
@@ -36,6 +30,7 @@ import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
 import neatlogic.framework.util.TimeUtil;
+import neatlogic.module.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -74,6 +69,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     protected static AuthenticationInfoService authenticationInfoService;
 
+    protected static LoginService loginService;
+
     @Autowired
     public void setUserMapper(UserMapper _userMapper) {
         userMapper = _userMapper;
@@ -104,6 +101,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         authenticationInfoService = _authenticationInfoService;
     }
 
+    @Autowired
+    public void setLoginService(LoginService _loginService) {
+        loginService = _loginService;
+    }
+
     @Override
     public UserVo auth(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String tenant = request.getHeader("tenant");
@@ -121,14 +123,14 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             JwtVo jwtVo = new JwtVo();
             AuthenticationInfoVo authenticationInfoVo;
             jwtVo.setToken(getToken(userVo));
-            Object authenticationInfo = UserSessionCache.getItem(jwtVo.getTokenHash());
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
             boolean isNeedLoginPost = false;
-            if (authenticationInfo == null) {
+            if (userSessionVo == null) {
                 logger.debug("======= tokenHash: {}", jwtVo.getTokenHash());
                 String authInfoHash = null;
                 String authenticationInfoStr = null;
                 authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                jwtVo = buildJwt(userVo, authenticationInfoVo);
+                jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
                 if (isNeedCookie()) {
                     setResponseAuthCookie(response, request, tenant, jwtVo);
                 }
@@ -138,9 +140,12 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                         authInfoHash = Md5Util.encryptMD5(authenticationInfoStr);
                     }
                 }
-                UserSessionVo userSessionVo = new UserSessionVo(userVo.getUuid(), jwtVo.getToken(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash, authenticationInfoStr);
-                InsertUserSessionThread.addInsertUserSession(userSessionVo);
-                UserSessionCache.addItem(jwtVo.getTokenHash(), authenticationInfoStr == null ? "{}" : authenticationInfoStr);
+                userSessionVo = new UserSessionVo(userVo.getUuid(), jwtVo.getToken(), jwtVo.getTokenHash(), jwtVo.getTokenCreateTime(), authInfoHash, authenticationInfoStr);
+                userSessionMapper.insertUserSession(userSessionVo.getUserUuid(), userSessionVo.getTokenHash(), userSessionVo.getTokenCreateTime(), userSessionVo.getAuthInfoHash());
+                userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(userSessionVo.getTokenHash(), userSessionVo.getToken()));
+                if (StringUtils.isNotBlank(userSessionVo.getAuthInfoHash())) {
+                    userSessionContentMapper.insertUserSessionContent(new UserSessionContentVo(userSessionVo.getAuthInfoHash(), userSessionVo.getAuthInfoStr()));
+                }
                 isNeedLoginPost = true;
                 if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
                     LoginAuditVo loginAuditVo = new LoginAuditVo();
@@ -151,17 +156,23 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
             } else {
-                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(authenticationInfo.toString()), AuthenticationInfoVo.class);
+                String autoInfoStr = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
+                if(StringUtils.isNotBlank(autoInfoStr)) {
+                    authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(autoInfoStr), AuthenticationInfoVo.class);
+                }else{
+                    //系统用户或者没有分组和角色的用户
+                    authenticationInfoVo = new AuthenticationInfoVo();
+                }
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
                 if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
-                    jwtVo = buildJwt(userVo, authenticationInfoVo);
+                    jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
                     setResponseAuthCookie(response, request, tenant, jwtVo);
                 }
             }
             userVo.setJwtVo(jwtVo);
             assert authenticationInfoVo != null;
             authenticationInfoVo.setUserUuid(userVo.getUuid());
-            UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME, request, response);
+            UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
             if (isNeedLoginPost) {
                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                     loginPostProcessor.loginAfterInitialization();
@@ -183,9 +194,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @return jwt对象
      * @throws Exception 异常
      */
-    public static JwtVo buildJwt(UserVo checkUserVo, AuthenticationInfoVo authenticationInfoVo) throws Exception {
+    public static JwtVo buildJwt(UserVo checkUserVo, AuthenticationInfoVo authenticationInfoVo, String authType) throws Exception {
         Long tokenCreateTime = System.currentTimeMillis();
-        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, authenticationInfoVo);
+        JwtVo jwtVo = new JwtVo(checkUserVo, tokenCreateTime, authenticationInfoVo, authType);
         SecretKeySpec signingKey = new SecretKeySpec(Config.JWT_SECRET().getBytes(), "HmacSHA1");
         Mac mac;
         mac = Mac.getInstance("HmacSHA1");
@@ -206,7 +217,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return jwtVo;
     }
 
-    public static String getToken(UserVo checkUserVo){
+    public static String getToken(UserVo checkUserVo) {
         Long tokenCreateTime = System.currentTimeMillis();
         //补充满足前缀的header
         Set<String> headerSet = new HashSet<>();
@@ -224,7 +235,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
      * @throws Exception 异常
      */
     public static JwtVo buildJwt(UserVo checkUserVo) throws Exception {
-        return buildJwt(checkUserVo, new AuthenticationInfoVo());
+        return buildJwt(checkUserVo, new AuthenticationInfoVo(), null);
     }
 
     /**
@@ -257,12 +268,11 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
 
     @Override
     public String logout() {
-        UserSessionCache.removeItem(UserContext.get().getTokenHash());
         //仅删除自己创建的session
         JwtVo jwtVo = UserContext.get().getJwtVo();
-        if(jwtVo != null){
-            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(jwtVo.getTokenHash());
-            if(userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(),jwtVo.getTokenCreateTime())){
+        if (jwtVo != null) {
+            UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHashWithoutCache(jwtVo.getTokenHash());
+            if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {
                 userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
             }
         }
@@ -317,26 +327,14 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     @Override
     public UserVo login(UserVo userVo, JSONObject resultJson) {
         UserVo checkUserVo = myLogin(userVo, resultJson);
-        LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
-        if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
-            int failedCount = 1;
-            loginFailedCountVo = loginMapper.getLoginFailedCountVoByUserId(userVo.getUserId());
-            if (loginFailedCountVo != null) {
-                failedCount = loginFailedCountVo.getFailedCount();
-            }
-            loginFailedCountVo = new LoginFailedCountVo(userVo.getUserId(), failedCount);
-            loginMapper.updateLoginFailedCount(loginFailedCountVo);
-        } else {//如果正常用户登录成功，则清空该用户的失败次数
-            resultJson.remove("isNeedCaptcha");
-            loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
-            if (SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
-                LoginAuditVo loginAuditVo = new LoginAuditVo();
-                loginAuditVo.setId(SnowflakeUtil.uniqueLong());
-                loginAuditVo.setUserUuid(checkUserVo.getUuid());
-                loginAuditVo.setIp(RequestContext.get().getRemoteAddr());
-                loginAuditVo.setLoginMethod(getType());
-                loginMapper.insertLoginAudit(loginAuditVo);
-            }
+        loginService.updateFailCount(userVo, resultJson, checkUserVo);
+        if (checkUserVo != null && SystemUserFactory.getUserVoByUser(userVo.getUuid()) == null) {
+            LoginAuditVo loginAuditVo = new LoginAuditVo();
+            loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+            loginAuditVo.setUserUuid(checkUserVo.getUuid());
+            loginAuditVo.setIp(RequestContext.get().getRemoteAddr());
+            loginAuditVo.setLoginMethod(getType());
+            loginMapper.insertLoginAudit(loginAuditVo);
         }
         return checkUserVo;
     }
@@ -345,4 +343,23 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         return userMapper.getUserByUserIdAndPassword(userVo);
     }
 
+    @Override
+    public String pwdExpiredDirectUrl() {
+        String directUrl;
+        String device = CommonUtil.getDevice();
+        if (StringUtils.isNotBlank(device) && Objects.equals(DeviceType.MOBILE.getValue(), device)) {
+            directUrl = mobilePwdExpiredDirectUrl();
+        } else {
+            directUrl = myPwdExpiredDirectUrl();
+        }
+        return directUrl;
+    }
+
+    String mobilePwdExpiredDirectUrl() {
+        return null;
+    }
+
+    String myPwdExpiredDirectUrl() {
+        return null;
+    }
 }

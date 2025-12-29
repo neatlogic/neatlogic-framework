@@ -20,17 +20,24 @@
         WHERE `session_id` = #{value}
     </select>
 
-    <select id="getLoginFailedCountByUserId" resultType="java.lang.Integer">
+    <select id="getLoginFailedCountByUserId" resultType="java.lang.Integer" useCache="false">
         SELECT `failed_count`
         FROM `login_failed_count`
         WHERE `user_id` = #{value}
     </select>
 
     <select id="getLoginFailedCountVoByUserId"
-            resultType="neatlogic.framework.dto.captcha.LoginFailedCountVo">
-        SELECT `failed_count` as failedCount, `user_id` as userId
+            resultType="neatlogic.framework.dto.captcha.LoginFailedCountVo" useCache="false">
+        SELECT `failed_count` as failedCount, `user_id` as userId, `last_failed_time` as lastFailedTime, `locked_until` as lockedUntil
         FROM `login_failed_count`
         WHERE `user_id` = #{value}
+    </select>
+
+    <select id="getLoginFailedCountLockByUserId"
+            resultType="neatlogic.framework.dto.captcha.LoginFailedCountVo" useCache="false">
+        SELECT `failed_count` as failedCount, `user_id` as userId, `last_failed_time` as lastFailedTime, `locked_until` as lockedUntil
+        FROM `login_failed_count`
+        WHERE `user_id` = #{value} for update
     </select>
 
     <select id="getLoginAuditCount" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditSearchVo" resultType="int">
@@ -94,10 +101,13 @@
     </insert>
 
     <insert id="updateLoginFailedCount" parameterType="neatlogic.framework.dto.captcha.LoginFailedCountVo">
-        INSERT INTO `login_failed_count` (`user_id`, `failed_count`)
-        VALUES (#{userId}, #{failedCount})
+        INSERT INTO `login_failed_count` (`user_id`, `failed_count`, `last_failed_time`, `locked_until`)
+        VALUES (#{userId}, #{failedCount}, #{lastFailedTime}, #{lockedUntil})
         ON DUPLICATE KEY
-            UPDATE failed_count = (failed_count + 1)
+            UPDATE failed_count       = (failed_count + 1),
+                   `last_failed_time` = #{lastFailedTime},
+                   `locked_until`     = #{lockedUntil}
+
     </insert>
 
     <insert id="insertLoginAudit" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditVo">

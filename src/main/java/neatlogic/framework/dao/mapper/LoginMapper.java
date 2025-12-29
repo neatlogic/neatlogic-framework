@@ -30,6 +30,8 @@ public interface LoginMapper {
 
     LoginFailedCountVo getLoginFailedCountVoByUserId(String userUuid);
 
+    LoginFailedCountVo getLoginFailedCountLockByUserId(String userUuid);
+
     int getLoginAuditCount(LoginAuditSearchVo searchVo);
 
     List<LoginAuditVo> getLoginAuditList(LoginAuditSearchVo searchVo);

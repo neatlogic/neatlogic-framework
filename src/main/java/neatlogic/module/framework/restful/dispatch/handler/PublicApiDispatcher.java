@@ -137,14 +137,13 @@ public class PublicApiDispatcher {
                 userVo = userTmpVo;
                 userVo.setAuthorization(authorization);
                 AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-                UserContext.init(userVo, authenticationInfoVo, timezone, request, response);
+                UserContext.init(userVo, authenticationInfoVo, timezone);
             }
         }
         if (userVo == null) {
-            UserContext.init(SystemUser.SYSTEM, request, response);
+            RequestContext.init(request, request.getRequestURI(), response);
+            UserContext.init(SystemUser.SYSTEM);
         }
-
-        UserContext.get().setRequest(request);
 
         ApiVo interfaceVo = apiMapper.getApiByToken(token);
         String uri = request.getRequestURI();

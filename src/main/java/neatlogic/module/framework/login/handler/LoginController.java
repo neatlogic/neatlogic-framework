@@ -164,6 +164,8 @@ public class LoginController {
                         loginMapper.insertLoginAudit(loginAuditVo);
                     }
                 } else {
+                    //校验用户锁定
+                    loginService.checkLockUser(userVo);
                     //目前仅先校验移动端
                     if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
                         loginService.loginCaptchaValid(jsonObj, resultJson);
@@ -178,7 +180,7 @@ public class LoginController {
                 if (checkUserVo != null) {
                     String timezone = TimeUtil.ZONE_TIME;
                     authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
-                    UserContext.init(checkUserVo, authenticationInfoVo, timezone, request, response);
+                    UserContext.init(checkUserVo, authenticationInfoVo, timezone);
                     if (TenantContext.get().getTenantUuid() != null) {
                         for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                             loginPostProcessor.loginAfterInitialization();
@@ -189,7 +191,7 @@ public class LoginController {
 
             if (checkUserVo != null) {
                 checkUserVo.setTenant(tenant);
-                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo);
+                JwtVo jwtVo = LoginAuthHandlerBase.buildJwt(checkUserVo, authenticationInfoVo, authType);
                 String authenticationInfoStr = null;
                 String authInfoHash = null;
                 if (authenticationInfoVo != null && (CollectionUtils.isNotEmpty(authenticationInfoVo.getUserUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getTeamUuidList()) || CollectionUtils.isNotEmpty(authenticationInfoVo.getRoleUuidList()))) {
@@ -210,6 +212,7 @@ public class LoginController {
                 LoginAuthHandlerBase.setResponseAuthCookie(response, request, tenant, jwtVo);
                 returnObj.put("Status", "OK");
                 returnObj.put("JwtToken", jwtVo.getJwthead() + "." + jwtVo.getJwtbody() + "." + jwtVo.getJwtsign());
+                returnObj.put("TokenHash", jwtVo.getTokenHash());
                 response.getWriter().print(returnObj);
             } else {
                 throw new UserAuthFailedException();
@@ -246,7 +249,7 @@ public class LoginController {
             }
             tenantContext.switchTenant(tenant);
             // 还原回租户库
-           // tenantContext.setUseMasterDatabase(false);
+            // tenantContext.setUseMasterDatabase(false);
         }
         String sessionId = jsonObj.getString("sessionId");
         JSONObject result = CaptchaUtil.getCaptcha();

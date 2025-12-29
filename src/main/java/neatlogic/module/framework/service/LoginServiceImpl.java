@@ -17,19 +17,25 @@ package neatlogic.module.framework.service;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.config.ConfigManager;
+import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.dao.mapper.LoginMapper;
-import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.exception.captcha.LoginCaptchaIsEmptyException;
 import neatlogic.framework.exception.captcha.LoginCaptchaNotInvalidException;
+import neatlogic.framework.exception.user.LoginLockedException;
+import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionStatus;
 
 import javax.annotation.Resource;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
@@ -37,28 +43,7 @@ import java.util.Objects;
 @Service
 public class LoginServiceImpl implements LoginService {
     @Resource
-    UserMapper userMapper;
-    @Resource
     LoginMapper loginMapper;
-
-    @Override
-    public UserVo loginWithUserIdAndPassword(UserVo userParam, JSONObject resultJson) {
-        UserVo checkUserVo = userMapper.getUserByUserIdAndPassword(userParam);
-        LoginFailedCountVo loginFailedCountVo = new LoginFailedCountVo();
-        if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
-            int failedCount = 1;
-            loginFailedCountVo = loginMapper.getLoginFailedCountVoByUserId(userParam.getUserId());
-            if (loginFailedCountVo != null) {
-                failedCount = loginFailedCountVo.getFailedCount();
-            }
-            loginFailedCountVo = new LoginFailedCountVo(userParam.getUserId(), failedCount);
-            loginMapper.updateLoginFailedCount(loginFailedCountVo);
-        } else {//如果正常用户登录成功，则清空该用户的失败次数
-            resultJson.remove("isNeedCaptcha");
-            loginMapper.deleteLoginFailedCountByUserId(userParam.getUserId());
-        }
-        return checkUserVo;
-    }
 
     @Override
     public void loginCaptchaValid(JSONObject jsonObj, JSONObject resultJson) {
@@ -83,6 +68,61 @@ public class LoginServiceImpl implements LoginService {
                 }
             } else {
                 throw new LoginCaptchaIsEmptyException(Config.LOGIN_FAILED_TIMES_CAPTCHA());
+            }
+        }
+    }
+
+    @Override
+    public void updateFailCount(UserVo userVo, JSONObject resultJson, UserVo checkUserVo) {
+        TransactionStatus tx = null;
+        try {
+            tx = TransactionUtil.openTx();
+            LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(userVo.getUserId());
+            if (checkUserVo == null) {//如果正常用户登录失败则，失败次数+1
+                int failedCount = 1;
+                Date lockedUtil = null;
+                if (loginFailedCountVo != null) {
+                    if (loginFailedCountVo.getFailedCount() + 1 > Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_FAILED_COUNT))) {
+                        lockedUtil = Date.from(
+                                Instant.now().plus(Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_TIME)), ChronoUnit.MINUTES)
+                        );
+                    }
+                    failedCount = loginFailedCountVo.getFailedCount();
+                }
+                Date lastFailedTime = Date.from(Instant.now());
+                loginFailedCountVo = new LoginFailedCountVo(userVo.getUserId(), failedCount + 1, lockedUtil, lastFailedTime);
+                loginMapper.updateLoginFailedCount(loginFailedCountVo);
+            } else {//如果正常用户登录成功，则清空该用户的失败次数
+                resultJson.remove("isNeedCaptcha");
+                loginMapper.deleteLoginFailedCountByUserId(userVo.getUserId());
+            }
+            TransactionUtil.commitTx(tx);
+        } catch (Exception ex) {
+            if (tx != null) {
+                TransactionUtil.rollbackTx(tx);
+            }
+            throw ex;
+        }
+    }
+
+    @Override
+    public void checkLockUser(UserVo paramUser) {
+        if (Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_NEED_LOCK)) == 1) {
+            TransactionStatus tx = null;
+            try {
+                tx = TransactionUtil.openTx();
+                LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(paramUser.getUserId());
+                if (loginFailedCountVo != null && loginFailedCountVo.getLockedUntil() != null && new Date().before(loginFailedCountVo.getLockedUntil())) {
+                    int failedCountLimit = Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_FAILED_COUNT));
+                    String lockUtil = TimeUtil.convertDateToString(loginFailedCountVo.getLockedUntil(),TimeUtil.YYYY_MM_DD_HH_MM_SS);
+                    throw new LoginLockedException(failedCountLimit, lockUtil);
+                }
+                TransactionUtil.commitTx(tx);
+            } catch (Exception ex) {
+                if (tx != null) {
+                    TransactionUtil.rollbackTx(tx);
+                }
+                throw ex;
             }
         }
     }

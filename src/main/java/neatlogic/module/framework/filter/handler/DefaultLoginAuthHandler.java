@@ -129,7 +129,7 @@ public class DefaultLoginAuthHandler extends LoginAuthHandlerBase {
                             String needPwdExpiredCheck = ConfigManager.getConfig(FrameworkTenantConfig.PASSWORD_NEED_EXPIRED_CHECK);
                             if (Objects.equals(needPwdExpiredCheck, "1")
                                     && Boolean.TRUE.equals(jwtBodyObj.getBoolean("pwdExpired"))
-                                    && PrivateApiComponentFactory.ExemptTokenMap.stream().noneMatch(o -> Objects.equals("/neatlogic/api/" + o, RequestContext.get().getRequest().getRequestURI()))
+                                    && PrivateApiComponentFactory.ExemptTokenMap.stream().noneMatch(o -> Objects.equals("/neatlogic/api/rest" + (o.startsWith("/")?"":"/") + o, RequestContext.get().getRequest().getRequestURI()))
                             ) {
                                 throw new UserPasswordExpiredException();
                             }

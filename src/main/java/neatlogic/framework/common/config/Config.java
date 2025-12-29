@@ -72,7 +72,6 @@ public class Config {
     private static String MASTER_HOME_URL;// 前端租户管理服务器地址，例如：http://192.168.0.10:9099
     private static String BACK_END_URL;// 后端服务器地址，例如：http://192.168.0.25:8282/neatlogic
     private static String USER_EXPIRETIME; // 会话超时时间(分)
-    private static String WEB_HEARTBEAT_INTERVAL; // 前端心跳时间间隔(秒)
     private static int LOGIN_CAPTCHA_EXPIRED_TIME; //验证码超时时间(秒)
     private static int LOGIN_FAILED_TIMES_CAPTCHA; //设置需要验证码的登录错误次数
 
@@ -94,7 +93,7 @@ public class Config {
     private static String MAINTENANCE_PASSWORD;//运维用户密码
     private static Boolean ENABLE_INTERFACE_VERIFY;//是否激活接口参数校验
     private static Boolean ENABLE_NO_SECRET;//是否激活免密登录，用户只校验用户名，不校验密码以及用户token创建时间
-    private static Boolean ENABLE_VALID_TOKEN_FCD;//校验用户token创建时间
+    private static Boolean ENABLE_CONCURRENT_SESSION;//是否允许同个用户多浏览器同时登录
     private static Boolean ENABLE_VALID_LICENSE;//校验license
     private static Boolean ENABLE_GZIP; //是否激活数据库大字段压缩
 
@@ -168,14 +167,14 @@ public class Config {
             ENABLE_NO_SECRET = false;
         }
 
-        if (StringUtils.isNotBlank(System.getProperty("enableValidTokenFcd"))) {
+        if (StringUtils.isNotBlank(System.getProperty("enableConcurrentSession"))) {
             try {
-                ENABLE_VALID_TOKEN_FCD = Boolean.valueOf(System.getProperty("enableValidTokenFcd"));
+                ENABLE_CONCURRENT_SESSION = Boolean.valueOf(System.getProperty("enableConcurrentSession"));
             } catch (Exception ex) {
-                ENABLE_VALID_TOKEN_FCD = true;
+                ENABLE_CONCURRENT_SESSION = false;
             }
         } else {
-            ENABLE_VALID_TOKEN_FCD = true;
+            ENABLE_CONCURRENT_SESSION = false;
         }
 
         if (StringUtils.isNotBlank(System.getProperty("enableValidLicense"))) {
@@ -353,10 +352,6 @@ public class Config {
         return Integer.parseInt(USER_EXPIRETIME);
     }
 
-    public static int WEB_HEARTBEAT_INTERVAL() {
-        return Integer.parseInt(WEB_HEARTBEAT_INTERVAL);
-    }
-
     public static int LOGIN_CAPTCHA_EXPIRED_TIME() {
         return LOGIN_CAPTCHA_EXPIRED_TIME;
     }
@@ -386,8 +381,8 @@ public class Config {
         return ENABLE_NO_SECRET;
     }
 
-    public static boolean ENABLE_VALID_TOKEN_FCD() {
-        return ENABLE_VALID_TOKEN_FCD;
+    public static boolean ENABLE_CONCURRENT_SESSION() {
+        return ENABLE_CONCURRENT_SESSION;
     }
 
     public static boolean ENABLE_VALID_LICENSE() {
@@ -660,7 +655,6 @@ public class Config {
             MASTER_HOME_URL = prop.getProperty("master.home.url");
             BACK_END_URL = prop.getProperty("back.end.url");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
-            WEB_HEARTBEAT_INTERVAL = prop.getProperty("web.heartbeat.interval", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));
             DB_TRANSACTION_TIMEOUT = Integer.parseInt(prop.getProperty("db.transaction.timeout", "180"));

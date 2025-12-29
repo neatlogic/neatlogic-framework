@@ -141,8 +141,6 @@ public class TenantController {
             // 是否允许移动端下载附件
             data.put("mobileFileDownloadEnabled", ConfigManager.getConfig(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED));
 
-            data.put("webHeartbeatInterval",Config.WEB_HEARTBEAT_INTERVAL());
-
             ReturnJson.success(data, response);
         } catch (Exception e) {
             logger.error(e.getMessage(), e);

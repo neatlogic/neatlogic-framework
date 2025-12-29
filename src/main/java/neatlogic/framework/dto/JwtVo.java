@@ -175,7 +175,7 @@ public class JwtVo implements Serializable {
     }
 
     public boolean isNotValidTokenCreateTime() {
-        return Config.ENABLE_NO_SECRET() || !Config.ENABLE_VALID_TOKEN_FCD();
+        return Config.ENABLE_NO_SECRET() || Config.ENABLE_CONCURRENT_SESSION();
 
     }
 

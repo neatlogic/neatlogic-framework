@@ -47,6 +47,9 @@ import java.time.ZoneOffset;
 import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
+    //前端定时心跳的时间
+    private static final int WEB_HEARTBEAT_INTERVAL= 60;
+
     @Resource
     private UserSessionMapper userSessionMapper;
 
@@ -251,15 +254,17 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     /**
      * 校验用户登录超时
+     * - 用户没有点击或滚动鼠标超过会话有效期（默认 60分）
+     * - 在别的浏览器登录同个用户默认是会互相挤退
      *
      * @return 不超时返回权限信息，否则返回null
      */
     private boolean userExpirationValid(UserSessionVo userSessionVo, JwtVo jwtVo) {
-        if (userSessionVo != null) {
+        if (userSessionVo != null && (jwtVo.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
             Date visitTime = userSessionVo.getSessionTime();
             Date now = new Date();
-            //超时时间需加上前端定时心跳的缓冲时间，否则再快超时的极限情况下用户又继续操作，又没到下次定时 heartbeat 会导致误登出
-            long expireTime = (Config.USER_EXPIRETIME() * 60L + Config.WEB_HEARTBEAT_INTERVAL()) * 1000L + visitTime.getTime();
+            //超时时间需加上前端定时心跳间隔时间，否则在快超时的极限情况下用户又继续操作，又没到下次定时 heartbeat 会导致误登出
+            long expireTime = (Config.USER_EXPIRETIME() * 60L + WEB_HEARTBEAT_INTERVAL) * 1000L + visitTime.getTime();
             //System.out.println(TimeUtil.millisecondsFormat(now.getTime(), 4, TimeUnit.SECONDS, " ") + "  now");
             //System.out.println(TimeUtil.millisecondsFormat(expireTime, 4, TimeUnit.SECONDS, " ") + "  expire");
             if (now.getTime() > expireTime) {

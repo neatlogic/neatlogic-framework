@@ -157,7 +157,12 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 }
             } else {
                 String autoInfoStr = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
-                authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(autoInfoStr), AuthenticationInfoVo.class);
+                if(StringUtils.isNotBlank(autoInfoStr)) {
+                    authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(autoInfoStr), AuthenticationInfoVo.class);
+                }else{
+                    //系统用户或者没有分组和角色的用户
+                    authenticationInfoVo = new AuthenticationInfoVo();
+                }
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
                 if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
                     jwtVo = buildJwt(userVo, authenticationInfoVo, getType());

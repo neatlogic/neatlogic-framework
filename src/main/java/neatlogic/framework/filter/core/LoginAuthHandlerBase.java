@@ -30,13 +30,12 @@ import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
 import neatlogic.framework.util.TimeUtil;
-import neatlogic.module.framework.service.LoginService;
+import neatlogic.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -51,7 +50,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
-@DependsOn("loginService")
 public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     protected static Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
 

@@ -46,7 +46,7 @@ import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.service.TenantService;
 import neatlogic.framework.util.*;
-import neatlogic.module.framework.service.LoginService;
+import neatlogic.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

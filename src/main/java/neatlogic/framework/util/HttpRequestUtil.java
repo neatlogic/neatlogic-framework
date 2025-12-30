@@ -16,7 +16,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.httprequest.HttpMethodIrregularException;
 import neatlogic.framework.file.dto.FileVo;
@@ -641,7 +640,7 @@ public class HttpRequestUtil {
                 this.errorMsg = e.getMessage();
             } finally {
                 connection.disconnect();
-                if (UserContext.get() != null && RequestContext.get().getResponse() != null && !RequestContext.get().getResponse().isCommitted()) {
+                if (RequestContext.get() != null && RequestContext.get().getResponse() != null && !RequestContext.get().getResponse().isCommitted()) {
                     resetResponse(RequestContext.get().getResponse());
                 }
                 IOUtils.closeQuietly(input); // 关闭输入流

@@ -75,6 +75,8 @@ public class DataSourceVo extends BasePageVo {
     private Long connectionId;
     @EntityField(name = "nfdd.datasourcevo.entityfield.name.databaseid", type = ApiParamType.LONG)
     private Long databaseId;
+    @EntityField(name = "term.framework.integrationuuid", type = ApiParamType.STRING)
+    private String integrationUuid;
     @JSONField(serialize = false)//数据列表
     private List<DataSourceDataVo> dataList;
     @EntityField(name = "nfdd.datasourcevo.entityfield.name.paramlist", type = ApiParamType.JSONARRAY)
@@ -254,6 +256,14 @@ public class DataSourceVo extends BasePageVo {
 
     public void setDatabaseId(Long databaseId) {
         this.databaseId = databaseId;
+    }
+
+    public String getIntegrationUuid() {
+        return integrationUuid;
+    }
+
+    public void setIntegrationUuid(String integrationUuid) {
+        this.integrationUuid = integrationUuid;
     }
 
     public void setQueryTimeout(Integer queryTimeout) {

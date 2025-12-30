@@ -18,5 +18,5 @@ package neatlogic.module.framework.integration.handler;
 import neatlogic.framework.integration.core.IRequestFrom;
 
 public enum FrameworkRequestFrom implements IRequestFrom {
-    API, TEST, FORM, SCHEDULE;
+    API, TEST, FORM, SCHEDULE, DATAWAREHOUSE;
 }

@@ -40,6 +40,7 @@
         <result column="dataCount" property="dataCount"/>
         <result column="dbType" property="dbType"/>
         <result column="databaseId" property="databaseId"/>
+        <result column="integrationUuid" property="integrationUuid"/>
         <collection property="fieldList" ofType="neatlogic.framework.datawarehouse.dto.DataSourceFieldVo">
             <id column="fieldId" property="id"/>
             <result column="fieldName" property="name"/>
@@ -92,6 +93,7 @@
                a.module_id       as moduleId,
                a.data_count      as dataCount,
                a.db_type         as dbType,
+               a.integration_uuid as integrationUuid,
                a.database_id     as databaseId,
                b.id              as fieldId,
                b.name            as fieldName,
@@ -193,6 +195,7 @@
             is_active       = #{isActive},
             db_type         = #{dbType},
             database_id     = #{databaseId},
+            integration_uuid     = #{integrationUuid},
             xml             = #{xml,typeHandler=CompressHandler}
         where id = #{id}
     </select>
@@ -229,6 +232,7 @@
                                               xml,
                                               db_type,
                                               database_id,
+                                              integration_uuid,
                                               is_active)
         values (#{id},
                 #{name},
@@ -242,6 +246,7 @@
                 #{xml,typeHandler=CompressHandler},
                 #{dbType},
                 #{databaseId},
+                #{integrationUuid},
                 #{isActive})
     </select>
 

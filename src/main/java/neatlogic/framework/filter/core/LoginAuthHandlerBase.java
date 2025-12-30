@@ -26,11 +26,11 @@ import neatlogic.framework.dto.loginaudit.LoginAuditVo;
 import neatlogic.framework.login.core.ILoginPostProcessor;
 import neatlogic.framework.login.core.LoginPostProcessorFactory;
 import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.service.LoginService;
 import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
 import neatlogic.framework.util.TimeUtil;
-import neatlogic.framework.service.LoginService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -53,7 +53,6 @@ import java.util.zip.GZIPOutputStream;
 public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     protected static Logger logger = LoggerFactory.getLogger(LoginAuthHandlerBase.class);
 
-    public abstract String getType();
 
     protected static UserMapper userMapper;
 
@@ -155,9 +154,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                 }
             } else {
                 String autoInfoStr = userSessionContentMapper.getUserSessionContentByHash(userSessionVo.getAuthInfoHash());
-                if(StringUtils.isNotBlank(autoInfoStr)) {
+                if (StringUtils.isNotBlank(autoInfoStr)) {
                     authenticationInfoVo = JSON.toJavaObject(JSON.parseObject(autoInfoStr), AuthenticationInfoVo.class);
-                }else{
+                } else {
                     //系统用户或者没有分组和角色的用户
                     authenticationInfoVo = new AuthenticationInfoVo();
                 }

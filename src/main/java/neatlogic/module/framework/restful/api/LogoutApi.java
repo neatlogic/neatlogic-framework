@@ -19,16 +19,14 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.login.LoginAuthNotFoundException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
-import neatlogic.framework.restful.annotation.Description;
-import neatlogic.framework.restful.annotation.Input;
-import neatlogic.framework.restful.annotation.OperationType;
-import neatlogic.framework.restful.annotation.Output;
+import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentBase;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
+@NoPasswordExpiredCheck
 @AuthAction(action = NoAuth.class)
 @OperationType(type = OperationTypeEnum.OPERATE)
 public class LogoutApi extends PrivateApiComponentBase {

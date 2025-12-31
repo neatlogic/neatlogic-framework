@@ -44,7 +44,7 @@ public class JdbcUtil {
             return driver.connect(url, props);
         } catch (Throwable exception) {
             logger.error(exception.getMessage(), exception);
-            throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb", LocalConfig.getPropertiesFrom()), exception);
+            throw new ModuleInitRuntimeException("ERROR: " + I18nUtils.getStaticMessage("nfb.moduleinitializer.getactivetenantlist.neatlogicdb", LocalConfig.getConfigSource()), exception);
         }
     }
 

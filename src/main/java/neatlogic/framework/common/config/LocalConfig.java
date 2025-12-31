@@ -12,7 +12,6 @@
 
 package neatlogic.framework.common.config;
 
-import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.config.ConfigService;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.util.I18nUtils;
@@ -39,18 +38,52 @@ import java.util.Properties;
 
 public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, PriorityOrdered {
     static Logger logger = LoggerFactory.getLogger(LocalConfig.class);
+
+    private static volatile Properties PROPERTIES;
+
     private static final String CONFIG_FILE = "config.properties";
 
-    private static String propertiesFrom;
+    private static ConfigSource configSource;
 
-    public static String getPropertiesFrom() {
-        return propertiesFrom;
+    public static ConfigSource getConfigSource() {
+        return configSource;
     }
 
-    private Properties properties;
     private ConfigurableEnvironment environment;
 
     public static final Map<String, Object> dbConfigMap = new HashMap<>();
+
+    public static Properties getProperties() {
+        Properties p = PROPERTIES;
+        if (p == null) {
+            return new Properties();
+        }
+        Properties copy = new Properties();
+        copy.putAll(p);
+        return copy;
+    }
+
+    static void setProperties(Properties properties) {
+        Properties copy = new Properties();
+        copy.putAll(properties);
+        PROPERTIES = copy;
+    }
+
+    public enum ConfigSource {
+
+        NACOS("nacos"),
+        LOCAL("config.properties");
+
+        private final String sourceName;
+
+        ConfigSource(String sourceName) {
+            this.sourceName = sourceName;
+        }
+
+        public String getSourceName() {
+            return sourceName;
+        }
+    }
 
     /**
      * 、
@@ -95,66 +128,77 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
 
     }
 
+    /**
+     *
+     * 获取配置入口
+     *
+     * @param prop 配置
+     */
+    public static void loadProperties(Properties prop) throws Exception {
+        ConfigService configService = null;
+        String configInfo = null;
+        Properties properties = new Properties();
+        String serverAddr = System.getProperty("nacos.home");
+        String namespace = System.getProperty("nacos.namespace");
+        if (StringUtils.isNotBlank(serverAddr) && StringUtils.isNotBlank(namespace)) {
+            properties.put("serverAddr", System.getProperty("nacos.home"));
+            properties.put("namespace", System.getProperty("nacos.namespace"));
+            configService = NacosConfigServiceHolder.getInstance(properties);
+            configInfo = configService.getConfig("config", "neatlogic.framework", 3000);
+            if (StringUtils.isNotBlank(configInfo)) {
+                prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
+                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", String.format("%s:%s %s", ConfigSource.NACOS.getSourceName(), System.getProperty("nacos.home"), System.getProperty("nacos.namespace"))));
+                configSource = ConfigSource.NACOS;
+            }
+        }
+        // 如果从nacos中读不出配置，则使用本地配置文件配置
+        if (StringUtils.isBlank(configInfo)) {
+            try {
+                prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
+                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", ConfigSource.LOCAL.getSourceName()));
+                configSource = ConfigSource.LOCAL;
+            } catch (Exception ex) {
+                System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfe.confignotfoundexception.confignotfoundexception"));
+                System.exit(1);
+            }
+        }
+
+        //加密dbPassword
+        String dbPassword = prop.getProperty("db.password", "password");
+        if (!RC4Util.isEncrypt(dbPassword)) {
+            String dbPasswordChipper = RC4Util.encrypt(dbPassword);
+            boolean isPublishOk;
+            if (Objects.equals(configSource, ConfigSource.NACOS)) {
+                assert configInfo != null;
+                String updatedConfig = configInfo.replaceAll("(?m)^db\\.password\\s*=\\s*.*$", "db.password=" + dbPasswordChipper);
+                isPublishOk = configService.publishConfig("config", "neatlogic.framework", updatedConfig);
+            } else {
+                // 保存到文件
+                String filePath = Objects.requireNonNull(LocalConfig.class.getClassLoader()
+                        .getResource(CONFIG_FILE)).getPath();
+                updatePropertyLocal(filePath, "db.password", dbPasswordChipper);
+                isPublishOk = true;
+            }
+            if (isPublishOk) {
+                prop.put("db.password", dbPasswordChipper);
+                System.out.println("  ✓db.password加密配置更新成功！");
+            } else {
+                System.out.println("  ✖db.password加密配置更新失败！");
+            }
+        }
+
+        setProperties(prop);
+    }
+
     static {
         Properties prop = new Properties();
-        String configInfo = null;
         try {
-            Properties properties = new Properties();
-            String serverAddr = System.getProperty("nacos.home");
-            String namespace = System.getProperty("nacos.namespace");
-            ConfigService configService = null;
-            if (StringUtils.isNotBlank(serverAddr) && StringUtils.isNotBlank(namespace)) {
-                properties.put("serverAddr", System.getProperty("nacos.home"));
-                properties.put("namespace", System.getProperty("nacos.namespace"));
-                configService = NacosFactory.createConfigService(properties);
-                configInfo = configService.getConfig("config", "neatlogic.framework", 3000);
-                if (StringUtils.isNotBlank(configInfo)) {
-                    prop.load(new InputStreamReader(new ByteArrayInputStream(configInfo.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
-                    System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos", System.getProperty("nacos.home"), System.getProperty("nacos.namespace")));
-                    propertiesFrom = "Nacos";
-                }
-            }
-
-            if (StringUtils.isBlank(configInfo)) {
-                // 如果从nacos中读不出配置，则使用本地配置文件配置
-                try {
-                    prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
-                    System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
-                    propertiesFrom = "config.properties";
-                } catch (Exception ex) {
-                    System.out.println("ERROR: " + I18nUtils.getStaticMessage("nfe.confignotfoundexception.confignotfoundexception"));
-                    System.exit(1);
-                }
-            }
-
+            loadProperties(prop);
             dbConfigMap.put("db.driverClassName", prop.getProperty("db.driverClassName", "com.mysql.cj.jdbc.Driver"));
             dbConfigMap.put("db.url", prop.getProperty("db.url", "jdbc:mysql://localhost:3306/neatlogic?characterEncoding=UTF-8&jdbcCompliantTruncation=false"));
             dbConfigMap.put("db.username", prop.getProperty("db.username", "username"));
             String dbPassword = prop.getProperty("db.password", "password");
-            //加密dbPassword
-            if (Boolean.FALSE.equals(RC4Util.isEncrypt(dbPassword))) {
-                String dbPasswordChipper = RC4Util.encrypt(dbPassword);
-                boolean isPublishOk;
-                if (Objects.equals(propertiesFrom, "Nacos")) {
-                    assert configInfo != null;
-                    String updatedConfig = configInfo.replaceAll("(?m)^db\\.password\\s*=\\s*.*$", "db.password=" + dbPasswordChipper);
-                    isPublishOk = configService.publishConfig("config", "neatlogic.framework", updatedConfig);
-                } else {
-                    // 保存到文件
-                    String filePath = Objects.requireNonNull(LocalConfig.class.getClassLoader()
-                            .getResource(CONFIG_FILE)).getPath();
-                    updatePropertyLocal(filePath, "db.password", dbPasswordChipper);
-                    isPublishOk = true;
-                }
-                if (isPublishOk) {
-                    System.out.println("  ✓db.password加密配置更新成功！");
-                } else {
-                    System.out.println("  ✖db.password加密配置更新失败！");
-                }
-            } else {
-                dbPassword = RC4Util.decrypt(dbPassword);
-            }
-            dbConfigMap.put("db.password", dbPassword);
+            dbConfigMap.put("db.password", RC4Util.decrypt(dbPassword));
             dbConfigMap.put("db.transaction.timeout", prop.getProperty("db.transaction.timeout", "-1"));
 
             Integer datasourceConnectTimeout = Integer.parseInt(prop.getProperty("datasource.connect.timeout", "5000"));

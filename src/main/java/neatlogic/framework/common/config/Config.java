@@ -12,7 +12,6 @@
 
 package neatlogic.framework.common.config;
 
-import com.alibaba.nacos.api.annotation.NacosInjected;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
@@ -37,9 +36,6 @@ import java.util.concurrent.Executor;
 @RootConfiguration
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
-    @NacosInjected
-    private ConfigService configService;
-    private static final String CONFIG_FILE = "config.properties";
     private static final String SERVER_ID_FILE = "serverid.conf";
 
     public static int SCHEDULE_SERVER_ID;
@@ -500,6 +496,7 @@ public class Config {
     public static Integer RUNNER_CONNECT_TIMEOUT() {
         return RUNNER_CONNECT_TIMEOUT;
     }
+
     public static Integer RUNNER_READ_TIMEOUT() {
         return RUNNER_READ_TIMEOUT;
     }
@@ -559,66 +556,15 @@ public class Config {
                 throw ex;
             }
         }
-
-//        try {
-//            SERVER_HOST = getProperty(CONFIG_FILE, "server.host", true);
-//        } catch (Exception ex) {
-//            logger.error("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
-//            System.out.println("【配置文件初始化失败】请在" + CONFIG_FILE + "中配置server.host变量");
-//            throw ex;
-//        }
-//
-//        Pattern pattern = RegexUtils.getPattern(RegexUtils.SERVER_HOST);
-//        Matcher matcher = pattern.matcher(SERVER_HOST);
-//        if (!matcher.matches()) {
-//            throw new RuntimeException("【配置文件初始化失败】，在" + CONFIG_FILE + "中变量server.host=" + SERVER_HOST + "的值不符格式要求，格式为“(http|https)://IP地址:端口”");
-//        }
-    }
-
-    public boolean readProperties(Properties prop) {
-        try {
-            String propertiesString = configService.getConfig("config", "neatlogic.framework", 3000);
-            if (StringUtils.isNotBlank(propertiesString)) {
-                prop.load(new InputStreamReader(new ByteArrayInputStream(propertiesString.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
-                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "Nacos"));
-                return true;
-            } else {
-                // 如果从nacos中读不出配置，则使用本地配置文件配置
-                prop.load(new InputStreamReader(Objects.requireNonNull(Config.class.getClassLoader().getResourceAsStream(CONFIG_FILE)), StandardCharsets.UTF_8));
-                System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadconfig", "config.properties"));
-                return false;
-            }
-        } catch (NacosException | IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return false;
-    }
-
-    /**
-     * 主动刷新本地配置文件
-     */
-    public synchronized void reloadLocalConfig() {
-        Properties prop = new Properties();
-        try (InputStream in =
-                     Objects.requireNonNull(
-                             Config.class.getClassLoader()
-                                     .getResourceAsStream(CONFIG_FILE))) {
-
-            prop.load(new InputStreamReader(in, StandardCharsets.UTF_8));
-            logger.info("Reload local config.properties manually");
-            loadNacosProperties(prop);
-        } catch (IOException e) {
-            logger.error("Reload local config failed", e);
-        }
     }
 
     @PostConstruct
     public void init() {
+        initConfigFile();
         try {
-            initConfigFile();
-            Properties prop = new Properties();
-            boolean flag = readProperties(prop);
-            if (flag) {
+            ConfigService configService = NacosConfigServiceHolder.getInstance();
+            Properties prop = LocalConfig.getProperties();
+            if (Objects.equals(LocalConfig.getConfigSource(), LocalConfig.ConfigSource.NACOS)) {
                 configService.addListener("config", "neatlogic.framework", new Listener() {
                     @Override
                     public void receiveConfigInfo(String configInfo) {
@@ -628,7 +574,9 @@ public class Config {
                         } catch (IOException e) {
                             logger.error(e.getMessage(), e);
                         }
-                        loadNacosProperties(properties);
+                        System.out.printf("serverId:%s,%s%n", SCHEDULE_SERVER_ID, I18nUtils.getStaticMessage("config.receiveconfiginfo"));
+                        LocalConfig.setProperties(properties);
+                        loadLocalOrNacosProperties(properties);
                     }
 
                     @Override
@@ -637,13 +585,13 @@ public class Config {
                     }
                 });
             }
-            loadNacosProperties(prop);
+            loadLocalOrNacosProperties(prop);
         } catch (NacosException e) {
             logger.error(e.getMessage(), e);
         }
     }
 
-    public static void loadNacosProperties(Properties prop) {
+    public static void loadLocalOrNacosProperties(Properties prop) {
         try {
             SCHEDULE_SERVER_ID_CHECK_ENABLE = Integer.parseInt(prop.getProperty("schedule.serverid.check.enable", "1"));
             DATA_HOME = prop.getProperty("data.home", "/app/data");
@@ -714,15 +662,15 @@ public class Config {
 
             JWT_SECRET = prop.getProperty("jwt.secret");
             HEADER_RULE_PREFIX = prop.getProperty("header.rule.prefix", "neatlogic-rule-");
-            RUNNER_CONNECT_TIMEOUT = Integer.valueOf(prop.getProperty("runner.connect.timeout","5000"));
-            RUNNER_READ_TIMEOUT = Integer.valueOf(prop.getProperty("runner.read.timeout","15000"));
+            RUNNER_CONNECT_TIMEOUT = Integer.valueOf(prop.getProperty("runner.connect.timeout", "5000"));
+            RUNNER_READ_TIMEOUT = Integer.valueOf(prop.getProperty("runner.read.timeout", "15000"));
             if (StringUtils.isBlank(JWT_SECRET)) {
                 System.out.println(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 logger.error(I18nUtils.getStaticMessage("nfcc.config.loadnacosproperties.jwtsecret"));
                 System.exit(1);
             }
             AUTOEXEC_TOKEN = prop.getProperty("autoexec.token");
-            if(StringUtils.isBlank(AUTOEXEC_TOKEN)){
+            if (StringUtils.isBlank(AUTOEXEC_TOKEN)) {
                 System.out.println(I18nUtils.getStaticMessage("nmac.autoexecconfig.loadconfig.autoexectoken"));
                 logger.error(I18nUtils.getStaticMessage("nmac.autoexecconfig.loadconfig.autoexectoken"));
                 System.exit(1);

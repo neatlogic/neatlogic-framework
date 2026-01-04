@@ -562,9 +562,9 @@ public class Config {
     public void init() {
         initConfigFile();
         try {
-            ConfigService configService = NacosConfigServiceHolder.getInstance();
             Properties prop = LocalConfig.getProperties();
             if (Objects.equals(LocalConfig.getConfigSource(), LocalConfig.ConfigSource.NACOS)) {
+                ConfigService configService = NacosConfigServiceHolder.getInstance();
                 configService.addListener("config", "neatlogic.framework", new Listener() {
                     @Override
                     public void receiveConfigInfo(String configInfo) {

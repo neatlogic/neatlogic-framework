@@ -24,6 +24,7 @@ public class MatrixViewVo {
     private String xml;
     @JSONField(serialize = false)
     private String config;
+    private String error;
     public String getMatrixUuid() {
         return matrixUuid;
     }
@@ -54,5 +55,13 @@ public class MatrixViewVo {
 
     public void setConfig(String config) {
         this.config = config;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

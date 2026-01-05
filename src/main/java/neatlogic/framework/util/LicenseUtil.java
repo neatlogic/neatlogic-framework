@@ -23,16 +23,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Base64Utils;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class LicenseUtil {
     static Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
 
-    public static Map<String, Map<String,LicenseInvalidVo>> tenantLicenseInvalidTipsMap = new HashMap<>();
+    public static Map<String, Map<String,LicenseInvalidVo>> tenantLicenseInvalidTipsMap = new ConcurrentHashMap<>();
 
-    public static Map<String, ILicensePolicy> licensePolicyMap = new HashMap<>();
+    public static Map<String, ILicensePolicy> licensePolicyMap = new ConcurrentHashMap<>();
 
     /**
      * 根据租户设置license

@@ -125,7 +125,8 @@
 			`matrix_uuid` AS matrixUuid,
 			`file_name` AS fileName,
 			`config`,
-		    `xml`
+		    `xml`,
+			`error`
 		FROM `matrix_view`
 		WHERE `matrix_uuid` = #{matrixUuid}
 	</select>
@@ -139,7 +140,8 @@
 			`matrix_uuid` AS matrixUuid,
 			`file_name` AS fileName,
 			`config`,
-		    `xml`
+		    `xml`,
+			`error`
 		FROM `matrix_view`
 		ORDER BY `matrix_uuid`
 		LIMIT #{startNum}, #{pageSize}
@@ -246,6 +248,11 @@
 		 `lcu` = #{lcu},
 		 `lcd` = NOW(3)
 		 WHERE `uuid` = #{uuid}
+	</update>
+
+	<update id="updateMatrixViewErrorByMatrixUuid" parameterType="neatlogic.framework.matrix.dto.MatrixViewVo">
+		UPDATE `matrix_view` SET `error` = #{error}
+		WHERE `matrix_uuid` = #{matrixUuid}
 	</update>
 
 	<delete id="deleteMatrixByUuid" parameterType="string">

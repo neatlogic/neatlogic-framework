@@ -213,7 +213,7 @@ public class RequestContext implements Serializable {
     }
 
     public void release() {
-        MDC.remove("url");
+        MDC.clear();
         instance.remove();
     }
 

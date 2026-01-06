@@ -5,6 +5,7 @@
                     converterClass="neatlogic.framework.logback.converter.RequestUrlConverter"/>
     <conversionRule conversionWord="requestParam"
                     converterClass="neatlogic.framework.logback.converter.RequestParamConverter"/>
+    <conversionRule conversionWord="sql" converterClass="neatlogic.framework.logback.converter.SqlConverter"/>
     <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
     <appender name="debugAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -120,7 +121,7 @@
             <MaxFileSize>100MB</MaxFileSize>
         </triggeringPolicy>
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] [%tenant] %requestUrl - %msg%n %requestParam%n
+            <Pattern>[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] [%tenant] %requestUrl - %n%requestParam%sql%msg%n
             </Pattern>
         </layout>
     </appender>

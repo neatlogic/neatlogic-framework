@@ -72,7 +72,7 @@ public class LocalConfig implements BeanFactoryPostProcessor, EnvironmentAware, 
     public enum ConfigSource {
 
         NACOS("nacos"),
-        LOCAL("config.properties");
+        LOCAL(CONFIG_FILE);
 
         private final String sourceName;
 

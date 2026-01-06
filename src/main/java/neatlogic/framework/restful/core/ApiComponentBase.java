@@ -82,6 +82,12 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
     public final Object doService(ApiVo apiVo, JSONObject paramObj, HttpServletResponse response) throws Exception {
         String error = "";
         Object result = null;
+        String param = null;
+        if (!apiVo.getModuleId().equals("master")) {
+            if (apiVo.getNeedAudit() != null && apiVo.getNeedAudit().equals(1)) {
+                param = paramObj.toJSONString();
+            }
+        }
         long startTime = System.currentTimeMillis();
         try {
 
@@ -166,7 +172,7 @@ public abstract class ApiComponentBase extends ApiValidateAndHelpBase implements
             long endTime = System.currentTimeMillis();
             if (!apiVo.getModuleId().equals("master")) {
                 if (apiVo.getNeedAudit() != null && apiVo.getNeedAudit().equals(1)) {
-                    saveAudit(apiVo, paramObj, result, error, startTime, endTime);
+                    saveAudit(apiVo, JSONObject.parseObject(param), result, error, startTime, endTime);
                 }
             }
 

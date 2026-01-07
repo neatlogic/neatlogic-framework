@@ -19,6 +19,8 @@ import neatlogic.framework.lcs.linehandler.core.ILineHandler;
 import neatlogic.framework.lcs.linehandler.core.LineHandlerFactory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.Stack;
  */
 public class LCSUtil {
 
+    private final static Logger logger = LoggerFactory.getLogger(LCSUtil.class);
     public final static String SPAN_CLASS_INSERT = "<span class='insert'>";
     public final static String SPAN_CLASS_DELETE = "<span class='delete'>";
     public final static String SPAN_END = "</span>";
@@ -446,7 +449,7 @@ public class LCSUtil {
 //        PrintSingeColorFormatUtil.println();
         String result = stringBuilder.toString();
         if (result.length() != capacity) {
-            System.out.println("wrapChangePlace:result.length()" + result.length() + " != " + capacity + "capacity");
+            logger.warn("wrapChangePlace:result.length()" + result.length() + " != " + capacity + "capacity");
         }
         return result;
     }
@@ -803,14 +806,14 @@ public class LCSUtil {
                 nodes[currentNode.getOldIndex()][currentNode.getNewIndex()] = currentNode;
             }
         }
-        for (int i = 0; i < sourceCount; i++) {
-            for (int j = 0; j < targetCount; j++) {
-                System.out.print(nodes[i][j]);
-                System.out.print("\t");
-            }
-            System.out.println();
-        }
-        System.out.println("------------------------------------------------------------------------------------------");
+//        for (int i = 0; i < sourceCount; i++) {
+//            for (int j = 0; j < targetCount; j++) {
+//                System.out.print(nodes[i][j]);
+//                System.out.print("\t");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println("------------------------------------------------------------------------------------------");
         List<Node> nodeList = new ArrayList<>();
         Node node = nodePool.getOldNode(0, 0);
         Node previous = null;
@@ -827,11 +830,11 @@ public class LCSUtil {
             } else {
                 previous = node;
             }
-            System.out.println(node);
+//            System.out.println(node);
             node = node.getNext();
         }
         nodeList.add(previous);
-        System.out.println("------------------------------------------------------------------------------------------");
+//        System.out.println("------------------------------------------------------------------------------------------");
         nodeList.forEach(System.out::println);
         List<SegmentPair> segmentPairList = new ArrayList<>();
         int lastOldEndIndex = 0;
@@ -1223,6 +1226,6 @@ public class LCSUtil {
         String source = "abcdefjhijklmnopqrstuvwxyz";
         String target = "bbcdef4j4h4i4j4k4l4mnopqrstuvwxyz";
         int min = minEditDistance(source, 0, source.length(), target, 0, target.length());
-        System.out.println("最小编辑距离是：" + min);
+//        System.out.println("最小编辑距离是：" + min);
     }
 }

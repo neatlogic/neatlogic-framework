@@ -59,6 +59,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
         Object result = null;
         try {
             result = invocation.proceed();
+            MDC.remove("sql");
         } catch (Exception ex) {
             Throwable targetException = ex;
             //如果是反射抛得异常，则需要拆包，把真实得异常类找出来

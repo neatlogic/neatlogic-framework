@@ -25,9 +25,9 @@ public class TestPublicSchedule extends PublicJobBase {
     public void executeInternal(JobExecutionContext context, JobObject jobObject) throws Exception {
         JobDetail jobDetail = context.getJobDetail();
         String jobUuid = jobDetail.getKey().getName();
-        System.out.println(jobObject.getProp("a"));
+//        System.out.println(jobObject.getProp("a"));
 //        String key = new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(jobObject.getLoadTime());
 //        System.out.println("测试：" + new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(new Date()) + ">>>>" + key);
-        System.out.println("测试：" + new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(new Date()));
+//        System.out.println("测试：" + new SimpleDateFormat("yyyy-MM-dd HH:ss:mm.SSS").format(new Date()));
     }
 }

@@ -338,34 +338,6 @@
         <includeCallerData>true</includeCallerData>
     </appender>
 
-    <appender name="AutoexecProcessAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <File>${log4j.home}/process.log</File>
-        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-            <FileNamePattern>${LOG_HOME}/process.log.%i</FileNamePattern>
-            <MinIndex>1</MinIndex>
-            <MaxIndex>5</MaxIndex>
-        </rollingPolicy>
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>DEBUG</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-            <MaxFileSize>100MB</MaxFileSize>
-        </triggeringPolicy>
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] [%tenant] %requestUrl- %msg%n</Pattern>
-        </layout>
-    </appender>
-
-    <!--异步输出 -->
-    <appender name="AutoexecProcessAsyncAppender" class="ch.qos.logback.classic.AsyncAppender">
-        <discardingThreshold>0</discardingThreshold>
-        <queueSize>50</queueSize>
-        <appender-ref ref="AutoexecProcessAppender"/>
-        <includeCallerData>true</includeCallerData>
-    </appender>
-
     <root level="${log4j.priority}">
         <appender-ref ref="DEBUG"/>
         <appender-ref ref="INFO"/>
@@ -405,11 +377,10 @@
     <logger name="neatlogic.module.tagent.api.TagentStatusUpdateApi" level="ERROR" additivity="false">
         <appender-ref ref="tagentRegisterAndNettyAsyncAppender"/>
     </logger>
+    <logger name="neatlogic.module.tagent.common.UpdateTagentInfoThread" level="ERROR" additivity="false">
+        <appender-ref ref="tagentRegisterAndNettyAsyncAppender"/>
+    </logger>
     <logger name="neatlogic.module.process.aop.MethodTimingAspect" level="ERROR" additivity="false">
         <appender-ref ref="MethodTimingAspectAsyncAppender"/>
-    </logger>
-    <!--自动化作业进程日志-->
-    <logger name="com.neatlogic.autoexecrunner.autoexec.ProcessWaitTask" level="DEBUG" additivity="false">
-        <appender-ref ref="AutoexecProcessAsyncAppender"/>
     </logger>
 </included>

@@ -103,7 +103,7 @@ public class MatrixDateAttrTypeHandler extends MatrixAttrTypeBase {
                 pattern = format;
             }
         }
-        System.out.println("pattern = " + pattern);
+//        System.out.println("pattern = " + pattern);
         SimpleDateFormat patternSdf = new SimpleDateFormat(pattern);
         for (Map.Entry<String, String> entry : valueMap.entrySet()) {
             try {

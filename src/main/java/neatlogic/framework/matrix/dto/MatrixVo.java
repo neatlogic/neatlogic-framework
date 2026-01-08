@@ -40,6 +40,8 @@ public class MatrixVo extends BaseEditorVo {
     private Long customViewId;
     @EntityField( name = "配置信息", type = ApiParamType.JSONOBJECT)
     private JSONObject config;
+    @EntityField( name = "错误信息", type = ApiParamType.STRING)
+    private String error;
 
     public Long getId() {
         return id;
@@ -147,5 +149,13 @@ public class MatrixVo extends BaseEditorVo {
 
     public void setConfig(JSONObject config) {
         this.config = config;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 }

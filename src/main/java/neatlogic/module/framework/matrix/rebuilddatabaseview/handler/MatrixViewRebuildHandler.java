@@ -24,6 +24,7 @@ import neatlogic.framework.rebuilddatabaseview.core.IRebuildDataBaseView;
 import neatlogic.framework.rebuilddatabaseview.core.ViewStatusInfo;
 import neatlogic.module.framework.matrix.handler.ViewDataSourceHandler;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -76,9 +77,15 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
                         try {
                             viewDataSourceHandler.buildView(matrixUuid, matrixName, matrixViewVo.getXml());
                             viewStatusInfo.setStatus(ViewStatusInfo.Status.SUCCESS.toString());
+                            if (StringUtils.isNotBlank(matrixViewVo.getError())) {
+                                matrixViewVo.setError(null);
+                                matrixMapper.updateMatrixViewErrorByMatrixUuid(matrixViewVo);
+                            }
                         } catch (Exception e) {
                             viewStatusInfo.setStatus(ViewStatusInfo.Status.FAILURE.toString());
                             viewStatusInfo.setError(e.getMessage());
+                            matrixViewVo.setError(e.getMessage());
+                            matrixMapper.updateMatrixViewErrorByMatrixUuid(matrixViewVo);
                         }
                         resultList.add(viewStatusInfo);
                     }

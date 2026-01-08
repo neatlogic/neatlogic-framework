@@ -33,6 +33,7 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.transaction.TransactionTimedOutException;
 
 import javax.sql.DataSource;
@@ -115,7 +116,8 @@ public class ExceptionCatchInterceptor implements Interceptor {
             }
             Object parameterObject = invocation.getArgs()[1];
             String sql = SqlCostInterceptor.getSql(ms, parameterObject);
-            defaultLogger.error("SQL Failed: {}: {} with params: {}", ms.getId(), sql, JSON.toJSONString(parameterObject), targetException);
+            MDC.put("sql", "执行SQL语句 " + ms.getId() + ":" + sql);
+//            defaultLogger.error("SQL Failed: {}: {} with params: {}", ms.getId(), sql, JSON.toJSONString(parameterObject), targetException);
             throw targetException;
         }
         return result;

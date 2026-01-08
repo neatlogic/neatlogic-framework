@@ -53,6 +53,8 @@ public interface MatrixMapper {
 
     int updateMatrixNameAndLcu(MatrixVo matrixVo);
 
+    int updateMatrixViewErrorByMatrixUuid(MatrixViewVo matrixViewVo);
+
     int deleteMatrixByUuid(String uuid);
 
     int deleteMatrixExternalByMatrixUuid(String matrixUuid);

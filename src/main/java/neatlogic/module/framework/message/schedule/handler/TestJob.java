@@ -20,6 +20,8 @@ import org.quartz.CronExpression;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,7 +30,7 @@ import java.util.Date;
 @DisallowConcurrentExecution
 public class TestJob extends JobBase {
 
-
+    private final Logger logger = LoggerFactory.getLogger(TestJob2.class);
     private final String cron = "* * * * * ?";
     private static Long currentTime = null;
 
@@ -69,7 +71,7 @@ public class TestJob extends JobBase {
             diff = System.currentTimeMillis() - currentTime;
             currentTime = System.currentTimeMillis();
         }
-        System.out.println("JOB1#" + Config.SCHEDULE_SERVER_ID + " gap:" + diff + "ms " + "now:" + sdf.format(new Date()) + " next:" + sdf.format(context.getNextFireTime()));
+        logger.info("JOB1#" + Config.SCHEDULE_SERVER_ID + " gap:" + diff + "ms " + "now:" + sdf.format(new Date()) + " next:" + sdf.format(context.getNextFireTime()));
     }
 
 }

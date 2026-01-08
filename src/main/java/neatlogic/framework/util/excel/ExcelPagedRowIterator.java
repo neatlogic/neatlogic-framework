@@ -99,10 +99,10 @@ public class ExcelPagedRowIterator {
 
             for (int i = 0; i < pageIterators.size(); i++) {
                 Iterator<Row> pageIterator = pageIterators.get(i);
-                System.out.println("Page " + (i + 1) + ":");
+//                System.out.println("Page " + (i + 1) + ":");
                 while (pageIterator.hasNext()) {
                     Row row = pageIterator.next();
-                    System.out.println(row.getCell(4));  // Example: Print first cell of each row
+//                    System.out.println(row.getCell(4));  // Example: Print first cell of each row
                 }
             }
         } catch (IOException e) {

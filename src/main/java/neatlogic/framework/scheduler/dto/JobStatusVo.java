@@ -2,12 +2,16 @@ package neatlogic.framework.scheduler.dto;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
+import neatlogic.framework.crossover.CrossoverServiceFactory;
+import neatlogic.framework.crossover.IScheduleCrossoverService;
 import neatlogic.framework.restful.annotation.EntityField;
 import com.alibaba.fastjson.annotation.JSONField;
-import neatlogic.framework.scheduler.core.SchedulerManager;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 public class JobStatusVo extends BaseEditorVo {
 	private static final long serialVersionUID = 2313591895745650036L;
@@ -35,6 +39,8 @@ public class JobStatusVo extends BaseEditorVo {
 	@EntityField(name = "是否已加载",
 			type = ApiParamType.INTEGER)
 	private Integer isLoad;
+
+	private List<JobLoadVo> jobLoadList;
 
 	@JSONField(serialize = false)
 	private Integer needAudit;
@@ -108,11 +114,14 @@ public class JobStatusVo extends BaseEditorVo {
 
 	public Integer getIsLoad() {
 		if (isLoad == null) {
-			if (StringUtils.isNotBlank(this.jobName) && StringUtils.isNotBlank(this.jobGroup)) {
-				if (SchedulerManager.checkJobIsLoad(this.jobName, this.jobGroup)) {
-					isLoad = 1;
-				} else {
-					isLoad = 0;
+			isLoad = 0;
+			List<JobLoadVo> loadList = this.getJobLoadList();
+			if (CollectionUtils.isNotEmpty(loadList)) {
+				for (JobLoadVo jobLoadVo : loadList) {
+					if (Objects.equals(jobLoadVo.getIsLoad(), 1)) {
+						isLoad = 1;
+						break;
+					}
 				}
 			}
 		}
@@ -121,5 +130,19 @@ public class JobStatusVo extends BaseEditorVo {
 
 	public void setIsLoad(Integer isLoad) {
 		this.isLoad = isLoad;
+	}
+
+	public List<JobLoadVo> getJobLoadList() {
+		if (jobLoadList == null) {
+			if (StringUtils.isNotBlank(this.jobName) && StringUtils.isNotBlank(this.jobGroup)) {
+				IScheduleCrossoverService scheduleCrossoverService = CrossoverServiceFactory.getApi(IScheduleCrossoverService.class);
+				jobLoadList = scheduleCrossoverService.getJobLoadList(this.jobName, this.jobGroup);
+			}
+		}
+		return jobLoadList;
+	}
+
+	public void setJobLoadList(List<JobLoadVo> jobLoadList) {
+		this.jobLoadList = jobLoadList;
 	}
 }

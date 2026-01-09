@@ -34,6 +34,7 @@
         SELECT `host`,
                `server_id`           AS serverId,
                `status`,
+               `start_time`          AS startTime,
                `heartbeat_rate`      AS heartbeatRate,
                `heartbeat_threshold` AS heartbeatThreshold,
                `heartbeat_time`      AS heartbeatTime,
@@ -76,15 +77,16 @@
 
     <insert id="insertServer" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
         INSERT INTO server_status(`server_id`, `status`, `heartbeat_rate`, `heartbeat_threshold`, `heartbeat_time`,
-                                  `ip`, `fcu`, `fcd`)
-        VALUES (#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{ip}, #{fcu}, NOW(3))
+                                  `ip`, `fcu`, `fcd`, `start_time`)
+        VALUES (#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{ip}, #{fcu}, NOW(3), #{startTime})
         ON DUPLICATE KEY UPDATE `status`              = #{status},
                                 `heartbeat_rate`      = #{heartbeatRate},
                                 `heartbeat_threshold` = #{heartbeatThreshold},
                                 `heartbeat_time`      = NOW(3),
                                 `ip`                  = #{ip},
                                 `lcu`                 = #{lcu},
-                                `lcd`                 = NOW(3)
+                                `lcd`                 = NOW(3),
+                                `start_time`          = #{startTime}
     </insert>
 
     <insert id="insertServerCounter" parameterType="neatlogic.framework.heartbeat.dto.ServerCounterVo">

@@ -52,6 +52,8 @@ public interface SchedulerMapper {
 
     int checkJobNameIsExists(JobVo job);
 
+    List<JobLoadVo> getJobLoadListByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+
 //    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 
     // UPDATE
@@ -82,6 +84,8 @@ public interface SchedulerMapper {
 
     int insertJobAuditDetail(@Param("hash") String hash, @Param("content") String content);
 
+    int insertJobLoad(JobLoadVo jobLoadVo);
+
 //    int insertJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 
     // DELETE
@@ -102,6 +106,12 @@ public interface SchedulerMapper {
     void deleteAuditDetail();
 
     void deleteAuditByDayBefore(int dayBefore);
+
+    int deleteJobLoad(JobLoadVo jobLoadVo);
+
+    int deleteJobLoadByServerId(int serverId);
+
+    int deleteJobLoadByServerIdAndServerStartTime(JobLoadVo jobLoadVo);
 
 //    int deleteJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 }

@@ -12,6 +12,10 @@
 
 package neatlogic.framework.crossover;
 
+import neatlogic.framework.scheduler.dto.JobLoadVo;
+
+import java.util.List;
+
 public interface IScheduleCrossoverService extends ICrossoverService {
     /**
      * 定时作业测试
@@ -21,4 +25,6 @@ public interface IScheduleCrossoverService extends ICrossoverService {
      * @param type                类型 private ｜ public
      */
     void scheduleTest(String jobHandlerClassName, String jobUuid, String type) throws Exception;
+
+    List<JobLoadVo> getJobLoadList(String jobName, String jobGroup);
 }

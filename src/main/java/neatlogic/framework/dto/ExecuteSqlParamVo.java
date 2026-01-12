@@ -12,6 +12,7 @@
 
 package neatlogic.framework.dto;
 
+import neatlogic.framework.changelog.ConnectionHolder;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.collections4.CollectionUtils;
@@ -20,7 +21,7 @@ import org.springframework.core.io.Resource;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,6 +40,8 @@ public class ExecuteSqlParamVo {
     PrintWriter errWriter;
     @EntityField(name = "log输出writer", type = ApiParamType.STRING)
     PrintWriter logWriter;
+    @EntityField(name = "log输出writer", type = ApiParamType.STRING)
+    StringWriter logStrWriter;
     @EntityField(name = "租户", type = ApiParamType.STRING)
     TenantVo tenant;
     @EntityField(name = "模块id", type = ApiParamType.STRING)
@@ -58,42 +61,40 @@ public class ExecuteSqlParamVo {
     @EntityField(name = "sql文件resource", type = ApiParamType.JSONOBJECT)
     Resource resource;
     @EntityField(name = "neatlogic库链接", type = ApiParamType.JSONOBJECT)
-    Connection neatlogicConn;
+    ConnectionHolder neatlogicConnectHolder;
     @EntityField(name = "neatlogic租户库链接", type = ApiParamType.JSONOBJECT)
-    Connection neatlogicTenantConn;
-    @EntityField(name = "是否使用租户库链接", type = ApiParamType.BOOLEAN)
-    boolean useTenantConn = false;
+    ConnectionHolder neatlogicTenantConnectHolder;
+    @EntityField(name = "是否需要新连接", type = ApiParamType.BOOLEAN)
+    boolean isNeedNewRunner = false;
 
     public ExecuteSqlParamVo() {
 
     }
 
-    public ExecuteSqlParamVo(TenantVo tenant, String moduleId, String version, Resource resource, List<String> changelogSqlHashList, Connection neatlogicTenantConn, Connection neatlogicConn, boolean useTenantConn) {
+    public ExecuteSqlParamVo(TenantVo tenant, String moduleId, String version, Resource resource, List<String> changelogSqlHashList, ConnectionHolder neatlogicTenantConnectHolder, ConnectionHolder neatlogicConnectHolder) {
         this.changelogSqlHashList = changelogSqlHashList;
         this.tenant = tenant;
         this.moduleId = moduleId;
         this.version = version;
         this.resource = resource;
-        this.neatlogicTenantConn = neatlogicTenantConn;
-        this.neatlogicConn = neatlogicConn;
-        this.useTenantConn = useTenantConn;
+        this.neatlogicTenantConnectHolder = neatlogicTenantConnectHolder;
+        this.neatlogicConnectHolder = neatlogicConnectHolder;
     }
 
-    public ExecuteSqlParamVo(TenantVo tenant, String moduleId,  Resource resource, List<String> dmlSqlHashList, Connection neatlogicTenantConn, Connection neatlogicConn, boolean useTenantConn) {
+    public ExecuteSqlParamVo(TenantVo tenant, String moduleId, Resource resource, List<String> dmlSqlHashList, ConnectionHolder neatlogicTenantConnectHolder, ConnectionHolder neatlogicConnectHolder) {
         this.dmlSqlHashList = dmlSqlHashList;
         this.tenant = tenant;
         this.moduleId = moduleId;
         this.resource = resource;
-        this.neatlogicTenantConn = neatlogicTenantConn;
-        this.neatlogicConn = neatlogicConn;
-        this.useTenantConn = useTenantConn;
+        this.neatlogicTenantConnectHolder = neatlogicTenantConnectHolder;
+        this.neatlogicConnectHolder = neatlogicConnectHolder;
     }
 
-    public ExecuteSqlParamVo(String moduleId, String version, Resource resource, Connection neatlogicConn) {
+    public ExecuteSqlParamVo(String moduleId, String version, Resource resource, ConnectionHolder neatlogicConnectHolder) {
         this.moduleId = moduleId;
         this.version = version;
         this.resource = resource;
-        this.neatlogicConn = neatlogicConn;
+        this.neatlogicConnectHolder = neatlogicConnectHolder;
     }
 
     public String getSql() {
@@ -122,13 +123,6 @@ public class ExecuteSqlParamVo {
 
     public void setRunner(ScriptRunner runner) {
         this.runner = runner;
-    }
-
-    public Connection getConn() {
-        if (useTenantConn) {
-            return neatlogicTenantConn;
-        }
-        return neatlogicConn;
     }
 
     public StringWriter getErrStrWriter() {
@@ -222,28 +216,20 @@ public class ExecuteSqlParamVo {
         this.resource = resource;
     }
 
-    public Connection getNeatlogicConn() {
-        return neatlogicConn;
+    public ConnectionHolder getNeatlogicConnectHolder() {
+        return neatlogicConnectHolder;
     }
 
-    public void setNeatlogicConn(Connection neatlogicConn) {
-        this.neatlogicConn = neatlogicConn;
+    public void setNeatlogicConnectHolder(ConnectionHolder neatlogicConnectHolder) {
+        this.neatlogicConnectHolder = neatlogicConnectHolder;
     }
 
-    public Connection getNeatlogicTenantConn() {
-        return neatlogicTenantConn;
+    public ConnectionHolder getNeatlogicTenantConnectHolder() {
+        return neatlogicTenantConnectHolder;
     }
 
-    public void setNeatlogicTenantConn(Connection neatlogicTenantConn) {
-        this.neatlogicTenantConn = neatlogicTenantConn;
-    }
-
-    public boolean isUseTenantConn() {
-        return useTenantConn;
-    }
-
-    public void setUseTenantConn(boolean useTenantConn) {
-        this.useTenantConn = useTenantConn;
+    public void setNeatlogicTenantConnectHolder(ConnectionHolder neatlogicTenantConnectHolder) {
+        this.neatlogicTenantConnectHolder = neatlogicTenantConnectHolder;
     }
 
     public List<String> getDmlSqlHashList() {
@@ -260,5 +246,33 @@ public class ExecuteSqlParamVo {
 
     public void setLogWriter(PrintWriter logWriter) {
         this.logWriter = logWriter;
+    }
+
+    public StringWriter getLogStrWriter() {
+        return logStrWriter;
+    }
+
+    public void setLogStrWriter(StringWriter logStrWriter) {
+        this.logStrWriter = logStrWriter;
+    }
+
+    public boolean isNeedNewRunner() {
+        if(this.runner == null){
+            return true;
+        }
+        return isNeedNewRunner;
+    }
+
+    public void setNeedNewRunner(boolean needNewRunner) {
+        isNeedNewRunner = needNewRunner;
+    }
+
+    public void invalidate() throws SQLException {
+        if (tenant == null) {
+            neatlogicConnectHolder.invalidate();
+        }else{
+            neatlogicTenantConnectHolder.invalidate();
+        }
+        isNeedNewRunner = true;
     }
 }

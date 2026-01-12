@@ -13,13 +13,13 @@
 package neatlogic.framework.bootstrap;
 
 import neatlogic.framework.asynchronization.thread.ModuleInitApplicationListener;
+import neatlogic.framework.changelog.ConnectionHolder;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
 import neatlogic.framework.util.ChangelogUtil;
 import neatlogic.framework.util.I18nUtils;
-import neatlogic.framework.util.JdbcUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,6 @@ import org.springframework.web.WebApplicationInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import java.sql.Connection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,11 +61,11 @@ public class ModuleInitializer implements WebApplicationInitializer {
                                                                                                              \s""");
         //生成地址:http://patorjk.com/software/taag/#p=display&v=1&f=ANSI%20Shadow&t=neatlogic%203.0
         ModuleVo module = null;
-        try (Connection neatlogicConn = JdbcUtil.getNeatlogicConnection()) {
+        try (ConnectionHolder neatlogicConnectionHolder = new ConnectionHolder()) {
             List<ModuleVo> moduleListFromServletContext = ChangelogUtil.getModuleListByServletContext(resolver);
-            List<TenantVo> activeTenantList = ChangelogUtil.getAllTenantList(neatlogicConn);
-            ChangelogUtil.updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext, neatlogicConn);
-            ChangelogUtil.initDmlSql(resolver, activeTenantList, moduleListFromServletContext, neatlogicConn);
+            List<TenantVo> activeTenantList = ChangelogUtil.getAllTenantList(neatlogicConnectionHolder);
+            ChangelogUtil.updateChangeLogVersion(resolver, activeTenantList, moduleListFromServletContext, neatlogicConnectionHolder);
+            ChangelogUtil.initDmlSql(resolver, activeTenantList, moduleListFromServletContext, neatlogicConnectionHolder);
             System.out.println("⚡" + I18nUtils.getStaticMessage("common.startloadmodule"));
             List<ModuleVo> parentModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() == null).collect(Collectors.toList());
             List<ModuleVo> childModuleList = moduleListFromServletContext.stream().filter(d -> d.getParent() != null).collect(Collectors.toList());

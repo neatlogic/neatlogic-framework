@@ -19,15 +19,14 @@ import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.dto.TenantVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
+import neatlogic.framework.heartbeat.core.HeartbeatManager;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
-import neatlogic.framework.scheduler.dto.JobClassVo;
-import neatlogic.framework.scheduler.dto.JobLockVo;
-import neatlogic.framework.scheduler.dto.JobObject;
-import neatlogic.framework.scheduler.dto.JobStatusVo;
+import neatlogic.framework.scheduler.dto.*;
 import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -173,10 +172,14 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                 //加上全局锁，避免并发加载同一个作业时出现作业已存在的问题
                 GLOBAL_LOCK.lock();
                 try {
-                    if (scheduler.getJobDetail(jobKey) != null) {
-                        scheduler.deleteJob(jobKey);
-                    }
+                    deleteJob(jobName, jobGroup);
                     nextFireDate = scheduler.scheduleJob(jobDetail, trigger);
+                    JobLoadVo jobLoadVo = new JobLoadVo();
+                    jobLoadVo.setJobName(jobName);
+                    jobLoadVo.setJobGroup(jobGroup);
+                    jobLoadVo.setServerId(Config.SCHEDULE_SERVER_ID);
+                    jobLoadVo.setServerStartTime(HeartbeatManager.START_TIME);
+                    schedulerMapper.insertJobLoad(jobLoadVo);
                 } finally {
                     GLOBAL_LOCK.unlock();
                 }
@@ -202,20 +205,31 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
      */
     public boolean unloadJob(JobObject jobObject) {
 //        schedulerMapper.deleteJobLoadTime(new JobLoadTimeVo(jobObject.getJobName(), jobObject.getJobGroup()));
+        deleteJob(jobObject.getJobName(), jobObject.getJobGroup());
+        // 清除作业锁和作业状态信息
+        schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
+        schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
+        return true;
+    }
+
+    public boolean deleteJob(String jobName, String jobGroup) {
+        boolean flag = false;
         try {
             Scheduler scheduler = schedulerFactoryBean.getScheduler();
-            JobKey jobKey = new JobKey(jobObject.getJobName(), jobObject.getJobGroup());
+            JobKey jobKey = new JobKey(jobName, jobGroup);
             if (scheduler.getJobDetail(jobKey) != null) {
-                scheduler.deleteJob(jobKey);
+                flag = scheduler.deleteJob(jobKey);
+                JobLoadVo jobLoadVo = new JobLoadVo();
+                jobLoadVo.setJobName(jobName);
+                jobLoadVo.setJobGroup(jobGroup);
+                jobLoadVo.setServerId(Config.SCHEDULE_SERVER_ID);
+                jobLoadVo.setServerStartTime(HeartbeatManager.START_TIME);
+                schedulerMapper.deleteJobLoad(jobLoadVo);
             }
-            // 清除作业锁和作业状态信息
-            schedulerMapper.deleteJobLock(jobObject.getJobName(), jobObject.getJobGroup());
-            schedulerMapper.deleteJobStatus(jobObject.getJobName(), jobObject.getJobGroup());
-            return true;
         } catch (SchedulerException e) {
             logger.error(e.getMessage(), e);
-            return false;
         }
+        return flag;
     }
 
     @Override
@@ -274,6 +288,10 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
                     jobHandler.initJob(tenantUuid);
                 }
                 schedulerMapper.deleteUnusedJobStatus();
+                JobLoadVo jobLoadVo = new JobLoadVo();
+                jobLoadVo.setServerId(Config.SCHEDULE_SERVER_ID);
+                jobLoadVo.setServerStartTime(HeartbeatManager.START_TIME);
+                schedulerMapper.deleteJobLoadByServerIdAndServerStartTime(jobLoadVo);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             } finally {

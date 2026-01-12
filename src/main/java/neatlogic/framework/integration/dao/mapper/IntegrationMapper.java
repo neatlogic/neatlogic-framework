@@ -39,6 +39,8 @@ public interface IntegrationMapper {
 
     List<IntegrationVo> searchIntegration(IntegrationVo integrationVo);
 
+    List<IntegrationVo> listActiveIntegration();
+
     List<IntegrationVo> getIntegrationListByUuidList(List<String> uuidList);
 
     List<ValueTextVo> searchIntegrationForSelect(IntegrationVo integrationVo);

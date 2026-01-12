@@ -304,6 +304,17 @@
         </if>
     </select>
 
+    <select id="getJobLoadListByJobNameGroup" resultType="neatlogic.framework.scheduler.dto.JobLoadVo">
+        SELECT
+            `job_name` AS jobName,
+            `job_group` AS jobGroup,
+            `server_id` AS serverId,
+            `server_start_time` AS serverStartTime
+        FROM `schedule_job_load`
+        WHERE `job_name` = #{jobName}
+        AND `job_group` = #{jobGroup}
+    </select>
+
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
         UPDATE
             `schedule_job_lock`
@@ -433,6 +444,23 @@
                 #{serverId})
     </insert>
 
+    <insert id="insertJobLoad" parameterType="neatlogic.framework.scheduler.dto.JobLoadVo">
+        INSERT INTO `schedule_job_load` (
+            `job_name`,
+            `job_group`,
+            `server_id`,
+            `server_start_time`
+        )
+        VALUES
+            (
+                #{jobName},
+                #{jobGroup},
+                #{serverId},
+                #{serverStartTime}
+            )
+        ON DUPLICATE KEY UPDATE `server_start_time` = #{serverStartTime}
+    </insert>
+
     <!--<insert id="insertJobLoadTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadTimeVo">
         INSERT INTO `schedule_job_load_time` (`job_name`, `job_group`, `cron`, `load_time`)
         VALUES (#{jobName}, #{jobGroup}, #{cron}, #{loadTime})
@@ -498,6 +526,23 @@
         WHERE b.`content_hash` IS NULL
     </delete>
 
+    <delete id="deleteJobLoad" parameterType="neatlogic.framework.scheduler.dto.JobLoadVo">
+        DELETE FROM `schedule_job_load`
+        WHERE `job_name` = #{jobName}
+          AND `job_group` = #{jobGroup}
+          AND `server_id` = #{serverId}
+    </delete>
+
+    <delete id="deleteJobLoadByServerId" parameterType="java.lang.Integer">
+        DELETE FROM `schedule_job_load`
+        WHERE `server_id` = #{serverId}
+    </delete>
+
+    <delete id="deleteJobLoadByServerIdAndServerStartTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadVo">
+        DELETE FROM `schedule_job_load`
+        WHERE `server_id` = #{serverId}
+          AND `server_start_time` != #{serverStartTime}
+    </delete>
     <!--<delete id="deleteJobLoadTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadTimeVo">
         DELETE
         FROM `schedule_job_load_time`

@@ -16,6 +16,7 @@ public class ServerClusterVo extends BaseEditorVo {
 	private Integer heartbeatThreshold;
 	private Date heartbeatTime;
 	private String ip;
+	private Date startTime;
 
 	public String getHost() {
 		return host;
@@ -66,5 +67,13 @@ public class ServerClusterVo extends BaseEditorVo {
 
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+
+	public Date getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
 	}
 }

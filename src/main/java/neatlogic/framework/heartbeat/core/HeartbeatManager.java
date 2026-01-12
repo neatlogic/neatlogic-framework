@@ -45,7 +45,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
     private final Logger logger = LoggerFactory.getLogger(HeartbeatManager.class);
 
     // 记录服务器启动时间
-    private static final Date START_TIME = new Date();
+    public static final Date START_TIME = new Date();
 
     @Resource
     private ServerMapper serverMapper;
@@ -92,6 +92,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         server.setHeartbeatRate(Config.SERVER_HEARTBEAT_RATE());
         server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
         server.setIp(ip);
+        server.setStartTime(START_TIME);
         serverMapper.insertServer(server);
 //        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {

@@ -49,6 +49,7 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			TenantContext.get().switchTenant(tenantVo.getUuid());
 			// 重置异常server的作业锁状态为waiting
 			schedulerMapper.resetJobLockByServerId(serverId);
+			schedulerMapper.deleteJobLoadByServerId(serverId);
 			// 接管异常server的作业
 			List<JobLockVo> jobLockList = schedulerMapper.getJobLockByServerId(serverId);
 			for (JobLockVo jobLockVo : jobLockList) {

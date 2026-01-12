@@ -171,6 +171,7 @@ public abstract class JobBase implements IJob {
         //如果租户不存在则不执行该租户的作业
         if (!TenantUtil.hasTenant(tenantUuid)) {
             logger.error("执行定时作业(jobName={},jobGroup={})时，租户：{}不存在", jobName, jobGroup, tenantUuid);
+            schedulerManager.deleteJob(jobName, jobGroup);
             return;
         }
         // 从job组名中获取租户uuid,切换到租户的数据源
@@ -181,6 +182,7 @@ public abstract class JobBase implements IJob {
         if (jobHandler == null) {
             schedulerManager.unloadJob(jobObject);
             logger.error("执行定时作业(jobName={},jobGroup={})时，定时作业组件：{}不存在", jobName, jobGroup, this.getClassName());
+            schedulerManager.deleteJob(jobName, jobGroup);
             return;
 //            throw new ScheduleHandlerNotFoundException(jobObject.getJobHandler());
         }
@@ -196,10 +198,12 @@ public abstract class JobBase implements IJob {
         JobStatusVo beforeJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup, System.currentTimeMillis());
         if (beforeJobStatusVo == null) {
             logger.error("执行定时作业(jobName={},jobGroup={})时，`schedule_job_status`表中没有对应数据", jobName, jobGroup);
+            schedulerManager.deleteJob(jobName, jobGroup);
             return;
         }
         // 如果数据库中记录的下次激活时间在本次执行激活时间之后，则放弃执行业务逻辑
         if (beforeJobStatusVo.getNextFireTime() != null && beforeJobStatusVo.getNextFireTime().after(currentFireTime)) {
+            schedulerManager.deleteJob(jobName, jobGroup);
             return;
         }
 
@@ -207,11 +211,13 @@ public abstract class JobBase implements IJob {
 
         // 取不到锁，不允许执行
         if (jobLockVo == null) {
+            schedulerManager.deleteJob(jobName, jobGroup);
             return;
         }
         JobStatusVo oldJobStatusVo = schedulerMapper.getJobStatusByJobNameGroup(jobName, jobGroup, System.currentTimeMillis());
         // 前后执行次数不一致，证明已经执行过，直接退出
         if (!Objects.equals(beforeJobStatusVo.getExecCount(), oldJobStatusVo.getExecCount())) {
+            schedulerManager.deleteJob(jobName, jobGroup);
             return;
         }
         try {

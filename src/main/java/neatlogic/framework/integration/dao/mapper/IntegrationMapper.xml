@@ -4,7 +4,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.integration.dao.mapper.IntegrationMapper">
 
-    <select id="getIntegrationAuditById" parameterType="java.lang.Long" resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
+    <select id="getIntegrationAuditById" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
+        SELECT `id`,
+               `integration_uuid` AS integrationUuid,
+               `user_uuid`        AS userUuid,
+               `request_from`     AS requestFrom,
+               `server_id`        AS serverId,
+               `start_time`       AS startTime,
+               `end_time`         AS endTime,
+               `status`,
+               `param_file_path`  AS paramFilePath,
+               `result_file_path` AS resultFilePath,
+               `error_file_path`  AS errorFilePath
+        FROM `integration_audit`
+        WHERE `id` = #{value}
+    </select>
+
+    <select id="getIntegrationAuditListByIdList" parameterType="java.lang.Long"
+            resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
         SELECT
         `id`,
         `integration_uuid` AS integrationUuid,
@@ -18,26 +36,9 @@
         `result_file_path` AS resultFilePath,
         `error_file_path` AS errorFilePath
         FROM `integration_audit`
-        WHERE `id` = #{value}
-    </select>
-
-    <select id="getIntegrationAuditListByIdList" parameterType="java.lang.Long" resultType="neatlogic.framework.integration.dto.IntegrationAuditVo">
-        SELECT
-            `id`,
-            `integration_uuid` AS integrationUuid,
-            `user_uuid` AS userUuid,
-            `request_from` AS requestFrom,
-            `server_id` AS serverId,
-            `start_time` AS startTime,
-            `end_time` AS endTime,
-            `status`,
-            `param_file_path` AS paramFilePath,
-            `result_file_path` AS resultFilePath,
-            `error_file_path` AS errorFilePath
-        FROM `integration_audit`
         WHERE `id` IN
         <foreach collection="list" item="id" open="(" close=")" separator=",">
-              #{id}
+            #{id}
         </foreach>
     </select>
 
@@ -188,6 +189,13 @@
         WHERE `uuid` = #{value}
     </select>
 
+    <select id="listActiveIntegration"  resultType="neatlogic.framework.integration.dto.IntegrationVo">
+        SELECT `uuid`,
+               `name`
+        FROM `integration`
+        where is_active = 1
+    </select>
+
     <select id="searchIntegration" parameterType="neatlogic.framework.integration.dto.IntegrationVo"
             resultType="neatlogic.framework.integration.dto.IntegrationVo">
         SELECT
@@ -305,11 +313,10 @@
         FROM `integration_audit` a
         WHERE a.`integration_uuid` = #{integrationUuid}
           AND a.id > #{id}
-          AND NOT EXISTS (
-            SELECT 1
-            FROM `fulltextindex_target_framework` b
-            WHERE a.`id` = b.`target_id` and b.`target_type` = #{type}
-        )
+          AND NOT EXISTS (SELECT 1
+                          FROM `fulltextindex_target_framework` b
+                          WHERE a.`id` = b.`target_id`
+                            and b.`target_type` = #{type})
         ORDER BY a.`id`
         LIMIT #{pageSize}
     </select>

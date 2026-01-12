@@ -1,4 +1,4 @@
-CREATE TABLE `neatlogic_develop`.`schedule_job_load` (
+CREATE TABLE `schedule_job_load` (
     `job_name` VARCHAR (100) NOT NULL COMMENT 'schedule_job表的uuid',
     `job_group` VARCHAR (100) NOT NULL COMMENT 'job组',
     `server_id` INT NOT NULL COMMENT '服务ID',

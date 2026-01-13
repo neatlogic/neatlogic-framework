@@ -25,6 +25,7 @@ import neatlogic.framework.exception.hmac.HeaderNotFoundException;
 import neatlogic.framework.exception.type.ApiNotDefinedException;
 import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
+import neatlogic.framework.restful.constvalue.ApiAuthType;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
@@ -96,7 +97,7 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
             throw new ApiNotFoundException(token);
         }
 
-        if (!interfaceVo.getBasicSupport()) {
+        if (!interfaceVo.getAuthTypeList().contains(ApiAuthType.BASIC.getText())) {
             throw new NotSupportBasicAuthException();
         }
 

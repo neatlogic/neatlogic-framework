@@ -21,10 +21,11 @@ import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.restful.constvalue.ApiAuthType;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.enums.ApiType;
-import neatlogic.framework.restful.enums.PublicApiAuthType;
 import neatlogic.framework.util.$;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -62,9 +63,9 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     @EntityField(name = "密码", type = ApiParamType.STRING)
     private String password;
     @EntityField(name = "认证方式", type = ApiParamType.STRING)
-    private String authtype = "";
-    @EntityField(name = "认证方式名称", type = ApiParamType.STRING)
-    private String authtypeName = "";
+    private List<String> authTypeList = new ArrayList<>(List.of(ApiAuthType.HMAC.getValue()));
+    @EntityField(name = "认证方式明", type = ApiParamType.STRING)
+    private List<String> authTypeNameList;
     @EntityField(name = "请求时效", type = ApiParamType.INTEGER)
     private Integer timeout = 0;
     @EntityField(name = "是否失效", type = ApiParamType.BOOLEAN)
@@ -78,7 +79,7 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     @EntityField(name = "接口类型名称", type = ApiParamType.STRING)
     private String typeText;
     @EntityField(name = "是否需要保存记录", type = ApiParamType.INTEGER)
-    private Integer needAudit = 0;
+    private Integer needAudit;
     @EntityField(name = "接口数据类型，stream,rest,binary", type = ApiParamType.STRING)
     private String dataType;
     @EntityField(name = "访问频率", type = ApiParamType.DOUBLE)
@@ -95,8 +96,6 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     private String moduleGroup;
     @EntityField(name = "模块group名称", type = ApiParamType.STRING)
     private String moduleGroupName;
-    @EntityField(name = "是否支持 basic 认证", type = ApiParamType.STRING)
-    private Boolean  isBasicSupport = false;
     @JSONField(serialize = false)
     private JSONObject pathVariableObj;
     @JSONField(serialize = false)
@@ -112,6 +111,8 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     private String timezone;
     @JSONField(serialize = false)
     private boolean isMcp = false;
+    @JSONField(serialize = false)
+    private String authType;
 
     //明文
     private String passwordPlain;
@@ -137,15 +138,16 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         this.setPageSize(20);
     }
 
-    public String getAuthtypeName() {
-        if (StringUtils.isBlank(authtypeName) && StringUtils.isNotBlank(authtype)) {
-            authtypeName = PublicApiAuthType.getText(authtype);
+    public List<String> getAuthTypeNameList() {
+        if (CollectionUtils.isEmpty(authTypeNameList) && CollectionUtils.isNotEmpty(authTypeList) ) {
+            for (String authType : authTypeList) {
+                if(authTypeNameList == null){
+                    authTypeNameList = new ArrayList<>();
+                }
+                authTypeNameList.add(ApiAuthType.getText(authType));
+            }
         }
-        return authtypeName;
-    }
-
-    public void setAuthtypeName(String authtypeName) {
-        this.authtypeName = authtypeName;
+        return authTypeNameList;
     }
 
     public List<String> getTokenList() {
@@ -194,12 +196,12 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         this.timeout = timeout;
     }
 
-    public String getAuthtype() {
-        return authtype;
+    public List<String> getAuthTypeList() {
+        return authTypeList;
     }
 
-    public void setAuthtype(String authtype) {
-        this.authtype = authtype;
+    public void addAuthType(String authType) {
+        this.authTypeList.add(authType);
     }
 
     public String getUsername() {
@@ -455,7 +457,7 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((authtype == null) ? 0 : authtype.hashCode());
+        result = prime * result + ((authTypeList == null) ? 0 : authTypeList.hashCode());
         result = prime * result + ((config == null) ? 0 : config.hashCode());
         result = prime * result + ((description == null) ? 0 : description.hashCode());
         result = prime * result + ((expire == null) ? 0 : expire.hashCode());
@@ -484,11 +486,11 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
             return false;
         }
         ApiVo other = (ApiVo) obj;
-        if (authtype == null) {
-            if (other.authtype != null) {
+        if (authTypeList == null) {
+            if (other.authTypeList != null) {
                 return false;
             }
-        } else if (!authtype.equals(other.authtype)) {
+        } else if (!authTypeList.equals(other.authTypeList)) {
             return false;
         }
         if (config == null) {
@@ -666,11 +668,15 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         return (ApiVo) super.clone();
     }
 
-    public Boolean getBasicSupport() {
-        return isBasicSupport;
+    public String getAuthType() {
+        return authType;
     }
 
-    public void setBasicSupport(Boolean basicSupport) {
-        isBasicSupport = basicSupport;
+    public void setAuthType(String authType) {
+        this.authType = authType;
+    }
+
+    public boolean basicSupport(){
+        return authTypeList.contains(ApiAuthType.BASIC.getValue());
     }
 }

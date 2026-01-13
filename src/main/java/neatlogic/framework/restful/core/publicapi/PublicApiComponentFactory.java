@@ -236,7 +236,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 token = token.substring(0, token.length() - 1);
             }
             ApiVo apiVo = new ApiVo();
-            apiVo.setAuthtype(PublicApiAuthType.BASIC.getValue());
+            apiVo.addAuthType(PublicApiAuthType.BASIC.getValue());
             apiVo.setUsername(Config.PUBLIC_API_AUTH_USERNAME());
             apiVo.setPassword(Config.PUBLIC_API_AUTH_PASSWORD());
             apiVo.setToken(token);

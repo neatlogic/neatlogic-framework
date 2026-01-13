@@ -36,6 +36,7 @@ import neatlogic.framework.exception.type.ParamJSONIrregularException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.restful.auth.core.ApiAuthFactory;
 import neatlogic.framework.restful.auth.core.IApiAuth;
+import neatlogic.framework.restful.constvalue.ApiAuthType;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
@@ -178,7 +179,7 @@ public class PublicApiDispatcher {
         }
         /*认证，如果是查看帮助接口，则不需要认证*/
         if (!(uri.contains("/public/api/help/") && !token.contains("/public/api/help/"))) {
-            IApiAuth apiAuth = ApiAuthFactory.getApiAuth(interfaceVo.getAuthtype());
+            IApiAuth apiAuth = ApiAuthFactory.getApiAuth(ApiAuthType.BASIC.getValue());
             if (apiAuth != null) {
                 apiAuth.auth(interfaceVo, paramObj, request);
             }

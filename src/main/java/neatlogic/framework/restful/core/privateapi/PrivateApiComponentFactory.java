@@ -23,6 +23,7 @@ import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.NoPasswordExpiredCheck;
 import neatlogic.framework.restful.annotation.OperationType;
+import neatlogic.framework.restful.constvalue.ApiAuthType;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.IJsonStreamApiComponent;
@@ -174,7 +175,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         token = token.substring(0, token.length() - 1);
                     }
                     ApiVo apiVo = new ApiVo();
-                    apiVo.setAuthtype("token");
                     apiVo.setToken(token);
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
@@ -190,7 +190,12 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-                    apiVo.setBasicSupport(component.isBasicSupport());
+                    if(component.isBasicSupport()){
+                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
+                    }
+                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
+                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
+                    }
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -243,7 +248,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         token = token.substring(0, token.length() - 1);
                     }
                     ApiVo apiVo = new ApiVo();
-                    apiVo.setAuthtype("token");
                     apiVo.setToken(token);
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
@@ -259,7 +263,12 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-                    apiVo.setBasicSupport(component.isBasicSupport());
+                    if(component.isBasicSupport()){
+                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
+                    }
+                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
+                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
+                    }
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -311,7 +320,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         token = token.substring(0, token.length() - 1);
                     }
                     ApiVo apiVo = new ApiVo();
-                    apiVo.setAuthtype("token");
                     apiVo.setToken(token);
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
@@ -327,7 +335,12 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-                    apiVo.setBasicSupport(component.isBasicSupport());
+                    if(component.isBasicSupport()){
+                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
+                    }
+                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
+                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
+                    }
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -379,7 +392,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                         token = token.substring(0, token.length() - 1);
                     }
                     ApiVo apiVo = new ApiVo();
-                    apiVo.setAuthtype("token");
                     apiVo.setToken(token);
                     apiVo.setHandler(component.getClassName());
                     apiVo.setHandlerName(component.getName());
@@ -395,7 +407,12 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-                    apiVo.setBasicSupport(component.isBasicSupport());
+                    if(component.isBasicSupport()){
+                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
+                    }
+                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
+                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
+                    }
 
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);

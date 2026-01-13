@@ -70,7 +70,7 @@ public class ApiValidateAndHelpBase {
         String requestIp = IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
-        data.put("authtype", apiVo.getAuthtype());
+//        data.put("authtype", apiVo.getAuthtype());
         data.put("userUuid", UserContext.get().getUserUuid());
         data.put("ip", requestIp);
         if (MapUtils.isNotEmpty(paramObj)) {
@@ -95,7 +95,7 @@ public class ApiValidateAndHelpBase {
         String requestIp = IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
-        data.put("authtype", apiVo.getAuthtype());
+//        data.put("authtype", apiVo.getAuthtype());
         data.put("userUuid", userContext.getUserUuid());
         data.put("ip", requestIp);
         if (StringUtils.isNotEmpty(param)) {

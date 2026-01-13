@@ -80,4 +80,14 @@ public interface IBinaryStreamApiComponent {
     default boolean isMcp() {
         return false;
     }
+
+    /**
+     * 是否支持Basic认证
+     *
+     * @return true false
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    default boolean isBasicSupport() {
+        return false;
+    }
 }

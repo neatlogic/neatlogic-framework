@@ -190,6 +190,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
+                    apiVo.setBasicSupport(component.isBasicSupport());
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -258,7 +259,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-
+                    apiVo.setBasicSupport(component.isBasicSupport());
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -326,7 +327,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
-
+                    apiVo.setBasicSupport(component.isBasicSupport());
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);
                         StringBuffer temp = new StringBuffer();
@@ -394,6 +395,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
                     apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
                     apiVo.setIsDeletable(0);// 不能删除
                     apiVo.setIsPrivate(true);
+                    apiVo.setBasicSupport(component.isBasicSupport());
 
                     if (token.contains("{")) {
                         Matcher m = p.matcher(token);

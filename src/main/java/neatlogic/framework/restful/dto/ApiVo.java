@@ -95,6 +95,8 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     private String moduleGroup;
     @EntityField(name = "模块group名称", type = ApiParamType.STRING)
     private String moduleGroupName;
+    @EntityField(name = "是否支持 basic 认证", type = ApiParamType.STRING)
+    private Boolean  isBasicSupport = false;
     @JSONField(serialize = false)
     private JSONObject pathVariableObj;
     @JSONField(serialize = false)
@@ -664,4 +666,11 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         return (ApiVo) super.clone();
     }
 
+    public Boolean getBasicSupport() {
+        return isBasicSupport;
+    }
+
+    public void setBasicSupport(Boolean basicSupport) {
+        isBasicSupport = basicSupport;
+    }
 }

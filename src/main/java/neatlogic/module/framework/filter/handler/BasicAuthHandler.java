@@ -122,7 +122,7 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
      *   "" (空字符串)     → /api/{channel}（极少见）
      *   "user/create"     → /api/rest/user/create
      */
-    public static String extractToken(HttpServletRequest request) {
+    private String extractToken(HttpServletRequest request) {
         if (request == null) {
             return null;
         }
@@ -161,14 +161,14 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
         return remain.substring(idx + 1);
     }
 
-    public static void main(String[] args) {
-        String username = "lvzk";
-        String password = "123456";
-        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-            Base64.Encoder encoder = Base64.getEncoder();
-            String key = username + ":" + password;
-            System.out.println("Basic " + encoder.encodeToString(key.getBytes()));
-        }
-    }
+//    public static void main(String[] args) {
+//        String username = "lvzk";
+//        String password = "123456Ab";
+//        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+//            Base64.Encoder encoder = Base64.getEncoder();
+//            String key = username + ":" + password;
+//            System.out.println("Basic " + encoder.encodeToString(key.getBytes()));
+//        }
+//    }
 }
 

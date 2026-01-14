@@ -153,37 +153,46 @@ public class LoginController {
                     loginMapper.insertLoginAudit(loginAuditVo);
                 }
             } else {
-                if (Config.ENABLE_NO_SECRET()) {
-                    checkUserVo = userMapper.getActiveUserByUserId(userVo);
-                    if (checkUserVo != null) {
-                        LoginAuditVo loginAuditVo = new LoginAuditVo();
-                        loginAuditVo.setId(SnowflakeUtil.uniqueLong());
-                        loginAuditVo.setUserUuid(checkUserVo.getUuid());
-                        loginAuditVo.setIp(IpUtil.getIpAddr(request));
-                        loginAuditVo.setLoginMethod("noSecret");
-                        loginMapper.insertLoginAudit(loginAuditVo);
-                    }
+                UserVo user = userMapper.getUserBaseInfoByUserIdWithoutCache(userId);
+                if (user == null) {
+                    logger.warn("用户{}不存在", userId);
+                } else if (Objects.equals(user.getIsDelete(), 1)) {
+                    logger.warn("用户{}已删除", userId);
+                } else if (Objects.equals(user.getIsActive(), 0)) {
+                    logger.warn("用户{}已禁用", userId);
                 } else {
-                    //校验用户锁定
-                    loginService.checkLockUser(userVo);
-                    //目前仅先校验移动端
-                    if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
-                        loginService.loginCaptchaValid(jsonObj, resultJson);
+                    if (Config.ENABLE_NO_SECRET()) {
+                        checkUserVo = userMapper.getActiveUserByUserId(userVo);
+                        if (checkUserVo != null) {
+                            LoginAuditVo loginAuditVo = new LoginAuditVo();
+                            loginAuditVo.setId(SnowflakeUtil.uniqueLong());
+                            loginAuditVo.setUserUuid(checkUserVo.getUuid());
+                            loginAuditVo.setIp(IpUtil.getIpAddr(request));
+                            loginAuditVo.setLoginMethod("noSecret");
+                            loginMapper.insertLoginAudit(loginAuditVo);
+                        }
+                    } else {
+                        //校验用户锁定
+                        loginService.checkLockUser(userVo);
+                        //目前仅先校验移动端
+                        if (Objects.equals(CommonUtil.getDevice(), DeviceType.MOBILE.getValue())) {
+                            loginService.loginCaptchaValid(jsonObj, resultJson);
+                        }
+                        //切换到具体的认证插件
+                        ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
+                        if (loginAuth == null) {//配置了插件，但不在已有的插件范围内
+                            throw new LoginAuthPluginNoFoundException();
+                        }
+                        checkUserVo = loginAuth.login(userVo, returnObj);
                     }
-                    //切换到具体的认证插件
-                    ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
-                    if (loginAuth == null) {//配置了插件，但不在已有的插件范围内
-                        throw new LoginAuthPluginNoFoundException();
-                    }
-                    checkUserVo = loginAuth.login(userVo, returnObj);
-                }
-                if (checkUserVo != null) {
-                    String timezone = TimeUtil.ZONE_TIME;
-                    authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
-                    UserContext.init(checkUserVo, authenticationInfoVo, timezone);
-                    if (TenantContext.get().getTenantUuid() != null) {
-                        for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
-                            loginPostProcessor.loginAfterInitialization();
+                    if (checkUserVo != null) {
+                        String timezone = TimeUtil.ZONE_TIME;
+                        authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
+                        UserContext.init(checkUserVo, authenticationInfoVo, timezone);
+                        if (TenantContext.get().getTenantUuid() != null) {
+                            for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
+                                loginPostProcessor.loginAfterInitialization();
+                            }
                         }
                     }
                 }

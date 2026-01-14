@@ -7,3 +7,5 @@ CREATE TABLE `schedule_job_load` (
 ) ENGINE = INNODB CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 ALTER TABLE `api` MODIFY COLUMN `need_audit` tinyint(1) NULL DEFAULT 0 COMMENT '是否记录日志' AFTER `type`;
+
+ALTER TABLE `api_audit` CHANGE `authtype` `authtype` VARCHAR (50) CHARSET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '认证方式';

@@ -161,7 +161,7 @@ public class LoginController {
                 } else if (Objects.equals(user.getIsActive(), 0)) {
                     logger.error("用户{}已禁用", userId);
                 } else {
-                    if (Config.ENABLE_NO_SECRET() && false) {
+                    if (Config.ENABLE_NO_SECRET()) {
                         checkUserVo = userMapper.getActiveUserByUserId(userVo);
                         if (checkUserVo != null) {
                             LoginAuditVo loginAuditVo = new LoginAuditVo();

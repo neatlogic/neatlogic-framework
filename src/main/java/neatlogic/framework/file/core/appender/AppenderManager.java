@@ -75,6 +75,7 @@ public class AppenderManager {
         public Appender<IEvent> build() {
             String path = Config.AUDIT_HOME() + TenantContext.get().getTenantUuid() + File.separator + auditType + File.separator + fileName;
             RollingFileAppender<IEvent> rollingFileAppender = new RollingFileAppender<>();
+            rollingFileAppender.setName(auditType);
             rollingFileAppender.setFile(path);
             FixedWindowRollingPolicy fixedWindowRollingPolicy = new FixedWindowRollingPolicy();
             fixedWindowRollingPolicy.setMinIndex(1);

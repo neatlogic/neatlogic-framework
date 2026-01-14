@@ -22,12 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Base64;
-import java.util.zip.GZIPInputStream;
 
 public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 
@@ -43,26 +38,12 @@ public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 		UserContext context = UserContext.get();
 		String token = context.getToken();
 		if (StringUtils.isNotBlank(token)) {
-			String authorization = null;
 			if (token.startsWith("GZIP_")) {
-				byte[] tokenDecoder = Base64.getDecoder().decode(token.substring(5));
-				ByteArrayOutputStream out = new ByteArrayOutputStream();
-				ByteArrayInputStream in = new ByteArrayInputStream(tokenDecoder);
-				try {
-					GZIPInputStream ungzip = new GZIPInputStream(in);
-					byte[] buffer = new byte[1024];
-					int n;
-					while ((n = ungzip.read(buffer)) >= 0){
-						out.write(buffer, 0, n);
-					}
-				} catch (IOException e) {
-					logger.error(e.getMessage(), e);
-				}
-				authorization = out.toString();
+                connection.setRequestProperty("Cookie","neatlogic_authorization="+token+";");
 			}else if (token.startsWith("Bearer_")) {
-				authorization = token;
+                connection.addRequestProperty("Authorization", token);
 			}
-			connection.addRequestProperty("Authorization", authorization);
+
 			connection.addRequestProperty("Tenant", TenantContext.get().getTenantUuid());
 		} else {
 			throw new AuthenticateException("无法获取用户登录信息");

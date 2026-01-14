@@ -40,7 +40,6 @@ public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 		if (StringUtils.isNotBlank(token)) {
 			if (token.startsWith("GZIP_")) {
                 connection.setRequestProperty("Cookie","neatlogic_authorization="+token+";");
-                connection.addRequestProperty("Authorization", token);
 			}else if (token.startsWith("Bearer_")) {
                 connection.addRequestProperty("Authorization", token);
 			}

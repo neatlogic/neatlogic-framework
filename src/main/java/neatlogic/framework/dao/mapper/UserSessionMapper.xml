@@ -197,6 +197,13 @@
         set `visit_time` = now(3)
         WHERE `token_hash` = #{value}
     </update>
+
+    <update id="updateUserSessionCreateTime" parameterType="java.lang.String">
+        UPDATE `user_session`
+        set `token_create_time` = #{tokenCreateTime}
+        WHERE `token_hash` = #{tokenHash}
+    </update>
+
     <update id="updateUserSessionAuthInfoHashByTokenHashList">
         update `user_session`
         set `auth_info_hash` = #{authInfoHash}

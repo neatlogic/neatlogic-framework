@@ -161,8 +161,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     authenticationInfoVo = new AuthenticationInfoVo();
                 }
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
-                if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
+                if (isNeedCookie()) {
                     jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
+                    userSessionMapper.updateUserSessionCreateTime(jwtVo.getTokenCreateTime(), jwtVo.getTokenHash());
                     setResponseAuthCookie(response, request, tenant, jwtVo);
                 }
             }
@@ -337,16 +338,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        UserVo user = userMapper.getUserByUserIdAndPassword(userVo);
-        if (user == null) {
-            UserPasswordVo userPasswordVo = userMapper.getActivePasswordByUserId(userVo.getUserId());
-            if (userPasswordVo == null) {
-                logger.warn("用户{}没有设置密码", userVo.getUserId());
-            } else {
-                logger.warn("用户{}输入密码错误", userVo.getUserId());
-            }
-        }
-        return user;
+        return userMapper.getUserByUserIdAndPassword(userVo);
     }
 
     @Override

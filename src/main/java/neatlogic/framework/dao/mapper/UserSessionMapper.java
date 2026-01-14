@@ -65,6 +65,8 @@ public interface UserSessionMapper {
 
     int updateUserSession(String tokenHash);
 
+    int updateUserSessionCreateTime(@Param("tokenCreateTime")Long tokenCreateTime, @Param("tokenHash")String tokenHash);
+
     int deleteUserSessionByTokenHash(String tokenHash);
 
     int deleteUserSessionByUserUuid(String userUuid);

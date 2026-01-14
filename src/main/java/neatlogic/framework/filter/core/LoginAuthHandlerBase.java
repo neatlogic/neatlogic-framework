@@ -341,9 +341,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         if (user == null) {
             UserPasswordVo userPasswordVo = userMapper.getActivePasswordByUserId(userVo.getUserId());
             if (userPasswordVo == null) {
-                logger.error("用户{}没有设置密码", userVo.getUserId());
+                logger.warn("用户{}没有设置密码", userVo.getUserId());
             } else {
-                logger.error("用户{}输入密码错误", userVo.getUserId());
+                logger.warn("用户{}输入密码错误", userVo.getUserId());
             }
         }
         return user;

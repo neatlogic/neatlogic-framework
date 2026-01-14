@@ -155,11 +155,11 @@ public class LoginController {
             } else {
                 UserVo user = userMapper.getUserBaseInfoByUserIdWithoutCache(userId);
                 if (user == null) {
-                    logger.error("用户{}不存在", userId);
+                    logger.warn("用户{}不存在", userId);
                 } else if (Objects.equals(user.getIsDelete(), 1)) {
-                    logger.error("用户{}已删除", userId);
+                    logger.warn("用户{}已删除", userId);
                 } else if (Objects.equals(user.getIsActive(), 0)) {
-                    logger.error("用户{}已禁用", userId);
+                    logger.warn("用户{}已禁用", userId);
                 } else {
                     if (Config.ENABLE_NO_SECRET()) {
                         checkUserVo = userMapper.getActiveUserByUserId(userVo);

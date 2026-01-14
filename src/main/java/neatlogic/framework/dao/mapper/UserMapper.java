@@ -45,6 +45,8 @@ public interface UserMapper {
      **/
     UserVo getUserBaseInfoByUuidWithoutCache(String userUuid);
 
+    UserVo getUserBaseInfoByUserIdWithoutCache(String userId);
+
     UserVo getUserByUserId(String userId);
 
     UserVo getUserByUserUuid(String userId);
@@ -191,6 +193,8 @@ public interface UserMapper {
     List<Map<String, Object>> searchUserListForMatrix(MatrixDataVo searchVo);
 
     UserPasswordVo getActivePasswordByUserUuid(@Param("userUuid") String userUuid);
+
+    UserPasswordVo getActivePasswordByUserId(String userId);
 
     int insertUserAuth(UserAuthVo userAuthVo);
 

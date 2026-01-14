@@ -337,7 +337,16 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     public UserVo myLogin(UserVo userVo, JSONObject resultJson) {
-        return userMapper.getUserByUserIdAndPassword(userVo);
+        UserVo user = userMapper.getUserByUserIdAndPassword(userVo);
+        if (user == null) {
+            UserPasswordVo userPasswordVo = userMapper.getActivePasswordByUserId(userVo.getUserId());
+            if (userPasswordVo == null) {
+                logger.warn("用户{}没有设置密码", userVo.getUserId());
+            } else {
+                logger.warn("用户{}输入密码错误", userVo.getUserId());
+            }
+        }
+        return user;
     }
 
     @Override

@@ -87,6 +87,23 @@
         WHERE a.`uuid` = #{value}
     </select>
 
+    <select id="getUserBaseInfoByUserIdWithoutCache" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
+            useCache="false">
+        SELECT a.`id`,
+               a.`uuid`,
+               a.`user_id`        as userId,
+               a.`user_name`      as userName,
+               a.`email`,
+               a.`phone`,
+               a.`pinyin`,
+               a.`is_active`      as isActive,
+               a.`is_delete`      as isDelete,
+               a.`user_info`      as userInfo,
+               a.`is_super_admin` as isSuperAdmin
+        FROM `user` a
+        WHERE a.`user_id` = #{value} limit 1
+    </select>
+
     <select id="getUserByUserId" parameterType="java.lang.String" resultType="neatlogic.framework.dto.UserVo"
             useCache="true">
         SELECT a.`id`,
@@ -620,6 +637,7 @@
                  LEFT JOIN user_role b ON a.`uuid` = b.`user_uuid`
         WHERE a.user_id = #{userId}
           AND a.`is_active` = 1
+          AND a.`is_delete` = 0
     </select>
 
     <select id="getUserByUserIdAndPassword" parameterType="neatlogic.framework.dto.UserVo" resultMap="userRoleMap"
@@ -1362,10 +1380,17 @@
         </where>
         LIMIT #{startNum}, #{pageSize}
     </select>
+
     <select id="getActivePasswordByUserUuid" resultType="neatlogic.framework.dto.UserPasswordVo" useCache="false">
         select id, user_uuid as userUuid, user_id as userId, create_time as createTime
         from user_password
         where user_uuid = #{userUuid} and is_active = 1  limit 1
+    </select>
+
+    <select id="getActivePasswordByUserId" resultType="neatlogic.framework.dto.UserPasswordVo" useCache="false">
+        select id, user_uuid as userUuid, user_id as userId, create_time as createTime
+        from user_password
+        where user_id = #{value} and is_active = 1  limit 1
     </select>
 
     <insert id="insertUserAuth" parameterType="neatlogic.framework.dto.UserAuthVo">

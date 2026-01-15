@@ -270,7 +270,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         if (jwtVo != null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHashWithoutCache(jwtVo.getTokenHash());
             if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {
-                userSessionMapper.deleteUserSessionByTokenHash(UserContext.get().getTokenHash());
+                userSessionMapper.deleteUserSessionByTokenHash(jwtVo.getTokenHash());
             }
         }
         String url;

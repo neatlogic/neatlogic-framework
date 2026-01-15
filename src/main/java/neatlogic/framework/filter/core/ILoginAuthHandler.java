@@ -1,6 +1,7 @@
 package neatlogic.framework.filter.core;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public interface ILoginAuthHandler {
      *
      * @return 系统登出后跳转的url，null则跳转回系统默认登录页面
      */
-    String logout();
+    String logout(JwtVo jwtVo);
 
     /**
      * 使用场景：移动端接口访问时拦截验证失败后，跳转的url

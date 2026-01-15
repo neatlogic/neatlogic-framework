@@ -161,7 +161,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
                     authenticationInfoVo = new AuthenticationInfoVo();
                 }
                 //如果没有cookie则补充cookie。因为UserSessionCache，兼容移动端认证浏览器cookie可能存在丢失重新认证却拿不到cookie的问题
-                if (isNeedCookie()) {
+                if (isNeedCookie() && StringUtils.isBlank(userVo.getCookieAuthorization())) {
                     jwtVo = buildJwt(userVo, authenticationInfoVo, getType());
                     userSessionMapper.updateUserSessionCreateTime(jwtVo.getTokenCreateTime(), jwtVo.getTokenHash());
                     setResponseAuthCookie(response, request, tenant, jwtVo);
@@ -265,9 +265,8 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
     }
 
     @Override
-    public String logout() {
+    public String logout(JwtVo jwtVo) {
         //仅删除自己创建的session
-        JwtVo jwtVo = UserContext.get().getJwtVo();
         if (jwtVo != null) {
             UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHashWithoutCache(jwtVo.getTokenHash());
             if (userSessionVo != null && Objects.equals(userSessionVo.getTokenCreateTime(), jwtVo.getTokenCreateTime())) {

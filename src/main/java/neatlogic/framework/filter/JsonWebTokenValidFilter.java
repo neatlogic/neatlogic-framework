@@ -29,6 +29,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.user.UserPasswordExpiredException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
+import neatlogic.framework.service.LoginService;
 import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -55,6 +56,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     @Resource
     private UserSessionContentMapper userSessionContentMapper;
+
+    @Resource
+    private LoginService loginService;
 
     /**
      * Default constructor.
@@ -118,6 +122,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     //用户如果过期则抛弃
                     if (isExpired) {
                         logger.debug("======= login expired: " + userVo.getUuid());
+                        loginService.logout(userVo.getJwtVo());
                         returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
                         return;
                     } else {

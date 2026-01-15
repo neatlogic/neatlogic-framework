@@ -22,12 +22,16 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.config.ConfigManager;
 import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.dao.mapper.LoginMapper;
+import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.captcha.LoginCaptchaVo;
 import neatlogic.framework.dto.captcha.LoginFailedCountVo;
 import neatlogic.framework.exception.captcha.LoginCaptchaIsEmptyException;
 import neatlogic.framework.exception.captcha.LoginCaptchaNotInvalidException;
+import neatlogic.framework.exception.login.LoginAuthNotFoundException;
 import neatlogic.framework.exception.user.LoginLockedException;
+import neatlogic.framework.filter.core.ILoginAuthHandler;
+import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.CaptchaUtil;
 import neatlogic.framework.util.TimeUtil;
@@ -127,5 +131,19 @@ public class LoginServiceImpl implements LoginService {
                 throw ex;
             }
         }
+    }
+
+    @Override
+    public String logout(JwtVo jwtVo){
+        ILoginAuthHandler loginAuth;
+        if(StringUtils.isBlank(Config.LOGIN_AUTH_TYPE())){
+            loginAuth = LoginAuthFactory.getLoginAuth("default");
+        }else{
+            loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
+        }
+        if(loginAuth == null){
+            throw new LoginAuthNotFoundException(Config.LOGIN_AUTH_TYPE());
+        }
+        return loginAuth.logout(jwtVo);
     }
 }

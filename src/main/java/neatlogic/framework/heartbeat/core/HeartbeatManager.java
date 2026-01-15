@@ -75,7 +75,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             }
             ServerClusterVo serverVo = serverMapper.getServerLockByServerId(Config.SCHEDULE_SERVER_ID);
             if (serverVo != null && StringUtils.isNotBlank(serverVo.getIp())) {
-                if (!Objects.equals(serverVo.getIp(), ip)) {
+                if (!Objects.equals(serverVo.getIp(), ip) && Objects.equals(serverVo.getStatus(), ServerClusterVo.STARTUP)) {
                     System.err.println($.t("nfhc.heartbeatmanager.myinit.startupfailureprompt", Config.SCHEDULE_SERVER_ID, serverVo.getIp()));
                     System.exit(1);
                 }

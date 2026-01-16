@@ -204,6 +204,10 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         this.authTypeList.add(authType);
     }
 
+    public void setAuthTypeList(List<String> authTypeList) {
+        this.authTypeList = authTypeList;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -676,7 +680,7 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         this.authType = authType;
     }
 
-    public boolean basicSupport(){
+    public boolean getBasicSupport(){
         return authTypeList.contains(ApiAuthType.BASIC.getValue());
     }
 }

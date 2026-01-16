@@ -97,7 +97,7 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
             throw new ApiNotFoundException(token);
         }
 
-        if (!interfaceVo.getAuthTypeList().contains(ApiAuthType.BASIC.getText())) {
+        if (!interfaceVo.getAuthTypeList().contains(ApiAuthType.BASIC.getValue())) {
             throw new NotSupportBasicAuthException();
         }
 
@@ -162,14 +162,14 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
         return remain.substring(idx + 1);
     }
 
-//    public static void main(String[] args) {
-//        String username = "lvzk";
-//        String password = "123456Ab";
-//        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-//            Base64.Encoder encoder = Base64.getEncoder();
-//            String key = username + ":" + password;
-//            System.out.println("Basic " + encoder.encodeToString(key.getBytes()));
-//        }
-//    }
+    public static void main(String[] args) {
+        String username = "lvzk";
+        String password = "123456Ab";
+        if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
+            Base64.Encoder encoder = Base64.getEncoder();
+            String key = username + ":" + password;
+            System.out.println("Basic " + encoder.encodeToString(key.getBytes()));
+        }
+    }
 }
 

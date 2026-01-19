@@ -21,12 +21,12 @@ public class USER_EXPORT_FILE_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "导出文件管理权限";
+		return "nfal.user_export_file_modify.getauthdisplayname";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "对所有用户的导出文件有查看、下载、删除权限";
+		return "nfal.user_export_file_modify.getauthintroduction";
 	}
 
 	@Override

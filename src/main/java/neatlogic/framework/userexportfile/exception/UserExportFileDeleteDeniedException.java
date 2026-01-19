@@ -10,7 +10,7 @@ public class UserExportFileDeleteDeniedException extends ApiRuntimeException {
     private static final long serialVersionUID = 3196317808541689156L;
 
     public UserExportFileDeleteDeniedException(String name) {
-        super("您没有权限删除{0}文件");
+        super("nfue.userexportfiledeletedeniedexception.userexportfiledeletedeniedexception");
     }
 
 }

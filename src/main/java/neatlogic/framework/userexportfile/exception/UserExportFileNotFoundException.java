@@ -15,6 +15,6 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class UserExportFileNotFoundException extends ApiRuntimeException {
 
     public UserExportFileNotFoundException(Long id) {
-        super("用户导出文件“{0}”不存在", id);
+        super("nfue.userexportfilenotfoundexception.userexportfilenotfoundexception", id);
     }
 }

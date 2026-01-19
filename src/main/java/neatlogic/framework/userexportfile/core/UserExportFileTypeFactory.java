@@ -48,4 +48,13 @@ public class UserExportFileTypeFactory {
         }
         return "";
     }
+
+    public static IUserExportFileType getUserExportFileType(String value) {
+        for (IUserExportFileType s : getProcessStepHandlerTypeSet()) {
+            if (s.getValue().equals(value)) {
+                return s;
+            }
+        }
+        return null;
+    }
 }

@@ -38,11 +38,21 @@ public class UserExportFileUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(UserExportFileUtil.class);
 
+    private final static int threshold = 10 * 1024 * 1024; // 10MB
+
+    private final static int bufferSize = 1024; // 1MB
+
     private static String generateFilePath(String prefix, String suffix) {
         String tenantUuid = TenantContext.get().getTenantUuid();
         String userId = UserContext.get().getUserId();
         String yyyyMM = LocalDate.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM"));
         return Config.DATA_HOME() + tenantUuid + File.separator + userId + File.separator + yyyyMM + File.separator + prefix + suffix;
+    }
+
+    public static DeferredFileOutputStream getDeferredFileOutputStream(String prefix, String suffix) throws IOException {
+        File tmpFile = File.createTempFile(prefix, suffix);
+        DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tmpFile).setThreshold(threshold).get();
+        return dfos;
     }
 
     public static String saveWorkbook(
@@ -61,9 +71,8 @@ public class UserExportFileUtil {
     ) throws Exception {
         IUserExportFileCrossoverMapper userExportFileCrossoverMapper = CrossoverServiceFactory.getApi(IUserExportFileCrossoverMapper.class);
         String path = null;
-        int threshold = 10 * 1024 * 1024; // 10MB
         File tmpFile = File.createTempFile(userExportFileVo.getPrefix(), userExportFileVo.getSuffix());
-        try (DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(1024).setOutputFile(tmpFile).setThreshold(threshold).get()) {
+        try (DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tmpFile).setThreshold(threshold).get()) {
             workbook.write(dfos);
             dfos.flush();
             String filePath = generateFilePath(userExportFileVo.getPrefix(), userExportFileVo.getSuffix());
@@ -122,20 +131,41 @@ public class UserExportFileUtil {
         return path;
     }
 
-    public static String saveInputStream(
-            InputStream inputStream,
-            long size,
+    public static String saveDeferredFileOutputStream(
+            DeferredFileOutputStream deferredFileOutputStream,
+            UserExportFileVo userExportFileVo,
+            HttpServletResponse response
+    ) throws Exception {
+        return saveDeferredFileOutputStream(deferredFileOutputStream, userExportFileVo, response, null);
+    }
+
+    public static String saveDeferredFileOutputStream(
+            DeferredFileOutputStream deferredFileOutputStream,
             UserExportFileVo userExportFileVo,
             HttpServletResponse response,
             Map<String, String> headerMap
     ) throws Exception {
         IUserExportFileCrossoverMapper userExportFileCrossoverMapper = CrossoverServiceFactory.getApi(IUserExportFileCrossoverMapper.class);
         String path = null;
-        try {
+        File tmpFile = deferredFileOutputStream.getFile();
+        try (DeferredFileOutputStream dfos = deferredFileOutputStream) {
             String filePath = generateFilePath(userExportFileVo.getPrefix(), userExportFileVo.getSuffix());
-            path = neatlogic.framework.common.util.FileUtil.saveData(inputStream, userExportFileVo.getContentType(), filePath);
-            userExportFileVo.setPath(path);
-            userExportFileVo.setStatus(UserExportFileVo.Status.DONE.getValue());
+            if (dfos.isInMemory()) {
+                byte[] bytes = dfos.getData();
+                userExportFileVo.setSize((long) bytes.length);
+                try (InputStream in = new ByteArrayInputStream(bytes)) {
+                    path = neatlogic.framework.common.util.FileUtil.saveData(in, userExportFileVo.getContentType(), filePath);
+                    userExportFileVo.setPath(path);
+                    userExportFileVo.setStatus(UserExportFileVo.Status.DONE.getValue());
+                }
+            } else {
+                userExportFileVo.setSize(tmpFile.length());
+                try (InputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+                    path = neatlogic.framework.common.util.FileUtil.saveData(in, userExportFileVo.getContentType(), filePath);
+                    userExportFileVo.setPath(path);
+                    userExportFileVo.setStatus(UserExportFileVo.Status.DONE.getValue());
+                }
+            }
             try (OutputStream os = response.getOutputStream()) {
                 response.setContentType(userExportFileVo.getContentType());
                 if (MapUtils.isNotEmpty(headerMap)) {
@@ -145,17 +175,27 @@ public class UserExportFileUtil {
                 }
                 String filename = FileUtil.getEncodedFileName(userExportFileVo.getPrefix() + userExportFileVo.getSuffix());
                 response.setHeader("Content-Disposition", " attachment; filename=\"" + filename + "\"");
-                IOUtils.copyLarge(inputStream, os);
+                if (dfos.isInMemory()) {
+                    try (InputStream in = new ByteArrayInputStream(dfos.getData())) {
+                        IOUtils.copyLarge(in, os);
+                    }
+                } else {
+                    try (InputStream in = new BufferedInputStream(new FileInputStream(tmpFile))) {
+                        IOUtils.copyLarge(in, os);
+                    }
+                }
             } catch (Exception e) {
                 logger.warn(e.getMessage(), e);
             }
-        }  catch (Exception e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             userExportFileVo.setError(ExceptionUtils.getStackTrace(e));
             userExportFileVo.setStatus(UserExportFileVo.Status.FAILED.getValue());
         } finally {
+            if (tmpFile.exists()) {
+                boolean delete = tmpFile.delete();
+            }
             userExportFileVo.setIsEnd(1);
-            userExportFileVo.setSize(size);
             userExportFileCrossoverMapper.insertUserExportFile(userExportFileVo);
         }
         return path;

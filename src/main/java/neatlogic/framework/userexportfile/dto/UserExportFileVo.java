@@ -14,6 +14,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.userexportfile.core.IUserExportFileType;
+import neatlogic.framework.userexportfile.core.UserExportFileTypeFactory;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +33,8 @@ public class UserExportFileVo implements Serializable {
     private Long size;
     private String sizeText;
     private String userUuid;
+    private String type;
+    private String typeText;
     private String contentType;
     private String path;
     private String prefix;
@@ -48,7 +52,8 @@ public class UserExportFileVo implements Serializable {
 
     }
 
-    public UserExportFileVo(String prefix, String suffix, String contentType) {
+    public UserExportFileVo(IUserExportFileType userExportFileType, String prefix, String suffix, String contentType) {
+        this.type = userExportFileType.getValue();
         this.prefix = prefix;
         this.suffix = suffix;
         this.name = prefix + suffix;
@@ -113,6 +118,25 @@ public class UserExportFileVo implements Serializable {
 
     public void setUserUuid(String userUuid) {
         this.userUuid = userUuid;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getTypeText() {
+        if (typeText == null && type != null) {
+            typeText = UserExportFileTypeFactory.getText(type);
+        }
+        return typeText;
+    }
+
+    public void setTypeText(String typeText) {
+        this.typeText = typeText;
     }
 
     public String getContentType() {

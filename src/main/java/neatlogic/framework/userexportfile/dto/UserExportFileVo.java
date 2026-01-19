@@ -248,9 +248,9 @@ public class UserExportFileVo implements Serializable {
     }
 
     public enum Status {
-        DOING("doing", "进行中"),
-        DONE("done", "已完成"),
-        FAILED("failed", "失败");
+        DOING("doing", "common.doing"),
+        DONE("done", "common.done"),
+        FAILED("failed", "common.failed");
 
         private final String value;
         private final String text;
@@ -265,7 +265,7 @@ public class UserExportFileVo implements Serializable {
         }
 
         public String getText() {
-            return $.t(text);
+            return $.t(this.text);
         }
 
 

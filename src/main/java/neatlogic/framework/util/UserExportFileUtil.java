@@ -40,7 +40,7 @@ public class UserExportFileUtil {
 
     private final static int threshold = 10 * 1024 * 1024; // 10MB
 
-    private final static int bufferSize = 1024; // 1MB
+    private final static int bufferSize = 1024; // 1KB
 
     private static String generateFilePath(String prefix, String suffix) {
         String tenantUuid = TenantContext.get().getTenantUuid();
@@ -51,8 +51,7 @@ public class UserExportFileUtil {
 
     public static DeferredFileOutputStream getDeferredFileOutputStream(String prefix, String suffix) throws IOException {
         File tmpFile = File.createTempFile(prefix, suffix);
-        DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tmpFile).setThreshold(threshold).get();
-        return dfos;
+        return DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tmpFile).setThreshold(threshold).get();
     }
 
     public static String saveWorkbook(
@@ -135,7 +134,7 @@ public class UserExportFileUtil {
             DeferredFileOutputStream deferredFileOutputStream,
             UserExportFileVo userExportFileVo,
             HttpServletResponse response
-    ) throws Exception {
+    ) {
         return saveDeferredFileOutputStream(deferredFileOutputStream, userExportFileVo, response, null);
     }
 
@@ -144,7 +143,7 @@ public class UserExportFileUtil {
             UserExportFileVo userExportFileVo,
             HttpServletResponse response,
             Map<String, String> headerMap
-    ) throws Exception {
+    ) {
         IUserExportFileCrossoverMapper userExportFileCrossoverMapper = CrossoverServiceFactory.getApi(IUserExportFileCrossoverMapper.class);
         String path = null;
         File tmpFile = deferredFileOutputStream.getFile();

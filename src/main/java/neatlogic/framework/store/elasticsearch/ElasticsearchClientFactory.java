@@ -16,7 +16,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import co.elastic.clients.util.ContentType;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
@@ -26,21 +25,28 @@ import neatlogic.framework.dto.ElasticsearchVo;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchHostNotFoundException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.message.BasicHeader;
+import org.apache.http.ssl.SSLContexts;
 import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import javax.net.ssl.SSLContext;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RootComponent
 public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
@@ -56,7 +62,7 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
     private static final Map<String, ElasticsearchClient> elasticSearchClientMap = new HashMap<>();
 
 
-    public static ElasticsearchClient getClient() {
+    public static ElasticsearchClient getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         if (!elasticSearchClientMap.containsKey(TenantContext.get().getTenantUuid())) {
             ElasticsearchVo elasticsearch = getElasticsearchVo();
             if (elasticsearch != null) {
@@ -75,20 +81,26 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
                     }
                 }
                 if (CollectionUtils.isNotEmpty(httpHosts)) {
+                    SSLContext sslContext = SSLContexts.custom()
+                            .loadTrustMaterial(null, TrustAllStrategy.INSTANCE)
+                            .build();
+
                     RestClient restClient = RestClient
                             .builder(httpHosts.toArray(new HttpHost[0]))
                             .setHttpClientConfigCallback(httpClientBuilder -> {
+                                httpClientBuilder.setSSLContext(sslContext);
+                                httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
                                 httpClientBuilder.disableAuthCaching();
                                 httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
                                         .setIoThreadCount(Runtime.getRuntime().availableProcessors())
                                         .setSoKeepAlive(true)
                                         .build());
-                                httpClientBuilder.setDefaultHeaders(Collections.singletonList(
+                                /*httpClientBuilder.setDefaultHeaders(Collections.singletonList(
                                         new BasicHeader(
-                                                HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
-                                httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
+                                                HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));*/
+                                /*httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
                                         (response, context) ->
-                                                response.addHeader("X-Elastic-Product", "Elasticsearch"));
+                                                response.addHeader("X-Elastic-Product", "Elasticsearch"));*/
 
                                 if (elasticsearch.getConfig().containsKey("maxConnPerRoute")) {
                                     int maxConnPerRoute = elasticsearch.getConfig().getIntValue("maxConnPerRoute");

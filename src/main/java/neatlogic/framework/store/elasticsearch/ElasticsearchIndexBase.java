@@ -99,14 +99,13 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     @Override
     public int getDocumentCount() {
-        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-        CountRequest countRequest = new CountRequest.Builder()
-                .index(getIndexName()) // 指定索引名称
-                .query(q -> q.matchAll(m -> m)) // 使用 MatchAll 查询来匹配所有文档
-                .build();
-        CountResponse countResponse = null;
         try {
-            countResponse = client.count(countRequest);
+            ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+            CountRequest countRequest = new CountRequest.Builder()
+                    .index(getIndexName()) // 指定索引名称
+                    .query(q -> q.matchAll(m -> m)) // 使用 MatchAll 查询来匹配所有文档
+                    .build();
+            CountResponse countResponse = client.count(countRequest);
             long documentCount = countResponse.count();
             return (int) documentCount;
         } catch (Exception e) {
@@ -117,7 +116,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     // 创建索引
     public final void createIndex() {
-        if (!this.isIndexExists() && ElasticsearchClientFactory.getClient() != null) {
+        if (!this.isIndexExists()) {
             ElasticsearchVo elasticsearchVo = ElasticsearchClientFactory.getElasticsearchVo();
             if (elasticsearchVo != null) {
                 this.myCreateIndex(elasticsearchVo);
@@ -127,12 +126,12 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     public final void deleteIndex() {
         // 删除索引
-        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-        if (this.isIndexExists() && client != null) {
-            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder()
-                    .index(this.getIndexName()) // 索引名称
-                    .build();
+        if (this.isIndexExists()) {
             try {
+                DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder()
+                        .index(this.getIndexName()) // 索引名称
+                        .build();
+                ElasticsearchClient client = ElasticsearchClientFactory.getClient();
                 client.indices().delete(deleteIndexRequest);
             } catch (Exception e) {
                 throw new ElasticSearchDeleteIndexException(e);
@@ -213,16 +212,14 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     }
 
     protected final void createDocument(Long id, Map<String, Object> document) {
-        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-        // 创建或更新文档
-        IndexRequest<Map<String, Object>> request = new IndexRequest.Builder<Map<String, Object>>()
-                .index(getIndexName()) // 索引名称
-                .id(id.toString())      // 文档 ID
-                .document(document) // 文档内容
-                .build();
-
-        // 执行请求
         try {
+            ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+            // 创建或更新文档
+            IndexRequest<Map<String, Object>> request = new IndexRequest.Builder<Map<String, Object>>()
+                    .index(getIndexName()) // 索引名称
+                    .id(id.toString())      // 文档 ID
+                    .document(document) // 文档内容
+                    .build();
             client.index(request);
         } catch (Exception ex) {
             //logger.error(ex.getMessage(), ex);
@@ -242,10 +239,9 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     @Override
     public final long searchDocumentCount(T targetVo) {
-        Query queryBuilder = this.myBuildQuery(targetVo);
-        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-
         try {
+            Query queryBuilder = this.myBuildQuery(targetVo);
+            ElasticsearchClient client = ElasticsearchClientFactory.getClient();
             CountResponse resp = client.count(c -> c
                     .index(this.getIndexName())
                     .query(queryBuilder)
@@ -340,20 +336,19 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
 
     @Override
     public final IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize) {
-
-        // 构建查询
-        Query queryBuilder = this.myBuildQuery(targetVo);
-
-        // 执行搜索
-        ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-
-
         IndexResultVo resultVo = new IndexResultVo();
         if (this.needPage(targetVo)) {
             resultVo.setCurrentPage(currentPage);
             resultVo.setPageSize(pageSize);
         }
+
         try {
+            // 构建查询
+            Query queryBuilder = this.myBuildQuery(targetVo);
+
+
+            ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+
             SearchRequest.Builder builder = new SearchRequest.Builder()
                     .index(this.getIndexName())
                     .source(s -> s.fetch(false));//不返回 _source

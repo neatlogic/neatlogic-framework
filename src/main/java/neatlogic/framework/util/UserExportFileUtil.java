@@ -13,8 +13,7 @@ package neatlogic.framework.util;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.crossover.CrossoverServiceFactory;
-import neatlogic.framework.crossover.IUserExportFileCrossoverMapper;
+import neatlogic.framework.dao.mapper.UserExportFileMapper;
 import neatlogic.framework.userexportfile.dto.UserExportFileVo;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -31,9 +30,12 @@ import java.util.Map;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 
+@Component
 public class UserExportFileUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(UserExportFileUtil.class);
@@ -41,6 +43,12 @@ public class UserExportFileUtil {
     private final static int threshold = 10 * 1024 * 1024; // 10MB
 
     private final static int bufferSize = 1024; // 1KB
+    private static UserExportFileMapper userExportFileMapper;
+
+    @Resource
+    public void setUserExportFileMapper(UserExportFileMapper _userExportFileMapper) {
+        userExportFileMapper = _userExportFileMapper;
+    }
 
     private static String generateFilePath(String prefix, String suffix) {
         String tenantUuid = TenantContext.get().getTenantUuid();
@@ -68,7 +76,6 @@ public class UserExportFileUtil {
             HttpServletResponse response,
             Map<String, String> headerMap
     ) throws Exception {
-        IUserExportFileCrossoverMapper userExportFileCrossoverMapper = CrossoverServiceFactory.getApi(IUserExportFileCrossoverMapper.class);
         String path = null;
         File tmpFile = File.createTempFile(userExportFileVo.getPrefix(), userExportFileVo.getSuffix());
         try (DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tmpFile).setThreshold(threshold).get()) {
@@ -125,7 +132,7 @@ public class UserExportFileUtil {
                 workbook.close();
             }
             userExportFileVo.setIsEnd(1);
-            userExportFileCrossoverMapper.insertUserExportFile(userExportFileVo);
+            userExportFileMapper.insertUserExportFile(userExportFileVo);
         }
         return path;
     }
@@ -144,7 +151,6 @@ public class UserExportFileUtil {
             HttpServletResponse response,
             Map<String, String> headerMap
     ) {
-        IUserExportFileCrossoverMapper userExportFileCrossoverMapper = CrossoverServiceFactory.getApi(IUserExportFileCrossoverMapper.class);
         String path = null;
         File tmpFile = deferredFileOutputStream.getFile();
         try (DeferredFileOutputStream dfos = deferredFileOutputStream) {
@@ -195,7 +201,7 @@ public class UserExportFileUtil {
                 boolean delete = tmpFile.delete();
             }
             userExportFileVo.setIsEnd(1);
-            userExportFileCrossoverMapper.insertUserExportFile(userExportFileVo);
+            userExportFileMapper.insertUserExportFile(userExportFileVo);
         }
         return path;
     }

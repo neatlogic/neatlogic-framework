@@ -8,14 +8,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 
-package neatlogic.framework.crossover;
+package neatlogic.framework.dao.mapper;
 
 import neatlogic.framework.userexportfile.dto.UserExportFileSearchVo;
 import neatlogic.framework.userexportfile.dto.UserExportFileVo;
 
 import java.util.List;
 
-public interface IUserExportFileCrossoverMapper extends ICrossoverService {
+public interface UserExportFileMapper {
 
     int getUserExportFileUnreadCount(String userUuid);
 

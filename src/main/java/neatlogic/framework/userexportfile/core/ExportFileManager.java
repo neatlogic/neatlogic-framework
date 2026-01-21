@@ -24,8 +24,6 @@ import neatlogic.framework.userexportfile.exception.UserExportingException;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -42,12 +40,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 @Component
-public class UserExportFileManager {
+public class ExportFileManager {
 
-    private final static Logger logger = LoggerFactory.getLogger(UserExportFileManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExportFileManager.class);
     private static final ConcurrentHashMap<String, Object> UNIQUE_KEY_MAP = new ConcurrentHashMap<>();
-    private final static int threshold = 10 * 1024 * 1024; // 10MB
-    private final static int bufferSize = 1024; // 1KB
+    private static final int threshold = 10 * 1024 * 1024; // 10MB
+    private static final int bufferSize = 1024; // 1KB
 
     private static UserExportFileMapper userExportFileMapper;
 
@@ -56,7 +54,7 @@ public class UserExportFileManager {
         userExportFileMapper = _userExportFileMapper;
     }
 
-    private Supplier<?> supplier;
+    private Supplier<ExportWriter> supplier;
 
     private IUserExportFileType userExportFileType;
 
@@ -69,19 +67,23 @@ public class UserExportFileManager {
     private String uniqueKey;
 
     private DeferredFileOutputStream deferredFileOutputStream;
-
-    public UserExportFileManager() {
+    @FunctionalInterface
+    public interface ExportWriter {
+        void writeTo(OutputStream out) throws Exception;
+    }
+    public ExportFileManager() {
 
     }
 
-    public UserExportFileManager(IUserExportFileType userExportFileType, String prefix, String suffix, String contentType) {
+    public ExportFileManager(IUserExportFileType userExportFileType, String prefix, String suffix, String contentType) {
         this.userExportFileType = userExportFileType;
         this.prefix = prefix;
         this.suffix = suffix;
         this.contentType = contentType;
     }
 
-    public void generateData(Supplier<?> supplier) {
+
+    public void generateData(Supplier<ExportWriter> supplier) {
         this.supplier = supplier;
     }
 
@@ -104,24 +106,13 @@ public class UserExportFileManager {
             @Override
             protected void execute() {
                 try {
-                    Object t = supplier.get();
-                    if (t instanceof Workbook workbook) {
-                        try {
-                            DeferredFileOutputStream dfos = getDeferredFileOutputStream();
-                            workbook.write(dfos);
-                            dfos.flush();
-                            saveData(dfos, userExportFileVo);
-                            deferredFileOutputStream = dfos;
-                        } finally {
-                            if (workbook instanceof SXSSFWorkbook sxssfWorkbook) {
-                                sxssfWorkbook.dispose(); // 清理内存缓存
-                            }
-                            workbook.close();
-                        }
-                    } else if (t instanceof DeferredFileOutputStream dfos) {
-                        saveData(dfos, userExportFileVo);
-                        deferredFileOutputStream = dfos;
-                    }
+                    //Object t = supplier.get();
+                    ExportWriter writer = supplier.get();
+                    DeferredFileOutputStream dfos = getDeferredFileOutputStream();
+                    writer.writeTo(dfos);
+                    dfos.flush();
+                    saveData(dfos, userExportFileVo);
+                    deferredFileOutputStream = dfos;
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     userExportFileVo.setError(ExceptionUtils.getStackTrace(e));

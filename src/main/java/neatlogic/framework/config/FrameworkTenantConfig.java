@@ -12,6 +12,7 @@
 
 package neatlogic.framework.config;
 
+import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.util.$;
 
 public enum FrameworkTenantConfig implements ITenantConfig{
@@ -23,15 +24,24 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     LOGIN_NEED_LOCK("login.need.lock", "0","nfc.frameworktenantconfig.loginneedlock"),
     PASSWORD_NEED_EXPIRED_CHECK("password.need.expired.check", "0","nfc.frameworktenantconfig.passwordneedexpiredcheck"),
     PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
+    EXPORT_AWAIT_TIME("export.await.time", "5", ApiParamType.INTEGER, "nfc.frameworktenantconfig.exportawaittime"),
     ;
 
     String key;
     String value;
+    ApiParamType type;
     String description;
 
     FrameworkTenantConfig(String key, String value, String description) {
         this.key = key;
         this.value = value;
+        this.description = description;
+    }
+
+    FrameworkTenantConfig(String key, String value, ApiParamType type, String description) {
+        this.key = key;
+        this.value = value;
+        this.type = type;
         this.description = description;
     }
 
@@ -48,5 +58,9 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     @Override
     public String getDescription() {
         return $.t(description);
+    }
+    @Override
+    public ApiParamType getType() {
+        return this.type;
     }
 }

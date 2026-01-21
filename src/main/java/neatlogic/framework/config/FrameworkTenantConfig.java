@@ -24,7 +24,6 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     LOGIN_NEED_LOCK("login.need.lock", "0","nfc.frameworktenantconfig.loginneedlock"),
     PASSWORD_NEED_EXPIRED_CHECK("password.need.expired.check", "0","nfc.frameworktenantconfig.passwordneedexpiredcheck"),
     PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
-    EXPORT_AWAIT_TIME("export.await.time", "5", ApiParamType.INTEGER, "nfc.frameworktenantconfig.exportawaittime"),
     ;
 
     String key;

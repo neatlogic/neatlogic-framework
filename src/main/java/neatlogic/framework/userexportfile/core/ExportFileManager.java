@@ -60,10 +60,12 @@ public class ExportFileManager {
     private Long exportFileId;
 
     private DeferredFileOutputStream deferredFileOutputStream;
+
     @FunctionalInterface
     public interface ExportWriter {
         void writeTo(OutputStream out) throws Exception;
     }
+
     public ExportFileManager() {
 
     }
@@ -98,12 +100,12 @@ public class ExportFileManager {
         UserExportFileVo userExportFileVo = new UserExportFileVo(userExportFileType, name, mimeType.getValue());
         this.exportFileId = userExportFileVo.getId();
         userExportFileMapper.insertUserExportFile(userExportFileVo);
-        NeatLogicThread neatLogicThread = new NeatLogicThread("export-" + userExportFileType.getValue() + "-Thread") {
+        NeatLogicThread neatLogicThread = new NeatLogicThread("EXPORT-MANAGER-" + userExportFileType.getValue()) {
             @Override
             protected void execute() {
                 try {
                     File tempFile = File.createTempFile(exportFileId.toString(), name);
-                    DeferredFileOutputStream dfos =  DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tempFile).setThreshold(threshold).get();
+                    DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tempFile).setThreshold(threshold).get();
                     exportWriter.writeTo(dfos);
                     dfos.flush();
                     String tenantUuid = TenantContext.get().getTenantUuid();
@@ -144,7 +146,7 @@ public class ExportFileManager {
         neatLogicThread.setCountDownLatch(countDownLatch);
         CachedThreadPool.execute(neatLogicThread);
         if (timeout != 0) {
-            boolean flag = countDownLatch.await(timeout, unit);
+            countDownLatch.await(timeout, unit);
         } else {
             countDownLatch.await();
         }

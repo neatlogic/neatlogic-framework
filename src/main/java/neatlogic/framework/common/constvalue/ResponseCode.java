@@ -27,6 +27,7 @@ import neatlogic.framework.exception.user.UserPasswordExpiredException;
 
 
 public enum ResponseCode {
+    EXPORT_TIMEOUT(220, "导出超时", ApiRateLimiterException.class),
     RATE_LIMITER_TOKEN_BUCKET(429, "系统繁忙", ApiRateLimiterException.class),
     EXCEPTION(500, "非已知异常", Exception.class),
     API_RUNTIME(520, "运行已知异常", ApiRuntimeException.class),

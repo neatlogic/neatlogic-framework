@@ -37,8 +37,6 @@ public class UserExportFileVo implements Serializable {
     private String typeText;
     private String contentType;
     private String path;
-    private String prefix;
-    private String suffix;
     private Date startTime;
     private Date endTime;
     private Integer isEnd;
@@ -52,11 +50,9 @@ public class UserExportFileVo implements Serializable {
 
     }
 
-    public UserExportFileVo(IUserExportFileType userExportFileType, String prefix, String suffix, String contentType) {
+    public UserExportFileVo(IUserExportFileType userExportFileType, String name, String contentType) {
         this.type = userExportFileType.getValue();
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.name = prefix + suffix;
+        this.name = name;
         this.contentType = contentType;
         this.status = Status.DOING.value;
         this.config = new JSONObject();
@@ -153,22 +149,6 @@ public class UserExportFileVo implements Serializable {
 
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public void setSuffix(String suffix) {
-        this.suffix = suffix;
     }
 
     public Date getStartTime() {

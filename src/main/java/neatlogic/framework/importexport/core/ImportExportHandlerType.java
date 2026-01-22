@@ -12,7 +12,9 @@
 
 package neatlogic.framework.importexport.core;
 
-public interface ImportExportHandlerType {
+import neatlogic.framework.userexportfile.core.IUserExportFileType;
+
+public interface ImportExportHandlerType extends IUserExportFileType {
 
     String getValue();
 

@@ -31,7 +31,9 @@ public class UserExportFileTypeFactory {
                     Reflections reflections = new Reflections("neatlogic");
                     Set<Class<? extends IUserExportFileType>> classSet = reflections.getSubTypesOf(IUserExportFileType.class);
                     for (Class<? extends IUserExportFileType> c : classSet) {
-                        Collections.addAll(set, c.getEnumConstants());
+                        if (c.getEnumConstants() != null) {
+                            Collections.addAll(set, c.getEnumConstants());
+                        }
                     }
                     isUninitialized = false;
                 }

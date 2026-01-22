@@ -92,12 +92,10 @@ public class ExportFileManager {
         if (StringUtils.isBlank(name)) {
             name = "导出文件" + System.currentTimeMillis();
         }
-        String prefix = name;
-        String suffix = "";
         if (mimeType == null) {
             mimeType = MimeType.STREAM;
         }
-        UserExportFileVo userExportFileVo = new UserExportFileVo(userExportFileType, prefix, suffix, mimeType.getValue());
+        UserExportFileVo userExportFileVo = new UserExportFileVo(userExportFileType, name, mimeType.getValue());
         this.exportFileId = userExportFileVo.getId();
         userExportFileMapper.insertUserExportFile(userExportFileVo);
         NeatLogicThread neatLogicThread = new NeatLogicThread("export-" + userExportFileType.getValue() + "-Thread") {

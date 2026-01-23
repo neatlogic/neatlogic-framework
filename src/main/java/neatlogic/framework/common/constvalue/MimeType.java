@@ -12,8 +12,8 @@ public enum MimeType {
     XLS("application/vnd.ms-excel", ".xls"),
     XLSX("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", ".xlsx"),
     PPT("application/vnd.ms-powerpoint", ".ppt");
-    private String value;
-    private String suffix;
+    private final String value;
+    private final String suffix;
 
     MimeType(String value, String suffix) {
         this.value = value;

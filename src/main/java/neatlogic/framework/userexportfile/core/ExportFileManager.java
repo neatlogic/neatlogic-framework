@@ -58,6 +58,8 @@ public class ExportFileManager {
     private MimeType mimeType;
     private String uniqueKey;
     private Long exportFileId;
+    private long timeout = 0;
+    private TimeUnit unit;
 
     private DeferredFileOutputStream deferredFileOutputStream;
 
@@ -80,10 +82,6 @@ public class ExportFileManager {
     }
 
     public DeferredFileOutputStream export() throws InterruptedException {
-        return export(0, TimeUnit.SECONDS);
-    }
-
-    public DeferredFileOutputStream export(long timeout, TimeUnit unit) throws InterruptedException {
         if (StringUtils.isNotBlank(uniqueKey)) {
             if (UNIQUE_KEY_MAP.containsKey(uniqueKey)) {
                 throw new UserExportingException();
@@ -100,6 +98,7 @@ public class ExportFileManager {
         UserExportFileVo userExportFileVo = new UserExportFileVo(userExportFileType, name, mimeType.getValue());
         this.exportFileId = userExportFileVo.getId();
         userExportFileMapper.insertUserExportFile(userExportFileVo);
+        final long startTimeMillis = System.currentTimeMillis();
         NeatLogicThread neatLogicThread = new NeatLogicThread("EXPORT-MANAGER-" + userExportFileType.getValue()) {
             @Override
             protected void execute() {
@@ -128,7 +127,13 @@ public class ExportFileManager {
                             userExportFileVo.setStatus(UserExportFileVo.Status.DONE.getValue());
                         }
                     }
-                    deferredFileOutputStream = dfos;
+                    if (timeout > 0 && unit != null && startTimeMillis + unit.toMillis(timeout) < System.currentTimeMillis()) {
+                        if (tempFile.exists()) {
+                            tempFile.delete();
+                        }
+                    } else {
+                        deferredFileOutputStream = dfos;
+                    }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     userExportFileVo.setError(ExceptionUtils.getStackTrace(e));
@@ -145,7 +150,7 @@ public class ExportFileManager {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         neatLogicThread.setCountDownLatch(countDownLatch);
         CachedThreadPool.execute(neatLogicThread);
-        if (timeout != 0) {
+        if (timeout > 0 && unit != null) {
             countDownLatch.await(timeout, unit);
         } else {
             countDownLatch.await();
@@ -177,6 +182,12 @@ public class ExportFileManager {
 
     public ExportFileManager withUniqueKey(String uniqueKey) {
         this.uniqueKey = uniqueKey;
+        return this;
+    }
+
+    public ExportFileManager withAwait(long timeout, TimeUnit unit) {
+        this.timeout = timeout;
+        this.unit = unit;
         return this;
     }
 }

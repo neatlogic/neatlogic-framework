@@ -20,6 +20,8 @@ import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.dao.mapper.UserExportFileMapper;
 import neatlogic.framework.userexportfile.dto.UserExportFileVo;
 import neatlogic.framework.userexportfile.exception.UserExportingException;
+import neatlogic.framework.util.SnowflakeUtil;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -36,6 +38,7 @@ import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class ExportFileManager {
@@ -60,20 +63,21 @@ public class ExportFileManager {
     private Long exportFileId;
     private long timeout = 0;
     private TimeUnit unit;
-
-    private DeferredFileOutputStream deferredFileOutputStream;
+    private AtomicBoolean hasTimedOut;
 
     @FunctionalInterface
     public interface ExportWriter {
         void writeTo(OutputStream out) throws Exception;
     }
 
-    public ExportFileManager() {
+    private ExportFileManager() {
 
     }
 
     public ExportFileManager(IUserExportFileType userExportFileType) {
         this.userExportFileType = userExportFileType;
+        this.exportFileId = SnowflakeUtil.uniqueLong();
+        this.hasTimedOut = new AtomicBoolean(false);
     }
 
 
@@ -81,7 +85,7 @@ public class ExportFileManager {
         this.exportWriter = exportWriter;
     }
 
-    public DeferredFileOutputStream export() throws InterruptedException {
+    public boolean exportTo(OutputStream outputStream) throws InterruptedException {
         if (StringUtils.isNotBlank(uniqueKey)) {
             if (UNIQUE_KEY_MAP.containsKey(uniqueKey)) {
                 throw new UserExportingException();
@@ -89,28 +93,24 @@ public class ExportFileManager {
                 UNIQUE_KEY_MAP.put(uniqueKey, StringUtils.EMPTY);
             }
         }
-        if (StringUtils.isBlank(name)) {
-            name = "导出文件" + System.currentTimeMillis();
-        }
-        if (mimeType == null) {
-            mimeType = MimeType.STREAM;
-        }
-        UserExportFileVo userExportFileVo = new UserExportFileVo(userExportFileType, name, mimeType.getValue());
-        this.exportFileId = userExportFileVo.getId();
+        UserExportFileVo userExportFileVo = new UserExportFileVo(userExportFileType, exportFileId, getName(), getMimeType().getValue());
         userExportFileMapper.insertUserExportFile(userExportFileVo);
-        final long startTimeMillis = System.currentTimeMillis();
         NeatLogicThread neatLogicThread = new NeatLogicThread("EXPORT-MANAGER-" + userExportFileType.getValue()) {
             @Override
             protected void execute() {
-                try {
-                    File tempFile = File.createTempFile(exportFileId.toString(), name);
-                    DeferredFileOutputStream dfos = DeferredFileOutputStream.builder().setBufferSize(bufferSize).setOutputFile(tempFile).setThreshold(threshold).get();
+                File tempFile = null;
+                try (DeferredFileOutputStream dfos = DeferredFileOutputStream.builder()
+                        .setBufferSize(bufferSize)
+                        .setOutputFile(File.createTempFile(userExportFileType.getValue(),  "-" + exportFileId + "-" + getName()))
+                        .setThreshold(threshold)
+                        .get()) {
+                    tempFile = dfos.getFile();
                     exportWriter.writeTo(dfos);
                     dfos.flush();
                     String tenantUuid = TenantContext.get().getTenantUuid();
                     String userId = UserContext.get().getUserId();
                     String yyyyMM = LocalDate.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("yyyy-MM"));
-                    String filePath = Config.DATA_HOME() + tenantUuid + File.separator + userId + File.separator + yyyyMM + File.separator + name;
+                    String filePath = Config.DATA_HOME() + tenantUuid + File.separator + userId + File.separator + yyyyMM + File.separator + tempFile.getName();
                     if (dfos.isInMemory()) {
                         byte[] bytes = dfos.getData();
                         userExportFileVo.setSize((long) bytes.length);
@@ -127,18 +127,29 @@ public class ExportFileManager {
                             userExportFileVo.setStatus(UserExportFileVo.Status.DONE.getValue());
                         }
                     }
-                    if (timeout > 0 && unit != null && startTimeMillis + unit.toMillis(timeout) < System.currentTimeMillis()) {
-                        if (tempFile.exists()) {
-                            tempFile.delete();
+                    if (!hasTimedOut.get()) {
+                        try {
+                            if (dfos.isInMemory()) {
+                                try (InputStream inputStream = new ByteArrayInputStream(dfos.getData())) {
+                                    IOUtils.copyLarge(inputStream, outputStream);
+                                }
+                            } else {
+                                try (InputStream inputStream = new BufferedInputStream(new FileInputStream(tempFile))) {
+                                    IOUtils.copyLarge(inputStream, outputStream);
+                                }
+                            }
+                        } catch (Exception e) {
+                            logger.warn(e.getMessage(), e);
                         }
-                    } else {
-                        deferredFileOutputStream = dfos;
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                     userExportFileVo.setError(ExceptionUtils.getStackTrace(e));
                     userExportFileVo.setStatus(UserExportFileVo.Status.FAILED.getValue());
                 } finally {
+                    if (tempFile != null && tempFile.exists()) {
+                        tempFile.delete();
+                    }
                     userExportFileVo.setIsEnd(1);
                     userExportFileMapper.insertUserExportFile(userExportFileVo);
                     if (StringUtils.isNotBlank(uniqueKey)) {
@@ -150,15 +161,22 @@ public class ExportFileManager {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         neatLogicThread.setCountDownLatch(countDownLatch);
         CachedThreadPool.execute(neatLogicThread);
-        if (timeout > 0 && unit != null) {
-            countDownLatch.await(timeout, unit);
-        } else {
-            countDownLatch.await();
+        try {
+            if (timeout > 0 && unit != null) {
+                return countDownLatch.await(timeout, unit);
+            } else {
+                countDownLatch.await();
+                return true;
+            }
+        } finally {
+            hasTimedOut.set(true);
         }
-        return deferredFileOutputStream;
     }
 
     public String getName() {
+        if (name == null) {
+            name = "exportFile";
+        }
         return name;
     }
 
@@ -168,6 +186,9 @@ public class ExportFileManager {
     }
 
     public MimeType getMimeType() {
+        if (mimeType == null) {
+            mimeType = MimeType.STREAM;
+        }
         return mimeType;
     }
 

@@ -50,7 +50,7 @@ public class UserExportFileVo implements Serializable {
 
     }
 
-    public UserExportFileVo(IUserExportFileType userExportFileType, String name, String contentType) {
+    public UserExportFileVo(IUserExportFileType userExportFileType, Long id, String name, String contentType) {
         this.type = userExportFileType.getValue();
         this.name = name;
         this.contentType = contentType;
@@ -64,7 +64,7 @@ public class UserExportFileVo implements Serializable {
             }
         }
         this.userUuid = UserContext.get().getUserUuid();
-        this.id = SnowflakeUtil.uniqueLong();
+        this.id = id;
     }
 
     public Long getId() {

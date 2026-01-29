@@ -171,5 +171,10 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
             System.out.println("Basic " + encoder.encodeToString(key.getBytes()));
         }
     }
+
+    @Override
+    public boolean isNeedCookie() {
+        return false;
+    }
 }
 

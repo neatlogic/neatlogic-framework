@@ -49,6 +49,15 @@
           AND `table_name` = #{tableName}
     </select>
 
+    <select id="getServerUuidAndHostName" resultType="java.util.LinkedHashMap">
+        SELECT
+            `VARIABLE_VALUE` AS serverUuid,
+            @@hostname AS hostName
+        FROM
+            `performance_schema`.`global_variables`
+        WHERE `VARIABLE_NAME` = 'server_uuid'
+    </select>
+
 
     <insert id="insertView" parameterType="java.lang.String">
         ${value}

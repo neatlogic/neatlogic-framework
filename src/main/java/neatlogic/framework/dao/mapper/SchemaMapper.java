@@ -36,6 +36,8 @@ public interface SchemaMapper {
 
     List<String> getTableOrViewAllColumnNameList(@Param("tableSchema") String tableSchema, @Param("tableName") String tableName);
 
+    Map<String, String> getServerUuidAndHostName();
+
 //    void insertAttrToCiTable(@Param("tableName") String tableName, @Param("attrVo") MatrixViewAttributeVo attrVo);
 
 //    void insertCiTable(@Param("tableName") String tableName);

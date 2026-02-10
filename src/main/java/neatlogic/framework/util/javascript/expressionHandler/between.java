@@ -19,17 +19,14 @@ import neatlogic.framework.util.javascript.JavascriptResult;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -37,6 +34,15 @@ import java.util.Map;
  */
 public class between {
     private static final Logger logger = LoggerFactory.getLogger(between.class);
+
+    private static final String[] DATE_PATTERNS = {"yyyy-MM-dd", "yyyy-M-dd", "yyyy-M-d", "yyyy-MM-d"};
+    private static final String[] TIME_PATTERNS = {"HH:mm:ss", "HH:mm", "HH", "mm:ss"};
+    private static final String[] DATETIME_PATTERNS = {
+            "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH",
+            "yyyy-M-dd HH:mm:ss", "yyyy-M-dd HH:mm", "yyyy-M-dd HH",
+            "yyyy-M-d HH:mm:ss", "yyyy-M-d HH:mm", "yyyy-M-d HH",
+            "yyyy-MM-d HH:mm:ss", "yyyy-MM-d HH:mm", "yyyy-MM-d HH"
+    };
 
     public static boolean calculate(JSONArray dataValueList, JSONArray conditionValueList, String label, String uuid) {
         String prefix = (StringUtils.isNotBlank(label) ? label + "的" : "");
@@ -119,86 +125,130 @@ public class between {
                 return false;
             }
             return true;
-        } else if (isDate(dataValue) || isDateTime(dataValue) || isTime(dataValue)) {
-            try {
-                String format = "yyyy-MM-dd";
-                if (isDateTime(dataValue)) {
-                    format = "yyyy-MM-dd HH:mm:ss";
-                } else if (isTime(dataValue)) {
-                    format = "HH:mm:ss";
-                }
-                Date transferValue = DateUtils.parseDate(dataValue, format);
-                Date transferValueBefore = null;
-                Date transferValueAfter = null;
-                if (StringUtils.isNotBlank(valueBefore)) {
-                    if (isDate(valueBefore) || isDateTime(valueBefore) || isTime(valueBefore)) {
-                        try {
-                            transferValueBefore = DateUtils.parseDate(valueBefore, format);
-                        } catch (Exception ignored) {
+        }
 
-                        }
-                    } else if (isNumber(valueBefore)) {
-                        try {
-                            Calendar cal = Calendar.getInstance();
-                            cal.add(Calendar.DAY_OF_MONTH, -Integer.parseInt(valueBefore));
-                            transferValueBefore = cal.getTime();
-                        } catch (Exception ignored) {
-
-                        }
+        if (isDateTime(dataValue)) {
+            LocalDateTime transferValue = parseDateTimeValue(dataValue);
+            if (transferValue == null) {
+                logger.warn(new ValueIsIrregularException(prefix).getMessage());
+                return false;
+            }
+            LocalDateTime transferValueBefore = parseDateTimeBoundary(valueBefore, true);
+            LocalDateTime transferValueAfter = parseDateTimeBoundary(valueAfter, false);
+            String formattedValue = formatDateTime(transferValue);
+            if (transferValueBefore != null && transferValueAfter != null) {
+                if (!(transferValue.isAfter(transferValueBefore) && transferValue.isBefore(transferValueAfter))) {
+                    ApiRuntimeException error = new ValueNotWithinRangeException(prefix, formattedValue, formatDateTime(transferValueBefore), formatDateTime(transferValueAfter));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
                     }
+                    logger.warn(error.getMessage());
+                    return false;
                 }
-                if (StringUtils.isNotBlank(valueAfter)) {
-                    if (isDate(valueAfter) || isDateTime(valueAfter) || isTime(valueAfter)) {
-                        try {
-                            transferValueAfter = DateUtils.parseDate(valueAfter, format);
-                        } catch (Exception ignored) {
-
-                        }
-                    } else if (isNumber(valueAfter)) {
-                        try {
-                            Calendar cal = Calendar.getInstance();
-                            cal.add(Calendar.DAY_OF_MONTH, Integer.parseInt(valueAfter));
-                            transferValueAfter = cal.getTime();
-                        } catch (Exception ignored) {
-
-                        }
+                return true;
+            } else if (transferValueBefore != null) {
+                if (!transferValue.isAfter(transferValueBefore)) {
+                    ApiRuntimeException error = new ValueNotAfterException(prefix, formattedValue, formatDateTime(transferValueBefore));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
                     }
+                    logger.warn(error.getMessage());
+                    return false;
                 }
-                SimpleDateFormat sdf = new SimpleDateFormat(format);
-                if (transferValueBefore != null && transferValueAfter != null) {
-                    if (!(transferValue.after(transferValueBefore) && transferValue.before(transferValueAfter))) {
-                        ApiRuntimeException error = new ValueNotWithinRangeException(prefix, sdf.format(transferValue), sdf.format(transferValueBefore), sdf.format(transferValueAfter));
-                        if (javascriptResult != null) {
-                            javascriptResult.setError(error);
-                        }
-                        logger.warn(error.getMessage());
-                        return false;
+                return true;
+            } else if (transferValueAfter != null) {
+                if (!transferValue.isBefore(transferValueAfter)) {
+                    ApiRuntimeException error = new ValueNotBeforeException(prefix, formattedValue, formatDateTime(transferValueAfter));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
                     }
-                    return true;
-                } else if (transferValueBefore != null) {
-                    if (!transferValue.after(transferValueBefore)) {
-                        ApiRuntimeException error = new ValueNotAfterException(prefix, sdf.format(transferValue), sdf.format(transferValueBefore));
-                        if (javascriptResult != null) {
-                            javascriptResult.setError(error);
-                        }
-                        logger.warn(error.getMessage());
-                        return false;
-                    }
-                    return true;
-                } else if (transferValueAfter != null) {
-                    if (!transferValue.before(transferValueAfter)) {
-                        ApiRuntimeException error = new ValueNotBeforeException(prefix, sdf.format(transferValue), sdf.format(transferValueAfter));
-                        if (javascriptResult != null) {
-                            javascriptResult.setError(error);
-                        }
-                        logger.warn(error.getMessage());
-                        return false;
-                    }
-                    return true;
+                    logger.warn(error.getMessage());
+                    return false;
                 }
-            } catch (ParseException ignored) {
+                return true;
+            }
+        } else if (isDate(dataValue)) {
+            LocalDate transferValue = parseDateValue(dataValue);
+            if (transferValue == null) {
+                logger.warn(new ValueIsIrregularException(prefix).getMessage());
+                return false;
+            }
+            LocalDate transferValueBefore = parseDateBoundary(valueBefore, true);
+            LocalDate transferValueAfter = parseDateBoundary(valueAfter, false);
+            String formattedValue = formatDate(transferValue);
+            if (transferValueBefore != null && transferValueAfter != null) {
+                if (!(transferValue.isAfter(transferValueBefore) && transferValue.isBefore(transferValueAfter))) {
+                    ApiRuntimeException error = new ValueNotWithinRangeException(prefix, formattedValue, formatDate(transferValueBefore), formatDate(transferValueAfter));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
+                    }
+                    logger.warn(error.getMessage());
+                    return false;
+                }
+                return true;
+            } else if (transferValueBefore != null) {
+                if (!transferValue.isAfter(transferValueBefore)) {
+                    ApiRuntimeException error = new ValueNotAfterException(prefix, formattedValue, formatDate(transferValueBefore));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
+                    }
+                    logger.warn(error.getMessage());
+                    return false;
+                }
+                return true;
+            } else if (transferValueAfter != null) {
+                if (!transferValue.isBefore(transferValueAfter)) {
+                    ApiRuntimeException error = new ValueNotBeforeException(prefix, formattedValue, formatDate(transferValueAfter));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
+                    }
+                    logger.warn(error.getMessage());
+                    return false;
+                }
+                return true;
+            }
+        } else if (isTime(dataValue)) {
+            LocalTime transferValue = parseTimeValue(dataValue);
+            if (transferValue == null) {
+                logger.warn(new ValueIsIrregularException(prefix).getMessage());
+                return false;
+            }
+            LocalTime transferValueBefore = parseTimeValue(valueBefore);
+            LocalTime transferValueAfter = parseTimeValue(valueAfter);
+            String formattedValue = formatTime(transferValue);
+            if (transferValueBefore != null && transferValueAfter != null) {
+                if (!(transferValue.isAfter(transferValueBefore) && transferValue.isBefore(transferValueAfter))) {
+                    ApiRuntimeException error = new ValueNotWithinRangeException(prefix, formattedValue, formatTime(transferValueBefore), formatTime(transferValueAfter));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
+                    }
+                    logger.warn(error.getMessage());
+                    return false;
+                }
+                return true;
+            } else if (transferValueBefore != null) {
+                if (!transferValue.isAfter(transferValueBefore)) {
+                    ApiRuntimeException error = new ValueNotAfterException(prefix, formattedValue, formatTime(transferValueBefore));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
+                    }
+                    logger.warn(error.getMessage());
+                    return false;
+                }
+                return true;
+            } else if (transferValueAfter != null) {
+                if (!transferValue.isBefore(transferValueAfter)) {
+                    ApiRuntimeException error = new ValueNotBeforeException(prefix, formattedValue, formatTime(transferValueAfter));
+                    if (javascriptResult != null) {
+                        javascriptResult.setError(error);
+                    }
+                    logger.warn(error.getMessage());
+                    return false;
+                }
+                return true;
             }
         }
+
         logger.warn(new ValueIsIrregularException(prefix).getMessage());
         return false;
     }
@@ -215,39 +265,146 @@ public class between {
         }
     }
 
-
-    private static boolean isValid(String value, String[] patterns) {
-        if (StringUtils.isNotBlank(value)) {
-            for (String pattern : patterns) {
-                try {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-                    LocalDate.parse(value, formatter);
-                    return true;
-                } catch (Exception ex) {
-                }
-            }
-
+    private static LocalDate parseDate(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
         }
-        return false;
+        for (String pattern : DATE_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalDate.parse(value, formatter);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return null;
+    }
+
+    private static LocalTime parseTime(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        for (String pattern : TIME_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalTime.parse(value, formatter);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return null;
+    }
+
+    private static LocalDateTime parseDateTime(String value) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        for (String pattern : DATETIME_PATTERNS) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                return LocalDateTime.parse(value, formatter);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return null;
+    }
+
+    private static LocalDate parseDateValue(String value) {
+        LocalDate date = parseDate(value);
+        if (date != null) {
+            return date;
+        }
+        LocalDateTime dateTime = parseDateTime(value);
+        if (dateTime != null) {
+            return dateTime.toLocalDate();
+        }
+        return null;
+    }
+
+    private static LocalTime parseTimeValue(String value) {
+        LocalTime time = parseTime(value);
+        if (time != null) {
+            return time;
+        }
+        LocalDateTime dateTime = parseDateTime(value);
+        if (dateTime != null) {
+            return dateTime.toLocalTime();
+        }
+        return null;
+    }
+
+    private static LocalDateTime parseDateTimeValue(String value) {
+        LocalDateTime dateTime = parseDateTime(value);
+        if (dateTime != null) {
+            return dateTime;
+        }
+        LocalDate date = parseDate(value);
+        if (date != null) {
+            return date.atStartOfDay();
+        }
+        return null;
+    }
+
+    private static LocalDate parseDateBoundary(String value, boolean before) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        LocalDate parsed = parseDateValue(value);
+        if (parsed != null) {
+            return parsed;
+        }
+        if (isNumber(value)) {
+            try {
+                int days = Integer.parseInt(value);
+                return before ? LocalDate.now().minusDays(days) : LocalDate.now().plusDays(days);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return null;
+    }
+
+    private static LocalDateTime parseDateTimeBoundary(String value, boolean before) {
+        if (StringUtils.isBlank(value)) {
+            return null;
+        }
+        LocalDateTime parsed = parseDateTimeValue(value);
+        if (parsed != null) {
+            return parsed;
+        }
+        if (isNumber(value)) {
+            try {
+                int days = Integer.parseInt(value);
+                return before ? LocalDateTime.now().minusDays(days) : LocalDateTime.now().plusDays(days);
+            } catch (Exception ignored) {
+
+            }
+        }
+        return null;
+    }
+
+    private static String formatDate(LocalDate date) {
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd").format(date);
+    }
+
+    private static String formatTime(LocalTime time) {
+        return DateTimeFormatter.ofPattern("HH:mm:ss").format(time);
+    }
+
+    private static String formatDateTime(LocalDateTime dateTime) {
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(dateTime);
     }
 
     private static boolean isDate(String value) {
-        String[] patterns = {"yyyy-MM-dd", "yyyy-M-dd", "yyyy-M-d", "yyyy-MM-d"};
-        return isValid(value, patterns);
+        return parseDate(value) != null;
     }
 
-
     private static boolean isTime(String value) {
-        String[] patterns = {"HH:mm:ss", "HH:mm", "HH", "mm:ss"};
-        return isValid(value, patterns);
+        return parseTime(value) != null;
     }
 
     private static boolean isDateTime(String value) {
-        String[] patterns = {"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd HH",
-                "yyyy-M-dd HH:mm:ss", "yyyy-M-dd HH:mm", "yyyy-M-dd HH",
-                "yyyy-M-d HH:mm:ss", "yyyy-M-d HH:mm", "yyyy-M-d HH",
-                "yyyy-MM-d HH:mm:ss", "yyyy-MM-d HH:mm", "yyyy-MM-d HH"};
-        return isValid(value, patterns);
+        return parseDateTime(value) != null;
     }
-
 }

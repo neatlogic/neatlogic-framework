@@ -15,6 +15,7 @@ package neatlogic.framework.common.config;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.config.listener.Listener;
 import com.alibaba.nacos.api.exception.NacosException;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.RootConfiguration;
 import neatlogic.framework.util.I18nUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -331,6 +332,10 @@ public class Config {
 
     public static String HOME_URL() {
         return HOME_URL;
+    }
+
+    public static String HOME_PAGE_URL() {
+        return HOME_URL + (HOME_URL.endsWith("/") ? "" : "/") + TenantContext.get().getTenantUuid();
     }
 
     public static String MASTER_HOME_URL() {

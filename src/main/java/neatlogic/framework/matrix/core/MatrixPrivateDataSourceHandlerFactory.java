@@ -115,7 +115,9 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
         String type = searchVo.getType();
         for (MatrixVo matrixVo : list) {
             if (StringUtils.isNotBlank(keyword)) {
-                if (!matrixVo.getName().toLowerCase().contains(keyword)) {
+                if (!matrixVo.getName().toLowerCase().contains(keyword)
+                        && !matrixVo.getLabel().toLowerCase().contains(keyword)
+                        && !matrixVo.getUuid().toLowerCase().contains(keyword)) {
                     continue;
                 }
             }

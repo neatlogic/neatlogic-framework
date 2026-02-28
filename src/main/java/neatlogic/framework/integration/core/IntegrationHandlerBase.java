@@ -283,7 +283,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             connection.connect();
         } catch (Exception e) {
             String errorMsg = e.getMessage() == null ? ExceptionUtils.getStackTrace(e) : e.getMessage();
-            logger.error(url + ", " + e.getMessage(), e);
+            logger.warn(url + ", " + e.getMessage(), e);
             integrationAuditVo.appendError(errorMsg);
             resultVo.appendError(errorMsg);
             integrationAuditVo.setStatus("failed");
@@ -299,7 +299,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                     }
                     out.flush();
                 } catch (Exception e) {
-                    logger.error(url + ", " + e.getMessage(), e);
+                    logger.warn(url + ", " + e.getMessage(), e);
                     resultVo.appendError(e.getMessage());
                     integrationAuditVo.appendError(e.getMessage());
                     integrationAuditVo.setStatus("failed");
@@ -335,7 +335,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                     throw new RuntimeException(writer.toString());
                 }
             } catch (Exception e) {
-                logger.error(url + ", " + e.getMessage(), e);
+                logger.warn(url + ", " + e.getMessage(), e);
                 resultVo.appendError(e.getMessage());
                 integrationAuditVo.appendError(e.getMessage());
                 integrationAuditVo.setStatus("failed");
@@ -352,7 +352,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                         }
                         hasTransferred = true;
                     } catch (Exception ex) {
-                        logger.error(url + ", " + ex.getMessage(), ex);
+                        logger.warn(url + ", " + ex.getMessage(), ex);
                         resultVo.appendError(ex.getMessage());
                         integrationAuditVo.appendError(ex.getMessage());
                         integrationAuditVo.setStatus("failed");

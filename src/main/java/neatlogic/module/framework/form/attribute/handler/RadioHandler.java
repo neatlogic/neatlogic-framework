@@ -12,6 +12,7 @@
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
@@ -191,6 +192,23 @@ public class RadioHandler extends FormHandlerBase {
     @Override
     public boolean isAudit() {
         return true;
+    }
+
+    @Override
+    protected List<String> myIndexFieldContentList(String data) {
+        List<String> resultList = new ArrayList<>();
+        if (data.startsWith("{") && data.endsWith("}")) {
+            JSONObject jsonObj = JSON.parseObject(data);
+            String value = jsonObj.getString("value");
+            if (StringUtils.isNotBlank(value)) {
+                resultList.add(value);
+            } else {
+                resultList.add(jsonObj.toJSONString());
+            }
+        } else {
+            resultList.add(data);
+        }
+        return resultList;
     }
 
     @Override

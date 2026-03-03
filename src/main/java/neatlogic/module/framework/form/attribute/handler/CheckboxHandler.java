@@ -12,6 +12,7 @@
 
 package neatlogic.module.framework.form.attribute.handler;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
@@ -178,11 +179,27 @@ public class CheckboxHandler extends FormHandlerBase {
 
     @Override
     protected List<String> myIndexFieldContentList(String data) {
+        List<String> resultList = new ArrayList<>();
         if (data.startsWith("[") && data.endsWith("]")) {
-            JSONArray jsonArray = JSONArray.parseArray(data);
-            return JSONObject.parseArray(jsonArray.toJSONString(), String.class);
+            JSONArray jsonArray = JSON.parseArray(data);
+            for (Object obj : jsonArray) {
+                if (obj != null) {
+                    if (obj instanceof JSONObject jsonObj) {
+                        String value = jsonObj.getString("value");
+                        if (StringUtils.isNotBlank(value)) {
+                            resultList.add(value);
+                        } else {
+                            resultList.add(jsonObj.toJSONString());
+                        }
+                    } else {
+                        resultList.add(obj.toString());
+                    }
+                }
+            }
+        } else {
+            resultList.add(data);
         }
-        return null;
+        return resultList;
     }
 
     @Override

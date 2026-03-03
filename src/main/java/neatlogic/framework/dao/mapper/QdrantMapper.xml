@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.QdrantMapper">
+
+    <select id="getAllTenantQdrant" resultType="neatlogic.framework.dto.QdrantVo">
+        SELECT tenant_uuid AS tenantUuid,
+               `api_key`   AS apiKey,
+               `url`,
+               `config`    AS configStr
+        FROM qdrant
+    </select>
+
+    <select id="getQdrantByTenant" parameterType="java.lang.String" resultType="neatlogic.framework.dto.QdrantVo">
+        SELECT tenant_uuid AS tenantUuid,
+               `api_key`   AS apiKey,
+               `url`,
+               `config`    AS configStr
+        FROM qdrant
+        where tenant_uuid = #{value}
+    </select>
+
+</mapper>

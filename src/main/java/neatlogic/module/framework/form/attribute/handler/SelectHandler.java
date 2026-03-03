@@ -325,37 +325,35 @@ public class SelectHandler extends FormHandlerBase {
 
     @Override
     protected List<String> myIndexFieldContentList(String data) {
-        List<String> contentList = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
         if (data.startsWith("{") && data.endsWith("}")) {
             JSONObject jsonObj = JSON.parseObject(data);
             String value = jsonObj.getString("value");
-            contentList.add(value);
-//            String text = jsonObj.getString("text");
-//            if (StringUtils.isNotBlank(text)) {
-//                contentList.add(text);
-//            }
+            if (StringUtils.isNotBlank(value)) {
+                resultList.add(value);
+            } else {
+                resultList.add(jsonObj.toJSONString());
+            }
         } else if (data.startsWith("[") && data.endsWith("]")) {
             JSONArray jsonArray = JSON.parseArray(data);
             for (Object obj : jsonArray) {
                 if (obj != null) {
-                    if (obj instanceof JSONObject) {
-                        JSONObject jsonObj = (JSONObject) obj;
+                    if (obj instanceof JSONObject jsonObj) {
                         String value = jsonObj.getString("value");
-                        contentList.add(value);
-//                        String text = jsonObj.getString("text");
-//                        if (StringUtils.isNotBlank(text)) {
-//                            contentList.add(text);
-//                        }
+                        if (StringUtils.isNotBlank(value)) {
+                            resultList.add(value);
+                        } else {
+                            resultList.add(jsonObj.toJSONString());
+                        }
                     } else {
-                        contentList.add(obj.toString());
+                        resultList.add(obj.toString());
                     }
                 }
             }
-            return JSON.parseArray(jsonArray.toJSONString(), String.class);
         } else {
-            contentList.add(data);
+            resultList.add(data);
         }
-        return contentList;
+        return resultList;
     }
 
     @Override

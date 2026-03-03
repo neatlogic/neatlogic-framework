@@ -22,6 +22,7 @@ import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.asynchronization.threadpool.CachedThreadPool;
+import neatlogic.framework.dao.mapper.ElasticsearchMapper;
 import neatlogic.framework.dto.ElasticsearchVo;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
@@ -31,6 +32,7 @@ import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMap
 import neatlogic.framework.fulltextindex.dto.fulltextindex.FullTextIndexRebuildAuditVo;
 import neatlogic.framework.fulltextindex.enums.FullTextIndexHandlerType;
 import neatlogic.framework.fulltextindex.enums.Status;
+import neatlogic.framework.util.SpringContextUtil;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T> {
     static Logger logger = LoggerFactory.getLogger(ElasticsearchIndexBase.class);
     private static final ConcurrentHashMap<Long, Object> LOCK_MAP = new ConcurrentHashMap<>();
+
 
     private static Object getLock(Long key) {
         // 同 key 共享同一个对象实例
@@ -117,7 +120,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
     // 创建索引
     public final void createIndex() {
         if (!this.isIndexExists()) {
-            ElasticsearchVo elasticsearchVo = ElasticsearchClientFactory.getElasticsearchVo();
+            ElasticsearchVo elasticsearchVo = SpringContextUtil.getBean(ElasticsearchMapper.class).getTenantElasticsearchByTenantUuid(TenantContext.get().getTenantUuid());
             if (elasticsearchVo != null) {
                 this.myCreateIndex(elasticsearchVo);
             }

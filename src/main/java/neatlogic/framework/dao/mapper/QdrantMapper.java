@@ -13,18 +13,13 @@
 package neatlogic.framework.dao.mapper;
 
 import neatlogic.framework.dao.aop.UseMasterDatabase;
-import neatlogic.framework.dto.ElasticsearchVo;
+import neatlogic.framework.dto.QdrantVo;
 
 import java.util.List;
 
 @UseMasterDatabase
-public interface ElasticsearchMapper {
-    List<ElasticsearchVo> getAllActiveTenantElasticsearch();
+public interface QdrantMapper {
+    List<QdrantVo> getAllTenantQdrant();
 
-    List<ElasticsearchVo> getAllTenantElasticsearch();
-
-    ElasticsearchVo getTenantElasticsearchByTenantUuid(String uuid);
-
-    int insertTenantElasticsearch(ElasticsearchVo elasticsearchVo);
-
+    QdrantVo getQdrantByTenant(String tenantUuid);
 }

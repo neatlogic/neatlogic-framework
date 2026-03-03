@@ -16,7 +16,8 @@ import neatlogic.framework.util.$;
 
 public enum FullTextIndexHandlerType {
     DATABASE("database", "数据库"),
-    ELASTICSEARCH("elasticsearch", "Elasticsearch");
+    ELASTICSEARCH("elasticsearch", "Elasticsearch"),
+    QDRANT("qdrant", "QDrant");
 
     private final String value;
     private final String text;

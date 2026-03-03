@@ -24,6 +24,7 @@ import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dao.mapper.ElasticsearchMapper;
 import neatlogic.framework.dto.ElasticsearchVo;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchHostNotFoundException;
+import neatlogic.framework.util.SpringContextUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -39,9 +40,6 @@ import org.apache.http.impl.nio.reactor.IOReactorConfig;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContexts;
 import org.elasticsearch.client.RestClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
@@ -51,21 +49,14 @@ import java.util.*;
 
 @RootComponent
 public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
-    static Logger logger = LoggerFactory.getLogger(ElasticsearchClientFactory.class);
-    private static ElasticsearchMapper elasticsearchMapper;
-    private static final Map<String, ElasticsearchVo> elasticsearchMap = new HashMap<>();
 
-    @Autowired
-    public ElasticsearchClientFactory(ElasticsearchMapper _elasticsearchMapper) {
-        elasticsearchMapper = _elasticsearchMapper;
-    }
 
     private static final Map<String, ElasticsearchClient> elasticSearchClientMap = new HashMap<>();
 
 
     public static ElasticsearchClient getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
         if (!elasticSearchClientMap.containsKey(TenantContext.get().getTenantUuid())) {
-            ElasticsearchVo elasticsearch = getElasticsearchVo();
+            ElasticsearchVo elasticsearch = SpringContextUtil.getBean(ElasticsearchMapper.class).getTenantElasticsearchByTenantUuid(TenantContext.get().getTenantUuid());
             if (elasticsearch != null) {
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                 if (StringUtils.isNotBlank(elasticsearch.getUsername()) && StringUtils.isNotBlank(elasticsearch.getPasswordPlain())) {
@@ -136,15 +127,8 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
 
     }
 
-    public static ElasticsearchVo getElasticsearchVo() {
-        return elasticsearchMap.get(TenantContext.get().getTenantUuid());
-    }
 
     @Override
     protected void myInit() {
-        List<ElasticsearchVo> elasticsearchVoList = elasticsearchMapper.getAllTenantElasticsearch();
-        for (ElasticsearchVo elasticsearchVo : elasticsearchVoList) {
-            elasticsearchMap.put(elasticsearchVo.getTenantUuid(), elasticsearchVo);
-        }
     }
 }

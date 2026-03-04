@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<!--
+  ~ /*
+  ~ Copyright (C) 2025  TechSure Co., Ltd.  All Rights Reserved.
+  ~ This file is part of the NeatLogic software.
+  ~ Licensed under the Sustainable Use License (SUL), Version 4.x – 2025.
+  ~ You may use this file only in compliance with the License.
+  ~ See the LICENSE file distributed with this work for the full license text.
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  */
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="neatlogic.framework.dao.mapper.EmbeddingAuditMapper">
+    <select id="searchEmbeddingAudit" parameterType="neatlogic.framework.dto.embedding.EmbeddingAuditVo" resultType="neatlogic.framework.dto.embedding.EmbeddingAuditVo">
+        select target_id   as targetId,
+               target_type as targetType,
+               create_time as createTime
+        from embedding_audit
+        order by target_id desc
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <select id="insertEmbeddingAudit">
+        insert into embedding_audit (target_id,
+                                        target_type,
+                                        create_time)
+        values (#{targetId},
+                #{targetType},
+                now())
+    </select>
+
+    <delete id="deleteEmbeddingAudit">
+        delete
+        from embedding_audit
+        where target_id = #{targetId}
+          and target_type = #{targetType}
+    </delete>
+</mapper>

@@ -16,7 +16,6 @@ import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
-import co.elastic.clients.util.ContentType;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
@@ -27,7 +26,6 @@ import neatlogic.framework.exception.elasticsearch.ElasticSearchHostNotFoundExce
 import neatlogic.framework.util.SpringContextUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.auth.AuthScope;
@@ -37,7 +35,6 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.TrustAllStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.reactor.IOReactorConfig;
-import org.apache.http.message.BasicHeader;
 import org.apache.http.ssl.SSLContexts;
 import org.elasticsearch.client.RestClient;
 
@@ -45,7 +42,10 @@ import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RootComponent
 public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
@@ -87,9 +87,12 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
                                         .setIoThreadCount(Runtime.getRuntime().availableProcessors())
                                         .setSoKeepAlive(true)
                                         .build());
+                                /*es7*
                                 httpClientBuilder.setDefaultHeaders(Collections.singletonList(
                                         new BasicHeader(
                                                 HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
+
+                                 */
                                 httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
                                         (response, context) ->
                                                 response.addHeader("X-Elastic-Product", "Elasticsearch"));

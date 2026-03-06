@@ -13,6 +13,7 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -81,7 +82,8 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                         .index(getIndexName())                   // 索引名称
                         .id(targetId.toString())          // 文档 ID
                         .docAsUpsert(isUpsert)
-                        .doc(document)                            // 需要更新的字段
+                        .doc(document)
+                        .refresh(Refresh.WaitFor)  //刷新文档
                         .build();
                 client.update(updateRequest, Object.class);
             } catch (Exception e) {
@@ -222,6 +224,7 @@ public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T
                     .index(getIndexName()) // 索引名称
                     .id(id.toString())      // 文档 ID
                     .document(document) // 文档内容
+                    .refresh(Refresh.WaitFor)
                     .build();
             client.index(request);
         } catch (Exception ex) {

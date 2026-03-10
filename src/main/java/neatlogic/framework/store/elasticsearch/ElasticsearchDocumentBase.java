@@ -44,8 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class ElasticsearchIndexBase<T> implements IElasticsearchIndex<T> {
-    static Logger logger = LoggerFactory.getLogger(ElasticsearchIndexBase.class);
+public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocument<T> {
+    static Logger logger = LoggerFactory.getLogger(ElasticsearchDocumentBase.class);
     private static final ConcurrentHashMap<Long, Object> LOCK_MAP = new ConcurrentHashMap<>();
 
 

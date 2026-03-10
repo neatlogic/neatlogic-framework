@@ -12,11 +12,8 @@
 
 package neatlogic.framework.store.elasticsearch;
 
-import neatlogic.framework.dto.elasticsearch.IndexResultVo;
+public interface IElasticsearchIndex {
 
-import java.util.Map;
-
-public interface IElasticsearchIndex<T> {
     /*
     ES中的索引名称
      */
@@ -42,59 +39,4 @@ public interface IElasticsearchIndex<T> {
      */
     void deleteIndex();
 
-    /*
-    创建文档
-     */
-    void createDocument(T targetVo);
-
-
-    /*
-    根据目标id创建文档
-     */
-    void createDocument(Long targetId);
-
-    /*
-    获取文档数量
-     */
-    int getDocumentCount();
-
-    /*
-    删除文档
-     */
-    void deleteDocument(Long targetId);
-
-    /*
-    更新文档
-     */
-    void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert);
-
-    /*
-    组装文档数据
-     */
-    Map<String, Object> makeupDocument(T targetVo);
-
-    /*
-        获取文档
-         */
-    T getDocument(T targetVo);
-
-
-    /*
-    判断是否需要分页
-     */
-    default Boolean needPage(T targetVo) {
-        return true;
-    }
-
-    /*
-    重建所有文档
-     */
-    void rebuildDocument(boolean isAll);
-
-    long searchDocumentCount(T targetVo);
-
-    /*
-        搜索文档
-         */
-    IndexResultVo searchDocument(T targetVo, Integer currentPage, Integer pageSize);
 }

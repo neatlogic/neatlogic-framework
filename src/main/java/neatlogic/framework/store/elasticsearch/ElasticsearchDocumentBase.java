@@ -224,7 +224,7 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
                     .index(getIndexName()) // 索引名称
                     .id(id.toString())      // 文档 ID
                     .document(document) // 文档内容
-                    .refresh(Refresh.WaitFor)
+                    //.refresh(Refresh.WaitFor)
                     .build();
             client.index(request);
         } catch (Exception ex) {

@@ -19,6 +19,7 @@ public interface IElasticsearchIndex {
      */
     String getIndexName();
 
+
     /*
     插件唯一标识
      */

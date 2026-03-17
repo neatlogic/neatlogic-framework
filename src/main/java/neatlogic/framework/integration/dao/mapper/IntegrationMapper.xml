@@ -293,6 +293,57 @@
         </where>
     </select>
 
+    <select id="checkUserHasIntegrationAuthority" resultType="int">
+        SELECT COUNT(1)
+        FROM `integration_authority`
+        <where>
+            `integration_uuid` = #{integrationUuid}
+            AND `action` = #{action}
+            AND (
+                (`type` = 'common' AND `uuid` = 'alluser')
+                <if test="userUuid != null and userUuid != ''">
+                    OR (`type` = 'user' AND `uuid` = #{userUuid})
+                </if>
+                <if test="teamUuidList != null and teamUuidList.size() > 0">
+                    OR (`type` = 'team' AND `uuid` IN
+                    <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                        #{teamUuid}
+                    </foreach>
+                    )
+                </if>
+                <if test="roleUuidList != null and roleUuidList.size() > 0">
+                    OR (`type` = 'role' AND `uuid` IN
+                    <foreach collection="roleUuidList" item="roleUuid" open="(" separator="," close=")">
+                        #{roleUuid}
+                    </foreach>
+                    )
+                </if>
+            )
+        </where>
+    </select>
+
+    <select id="getIntegrationAuthorityListByIntegrationUuidListAndAction" resultType="neatlogic.framework.integration.dto.IntegrationAuthorityVo">
+        SELECT `integration_uuid` AS integrationUuid,
+               `type`,
+               `uuid`,
+               `action`
+        FROM `integration_authority`
+        WHERE `integration_uuid` IN
+        <foreach collection="integrationUuidList" item="integrationUuid" open="(" separator="," close=")">
+            #{integrationUuid}
+        </foreach>
+          AND `action` = #{action}
+    </select>
+
+    <select id="getIntegrationAuthorityListByIntegrationUuidAndAction" resultType="neatlogic.framework.dto.AuthorityVo">
+        SELECT `type`,
+               `uuid`,
+               `action`
+        FROM `integration_authority`
+        WHERE `integration_uuid` = #{integrationUuid}
+          AND `action` = #{action}
+    </select>
+
     <select id="checkNameIsRepeats" parameterType="neatlogic.framework.integration.dto.IntegrationVo" resultType="int">
         select count(1)
         from `integration`
@@ -366,6 +417,17 @@
                 #{fcu})
     </insert>
 
+    <insert id="insertIntegrationAuthority">
+        INSERT INTO `integration_authority` (`integration_uuid`,
+                                             `type`,
+                                             `uuid`,
+                                             `action`)
+        VALUES (#{integrationUuid},
+                #{authorityVo.type},
+                #{authorityVo.uuid},
+                #{authorityVo.action})
+    </insert>
+
     <insert id="insertIntegrationAudit" parameterType="neatlogic.framework.integration.dto.IntegrationAuditVo">
         INSERT INTO `integration_audit` (`id`,
                                          `integration_uuid`,
@@ -401,6 +463,13 @@
         DELETE
         FROM `integration`
         WHERE `uuid` = #{value}
+    </delete>
+
+    <delete id="deleteIntegrationAuthorityByIntegrationUuidAndAction">
+        DELETE
+        FROM `integration_authority`
+        WHERE `integration_uuid` = #{integrationUuid}
+          AND `action` = #{action}
     </delete>
 
     <delete id="deleteAuditByDayBefore" parameterType="int">

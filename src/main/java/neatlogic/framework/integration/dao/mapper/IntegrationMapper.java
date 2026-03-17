@@ -13,6 +13,8 @@
 package neatlogic.framework.integration.dao.mapper;
 
 import neatlogic.framework.common.dto.ValueTextVo;
+import neatlogic.framework.dto.AuthorityVo;
+import neatlogic.framework.integration.dto.IntegrationAuthorityVo;
 import neatlogic.framework.integration.dto.IntegrationAuditVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import org.apache.ibatis.annotations.Param;
@@ -47,6 +49,16 @@ public interface IntegrationMapper {
 
     int searchIntegrationCount(IntegrationVo integrationVo);
 
+    int checkUserHasIntegrationAuthority(@Param("integrationUuid") String integrationUuid,
+                                         @Param("action") String action,
+                                         @Param("userUuid") String userUuid,
+                                         @Param("teamUuidList") List<String> teamUuidList,
+                                         @Param("roleUuidList") List<String> roleUuidList);
+
+    List<IntegrationAuthorityVo> getIntegrationAuthorityListByIntegrationUuidListAndAction(@Param("integrationUuidList") List<String> integrationUuidList, @Param("action") String action);
+
+    List<AuthorityVo> getIntegrationAuthorityListByIntegrationUuidAndAction(@Param("integrationUuid") String integrationUuid, @Param("action") String action);
+
     int checkNameIsRepeats(IntegrationVo integrationVo);
 
     List<String> checkUuidListExists(List<String> uuidList);
@@ -60,11 +72,15 @@ public interface IntegrationMapper {
 
     int insertIntegration(IntegrationVo integrationVo);
 
+    int insertIntegrationAuthority(@Param("integrationUuid") String integrationUuid, @Param("authorityVo") AuthorityVo authorityVo);
+
     int updateIntegration(IntegrationVo integrationVo);
 
     int updateIntegrationActive(IntegrationVo integrationVo);
 
     int deleteIntegrationByUuid(String uuid);
+
+    int deleteIntegrationAuthorityByIntegrationUuidAndAction(@Param("integrationUuid") String integrationUuid, @Param("action") String action);
 
     int insertIntegrationAudit(IntegrationAuditVo integrationAuditVo);
 

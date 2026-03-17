@@ -12,6 +12,7 @@
 
 package neatlogic.framework.integration.dto;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
@@ -54,6 +55,10 @@ public class IntegrationVo extends BaseEditorVo {
     private JSONObject paramObj = new JSONObject();
     @EntityField(name = "是否有帮助", type = ApiParamType.INTEGER)
     private Integer hasHelp;
+    @EntityField(name = "执行授权", type = ApiParamType.JSONARRAY)
+    private List<String> executeAuthorityList;
+    @EntityField(name = "执行授权", type = ApiParamType.JSONARRAY)
+    private JSONArray executeAuthorityVoList;
 
     public String getUrl() {
         return url;
@@ -189,6 +194,22 @@ public class IntegrationVo extends BaseEditorVo {
 
     public void setHasHelp(Integer hasHelp) {
         this.hasHelp = hasHelp;
+    }
+
+    public List<String> getExecuteAuthorityList() {
+        return executeAuthorityList;
+    }
+
+    public void setExecuteAuthorityList(List<String> executeAuthorityList) {
+        this.executeAuthorityList = executeAuthorityList;
+    }
+
+    public JSONArray getExecuteAuthorityVoList() {
+        return executeAuthorityVoList;
+    }
+
+    public void setExecuteAuthorityVoList(JSONArray executeAuthorityVoList) {
+        this.executeAuthorityVoList = executeAuthorityVoList;
     }
 
 }

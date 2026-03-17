@@ -10,34 +10,18 @@
  *
  */
 
-package neatlogic.framework.store.elasticsearch;
+package neatlogic.framework.integration.dto;
 
-public interface IElasticsearchIndex {
+import neatlogic.framework.dto.AuthorityVo;
 
-    /*
-    ES中的索引名称
-     */
-    String getIndexName();
+public class IntegrationAuthorityVo extends AuthorityVo {
+    private String integrationUuid;
 
+    public String getIntegrationUuid() {
+        return integrationUuid;
+    }
 
-    /*
-    插件唯一标识
-     */
-    String getName();
-
-    /*
-    插件名称
-     */
-    String getLabel();
-
-    /*
-    创建索引
-     */
-    void createIndex();
-
-    /*
-    删除索引
-     */
-    void deleteIndex();
-
+    public void setIntegrationUuid(String integrationUuid) {
+        this.integrationUuid = integrationUuid;
+    }
 }

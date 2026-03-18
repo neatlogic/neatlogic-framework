@@ -127,18 +127,19 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (CollectionUtils.isEmpty(attributeList)) {
             return resultList;
         }
-        Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(MatrixAttributeVo::getUuid, e -> e));
         List<Map<String, String>> dataMapList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(dataVo.getDefaultValueFilterList())) {
+            List<MatrixFilterVo> initFilterList = dataVo.getFilterList();
             for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
-                List<MatrixFilterVo> filterList = new ArrayList<>();
+                List<MatrixFilterVo> filterList = new ArrayList<>(initFilterList);
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
                 if (valueFieldFilter != null) {
-                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), List.of(valueFieldFilter.getValue())));
                 }
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
                 if (textFieldFilter != null && (valueFieldFilter == null || !Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid()))) {
-                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), List.of(textFieldFilter.getValue())));
                 }
                 dataVo.setFilterList(filterList);
                 List<Map<String, String>> list = matrixPrivateDataSourceHandler.searchTableData(dataVo);
@@ -151,11 +152,7 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
             String keyword = dataVo.getKeyword();
             if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
                 List<MatrixFilterVo> filterList = dataVo.getFilterList();
-                if (filterList == null) {
-                    filterList = new ArrayList<>();
-                }
-                filterList.add(new MatrixFilterVo(keywordColumn, SearchExpression.LI.getExpression(), Arrays.asList(keyword)));
-                dataVo.setFilterList(filterList);
+                filterList.add(new MatrixFilterVo(keywordColumn, SearchExpression.LI.getExpression(), List.of(keyword)));
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
             dataMapList = matrixPrivateDataSourceHandler.searchTableData(dataVo);

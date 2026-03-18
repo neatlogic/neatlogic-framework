@@ -296,21 +296,22 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
         }
         List<MatrixAttributeVo> attributeList = attributeArray.toJavaList(MatrixAttributeVo.class);
 
-        Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
+        Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(MatrixAttributeVo::getUuid, e -> e));
         List<Map<String, String>> dataMapList = new ArrayList<>();
         JSONArray defaultValue = dataVo.getDefaultValue();
         if (CollectionUtils.isNotEmpty(defaultValue)) {
             dataMapList = matrixViewDataMapper.getDynamicTableDataByUuidList(dataVo);
         } else if (CollectionUtils.isNotEmpty(dataVo.getDefaultValueFilterList())) {
+            List<MatrixFilterVo> initFilterList = dataVo.getFilterList();
             for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
-                List<MatrixFilterVo> filterList = new ArrayList<>();
+                List<MatrixFilterVo> filterList = new ArrayList<>(initFilterList);
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
                 if (valueFieldFilter != null) {
-                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), List.of(valueFieldFilter.getValue())));
                 }
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
                 if (textFieldFilter != null) {
-                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), List.of(textFieldFilter.getValue())));
                 }
                 dataVo.setFilterList(filterList);
                 List<Map<String, String>> list = matrixViewDataMapper.getDynamicTableDataList(dataVo);
@@ -327,8 +328,8 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
                     throw new MatrixAttributeNotFoundException(dataVo.getMatrixUuid(), keywordColumn);
                 }
                 List<MatrixFilterVo> filterList = dataVo.getFilterList();
-                filterList.add(new MatrixFilterVo(keywordColumn, Expression.LIKE.getExpression(), Arrays.asList(keyword)));
-                dataVo.setFilterList(filterList);
+                filterList.add(new MatrixFilterVo(keywordColumn, Expression.LIKE.getExpression(), List.of(keyword)));
+//                dataVo.setFilterList(filterList);
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
             if (Objects.equals(dataVo.getRowNum(), 0)) {

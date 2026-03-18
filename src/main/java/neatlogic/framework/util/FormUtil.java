@@ -582,4 +582,55 @@ public class FormUtil {
         return formAttributeVo;
     }
 
+    /**
+     * 检查两个(下拉框、单选框、复选框)属性是否可以相互赋值
+     *
+     * @param fromFormAttributeVo
+     * @param toFormAttributeVo
+     * @return
+     */
+    public static boolean checkWhetherTwoSelectAttributeCanBeAssignedToEachOther(FormAttributeVo fromFormAttributeVo, FormAttributeVo toFormAttributeVo) {
+        JSONObject fromConfig = fromFormAttributeVo.getConfig();
+        JSONObject toConfig = toFormAttributeVo.getConfig();
+        if (MapUtils.isEmpty(fromConfig) || MapUtils.isEmpty(toConfig)) {
+            return false;
+        }
+        if (!Objects.equals(fromConfig.getString("dataSource"), toConfig.getString("dataSource"))) {
+            return false;
+        }
+        if (Objects.equals(fromConfig.getString("dataSource"), "matrix")) {
+            if (!Objects.equals(fromConfig.getString("matrixUuid"), toConfig.getString("matrixUuid"))) {
+                return false;
+            }
+            JSONObject fromMapping = fromConfig.getJSONObject("mapping");
+            JSONObject toMapping = toConfig.getJSONObject("mapping");
+            if (MapUtils.isEmpty(fromMapping) || MapUtils.isEmpty(toMapping)) {
+                return false;
+            }
+            if (!Objects.equals(fromMapping.getString("value"), toMapping.getString("value"))) {
+                return false;
+            }
+            if (!Objects.equals(fromMapping.getString("text"), toMapping.getString("text"))) {
+                return false;
+            }
+        } else if (Objects.equals(fromConfig.getString("dataSource"), "static")) {
+            JSONArray fromDataList = fromConfig.getJSONArray("dataList");
+            JSONArray toDataList = toConfig.getJSONArray("dataList");
+            for (int i = 0; i < fromDataList.size(); i++) {
+                boolean exists = false;
+                JSONObject fromData = fromDataList.getJSONObject(i);
+                for (int j = 0; j < toDataList.size(); j++) {
+                    JSONObject toData = toDataList.getJSONObject(j);
+                    if (Objects.equals(toData, fromData)) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

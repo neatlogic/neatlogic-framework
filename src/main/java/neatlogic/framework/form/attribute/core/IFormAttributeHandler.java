@@ -20,6 +20,7 @@ import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.exception.AttributeValidException;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author:chenqiwei
@@ -233,4 +234,15 @@ public interface IFormAttributeHandler {
      * @param config
      */
     void validateExtendAttributeConfig(String key, JSONObject config);
+
+    /**
+     * 检查两个属性是否可以相互赋值
+     *
+     * @param fromFormAttributeVo
+     * @param toFormAttributeVo
+     * @return
+     */
+    default boolean checkWhetherTwoAttributeCanBeAssignedToEachOther(FormAttributeVo fromFormAttributeVo, FormAttributeVo toFormAttributeVo) {
+        return Objects.equals(fromFormAttributeVo.getHandler(), toFormAttributeVo.getHandler());
+    }
 }

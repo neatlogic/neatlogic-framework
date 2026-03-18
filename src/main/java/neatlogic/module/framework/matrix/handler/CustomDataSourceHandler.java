@@ -597,20 +597,22 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         if (CollectionUtils.isEmpty(attributeList)) {
             return resultList;
         }
-        Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(e -> e.getUuid(), e -> e));
         List<Map<String, String>> dataMapList = new ArrayList<>();
         JSONArray defaultValue = dataVo.getDefaultValue();
         if (CollectionUtils.isNotEmpty(defaultValue)) {
             dataMapList = matrixDataMapper.getDynamicTableDataByUuidList(dataVo);
         } else if (CollectionUtils.isNotEmpty(dataVo.getDefaultValueFilterList())) {
+            List<MatrixFilterVo> initFilterList = dataVo.getFilterList();
+            handleFilterList(initFilterList, attributeList);
             for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
-                List<MatrixFilterVo> filterList = new ArrayList<>();
+                List<MatrixFilterVo> filterList = new ArrayList<>(initFilterList);
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
                 if (valueFieldFilter != null) {
-                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), List.of(valueFieldFilter.getValue())));
                 }
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
                 if (textFieldFilter != null) {
+                    Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(MatrixAttributeVo::getUuid, e -> e));
                     MatrixAttributeVo attributeVo = matrixAttributeMap.get(textFieldFilter.getUuid());
                     if (MatrixAttributeType.SELECT.getValue().equals(attributeVo.getType())) {
                         List<String> valueList = getSelectTypeValueList(attributeVo, textFieldFilter.getValue(), SearchExpression.EQ);
@@ -636,8 +638,9 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
         } else {
             String keyword = dataVo.getKeyword();
             String keywordColumn = dataVo.getKeywordColumn();
-            MatrixAttributeVo keywordAttributeVo = matrixAttributeMap.get(keywordColumn);
             if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(keyword)) {
+                Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(MatrixAttributeVo::getUuid, e -> e));
+                MatrixAttributeVo keywordAttributeVo = matrixAttributeMap.get(keywordColumn);
                 if (MatrixAttributeType.SELECT.getValue().equals(keywordAttributeVo.getType())) {
                     List<String> valueList = getSelectTypeValueList(keywordAttributeVo, keyword, SearchExpression.LI);
                     if (CollectionUtils.isNotEmpty(valueList)) {
@@ -656,56 +659,8 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
                     dataVo.setKeywordExpression(SearchExpression.LI.getExpression());
                 }
             }
-            // 遍历过滤条件列表dataVo.getFilterList()，补充type字段值，即条件类型
-            List<MatrixFilterVo> filterList = dataVo.getFilterList();
-            if (CollectionUtils.isNotEmpty(filterList)) {
-                SimpleDateFormat generalFormat = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
-                for (MatrixFilterVo filterVo : filterList) {
-                    MatrixAttributeVo matrixAttributeVo = matrixAttributeMap.get(filterVo.getUuid());
-                    if (matrixAttributeVo != null) {
-                        if (Objects.equals(MatrixAttributeType.USER.getValue(), matrixAttributeVo.getType())
-                                || Objects.equals(MatrixAttributeType.TEAM.getValue(), matrixAttributeVo.getType())
-                                || Objects.equals(MatrixAttributeType.ROLE.getValue(), matrixAttributeVo.getType())) {
-                            filterVo.setType(matrixAttributeVo.getType());
-                            if (CollectionUtils.isNotEmpty(filterVo.getValueList())) {
-                                List<String> valueList = new ArrayList<>();
-                                for (String value : filterVo.getValueList()) {
-                                    valueList.add(GroupSearch.removePrefix(value));
-                                }
-                                filterVo.setValueList(valueList);
-                            }
-                        } else if (Objects.equals(MatrixAttributeType.DATE.getValue(), matrixAttributeVo.getType())) {
-                            JSONObject config = matrixAttributeVo.getConfig();
-                            if (MapUtils.isNotEmpty(config)) {
-                                String format = config.getString("format");
-                                if (StringUtils.isBlank(format)) {
-                                    format = TimeUtil.YYYY_MM_DD_HH_MM_SS;
-                                }
-                                String styleType = config.getString("styleType");
-                                if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
-                                    if ("|".equals(styleType)) {
-                                        styleType = "";
-                                    }
-                                    format = format.replace("-", styleType);
-                                }
-                                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-                                List<String> valueList = new ArrayList<>();
-                                for (String value : filterVo.getValueList()) {
-                                    try {
-                                        Date date = simpleDateFormat.parse(value);
-                                        valueList.add(generalFormat.format(date));
-                                    } catch (ParseException e) {
-                                        valueList.add(value);
-                                    }
-                                }
-                                filterVo.setValueList(valueList);
-                            }
-                        } else {
-                            filterVo.setType(matrixAttributeVo.getType());
-                        }
-                    }
-                }
-            }
+            // 遍历过滤条件列表dataVo.getFilterList()，补充type字段值，
+            handleFilterList(dataVo.getFilterList(), attributeList);
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
             if (Objects.equals(dataVo.getRowNum(), 0)) {
                 int rowNum = matrixDataMapper.getDynamicTableDataListCount(dataVo);
@@ -719,18 +674,69 @@ public class CustomDataSourceHandler extends MatrixDataSourceHandlerBase {
             }
             dataMapList = matrixDataMapper.getDynamicTableDataList(dataVo);
         }
-        if (CollectionUtils.isEmpty(dataMapList)) {
-            return resultList;
-        }
-        List<Map<String, String>> distinctList = new ArrayList<>();
-        for (Map<String, String> dataMap : dataMapList) {
-            if (distinctList.contains(dataMap)) {
-                continue;
+        if (CollectionUtils.isNotEmpty(dataMapList)) {
+            List<Map<String, String>> distinctList = new ArrayList<>();
+            for (Map<String, String> dataMap : dataMapList) {
+                if (distinctList.contains(dataMap)) {
+                    continue;
+                }
+                distinctList.add(dataMap);
             }
-            distinctList.add(dataMap);
+            resultList = matrixTableDataValueHandle(attributeList, distinctList);
         }
-        resultList = matrixTableDataValueHandle(attributeList, distinctList);
         return resultList;
+    }
+
+    private void handleFilterList(List<MatrixFilterVo> filterList, List<MatrixAttributeVo> attributeList) {
+        if (CollectionUtils.isNotEmpty(filterList)) {
+            Map<String, MatrixAttributeVo> matrixAttributeMap = attributeList.stream().collect(Collectors.toMap(MatrixAttributeVo::getUuid, e -> e));
+            SimpleDateFormat generalFormat = new SimpleDateFormat(TimeUtil.YYYY_MM_DD_HH_MM_SS);
+            for (MatrixFilterVo filterVo : filterList) {
+                MatrixAttributeVo matrixAttributeVo = matrixAttributeMap.get(filterVo.getUuid());
+                if (matrixAttributeVo != null) {
+                    if (Objects.equals(MatrixAttributeType.USER.getValue(), matrixAttributeVo.getType())
+                            || Objects.equals(MatrixAttributeType.TEAM.getValue(), matrixAttributeVo.getType())
+                            || Objects.equals(MatrixAttributeType.ROLE.getValue(), matrixAttributeVo.getType())) {
+                        filterVo.setType(matrixAttributeVo.getType());
+                        if (CollectionUtils.isNotEmpty(filterVo.getValueList())) {
+                            List<String> valueList = new ArrayList<>();
+                            for (String value : filterVo.getValueList()) {
+                                valueList.add(GroupSearch.removePrefix(value));
+                            }
+                            filterVo.setValueList(valueList);
+                        }
+                    } else if (Objects.equals(MatrixAttributeType.DATE.getValue(), matrixAttributeVo.getType())) {
+                        JSONObject config = matrixAttributeVo.getConfig();
+                        if (MapUtils.isNotEmpty(config)) {
+                            String format = config.getString("format");
+                            if (StringUtils.isBlank(format)) {
+                                format = TimeUtil.YYYY_MM_DD_HH_MM_SS;
+                            }
+                            String styleType = config.getString("styleType");
+                            if (StringUtils.isNotBlank(styleType) && !Objects.equals(styleType, "-")) {
+                                if ("|".equals(styleType)) {
+                                    styleType = "";
+                                }
+                                format = format.replace("-", styleType);
+                            }
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+                            List<String> valueList = new ArrayList<>();
+                            for (String value : filterVo.getValueList()) {
+                                try {
+                                    Date date = simpleDateFormat.parse(value);
+                                    valueList.add(generalFormat.format(date));
+                                } catch (ParseException e) {
+                                    valueList.add(value);
+                                }
+                            }
+                            filterVo.setValueList(valueList);
+                        }
+                    } else {
+                        filterVo.setType(matrixAttributeVo.getType());
+                    }
+                }
+            }
+        }
     }
 
     /**

@@ -348,15 +348,16 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             dataVo.setRowNum(rowNum);
             tbodyArray = transformedResult.getJSONArray("tbodyList");
         } else if (CollectionUtils.isNotEmpty(dataVo.getDefaultValueFilterList())) {
+            List<MatrixFilterVo> initFilterList = dataVo.getFilterList();
             for (MatrixDefaultValueFilterVo defaultValueFilterVo : dataVo.getDefaultValueFilterList()) {
-                List<MatrixFilterVo> filterList = new ArrayList<>();
+                List<MatrixFilterVo> filterList = new ArrayList<>(initFilterList);
                 MatrixKeywordFilterVo valueFieldFilter = defaultValueFilterVo.getValueFieldFilter();
                 if (valueFieldFilter != null) {
-                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), Arrays.asList(valueFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(valueFieldFilter.getUuid(), valueFieldFilter.getExpression(), List.of(valueFieldFilter.getValue())));
                 }
                 MatrixKeywordFilterVo textFieldFilter = defaultValueFilterVo.getTextFieldFilter();
                 if (textFieldFilter != null && (valueFieldFilter == null || !Objects.equals(valueFieldFilter.getUuid(), textFieldFilter.getUuid()))) {
-                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), Arrays.asList(textFieldFilter.getValue())));
+                    filterList.add(new MatrixFilterVo(textFieldFilter.getUuid(), textFieldFilter.getExpression(), List.of(textFieldFilter.getValue())));
                 }
 //                dataVo.setFilterList(filterList);
                 paramObj.put("filterList", filterList);
@@ -374,7 +375,7 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
             String keywordColumn = dataVo.getKeywordColumn();
             paramObj.put("keyword", dataVo.getKeyword()); //keyword给到用户自行处理即可
             if (StringUtils.isNotBlank(keywordColumn) && StringUtils.isNotBlank(dataVo.getKeyword())) {
-                filterList.add(new MatrixFilterVo(keywordColumn, SearchExpression.LI.getExpression(), Arrays.asList(dataVo.getKeyword())));
+                filterList.add(new MatrixFilterVo(keywordColumn, SearchExpression.LI.getExpression(), List.of(dataVo.getKeyword())));
             }
             //下面逻辑适用于下拉框滚动加载，也可以搜索，但是一页返回的数据量可能会小于pageSize，因为做了去重处理
             paramObj.put("currentPage", dataVo.getCurrentPage());

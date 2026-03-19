@@ -15,19 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.restful.core.privateapi;
+package neatlogic.framework.restful.core.privateapi.raw;
 
-import neatlogic.framework.restful.core.IApiComponent;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+/**
+ * 此类用于提供两个接口方法，让实现类支持事务增强
+ */
+public interface MyRawApiComponent extends IRawApiComponent {
+    Object myDoService(String param) throws Exception;
 
-public interface IPrivateApiComponent extends IApiComponent {
-    /**
-     * 接口唯一标识，也是访问URI
-     *
-     * @return 接口唯一地址
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getToken();
-
+    default Object myDoTest(String param) {
+        return null;
+    }
 }

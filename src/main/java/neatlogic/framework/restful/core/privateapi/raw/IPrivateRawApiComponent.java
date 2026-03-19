@@ -10,26 +10,20 @@
  *
  */
 
-package neatlogic.framework.restful.core.privateapi;
+package neatlogic.framework.restful.core.privateapi.raw;
 
-import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * @Author
- * @Time Aug 26,2020
- * @Description: 内部接口
- */
-public interface IPrivateBinaryStreamApiComponent extends IBinaryStreamApiComponent {
+public interface IPrivateRawApiComponent extends IRawApiComponent {
     /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 接口唯一标识，也是访问URI
+     * 接口唯一标识，也是访问URI
+     *
+     * @return 接口唯一地址
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     String getToken();
+
+
 
 }

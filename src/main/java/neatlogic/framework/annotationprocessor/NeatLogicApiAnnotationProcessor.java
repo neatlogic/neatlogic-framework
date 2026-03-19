@@ -1,9 +1,9 @@
 package neatlogic.framework.annotationprocessor;
 
 import neatlogic.framework.restful.core.IApiComponent;
-import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
-import neatlogic.framework.restful.core.IJsonStreamApiComponent;
-import neatlogic.framework.restful.core.IRawApiComponent;
+import neatlogic.framework.restful.core.privateapi.binarystream.IBinaryStreamApiComponent;
+import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.privateapi.raw.IRawApiComponent;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.annotation.processing.*;

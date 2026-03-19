@@ -1,6 +1,4 @@
-package neatlogic.framework.restful.core.privateapi;
-
-import neatlogic.framework.restful.core.RawApiComponentBase;
+package neatlogic.framework.restful.core.privateapi.raw;
 
 public abstract class PrivateRawApiComponentBase extends RawApiComponentBase implements IPrivateRawApiComponent {
 

@@ -15,19 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.restful.core.privateapi;
+package neatlogic.framework.restful.core.privateapi.binarystream;
 
-import neatlogic.framework.restful.core.IApiComponent;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import com.alibaba.fastjson.JSONObject;
 
-public interface IPrivateApiComponent extends IApiComponent {
-    /**
-     * 接口唯一标识，也是访问URI
-     *
-     * @return 接口唯一地址
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getToken();
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+/**
+ * @Author: chenqiwei
+ * @Time: Jun 19, 2020
+ * @ClassName: MyBinaryStreamApiComponent
+ * @Description: 此类用于提供两个接口方法，让实现类支持事务增强
+ */
+public interface MyBinaryStreamApiComponent extends IBinaryStreamApiComponent {
+	Object myDoService(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception;
 }

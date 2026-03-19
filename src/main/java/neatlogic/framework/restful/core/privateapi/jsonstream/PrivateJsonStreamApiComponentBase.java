@@ -1,6 +1,4 @@
-package neatlogic.framework.restful.core.privateapi;
-
-import neatlogic.framework.restful.core.JsonStreamApiComponentBase;
+package neatlogic.framework.restful.core.privateapi.jsonstream;
 
 public abstract class PrivateJsonStreamApiComponentBase extends JsonStreamApiComponentBase implements IPrivateJsonStreamApiComponent {
     

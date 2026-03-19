@@ -25,41 +25,44 @@ import neatlogic.framework.restful.annotation.NoPasswordExpiredCheck;
 import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.constvalue.ApiAuthType;
 import neatlogic.framework.restful.core.IApiComponent;
-import neatlogic.framework.restful.core.IBinaryStreamApiComponent;
-import neatlogic.framework.restful.core.IJsonStreamApiComponent;
-import neatlogic.framework.restful.core.IRawApiComponent;
+import neatlogic.framework.restful.core.privateapi.binarystream.IBinaryStreamApiComponent;
+import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.privateapi.raw.IRawApiComponent;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiKind;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.util.$;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * 私有接口组件工厂。
+ * 负责在模块初始化时协调各类型注册器完成 private API 组件注册，并维护统一的处理器、token 与组件索引。
+ */
 @RootComponent
 public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     static Logger logger = LoggerFactory.getLogger(PrivateApiComponentFactory.class);
 
-    private static final Map<String, IApiComponent> componentMap = new HashMap<>();
+    @Resource
+    private List<IPrivateApiTypeRegistrar> registrarList;
+
+    private static final Map<String, Map<String, Object>> componentRegistryMap = new HashMap<>();
     private static final List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
     private static final Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
     private static final List<ApiVo> apiList = new ArrayList<>();
     private static final Map<String, ApiVo> apiMap = new HashMap<>();
-    private static final Map<String, IJsonStreamApiComponent> streamComponentMap = new HashMap<>();
-    private static final Map<String, IBinaryStreamApiComponent> binaryComponentMap = new HashMap<>();
-    public static final Map<String, IRawApiComponent> rawComponentMap = new HashMap<>();
     public static final List<String> ExemptTokenMap = new ArrayList<>();
     // 按照token表达式长度排序，最长匹配原则
     private static final Map<String, ApiVo> regexApiMap = new TreeMap<>((o1, o2) -> {
-        // 先按照长度排序，如果长度一样按照内容排序
         if (o1.length() != o2.length()) {
             return o1.length() - o2.length();
         } else {
@@ -68,26 +71,62 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     });
     private static final Pattern p = Pattern.compile("\\{([^}]+)}");
 
+    static {
+        for (ApiType apiType : ApiType.values()) {
+            componentRegistryMap.put(apiType.getValue(), new HashMap<>());
+        }
+    }
+
+    /**
+     * 根据处理器类名获取对象型接口组件实例。
+     */
     public static IApiComponent getInstance(String componentId) {
-        return componentMap.get(componentId);
+        return getComponent(componentId, ApiType.OBJECT, IApiComponent.class);
     }
 
+    /**
+     * 根据处理器类名获取 JSON 流接口组件实例。
+     */
     public static IJsonStreamApiComponent getStreamInstance(String componentId) {
-        return streamComponentMap.get(componentId);
+        return getComponent(componentId, ApiType.STREAM, IJsonStreamApiComponent.class);
     }
 
+    /**
+     * 根据处理器类名获取二进制流接口组件实例。
+     */
     public static IBinaryStreamApiComponent getBinaryInstance(String componentId) {
-        return binaryComponentMap.get(componentId);
+        return getComponent(componentId, ApiType.BINARY, IBinaryStreamApiComponent.class);
     }
 
+    /**
+     * 根据处理器类名获取 raw 接口组件实例。
+     */
     public static IRawApiComponent getRawInstance(String componentId) {
-        return rawComponentMap.get(componentId);
+        return getComponent(componentId, ApiType.RAW, IRawApiComponent.class);
     }
 
+    /**
+     * 按接口类型和处理器类名获取组件实例。
+     */
+    public static <T> T getComponent(String componentId, ApiType apiType, Class<T> componentClass) {
+        Object component = getTypedComponentMap(apiType).get(componentId);
+        if (component == null) {
+            return null;
+        }
+        return componentClass.cast(component);
+    }
+
+    /**
+     * 获取当前已注册且声明为 MCP 工具的接口列表。
+     */
     public static List<ApiVo> getMcpApiList() {
         return apiList.stream().filter(ApiVo::getIsMcp).toList();
     }
 
+    /**
+     * 根据 token 获取接口定义。
+     * 优先命中精确 token，未命中时再尝试正则 token，并回填路径变量。
+     */
     public static ApiVo getApiByToken(String token) throws CloneNotSupportedException {
         ApiVo api = apiMap.get(token);
         if (api == null) {
@@ -121,357 +160,186 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         return apiVo;
     }
 
+    /**
+     * 获取全部已注册的接口定义。
+     */
     public static List<ApiVo> getApiList() {
         return apiList;
     }
 
+    /**
+     * 根据处理器类名获取处理器元数据。
+     */
     public static ApiHandlerVo getApiHandlerByHandler(String handler) {
         return apiHandlerMap.get(handler);
     }
 
+    /**
+     * 获取全部处理器元数据。
+     */
     public static List<ApiHandlerVo> getApiHandlerList() {
         return apiHandlerList;
     }
 
+    /**
+     * 获取对象型接口组件索引。
+     */
     public static Map<String, IApiComponent> getComponentMap() {
-        return componentMap;
+        return getTypedComponentMap(ApiType.OBJECT);
     }
 
-
+    /**
+     * 获取处理器元数据索引。
+     */
     public static Map<String, ApiHandlerVo> getApiHandlerMap() {
         return apiHandlerMap;
     }
 
+    /**
+     * 获取接口定义索引。
+     */
     public static Map<String, ApiVo> getApiMap() {
         return apiMap;
     }
 
-    @Override
-    public void onInitialized(NeatLogicWebApplicationContext context) {
-        Map<String, IPrivateApiComponent> myMap = context.getBeansOfType(IPrivateApiComponent.class);
-        Map<String, IPrivateJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IPrivateJsonStreamApiComponent.class);
-        Map<String, IPrivateBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IPrivateBinaryStreamApiComponent.class);
-        Map<String, IPrivateRawApiComponent> myRawMap = context.getBeansOfType(IPrivateRawApiComponent.class);
-        for (Map.Entry<String, IPrivateApiComponent> entry : myMap.entrySet()) {
-            IPrivateApiComponent component = entry.getValue();
-            if (component.getClassName() != null) {
-                checkAnnotation(component, context);
-                componentMap.put(component.getClassName(), component);
-                ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getClassName());
-                restComponentVo.setName(component.getName());
-                restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(true);
-                restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiType.OBJECT.getValue());
-                apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getClassName(), restComponentVo);
-                String token = component.getToken();
-                if (StringUtils.isNotBlank(token)) {
-                    if (token.startsWith("/")) {
-                        token = token.substring(1);
-                    }
-                    if (token.endsWith("/")) {
-                        token = token.substring(0, token.length() - 1);
-                    }
-                    ApiVo apiVo = new ApiVo();
-                    apiVo.setToken(token);
-                    apiVo.setHandler(component.getClassName());
-                    apiVo.setHandlerName(component.getName());
-                    apiVo.setName(component.getName());
-                    apiVo.setDescription(component.getDescription());
-                    apiVo.setIsActive(1);
-                    apiVo.setIsMcp(component.isMcp());
-                    apiVo.setNeedAudit(component.needAudit());
-                    apiVo.setTimeout(0);// 0是default
-                    apiVo.setType(ApiType.OBJECT.getValue());
-                    apiVo.setModuleId(context.getId());
-                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
-                    apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
-                    apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(true);
-                    if(component.isBasicSupport()){
-                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
-                    }
-                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
-                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
-                    }
-                    if (token.contains("{")) {
-                        Matcher m = p.matcher(token);
-                        StringBuffer temp = new StringBuffer();
-                        while (m.find()) {
-                            apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^/]+)");
-                        }
-                        m.appendTail(temp);
-                        String regexToken = "^" + temp + "$";
-                        if (!regexApiMap.containsKey(regexToken)) {
-                            regexApiMap.put(regexToken, apiVo);
-                        } else {
-                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
-                            System.exit(1);
-                        }
-                    }
-                    // 即使是regex path也需要存到apiMap里，这样才能获取帮助信息
-                    if (!apiMap.containsKey(token)) {
-                        apiList.add(apiVo);
-                        apiMap.put(token, apiVo);
-                    } else {
-                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
-                        System.exit(1);
-                    }
+    /**
+     * 统一规范化接口 token，移除首尾斜杠。
+     */
+    static String normalizeToken(String token) {
+        if (token.startsWith("/")) {
+            token = token.substring(1);
+        }
+        if (token.endsWith("/")) {
+            token = token.substring(0, token.length() - 1);
+        }
+        return token;
+    }
 
-                }
+    /**
+     * 构建处理器元数据对象。
+     */
+    static ApiHandlerVo createApiHandlerVo(String className, String name, String config, String moduleId, ApiType apiType) {
+        ApiHandlerVo restComponentVo = new ApiHandlerVo();
+        restComponentVo.setHandler(className);
+        restComponentVo.setName(name);
+        restComponentVo.setConfig(config);
+        restComponentVo.setPrivate(true);
+        restComponentVo.setModuleId(moduleId);
+        restComponentVo.setType(apiType.getValue());
+        return restComponentVo;
+    }
+
+    /**
+     * 注册处理器元数据到列表和索引。
+     */
+    static void registerApiHandler(ApiHandlerVo apiHandlerVo) {
+        apiHandlerList.add(apiHandlerVo);
+        apiHandlerMap.put(apiHandlerVo.getHandler(), apiHandlerVo);
+    }
+
+    /**
+     * 构建系统级 private 接口定义。
+     */
+    static ApiVo createSystemApiVo(String token, String className, String name, String description, NeatLogicWebApplicationContext context,
+                                   ApiType apiType, Integer needAudit, boolean isMcp, boolean isBasicSupport, boolean supportAnonymousAccess) {
+        ApiVo apiVo = new ApiVo();
+        apiVo.setToken(token);
+        apiVo.setHandler(className);
+        apiVo.setHandlerName(name);
+        apiVo.setName(name);
+        apiVo.setDescription(description);
+        apiVo.setIsActive(1);
+        apiVo.setIsMcp(isMcp);
+        apiVo.setNeedAudit(needAudit);
+        apiVo.setTimeout(0);
+        apiVo.setType(apiType.getValue());
+        apiVo.setModuleId(context.getId());
+        apiVo.setModuleGroup(context.getGroup());
+        apiVo.setApiType(ApiKind.SYSTEM.getValue());
+        apiVo.setIsDeletable(0);
+        apiVo.setIsPrivate(true);
+        if (isBasicSupport) {
+            apiVo.addAuthType(ApiAuthType.BASIC.getValue());
+        }
+        if (supportAnonymousAccess) {
+            apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
+        }
+        return apiVo;
+    }
+
+    /**
+     * 注册接口 token。
+     * 同时维护精确 token 映射、正则 token 映射以及接口列表。
+     */
+    static void registerApiToken(String token, ApiVo apiVo) {
+        if (token.contains("{")) {
+            Matcher m = p.matcher(token);
+            StringBuffer temp = new StringBuffer();
+            while (m.find()) {
+                apiVo.addPathVariable(m.group(1));
+                m.appendReplacement(temp, "([^/]+)");
+            }
+            m.appendTail(temp);
+            String regexToken = "^" + temp + "$";
+            if (!regexApiMap.containsKey(regexToken)) {
+                regexApiMap.put(regexToken, apiVo);
+            } else {
+                logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
+                System.exit(1);
             }
         }
-
-        for (Map.Entry<String, IPrivateJsonStreamApiComponent> entry : myStreamMap.entrySet()) {
-            IPrivateJsonStreamApiComponent component = entry.getValue();
-            if (component.getClassName() != null) {
-                checkAnnotation(component, context);
-                streamComponentMap.put(component.getClassName(), component);
-                ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getClassName());
-                restComponentVo.setName(component.getName());
-                restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(true);
-                restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiType.STREAM.getValue());
-                apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getClassName(), restComponentVo);
-                String token = component.getToken();
-                if (StringUtils.isNotBlank(token)) {
-                    if (token.startsWith("/")) {
-                        token = token.substring(1);
-                    }
-                    if (token.endsWith("/")) {
-                        token = token.substring(0, token.length() - 1);
-                    }
-                    ApiVo apiVo = new ApiVo();
-                    apiVo.setToken(token);
-                    apiVo.setHandler(component.getClassName());
-                    apiVo.setHandlerName(component.getName());
-                    apiVo.setName(component.getName());
-                    apiVo.setDescription(component.getDescription());
-                    apiVo.setIsActive(1);
-                    apiVo.setIsMcp(component.isMcp());
-                    apiVo.setNeedAudit(component.needAudit());
-                    apiVo.setTimeout(0);// 0是default
-                    apiVo.setType(ApiType.STREAM.getValue());
-                    apiVo.setModuleId(context.getId());
-                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
-                    apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
-                    apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(true);
-                    if(component.isBasicSupport()){
-                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
-                    }
-                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
-                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
-                    }
-                    if (token.contains("{")) {
-                        Matcher m = p.matcher(token);
-                        StringBuffer temp = new StringBuffer();
-                        while (m.find()) {
-                            apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^/]+)");
-                        }
-                        m.appendTail(temp);
-                        String regexToken = "^" + temp + "$";
-                        if (!regexApiMap.containsKey(regexToken)) {
-                            regexApiMap.put(regexToken, apiVo);
-                        } else {
-                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
-                            System.exit(1);
-                        }
-                    }
-
-                    if (!apiMap.containsKey(token)) {
-                        apiList.add(apiVo);
-                        apiMap.put(token, apiVo);
-                    } else {
-                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
-                        System.exit(1);
-                    }
-                }
-            }
-        }
-
-        for (Map.Entry<String, IPrivateBinaryStreamApiComponent> entry : myBinaryMap.entrySet()) {
-            IPrivateBinaryStreamApiComponent component = entry.getValue();
-            if (component.getClassName() != null) {
-                checkAnnotation(component, context);
-                binaryComponentMap.put(component.getClassName(), component);
-                ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getClassName());
-                restComponentVo.setName(component.getName());
-                restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(true);
-                restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiType.BINARY.getValue());
-                apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getClassName(), restComponentVo);
-                String token = component.getToken();
-                if (StringUtils.isNotBlank(token)) {
-                    if (token.startsWith("/")) {
-                        token = token.substring(1);
-                    }
-                    if (token.endsWith("/")) {
-                        token = token.substring(0, token.length() - 1);
-                    }
-                    ApiVo apiVo = new ApiVo();
-                    apiVo.setToken(token);
-                    apiVo.setHandler(component.getClassName());
-                    apiVo.setHandlerName(component.getName());
-                    apiVo.setName(component.getName());
-                    apiVo.setDescription(component.getDescription());
-                    apiVo.setIsActive(1);
-                    apiVo.setIsMcp(component.isMcp());
-                    apiVo.setNeedAudit(component.needAudit());
-                    apiVo.setTimeout(0);// 0是default
-                    apiVo.setType(ApiType.BINARY.getValue());
-                    apiVo.setModuleId(context.getId());
-                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
-                    apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
-                    apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(true);
-                    if(component.isBasicSupport()){
-                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
-                    }
-                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
-                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
-                    }
-                    if (token.contains("{")) {
-                        Matcher m = p.matcher(token);
-                        StringBuffer temp = new StringBuffer();
-                        while (m.find()) {
-                            apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^/]+)");
-                        }
-                        m.appendTail(temp);
-                        String regexToken = "^" + temp + "$";
-                        if (!regexApiMap.containsKey(regexToken)) {
-                            regexApiMap.put(regexToken, apiVo);
-                        } else {
-                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
-                            System.exit(1);
-                        }
-                    }
-
-                    if (!apiMap.containsKey(token)) {
-                        apiList.add(apiVo);
-                        apiMap.put(token, apiVo);
-                    } else {
-                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
-                        System.exit(1);
-                    }
-                }
-            }
-        }
-
-        for (Map.Entry<String, IPrivateRawApiComponent> entry : myRawMap.entrySet()) {
-            IPrivateRawApiComponent component = entry.getValue();
-            if (component.getClassName() != null) {
-                checkAnnotation(component, context);
-                rawComponentMap.put(component.getClassName(), component);
-                ApiHandlerVo restComponentVo = new ApiHandlerVo();
-                restComponentVo.setHandler(component.getClassName());
-                restComponentVo.setName(component.getName());
-                restComponentVo.setConfig(component.getConfig());
-                restComponentVo.setPrivate(true);
-                restComponentVo.setModuleId(context.getId());
-                restComponentVo.setType(ApiType.RAW.getValue());
-                apiHandlerList.add(restComponentVo);
-                apiHandlerMap.put(component.getClassName(), restComponentVo);
-                String token = component.getToken();
-                if (StringUtils.isNotBlank(token)) {
-                    if (token.startsWith("/")) {
-                        token = token.substring(1);
-                    }
-                    if (token.endsWith("/")) {
-                        token = token.substring(0, token.length() - 1);
-                    }
-                    ApiVo apiVo = new ApiVo();
-                    apiVo.setToken(token);
-                    apiVo.setHandler(component.getClassName());
-                    apiVo.setHandlerName(component.getName());
-                    apiVo.setName(component.getName());
-                    apiVo.setDescription(component.getDescription());
-                    apiVo.setIsActive(1);
-                    apiVo.setIsMcp(component.isMcp());
-                    apiVo.setNeedAudit(component.needAudit());
-                    apiVo.setTimeout(0);// 0是default
-                    apiVo.setType(ApiType.RAW.getValue());
-                    apiVo.setModuleId(context.getId());
-                    apiVo.setModuleGroup(context.getGroup());//根据moduleId设置moduleGroup
-                    apiVo.setApiType(ApiKind.SYSTEM.getValue());// 系统扫描出来的就是系统接口
-                    apiVo.setIsDeletable(0);// 不能删除
-                    apiVo.setIsPrivate(true);
-                    if(component.isBasicSupport()){
-                        apiVo.addAuthType(ApiAuthType.BASIC.getValue());
-                    }
-                    if(component.supportAnonymousAccess().isSupportAnonymousAccess()){
-                        apiVo.addAuthType(ApiAuthType.ANONYMOUS.getValue());
-                    }
-
-                    if (token.contains("{")) {
-                        Matcher m = p.matcher(token);
-                        StringBuffer temp = new StringBuffer();
-                        while (m.find()) {
-                            apiVo.addPathVariable(m.group(1));
-                            m.appendReplacement(temp, "([^/]+)");
-                        }
-                        m.appendTail(temp);
-                        String regexToken = "^" + temp + "$";
-                        if (!regexApiMap.containsKey(regexToken)) {
-                            regexApiMap.put(regexToken, apiVo);
-                        } else {
-                            logger.error("路径匹配接口：" + regexToken + "  " + token + "已存在，请重新定义访问路径");
-                            System.exit(1);
-                        }
-                    }
-
-                    if (!apiMap.containsKey(token)) {
-                        apiList.add(apiVo);
-                        apiMap.put(token, apiVo);
-                    } else {
-                        logger.error("接口：" + token + "已存在，请重新定义访问路径");
-                        System.exit(1);
-                    }
-                }
-            }
+        if (!apiMap.containsKey(token)) {
+            apiList.add(apiVo);
+            apiMap.put(token, apiVo);
+        } else {
+            logger.error("接口：" + token + "已存在，请重新定义访问路径");
+            System.exit(1);
         }
     }
 
     /**
-     * 补充注解提示，防止越权
-     *
-     * @param component 组件
-     * @param context   应用context
+     * 按接口类型注册组件实例。
      */
-    public void checkAnnotation(Object component, ApplicationContext context) {
-        //TODO 后续master模块完善后放开
+    static void registerComponent(ApiType apiType, String className, Object component) {
+        getTypedComponentMap(apiType).put(className, component);
+    }
+
+    /**
+     * 获取指定接口类型的组件索引。
+     */
+    @SuppressWarnings("unchecked")
+    static <T> Map<String, T> getTypedComponentMap(ApiType apiType) {
+        return (Map<String, T>) (Map<?, ?>) componentRegistryMap.computeIfAbsent(apiType.getValue(), key -> new HashMap<>());
+    }
+
+    /**
+     * 模块初始化入口。
+     * 统一调度各类型注册器完成 private API 注册。
+     */
+    @Override
+    public void onInitialized(NeatLogicWebApplicationContext context) {
+        registrarList.stream()
+                .sorted(Comparator.comparingInt(IPrivateApiTypeRegistrar::getOrder)
+                        .thenComparing(registrar -> registrar.getClass().getName()))
+                .forEach(registrar -> registrar.register(context));
+    }
+
+    /**
+     * 补充注解提示，防止越权。
+     */
+    static void checkAnnotation(Object component, ApplicationContext context) {
         if (!Objects.equals(context.getId(), "master")) {
             Class<?> clazz = AopUtils.getTargetClass(component);
             OperationType operationType = clazz.getAnnotation(OperationType.class);
             if (operationType == null) {
                 logger.warn("{}接口没有OperationType注解", clazz.getName());
             }
-
-//            System.out.println(clazz.getSimpleName());
-            //跳过匿名接口
-//            if (component instanceof IApiComponent && ((IApiComponent) component).supportAnonymousAccess().isSupportAnonymousAccess()) {
-//                return;
-//            }
-//            if (!Objects.equals(context.getId(), "framework") && !Objects.equals(context.getId(), "tenant")) {
             AuthAction authAction = clazz.getAnnotation(AuthAction.class);
             AuthActions authActions = clazz.getAnnotation(AuthActions.class);
             if (authAction == null && authActions == null) {
                 System.err.println(clazz.getName() + "接口类需要加上@AuthAction注解进行权限控制, 如果未创建权限类, 可以先临时加上@AuthAction(action = NoAuth.class)使得应用服务正常启动");
                 System.exit(1);
             }
-//            }
-            // 查找标注了 @NoPasswordExpiredCheck 注解的方法
             if (clazz.isAnnotationPresent(NoPasswordExpiredCheck.class)) {
                 if (component instanceof IPrivateApiComponent) {
                     ExemptTokenMap.add(((IPrivateApiComponent) component).getToken());
@@ -480,11 +348,18 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         }
     }
 
+    /**
+     * 预留初始化钩子，当前无额外初始化逻辑。
+     */
     @Override
     protected void myInit() {
 
     }
 
+    /**
+     * 获取当前租户已激活模块下可见的接口定义列表。
+     * 返回值为克隆副本，避免调用方修改全局缓存对象。
+     */
     public static List<ApiVo> getTenantActiveApiList() throws CloneNotSupportedException {
         List<String> activeModuleIdList = TenantContext.get().getActiveModuleList().stream().map(ModuleVo::getId).collect(Collectors.toList());
         List<ApiVo> apiVoList = apiList.stream().filter(e -> activeModuleIdList.contains(e.getModuleId())).collect(Collectors.toList());

@@ -15,19 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.restful.core.privateapi;
+package neatlogic.framework.restful.core.privateapi.binarystream;
 
-import neatlogic.framework.restful.core.IApiComponent;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+public abstract class PrivateBinaryStreamApiComponentBase extends BinaryStreamApiComponentBase implements IPrivateBinaryStreamApiComponent {
 
-public interface IPrivateApiComponent extends IApiComponent {
-    /**
-     * 接口唯一标识，也是访问URI
-     *
-     * @return 接口唯一地址
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getToken();
-
+	public int needAudit() {
+		return 0;
+	}
+	
 }

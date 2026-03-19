@@ -1,6 +1,6 @@
 package neatlogic.framework.restful.core.publicapi;
 
-import neatlogic.framework.restful.core.JsonStreamApiComponentBase;
+import neatlogic.framework.restful.core.privateapi.jsonstream.JsonStreamApiComponentBase;
 
 @Deprecated
 public abstract class PublicJsonStreamApiComponentBase extends JsonStreamApiComponentBase implements IPublicJsonStreamApiComponent {

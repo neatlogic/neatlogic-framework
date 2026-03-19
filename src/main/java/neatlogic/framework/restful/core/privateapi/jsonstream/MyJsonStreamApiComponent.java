@@ -15,19 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.restful.core.privateapi;
+package neatlogic.framework.restful.core.privateapi.jsonstream;
 
-import neatlogic.framework.restful.core.IApiComponent;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
 
-public interface IPrivateApiComponent extends IApiComponent {
-    /**
-     * 接口唯一标识，也是访问URI
-     *
-     * @return 接口唯一地址
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getToken();
-
+/**
+ * @Author: chenqiwei
+ * @Time: Jun 19, 2020
+ * @ClassName: MyJsonStreamApiComponent
+ * @Description: 此类用于提供两个接口方法，让实现类支持事务增强
+ */
+public interface MyJsonStreamApiComponent extends IJsonStreamApiComponent {
+    Object myDoService(JSONObject paramObj, JSONReader jsonReader) throws Exception;
 }

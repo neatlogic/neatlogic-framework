@@ -1,6 +1,6 @@
 package neatlogic.framework.restful.core.publicapi;
 
-import neatlogic.framework.restful.core.BinaryStreamApiComponentBase;
+import neatlogic.framework.restful.core.privateapi.binarystream.BinaryStreamApiComponentBase;
 
 @Deprecated
 public abstract class PublicBinaryStreamApiComponentBase extends BinaryStreamApiComponentBase implements IPublicBinaryStreamApiComponent {

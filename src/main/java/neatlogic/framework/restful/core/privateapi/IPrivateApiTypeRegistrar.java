@@ -12,19 +12,21 @@
 
 package neatlogic.framework.restful.core.privateapi;
 
-import neatlogic.framework.restful.core.IJsonStreamApiComponent;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 
-public interface IPrivateJsonStreamApiComponent extends IJsonStreamApiComponent {
+/**
+ * private API 类型注册器。
+ * 每种接口类型各自实现自己的扫描与注册逻辑，factory 只负责统一调度。
+ */
+public interface IPrivateApiTypeRegistrar {
 
     /**
-     * @param @return
-     * @return String
-     * @Author: chenqiwei
-     * @Time:Jun 19, 2020
-     * @Description: 接口唯一标识，也是访问URI
+     * 返回注册顺序，用于保持各类型注册的稳定性。
      */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    String getToken();
+    int getOrder();
+
+    /**
+     * 在指定模块上下文中注册当前类型的 private API。
+     */
+    void register(NeatLogicWebApplicationContext context);
 }

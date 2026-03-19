@@ -12,7 +12,7 @@
 
 package neatlogic.framework.restful.core.publicapi;
 
-import neatlogic.framework.restful.core.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

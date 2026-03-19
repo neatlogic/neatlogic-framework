@@ -26,6 +26,7 @@ import neatlogic.framework.form.exception.FormExtendAttributeConfigIllegalExcept
 import neatlogic.framework.util.FormUtil;
 import neatlogic.module.framework.form.service.FormService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -514,5 +515,61 @@ public class SelectHandler extends FormHandlerBase {
         } else {
             throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataSource", dataSource);
         }
+    }
+
+    /**
+     * 检查两个属性是否可以相互赋值
+     *
+     * @param fromFormAttributeVo
+     * @param toFormAttributeVo
+     * @return
+     */
+    @Override
+    public boolean checkWhetherTwoAttributeCanBeAssignedToEachOther(FormAttributeVo fromFormAttributeVo, FormAttributeVo toFormAttributeVo) {
+        if (!Objects.equals(fromFormAttributeVo.getHandler(), FormHandler.FORMSELECT.getHandler())
+                || !Objects.equals(toFormAttributeVo.getHandler(), FormHandler.FORMSELECT.getHandler())) {
+            return false;
+        }
+        boolean flag = FormUtil.checkWhetherTwoSelectAttributeCanBeAssignedToEachOther(fromFormAttributeVo, toFormAttributeVo);
+        if (flag) {
+            JSONObject fromConfig = fromFormAttributeVo.getConfig();
+            JSONObject toConfig = toFormAttributeVo.getConfig();
+            if (!Objects.equals(fromConfig.getBoolean("isMultiple"), toConfig.getBoolean("isMultiple"))) {
+                return false;
+            }
+            if (Objects.equals(fromConfig.getString("dataSource"), "matrix")) {
+                JSONArray fromHiddenFieldList = fromConfig.getJSONArray("hiddenFieldList");
+                JSONArray toHiddenFieldList = toConfig.getJSONArray("hiddenFieldList");
+                if (ListUtils.isEqualList(fromHiddenFieldList, toHiddenFieldList)) {
+                    return true;
+                } else if (CollectionUtils.isEmpty(fromHiddenFieldList) && CollectionUtils.isEmpty(toHiddenFieldList)) {
+                    return true;
+                } else if (CollectionUtils.isNotEmpty(fromHiddenFieldList) && CollectionUtils.isEmpty(toHiddenFieldList)) {
+                    return false;
+                } else if (CollectionUtils.isEmpty(fromHiddenFieldList) && CollectionUtils.isNotEmpty(toHiddenFieldList)) {
+                    return false;
+                } else if (!Objects.equals(fromHiddenFieldList.size(), toHiddenFieldList.size())) {
+                    return false;
+                } else {
+                    for (int i = 0; i < fromHiddenFieldList.size(); i++) {
+                        boolean exists = false;
+                        JSONObject fromHiddenField = fromHiddenFieldList.getJSONObject(i);
+                        for (int j = 0; j < toHiddenFieldList.size(); j++) {
+                            JSONObject toHiddenField = toHiddenFieldList.getJSONObject(j);
+                            if (Objects.equals(toHiddenField.getString("uuid"), fromHiddenField.getString("uuid"))) {
+                                exists = true;
+                                break;
+                            }
+                        }
+                        if (!exists) {
+                            return false;
+                        }
+                    }
+                }
+            } else if (Objects.equals(fromConfig.getString("dataSource"), "tag")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

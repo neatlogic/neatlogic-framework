@@ -371,4 +371,20 @@ public class RadioHandler extends FormHandlerBase {
             throw new FormExtendAttributeConfigIllegalException(this.getHandler(), key, "config.dataSource", dataSource);
         }
     }
+
+    /**
+     * 检查两个属性是否可以相互赋值
+     *
+     * @param fromFormAttributeVo
+     * @param toFormAttributeVo
+     * @return
+     */
+    @Override
+    public boolean checkWhetherTwoAttributeCanBeAssignedToEachOther(FormAttributeVo fromFormAttributeVo, FormAttributeVo toFormAttributeVo) {
+        if (!Objects.equals(fromFormAttributeVo.getHandler(), FormHandler.FORMRADIO.getHandler())
+                || !Objects.equals(toFormAttributeVo.getHandler(), FormHandler.FORMRADIO.getHandler())) {
+            return false;
+        }
+        return FormUtil.checkWhetherTwoSelectAttributeCanBeAssignedToEachOther(fromFormAttributeVo, toFormAttributeVo);
+    }
 }

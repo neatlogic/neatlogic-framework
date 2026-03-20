@@ -139,7 +139,7 @@ public class AnonymousApiDispatcher {
         //如果只是接口校验入参
         String validField = request.getHeader("neatlogic-validfield");
         if (StringUtils.isNotBlank(validField)) {
-            IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
+            IApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.OBJECT, IApiComponent.class);
             FieldValidResultVo validResultVo = restComponent.doValid(interfaceVo, paramObj, validField);
             if (StringUtils.isNotBlank(validResultVo.getMsg())) {
                 response.setStatus(ResponseCode.API_FIELD_INVALID.getCode());
@@ -148,7 +148,7 @@ public class AnonymousApiDispatcher {
             returnObj.put("Status", validResultVo.getStatus());
         } else {
             if (apiType.equals(ApiType.OBJECT)) {
-                IApiComponent restComponent = PrivateApiComponentFactory.getInstance(interfaceVo.getHandler());
+                IApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.OBJECT, IApiComponent.class);
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
                             || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
@@ -176,7 +176,7 @@ public class AnonymousApiDispatcher {
                     throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
             } else if (apiType.equals(ApiType.STREAM)) {
-                IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getStreamInstance(interfaceVo.getHandler());
+                IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.STREAM, IJsonStreamApiComponent.class);
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
                             || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
@@ -204,7 +204,7 @@ public class AnonymousApiDispatcher {
                     throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
             } else if (apiType.equals(ApiType.BINARY)) {
-                IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getBinaryInstance(interfaceVo.getHandler());
+                IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.BINARY, IBinaryStreamApiComponent.class);
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
                             || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
@@ -232,7 +232,7 @@ public class AnonymousApiDispatcher {
                     throw new ComponentNotFoundException(interfaceVo.getHandler());
                 }
             } else if (apiType.equals(ApiType.RAW)) {
-                IRawApiComponent restComponent = PrivateApiComponentFactory.getRawInstance(interfaceVo.getHandler());
+                IRawApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.RAW, IRawApiComponent.class);
                 if (restComponent != null) {
                     if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
                             || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {

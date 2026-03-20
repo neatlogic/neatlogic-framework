@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dto.ApiVo;
+import neatlogic.framework.restful.enums.ApiType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,7 +93,7 @@ public class McpDispatcher {
         if (apiVo == null) {
             throw new IllegalArgumentException("api not found: " + token);
         }
-        IApiComponent comp = PrivateApiComponentFactory.getInstance(apiVo.getHandler());
+        IApiComponent comp = PrivateApiComponentFactory.getComponent(apiVo.getHandler(), ApiType.OBJECT, IApiComponent.class);
         return comp.doService(apiVo, arguments, null);
     }
 

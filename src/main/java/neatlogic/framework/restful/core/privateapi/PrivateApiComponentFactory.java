@@ -25,9 +25,6 @@ import neatlogic.framework.restful.annotation.NoPasswordExpiredCheck;
 import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.constvalue.ApiAuthType;
 import neatlogic.framework.restful.core.IApiComponent;
-import neatlogic.framework.restful.core.privateapi.binarystream.IBinaryStreamApiComponent;
-import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
-import neatlogic.framework.restful.core.privateapi.raw.IRawApiComponent;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiKind;
@@ -75,34 +72,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         for (ApiType apiType : ApiType.values()) {
             componentRegistryMap.put(apiType.getValue(), new HashMap<>());
         }
-    }
-
-    /**
-     * 根据处理器类名获取对象型接口组件实例。
-     */
-    public static IApiComponent getInstance(String componentId) {
-        return getComponent(componentId, ApiType.OBJECT, IApiComponent.class);
-    }
-
-    /**
-     * 根据处理器类名获取 JSON 流接口组件实例。
-     */
-    public static IJsonStreamApiComponent getStreamInstance(String componentId) {
-        return getComponent(componentId, ApiType.STREAM, IJsonStreamApiComponent.class);
-    }
-
-    /**
-     * 根据处理器类名获取二进制流接口组件实例。
-     */
-    public static IBinaryStreamApiComponent getBinaryInstance(String componentId) {
-        return getComponent(componentId, ApiType.BINARY, IBinaryStreamApiComponent.class);
-    }
-
-    /**
-     * 根据处理器类名获取 raw 接口组件实例。
-     */
-    public static IRawApiComponent getRawInstance(String componentId) {
-        return getComponent(componentId, ApiType.RAW, IRawApiComponent.class);
     }
 
     /**

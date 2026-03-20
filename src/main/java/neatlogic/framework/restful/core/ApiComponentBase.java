@@ -19,6 +19,7 @@ import neatlogic.framework.dto.api.CacheControlVo;
 import neatlogic.framework.exception.core.ApiFieldValidNotFoundException;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dto.ApiVo;
+import neatlogic.framework.restful.enums.ApiType;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.aop.support.AopUtils;
@@ -43,7 +44,7 @@ public abstract class ApiComponentBase extends ApiComponentTemplateBase implemen
         boolean isHasValid = false;
         FieldValidResultVo resultVo = null;
         try {
-            IApiComponent restComponent = PrivateApiComponentFactory.getInstance(apiVo.getHandler());
+            IApiComponent restComponent = PrivateApiComponentFactory.getComponent(apiVo.getHandler(), ApiType.OBJECT, IApiComponent.class);
             try {
                 Object proxy = AopContext.currentProxy();
                 //获取代理的真实bean

@@ -41,7 +41,7 @@ import java.util.Set;
 
 @Service
 public class BasicAuthHandler extends LoginAuthHandlerBase {
-    private static final Set<String> CHANNELS = Set.of("rest", "stream", "binary");
+    private static final Set<String> CHANNELS = Set.of("rest", "stream", "binary", "metrics");
 
     @Resource
     ApiMapper apiMapper;
@@ -122,6 +122,7 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
      *   null              → 非 API 请求或非法路径
      *   "" (空字符串)     → /api/{channel}（极少见）
      *   "user/create"     → /api/rest/user/create
+     *   "monitor/export"  → /api/metrics/monitor/export
      */
     private String extractToken(HttpServletRequest request) {
         if (request == null) {
@@ -177,4 +178,3 @@ public class BasicAuthHandler extends LoginAuthHandlerBase {
         return false;
     }
 }
-

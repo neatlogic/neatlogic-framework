@@ -31,6 +31,7 @@ import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.privateapi.binarystream.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
+import neatlogic.framework.restful.core.privateapi.metric.IMetricApiComponent;
 import neatlogic.framework.restful.core.privateapi.raw.IRawApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
@@ -245,6 +246,32 @@ public class ApiDispatcher {
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
 //                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
+                            if (restComponent.disableReturnCircularReferenceDetect()) {
+                                returnObj.put("_disableDetect", true);
+                            }
+                        } else {
+                            returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
+                        }
+                    } else {
+                        returnObj.putAll(restComponent.help());
+                    }
+                } else {
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                }
+            } else if (apiType.equals(ApiType.METRIC)) {
+                IMetricApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.METRIC, IMetricApiComponent.class);
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        /* 统计接口访问次数 */
+                        apiAccessCountService.putToken(token);
+                        Long starttime = System.currentTimeMillis();
+                        Object returnV = restComponent.doService(interfaceVo, paramObj, request, response);
+                        Long endtime = System.currentTimeMillis();
+                        if (!restComponent.isRaw()) {
+                            returnObj.put("TimeCost", endtime - starttime);
+                            returnObj.put("Return", returnV);
+                            returnObj.put("Status", "OK");
                             returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                             if (restComponent.disableReturnCircularReferenceDetect()) {
                                 returnObj.put("_disableDetect", true);
@@ -699,6 +726,74 @@ public class ApiDispatcher {
         }
     }
 
+    @GetMapping(value = "/metrics/**")
+    public void dispatcherForGetMetric(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject paramObj = new JSONObject();
+
+        Enumeration<String> paraNames = request.getParameterNames();
+        while (paraNames.hasMoreElements()) {
+            String p = paraNames.nextElement();
+            String[] vs = request.getParameterValues(p);
+            if (vs.length > 1) {
+                paramObj.put(p, vs);
+            } else {
+                paramObj.put(p, request.getParameter(p));
+            }
+        }
+        JSONObject returnObj = new JSONObject();
+        try {
+            doIt(request, response, token, ApiType.METRIC, paramObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        }
+        if (!response.isCommitted()) {
+            if (UserContext.get() != null) {
+                HttpRequestUtil.resetResponse(response);
+            }
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            if (returnObj.containsKey("_disableDetect")) {
+                returnObj.remove("_disableDetect");
+                response.getWriter().print(returnObj.toString(SerializerFeature.DisableCircularReferenceDetect));
+            } else {
+                response.getWriter().print(returnObj.toJSONString());
+            }
+        }
+    }
+
     @PostMapping(value = "/binary/**", consumes = "application/json")
     public void dispatcherForPostBinaryJson(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -952,6 +1047,40 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        }
+        response.setContentType(Config.RESPONSE_TYPE_JSON);
+        response.getWriter().print(returnObj.toJSONString());
+    }
+
+    @GetMapping(value = "/help/metrics/**")
+    public void metrichelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        try {
+            doIt(request, response, token, ApiType.METRIC, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(ResponseCode.API_RUNTIME.getCode());
             if (logger.isWarnEnabled()) {

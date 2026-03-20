@@ -19,6 +19,7 @@ public enum ApiType {
     OBJECT("object", "对象模式", "rest/"),
     STREAM("stream", "json流模式", "stream/"),
     BINARY("binary", "字节流模式", "binary/"),
+    METRIC("metric", "指标模式", "metrics/"),
     FETCH("fetch", "客户端拉取模式", "fetch/");
 
     private final String name;

@@ -17,26 +17,32 @@ import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchIndexNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RootComponent
 public class ElasticsearchDocumentFactory extends ModuleInitializedListenerBase {
     private static final Map<String, IElasticsearchDocument> componentMap = new HashMap<>();
     private static final List<IElasticsearchDocument> components = new ArrayList<>();
+    private static final Map<String, Object> lockMap = new ConcurrentHashMap<>();
 
     public static IElasticsearchDocument getIndex(String name) {
         IElasticsearchDocument index = componentMap.get(name);
         if (index == null) {
             throw new ElasticSearchIndexNotFoundException(name);
         }
+        Object lock = lockMap.computeIfAbsent(name, key -> new Object());
+        synchronized (lock) {
+            String indexName = index.getIndexName(name);
+            if (!index.isIndexExists(indexName)) {
+                index.createIndex(indexName);
+            }
+        }
         return index;
     }
 
     public static List<IElasticsearchDocument> getAllIndex() {
-        return components;
+        return Collections.unmodifiableList(components);
     }
 
 

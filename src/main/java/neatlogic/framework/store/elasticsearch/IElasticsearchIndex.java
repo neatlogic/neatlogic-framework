@@ -17,7 +17,7 @@ public interface IElasticsearchIndex {
     /*
     ES中的索引名称
      */
-    String getIndexName();
+    String getIndexName(String indexName);
 
 
     /*
@@ -33,11 +33,21 @@ public interface IElasticsearchIndex {
     /*
     创建索引
      */
-    void createIndex();
+    void createIndex(String indexName);
+
+    /*
+    判断索引是否存在
+     */
+    boolean isIndexExists(String indexName);
 
     /*
     删除索引
      */
     void deleteIndex();
+
+    /*
+    删除指定索引
+     */
+    void deleteIndex(String indexName);
 
 }

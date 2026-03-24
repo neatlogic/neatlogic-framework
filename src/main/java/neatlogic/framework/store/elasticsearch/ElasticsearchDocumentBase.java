@@ -19,6 +19,7 @@ import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
 import co.elastic.clients.elasticsearch.indices.GetIndexResponse;
+import co.elastic.clients.elasticsearch.indices.RefreshRequest;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -27,6 +28,7 @@ import neatlogic.framework.dao.mapper.ElasticsearchMapper;
 import neatlogic.framework.dto.ElasticsearchVo;
 import neatlogic.framework.dto.elasticsearch.IndexResultVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.exception.elasticsearch.ElasticSearchClientNotFoundException;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchCreateDocumentException;
 import neatlogic.framework.exception.elasticsearch.ElasticSearchDeleteIndexException;
 import neatlogic.framework.fulltextindex.dao.mapper.FullTextIndexRebuildAuditMapper;
@@ -66,8 +68,29 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
     @Resource
     private FullTextIndexRebuildAuditMapper fullTextIndexRebuildAuditMapper;
 
-    public final String getIndexName() {
+    protected final String getCurrentIndexName() {
         return (TenantContext.get().getTenantUuid() + "_" + this.getName()).toLowerCase();
+    }
+
+    @Override
+    public final String getIndexName(String indexName) {
+        return getCurrentIndexName();
+    }
+
+    @Override
+    public final void refresh() {
+        try {
+            ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+            if (client == null) {
+                throw new ElasticSearchClientNotFoundException();
+            }
+            RefreshRequest request = new RefreshRequest.Builder()
+                    .index(getCurrentIndexName())
+                    .build();
+            client.indices().refresh(request);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -78,8 +101,11 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
         synchronized (lock) {
             try {
                 ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+                if (client == null) {
+                    throw new ElasticSearchClientNotFoundException();
+                }
                 UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
-                        .index(getIndexName())                   // 索引名称
+                        .index(getCurrentIndexName())
                         .id(targetId.toString())          // 文档 ID
                         .docAsUpsert(isUpsert)
                         .doc(document)
@@ -107,7 +133,7 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
         try {
             ElasticsearchClient client = ElasticsearchClientFactory.getClient();
             CountRequest countRequest = new CountRequest.Builder()
-                    .index(getIndexName()) // 指定索引名称
+                    .index(getCurrentIndexName())
                     .query(q -> q.matchAll(m -> m)) // 使用 MatchAll 查询来匹配所有文档
                     .build();
             CountResponse countResponse = client.count(countRequest);
@@ -120,8 +146,9 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
     }
 
     // 创建索引
-    public final void createIndex() {
-        if (!this.isIndexExists()) {
+    @Override
+    public final void createIndex(String indexName) {
+        if (!this.isIndexExists(indexName)) {
             ElasticsearchVo elasticsearchVo = SpringContextUtil.getBean(ElasticsearchMapper.class).getTenantElasticsearchByTenantUuid(TenantContext.get().getTenantUuid());
             if (elasticsearchVo != null) {
                 this.myCreateIndex(elasticsearchVo);
@@ -131,10 +158,10 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
 
     public final void deleteIndex() {
         // 删除索引
-        if (this.isIndexExists()) {
+        if (this.isIndexExists(this.getCurrentIndexName())) {
             try {
                 DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest.Builder()
-                        .index(this.getIndexName()) // 索引名称
+                        .index(this.getCurrentIndexName())
                         .build();
                 ElasticsearchClient client = ElasticsearchClientFactory.getClient();
                 client.indices().delete(deleteIndexRequest);
@@ -144,17 +171,27 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
         }
     }
 
+    @Override
+    public final void deleteIndex(String indexName) {
+        this.deleteIndex();
+    }
+
 
     protected abstract void myCreateIndex(ElasticsearchVo elasticsearchVo);
 
     // 判断索引是否存在
-    protected boolean isIndexExists() {
+    @Override
+    public final boolean isIndexExists(String indexName) {
         try {
             ElasticsearchClient client = ElasticsearchClientFactory.getClient();
-            GetIndexResponse response = client.indices().get(g -> g.index(this.getIndexName()));
-            return response.result().containsKey(this.getIndexName());
+            if (client == null) {
+                throw new ElasticSearchClientNotFoundException();
+            }
+            GetIndexResponse response = client.indices().get(g -> g.index(indexName));
+            return response.result().containsKey(indexName);
         } catch (Exception e) {
             // 索引不存在会抛异常
+            logger.error(e.getMessage(), e);
             return false;
         }
     }
@@ -169,9 +206,9 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
         fullTextIndexRebuildAuditMapper.insertFullTextIndexRebuildAudit(auditVo);
         if (isAll) {
             this.deleteIndex();
-            this.createIndex();
+            this.createIndex(this.getCurrentIndexName());
         }
-        CachedThreadPool.execute(new NeatLogicThread("ELASTICSEARCH-INDEX-REBUILD-" + this.getIndexName()) {
+        CachedThreadPool.execute(new NeatLogicThread("ELASTICSEARCH-INDEX-REBUILD-" + this.getName()) {
             @Override
             protected void execute() {
                 try {
@@ -219,9 +256,12 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
     protected final void createDocument(Long id, Map<String, Object> document) {
         try {
             ElasticsearchClient client = ElasticsearchClientFactory.getClient();
+            if (client == null) {
+                throw new ElasticSearchClientNotFoundException();
+            }
             // 创建或更新文档
             IndexRequest<Map<String, Object>> request = new IndexRequest.Builder<Map<String, Object>>()
-                    .index(getIndexName()) // 索引名称
+                    .index(getCurrentIndexName())
                     .id(id.toString())      // 文档 ID
                     .document(document) // 文档内容
                     //.refresh(Refresh.WaitFor)
@@ -249,7 +289,7 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
             Query queryBuilder = this.myBuildQuery(targetVo);
             ElasticsearchClient client = ElasticsearchClientFactory.getClient();
             CountResponse resp = client.count(c -> c
-                    .index(this.getIndexName())
+                    .index(this.getCurrentIndexName())
                     .query(queryBuilder)
             );
             return resp.count();
@@ -356,7 +396,7 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
             ElasticsearchClient client = ElasticsearchClientFactory.getClient();
 
             SearchRequest.Builder builder = new SearchRequest.Builder()
-                    .index(this.getIndexName())
+                    .index(this.getCurrentIndexName())
                     .source(s -> s.fetch(false));//不返回 _source
             //.trackTotalHits(th -> th.enabled(true)); // 加上可以突破10000的限制
 

@@ -39,90 +39,119 @@ import org.apache.http.ssl.SSLContexts;
 import org.elasticsearch.client.RestClient;
 
 import javax.net.ssl.SSLContext;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RootComponent
 public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
+    private static final long CONFIG_CHECK_INTERVAL = 60 * 1000L;
+
+    private static final Map<String, ClientHolder> elasticSearchClientMap = new ConcurrentHashMap<>();
 
 
-    private static final Map<String, ElasticsearchClient> elasticSearchClientMap = new HashMap<>();
+    public static synchronized ElasticsearchClient getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        String tenantUuid = TenantContext.get().getTenantUuid();
+        ClientHolder clientHolder = elasticSearchClientMap.get(tenantUuid);
+        long now = System.currentTimeMillis();
+        if (clientHolder != null && now - clientHolder.getLastCheckTime() < CONFIG_CHECK_INTERVAL) {
+            return clientHolder.getClient();
+        }
+        ElasticsearchVo elasticsearch = SpringContextUtil.getBean(ElasticsearchMapper.class).getTenantElasticsearchByTenantUuid(tenantUuid);
+        if (elasticsearch == null) {
+            removeClient(tenantUuid);
+            return null;
+        }
+        String configHash = buildConfigHash(elasticsearch);
+        if (clientHolder == null || !Objects.equals(clientHolder.getConfigHash(), configHash)) {
+            ClientHolder newClientHolder = buildClientHolder(elasticsearch, configHash, now);
+            elasticSearchClientMap.put(tenantUuid, newClientHolder);
+            closeClientHolder(clientHolder);
+            clientHolder = newClientHolder;
+        } else {
+            clientHolder.setLastCheckTime(now);
+        }
+        return clientHolder.getClient();
+    }
 
+    public static synchronized void removeClient(String tenantUuid) {
+        closeClientHolder(elasticSearchClientMap.remove(tenantUuid));
+    }
 
-    public static ElasticsearchClient getClient() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-        if (!elasticSearchClientMap.containsKey(TenantContext.get().getTenantUuid())) {
-            ElasticsearchVo elasticsearch = SpringContextUtil.getBean(ElasticsearchMapper.class).getTenantElasticsearchByTenantUuid(TenantContext.get().getTenantUuid());
-            if (elasticsearch != null) {
-                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                if (StringUtils.isNotBlank(elasticsearch.getUsername()) && StringUtils.isNotBlank(elasticsearch.getPasswordPlain())) {
-                    credentialsProvider.setCredentials(AuthScope.ANY,
-                            new UsernamePasswordCredentials(elasticsearch.getUsername(), elasticsearch.getPasswordPlain()));
-                }
-                List<HttpHost> httpHosts = new ArrayList<>();
-                if (StringUtils.isNotBlank(elasticsearch.getHost())) {
-                    String[] hostArray = elasticsearch.getHost().split(",");
-                    for (String host : hostArray) {
-                        if (StringUtils.isNotBlank(host)) {
-                            httpHosts.add(HttpHost.create(host));
-                        }
-                    }
-                }
-                if (CollectionUtils.isNotEmpty(httpHosts)) {
-                    SSLContext sslContext = SSLContexts.custom()
-                            .loadTrustMaterial(null, TrustAllStrategy.INSTANCE)
-                            .build();
-
-                    RestClient restClient = RestClient
-                            .builder(httpHosts.toArray(new HttpHost[0]))
-                            .setHttpClientConfigCallback(httpClientBuilder -> {
-                                httpClientBuilder.setSSLContext(sslContext);
-                                httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
-                                httpClientBuilder.disableAuthCaching();
-                                httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
-                                        .setIoThreadCount(Runtime.getRuntime().availableProcessors())
-                                        .setSoKeepAlive(true)
-                                        .build());
-                                /*es7*
-                                httpClientBuilder.setDefaultHeaders(Collections.singletonList(
-                                        new BasicHeader(
-                                                HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON)));
-
-                                 */
-                                httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
-                                        (response, context) ->
-                                                response.addHeader("X-Elastic-Product", "Elasticsearch"));
-
-                                if (elasticsearch.getConfig().containsKey("maxConnPerRoute")) {
-                                    int maxConnPerRoute = elasticsearch.getConfig().getIntValue("maxConnPerRoute");
-                                    if (maxConnPerRoute > 0) {
-                                        httpClientBuilder.setMaxConnTotal(httpHosts.size() * maxConnPerRoute);
-                                        httpClientBuilder.setMaxConnPerRoute(maxConnPerRoute);
-                                    }
-                                }
-                                return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-                            }).build();
-
-                    ElasticsearchTransport transport = new RestClientTransport(
-                            restClient, new JacksonJsonpMapper());
-
-                    ElasticsearchClient esClient = new ElasticsearchClient(transport);
-                    elasticSearchClientMap.put(elasticsearch.getTenantUuid(), esClient);
-
-                    List<IElasticsearchIndex> indexList = ElasticsearchIndexFactory.getAllIndex();
-                    for (IElasticsearchIndex index : indexList) {
-                        index.createIndex();
-                    }
-                } else {
-                    throw new ElasticSearchHostNotFoundException();
+    private static ClientHolder buildClientHolder(ElasticsearchVo elasticsearch, String configHash, long lastCheckTime) throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        if (StringUtils.isNotBlank(elasticsearch.getUsername()) && StringUtils.isNotBlank(elasticsearch.getPasswordPlain())) {
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials(elasticsearch.getUsername(), elasticsearch.getPasswordPlain()));
+        }
+        List<HttpHost> httpHosts = new ArrayList<>();
+        if (StringUtils.isNotBlank(elasticsearch.getHost())) {
+            String[] hostArray = elasticsearch.getHost().split(",");
+            for (String host : hostArray) {
+                if (StringUtils.isNotBlank(host)) {
+                    httpHosts.add(HttpHost.create(host));
                 }
             }
         }
-        return elasticSearchClientMap.get(TenantContext.get().getTenantUuid());
+        if (CollectionUtils.isEmpty(httpHosts)) {
+            throw new ElasticSearchHostNotFoundException();
+        }
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, TrustAllStrategy.INSTANCE)
+                .build();
+
+        RestClient restClient = RestClient
+                .builder(httpHosts.toArray(new HttpHost[0]))
+                .setHttpClientConfigCallback(httpClientBuilder -> {
+                    httpClientBuilder.setSSLContext(sslContext);
+                    httpClientBuilder.setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE);
+                    httpClientBuilder.disableAuthCaching();
+                    httpClientBuilder.setDefaultIOReactorConfig(IOReactorConfig.custom()
+                            .setIoThreadCount(Runtime.getRuntime().availableProcessors())
+                            .setSoKeepAlive(true)
+                            .build());
+                    httpClientBuilder.addInterceptorLast((HttpResponseInterceptor)
+                            (response, context) ->
+                                    response.addHeader("X-Elastic-Product", "Elasticsearch"));
+
+                    if (elasticsearch.getConfig().containsKey("maxConnPerRoute")) {
+                        int maxConnPerRoute = elasticsearch.getConfig().getIntValue("maxConnPerRoute");
+                        if (maxConnPerRoute > 0) {
+                            httpClientBuilder.setMaxConnTotal(httpHosts.size() * maxConnPerRoute);
+                            httpClientBuilder.setMaxConnPerRoute(maxConnPerRoute);
+                        }
+                    }
+                    return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+                }).build();
+
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient esClient = new ElasticsearchClient(transport);
+        return new ClientHolder(esClient, restClient, configHash, lastCheckTime);
+    }
+
+    private static String buildConfigHash(ElasticsearchVo elasticsearch) {
+        return String.join("|",
+                StringUtils.defaultString(elasticsearch.getTenantUuid()),
+                StringUtils.defaultString(elasticsearch.getHost()),
+                StringUtils.defaultString(elasticsearch.getUsername()),
+                StringUtils.defaultString(elasticsearch.getPasswordCipher()),
+                StringUtils.defaultString(elasticsearch.getConfigStr()));
+    }
+
+    private static void closeClientHolder(ClientHolder clientHolder) {
+        if (clientHolder == null || clientHolder.getRestClient() == null) {
+            return;
+        }
+        try {
+            clientHolder.getRestClient().close();
+        } catch (IOException ignored) {
+        }
     }
 
     @Override
@@ -133,5 +162,39 @@ public class ElasticsearchClientFactory extends ModuleInitializedListenerBase {
 
     @Override
     protected void myInit() {
+    }
+
+    private static class ClientHolder {
+        private final ElasticsearchClient client;
+        private final RestClient restClient;
+        private final String configHash;
+        private volatile long lastCheckTime;
+
+        public ClientHolder(ElasticsearchClient client, RestClient restClient, String configHash, long lastCheckTime) {
+            this.client = client;
+            this.restClient = restClient;
+            this.configHash = configHash;
+            this.lastCheckTime = lastCheckTime;
+        }
+
+        public ElasticsearchClient getClient() {
+            return client;
+        }
+
+        public RestClient getRestClient() {
+            return restClient;
+        }
+
+        public String getConfigHash() {
+            return configHash;
+        }
+
+        public long getLastCheckTime() {
+            return lastCheckTime;
+        }
+
+        public void setLastCheckTime(long lastCheckTime) {
+            this.lastCheckTime = lastCheckTime;
+        }
     }
 }

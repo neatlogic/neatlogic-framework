@@ -48,6 +48,16 @@ public interface IElasticsearchDocument<T> extends IElasticsearchIndex {
     void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert);
 
     /*
+    更新文档并指定是否立即刷新索引
+     */
+    void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert, boolean refresh);
+
+    /*
+    手动刷新当前索引
+     */
+    void refresh();
+
+    /*
     组装文档数据
      */
     Map<String, Object> makeupDocument(T targetVo);

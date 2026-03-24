@@ -20,6 +20,7 @@ import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.dao.mapper.UserExportFileMapper;
 import neatlogic.framework.userexportfile.dto.UserExportFileVo;
 import neatlogic.framework.userexportfile.exception.UserExportingException;
+import neatlogic.framework.util.HanyuPinyinUtil;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.DeferredFileOutputStream;
@@ -101,7 +102,7 @@ public class ExportFileManager {
                 File tempFile = null;
                 try (DeferredFileOutputStream dfos = DeferredFileOutputStream.builder()
                         .setBufferSize(bufferSize)
-                        .setOutputFile(File.createTempFile(userExportFileType.getValue(),  "-" + exportFileId + "-" + getName()))
+                        .setOutputFile(File.createTempFile(userExportFileType.getValue(),  "-" + exportFileId + "-" + HanyuPinyinUtil.format(getName())))
                         .setThreshold(threshold)
                         .get()) {
                     tempFile = dfos.getFile();

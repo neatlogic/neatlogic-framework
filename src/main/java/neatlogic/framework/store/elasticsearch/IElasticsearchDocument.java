@@ -19,8 +19,6 @@ import java.util.Map;
 public interface IElasticsearchDocument<T> extends IElasticsearchIndex {
 
 
-
-
     /*
     创建文档
      */
@@ -46,11 +44,6 @@ public interface IElasticsearchDocument<T> extends IElasticsearchIndex {
     更新文档
      */
     void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert);
-
-    /*
-    更新文档并指定是否立即刷新索引
-     */
-    void updateDocument(Long targetId, Map<String, Object> document, boolean isUpsert, boolean refresh);
 
     /*
     手动刷新当前索引

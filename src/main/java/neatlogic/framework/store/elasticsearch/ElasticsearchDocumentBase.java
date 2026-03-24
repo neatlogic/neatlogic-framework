@@ -13,7 +13,6 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-import co.elastic.clients.elasticsearch._types.Refresh;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
@@ -109,7 +108,6 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
                         .id(targetId.toString())          // 文档 ID
                         .docAsUpsert(isUpsert)
                         .doc(document)
-                        .refresh(Refresh.WaitFor)  //刷新文档
                         .build();
                 client.update(updateRequest, Object.class);
             } catch (Exception e) {

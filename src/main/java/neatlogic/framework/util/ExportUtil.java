@@ -18,6 +18,7 @@ import org.docx4j.wml.*;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Entities;
+import org.jsoup.nodes.Element;
 import org.w3c.tidy.Tidy;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
@@ -41,6 +42,24 @@ public class ExportUtil {
     public static void getPdfFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
         savePdf(getWordprocessingMLPackage(html, landscape, isNeedCompletedHtml), os);
+    }
+
+    /**
+     * 通过轻量直出链路将 HTML 导出为 PDF，供新报表导出接口使用。
+     *
+     * @param html 原始 HTML 内容
+     * @param os 目标输出流
+     * @param landscape 是否使用横向页面
+     * @param isNeedCompletedHtml 渲染前是否需要通过 Tidy 补全 HTML
+     * @return PDF 导出各阶段的耗时指标
+     * @throws Exception 当 HTML 规范化或 PDF 渲染失败时抛出异常
+     */
+    public static void getPdfFileByHtmlFast(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
+        // 新报表导出走轻量直出路径，先把 HTML 规范成适合 PDF 渲染的 XHTML。
+        String normalizedHtml = normalizeHtmlForPdf(html, landscape, isNeedCompletedHtml);
+        ITextRenderer renderer = createPdfRenderer(normalizedHtml);
+        renderer.layout();
+        renderer.createPDF(os);
     }
 
     /**
@@ -99,6 +118,46 @@ public class ExportUtil {
         sr.close();
         sw.close();
         return sw.toString();
+    }
+
+    /**
+     * 在直接渲染 PDF 之前规范化导出 HTML。
+     *
+     * @param html 原始 HTML 内容
+     * @param landscape 是否使用横向页面
+     * @param isNeedCompletedHtml 渲染前是否需要通过 Tidy 补全 HTML
+     * @return 已补充分页样式的规范化 XHTML 内容
+     * @throws IOException 当 HTML 补全过程失败时抛出异常
+     */
+    private static String normalizeHtmlForPdf(String html, boolean landscape, boolean isNeedCompletedHtml) throws IOException {
+        html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
+        if (isNeedCompletedHtml) {
+            String completedHtml = completeHtml(html);
+            if (StringUtils.isNotBlank(completedHtml)) {
+                html = completedHtml;
+            }
+        }
+        html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");
+        Document doc = Jsoup.parse(html);
+        doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml).prettyPrint(false);
+        appendPdfPageStyle(doc, landscape);
+        return doc.html();
+    }
+
+    /**
+     * 向规范化后的导出文档追加页面尺寸样式。
+     *
+     * @param doc 已解析的 HTML 文档
+     * @param landscape 是否使用横向页面
+     */
+    private static void appendPdfPageStyle(Document doc, boolean landscape) {
+        Element head = doc.head();
+        if (head == null) {
+            head = doc.prependElement("head");
+        }
+        Element style = head.appendElement("style");
+        style.attr("type", "text/css");
+        style.appendText(landscape ? "@page { size: A4 landscape; }" : "@page { size: A4; }");
     }
 
     public static WordprocessingMLPackage xhtml2word(Document doc, boolean landscape) throws Exception {
@@ -365,14 +424,50 @@ public class ExportUtil {
      * @throws DocumentException
      */
     public static void savePdf(String content, OutputStream os, boolean landscape) throws IOException, DocumentException {
+        ITextRenderer renderer = createPdfRenderer(applyPdfPageStyle(content, landscape));
+        renderer.layout();
+        renderer.createPDF(os);
+    }
+
+    /**
+     * 使用缓存字体列表创建 {@link ITextRenderer}。
+     *
+     * @param content 已可直接用于 PDF 渲染的 XHTML 内容
+     * @return 已完成字体配置的 PDF 渲染器
+     * @throws IOException 当字体解析器加载字体资源失败时抛出异常
+     * @throws DocumentException 当渲染器初始化失败时抛出异常
+     */
+    private static ITextRenderer createPdfRenderer(String content) throws IOException, DocumentException {
         ITextRenderer renderer = new ITextRenderer();
         ChineseFont[] fonts = ChineseFont.values();
         for (ChineseFont font : fonts) {
             renderer.getFontResolver().addFont(font.getPath(), BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
         }
         renderer.setDocumentFromString(content);
-        renderer.layout();
-        renderer.createPDF(os);
+        return renderer;
+    }
+
+    /**
+     * 向即将直接渲染为 PDF 的 HTML 中注入页面尺寸样式。
+     *
+     * @param content 原始 HTML 内容
+     * @param landscape 是否使用横向页面
+     * @return 已注入页面尺寸样式的 HTML 内容
+     */
+    private static String applyPdfPageStyle(String content, boolean landscape) {
+        if (StringUtils.isBlank(content)) {
+            return content;
+        }
+        String pageStyle = landscape ? "@page { size: A4 landscape; }" : "@page { size: A4; }";
+        String fontStyle = "html,body,div,span,p,table,thead,tbody,tr,th,td,a{font-family:\"SimSun\",\"SimHei\",\"SimKai\",\"SimFang\",\"StFangSo\" !important;}";
+        String styleTag = "<style type=\"text/css\">" + pageStyle + fontStyle + "</style>";
+        if (content.contains("</head>")) {
+            return content.replace("</head>", styleTag + "</head>");
+        }
+        if (content.contains("<body")) {
+            return content.replaceFirst("<body", "<head>" + styleTag + "</head><body");
+        }
+        return "<head>" + styleTag + "</head>" + content;
     }
 
 }

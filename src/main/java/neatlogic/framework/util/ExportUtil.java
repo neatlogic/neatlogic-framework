@@ -13,6 +13,7 @@ import org.docx4j.jaxb.Context;
 import org.docx4j.model.structure.PageSizePaper;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.AltChunkType;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.*;
 import org.jsoup.Jsoup;
@@ -73,6 +74,27 @@ public class ExportUtil {
      */
     public static void getWordFileByHtml(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
         saveDocx(getWordprocessingMLPackage(html, landscape, isNeedCompletedHtml), os);
+    }
+
+    /**
+     * 通过轻量 altChunk 方式将 HTML 导出为 Word。
+     * 该方法不再走 XHTMLImporterImpl 的逐节点转换链路，适合大报表场景下的快速导出。
+     *
+     * @param html 原始 HTML 内容
+     * @param os 目标输出流
+     * @param landscape 是否使用横向页面
+     * @param isNeedCompletedHtml 导出前是否需要补全 HTML 标签
+     * @throws Exception 当 HTML 规范化或 DOCX 写出失败时抛出异常
+     */
+    public static void getWordFileByHtmlFast(String html, OutputStream os, boolean landscape, boolean isNeedCompletedHtml) throws Exception {
+        String normalizedHtml = normalizeHtmlForWord(html, isNeedCompletedHtml);
+        WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.createPackage(PageSizePaper.A4, landscape);
+        // 配置中文字体，保证 Word 打开后尽量与原导出样式保持一致。
+        configSimSunFont(wordMLPackage);
+        MainDocumentPart mainDocumentPart = wordMLPackage.getMainDocumentPart();
+        // 将规范化后的 HTML 直接作为 altChunk 写入 docx，避免逐个 XHTML 节点转换带来的性能损耗。
+        mainDocumentPart.addAltChunk(AltChunkType.Html, normalizedHtml.getBytes("UTF-8"));
+        saveDocx(wordMLPackage, os);
     }
 
     /**
@@ -145,6 +167,30 @@ public class ExportUtil {
     }
 
     /**
+     * 规范化 Word 导出的 HTML 内容。
+     * 这里保留原始结构，只做标签补全、非法字符清理和基础样式注入，尽量保证结果与旧实现一致。
+     *
+     * @param html 原始 HTML 内容
+     * @param isNeedCompletedHtml 导出前是否需要补全 HTML 标签
+     * @return 可直接写入 altChunk 的 HTML 内容
+     * @throws IOException 当 HTML 补全过程失败时抛出异常
+     */
+    private static String normalizeHtmlForWord(String html, boolean isNeedCompletedHtml) throws IOException {
+        html = html.replaceAll("(?!\\\"|\\&amp;)&nbsp;(?!\\\")", " ");
+        if (isNeedCompletedHtml) {
+            String completedHtml = completeHtml(html);
+            if (StringUtils.isNotBlank(completedHtml)) {
+                html = completedHtml;
+            }
+        }
+        html = html.replaceAll("[\\x00-\\x08\\x0b-\\x0c\\x0e-\\x1f]", "");
+        Document doc = Jsoup.parse(html);
+        doc.outputSettings().syntax(Document.OutputSettings.Syntax.xml).escapeMode(Entities.EscapeMode.xhtml).prettyPrint(false);
+        appendWordDefaultStyle(doc);
+        return doc.html();
+    }
+
+    /**
      * 向规范化后的导出文档追加页面尺寸样式。
      *
      * @param doc 已解析的 HTML 文档
@@ -158,6 +204,21 @@ public class ExportUtil {
         Element style = head.appendElement("style");
         style.attr("type", "text/css");
         style.appendText(landscape ? "@page { size: A4 landscape; }" : "@page { size: A4; }");
+    }
+
+    /**
+     * 为 Word 导出的 HTML 注入基础字体样式，减少 Word 打开后因默认字体差异导致的版式偏差。
+     *
+     * @param doc 已解析的 HTML 文档
+     */
+    private static void appendWordDefaultStyle(Document doc) {
+        Element head = doc.head();
+        if (head == null) {
+            head = doc.prependElement("head");
+        }
+        Element style = head.appendElement("style");
+        style.attr("type", "text/css");
+        style.appendText("html,body,div,span,p,table,thead,tbody,tr,th,td,a{font-family:\"SimSun\",\"SimHei\",\"SimKai\",\"SimFang\",\"StFangSo\" !important;}");
     }
 
     public static WordprocessingMLPackage xhtml2word(Document doc, boolean landscape) throws Exception {

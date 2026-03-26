@@ -65,6 +65,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -117,7 +118,7 @@ public class ApiDispatcher {
         }
         RequestContext.get().setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
-        ApiVo dbApiVo = apiMapper.getApiByToken(token);
+        ApiVo dbApiVo = getDbApiVo(token, interfaceVo);
         if (interfaceVo == null) {
             if (dbApiVo != null) {
                 interfaceVo = dbApiVo;
@@ -318,6 +319,20 @@ public class ApiDispatcher {
                 }
             }
         }
+    }
+
+    /**
+     * 动态路径接口请求进来时 token 可能已经替换成实际值，例如 report/show/123。
+     * 数据库存的是规范 token（例如 report/show/{id}），这里需要回退到规范 token 再取配置，
+     * 否则 needAudit / qps 等开关不会生效。
+     */
+    private ApiVo getDbApiVo(String requestToken, ApiVo interfaceVo) {
+        ApiVo dbApiVo = apiMapper.getApiByToken(requestToken);
+        if (dbApiVo == null && interfaceVo != null && StringUtils.isNotBlank(interfaceVo.getToken())
+                && !Objects.equals(interfaceVo.getToken(), requestToken)) {
+            dbApiVo = apiMapper.getApiByToken(interfaceVo.getToken());
+        }
+        return dbApiVo;
     }
 
     @GetMapping(value = "/rest/**")

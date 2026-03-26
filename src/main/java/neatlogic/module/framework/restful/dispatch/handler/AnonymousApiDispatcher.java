@@ -94,7 +94,7 @@ public class AnonymousApiDispatcher {
         InputFromContext.init(inputFrom);
         ApiVo interfaceVo = PrivateApiComponentFactory.getApiByToken(token);
         RequestContext.init(request, token, response).setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
-        ApiVo dbApiVo = apiMapper.getApiByToken(token);
+        ApiVo dbApiVo = getDbApiVo(token, interfaceVo);
         if (interfaceVo == null) {
             if (dbApiVo != null) {
                 interfaceVo = dbApiVo;
@@ -268,6 +268,18 @@ public class AnonymousApiDispatcher {
                 }
             }
         }
+    }
+
+    /**
+     * 兼容带路径变量的匿名接口：请求 token 是实际路径，数据库保存的是模板 token。
+     */
+    private ApiVo getDbApiVo(String requestToken, ApiVo interfaceVo) {
+        ApiVo dbApiVo = apiMapper.getApiByToken(requestToken);
+        if (dbApiVo == null && interfaceVo != null && StringUtils.isNotBlank(interfaceVo.getToken())
+                && !Objects.equals(interfaceVo.getToken(), requestToken)) {
+            dbApiVo = apiMapper.getApiByToken(interfaceVo.getToken());
+        }
+        return dbApiVo;
     }
 
     @RequestMapping(value = "/t/{tenant}/rest/**", method = RequestMethod.GET)

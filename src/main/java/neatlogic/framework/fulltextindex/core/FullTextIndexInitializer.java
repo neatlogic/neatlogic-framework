@@ -47,6 +47,7 @@ public class FullTextIndexInitializer extends ModuleInitializedListenerBase {
         FULLTEXT_INDEX_MODULE_MAP.add("cmdb");
         FULLTEXT_INDEX_MODULE_MAP.add("autoexec");
         FULLTEXT_INDEX_MODULE_MAP.add("rdm");
+        FULLTEXT_INDEX_MODULE_MAP.add("ai");
         FULLTEXT_INDEX_MODULE_MAP.add("framework");
     }
 

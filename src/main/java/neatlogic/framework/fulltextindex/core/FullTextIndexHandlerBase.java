@@ -85,6 +85,22 @@ public abstract class FullTextIndexHandlerBase implements IFullTextIndexHandler 
         job.execute(new FullTextIndexVo(targetId, this.getType().getType()), fullTextIndexVo -> fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), moduleId));
     }
 
+    @Override
+    public void deleteIndex(List<Long> targetIdList) {
+        if (CollectionUtils.isEmpty(targetIdList)) {
+            return;
+        }
+        AfterTransactionJob<List<Long>> job = new AfterTransactionJob<>("FULLTEXTINDEX-BATCH-DELETE-" + this.getType().getType().toUpperCase(Locale.ROOT));
+        String moduleId = this.getModuleId();
+        job.execute(targetIdList, ids -> {
+            for (Long targetId : ids) {
+                if (targetId != null) {
+                    fullTextIndexMapper.deleteFullTextIndexByTargetIdAndType(new FullTextIndexVo(targetId, this.getType().getType()), moduleId);
+                }
+            }
+        });
+    }
+
     protected final void createIndex(Long targetId, boolean isSync) {
         createIndex(targetId, isSync, null);
     }

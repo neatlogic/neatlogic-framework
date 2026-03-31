@@ -16,6 +16,7 @@ package neatlogic.framework.fulltextindex.core;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.fulltextindex.dto.globalsearch.DocumentVo;
 
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 public interface IFullTextIndexHandler {
@@ -57,8 +58,10 @@ public interface IFullTextIndexHandler {
      * @Date: 2021/2/25 5:03 下午
      * @Params: [targetId]
      * @Returns: void
-     **/
+    **/
     void deleteIndex(Long targetId);
+
+    void deleteIndex(List<Long> targetIdList);
 
     /*
      * @Description: 重建索引

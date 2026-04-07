@@ -32,7 +32,13 @@ public class JSONArrayApiParam extends ApiParamValidatorBase {
     @Override
     public boolean validate(Object param, String rule) {
         try {
-            JSONArray valueList = JSONArray.parseArray(JSONObject.toJSONString(param));
+            String str = null;
+            if (param instanceof String) {
+                str = param.toString();
+            } else {
+                str = JSONObject.toJSONString(param);
+            }
+            JSONArray valueList = JSONArray.parseArray(str);
             if (StringUtils.isNotBlank(rule)) {
                 if (rule.contains(",")) {
                     List<String> ruleList = Arrays.asList(rule.split(","));

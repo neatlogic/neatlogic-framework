@@ -20,6 +20,7 @@
                target_type as targetType,
                create_time as createTime
         from embedding_audit
+        where target_type = #{targetType}
         order by target_id desc
         limit #{startNum}, #{pageSize}
     </select>

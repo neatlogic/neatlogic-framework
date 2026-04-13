@@ -26,7 +26,7 @@ import java.net.HttpURLConnection;
 
 public class BuildinAuthenticateHandler implements IAuthenticateHandler {
 
-    private final static Logger logger = LoggerFactory.getLogger(BuildinAuthenticateHandler.class);
+	private static final Logger logger = LoggerFactory.getLogger(BuildinAuthenticateHandler.class);
 
     @Override
     public String getType() {

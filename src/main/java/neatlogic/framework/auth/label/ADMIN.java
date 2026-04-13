@@ -18,7 +18,7 @@ public class ADMIN extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "系统核心基础功能权限";
+        return "系统核心基础权限";
     }
 
     @Override

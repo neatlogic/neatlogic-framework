@@ -557,7 +557,6 @@ public class HttpRequestUtil {
                     handler.authenticate(connection, this.getAuthConfig());
                 }
             }
-            connection.connect();
             return connection;
         } catch (Exception ex) {
             logger.error(this.url + ", " + ex.getMessage(), ex);
@@ -575,14 +574,113 @@ public class HttpRequestUtil {
     private List<String> responseHeaderList;
     private Map<String, List<String>> responseHeaderMap;
 
+    private byte[] buildRequestBodyBytes() throws Exception {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        try (DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream)) {
+            OutputStreamHandlerMap.get(this.contentType).execute(dataOutputStream, this);
+            dataOutputStream.flush();
+        }
+        return byteArrayOutputStream.toByteArray();
+    }
+
+    private String escapeShellSingleQuote(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("'", "'\"'\"'");
+    }
+
+    private String buildCurlCommand(HttpURLConnection connection, byte[] requestBodyBytes) {
+        StringBuilder builder = new StringBuilder("curl --location");
+        builder.append(" '").append(escapeShellSingleQuote(this.url)).append("'");
+        builder.append(" \\\n--request ").append(this.method);
+        Map<String, List<String>> requestProperties = connection.getRequestProperties();
+        if (MapUtils.isNotEmpty(requestProperties)) {
+            for (Map.Entry<String, List<String>> entry : requestProperties.entrySet()) {
+                String key = entry.getKey();
+                if (key == null) {
+                    continue;
+                }
+                List<String> valueList = entry.getValue();
+                if (CollectionUtils.isEmpty(valueList)) {
+                    builder.append(" \\\n--header '").append(escapeShellSingleQuote(key)).append(":'");
+                } else {
+                    for (String value : valueList) {
+                        builder.append(" \\\n--header '")
+                                .append(escapeShellSingleQuote(key))
+                                .append(": ")
+                                .append(escapeShellSingleQuote(value))
+                                .append("'");
+                    }
+                }
+            }
+        }
+        if (requestBodyBytes != null && requestBodyBytes.length > 0) {
+            builder.append(" \\\n--data '").append(escapeShellSingleQuote(new String(requestBodyBytes, this.charset))).append("'");
+        } else if (Objects.equals(this.contentType, ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM)) {
+            builder.append(" \\\n# multipart file stream request, use files below to rebuild");
+            if (MapUtils.isNotEmpty(this.formData)) {
+                for (String key : this.formData.keySet()) {
+                    builder.append(" \\\n--form '")
+                            .append(escapeShellSingleQuote(key))
+                            .append("=")
+                            .append(escapeShellSingleQuote(this.formData.getString(key)))
+                            .append("'");
+                }
+            }
+            if (MapUtils.isNotEmpty(this.fileStreamMap)) {
+                for (String fileName : this.fileStreamMap.keySet()) {
+                    builder.append(" \\\n--form '")
+                            .append(escapeShellSingleQuote(fileName))
+                            .append("=@")
+                            .append(escapeShellSingleQuote(fileName))
+                            .append("'");
+                }
+            }
+        }
+        return builder.toString();
+    }
+
+    private String buildMultipartDebugBody() {
+        StringBuilder builder = new StringBuilder();
+        if (MapUtils.isNotEmpty(this.formData)) {
+            for (String key : this.formData.keySet()) {
+                builder.append("--").append(FORM_DATA_BOUNDARY).append("\n");
+                builder.append("Content-Disposition: form-data; name=").append(key).append("\n\n");
+                builder.append(this.formData.getString(key)).append("\n");
+            }
+        }
+        if (MapUtils.isNotEmpty(this.fileStreamMap)) {
+            for (String fileName : this.fileStreamMap.keySet()) {
+                builder.append("--").append(FORM_DATA_BOUNDARY).append("\n");
+                builder.append("Content-Disposition: form-data; name=").append(fileName).append("; filename=").append(fileName).append("\n");
+                builder.append("Content-Type: multipart/form-data\n\n");
+                builder.append("[binary stream omitted]").append("\n");
+            }
+        }
+        builder.append("--").append(FORM_DATA_BOUNDARY).append("--");
+        return builder.toString();
+    }
+
     public HttpRequestUtil sendRequest() {
         HttpURLConnection connection = getConnection();
         DataInputStream input = null;
         if (connection != null) {
             try {
+                byte[] requestBodyBytes = null;
+                if (Objects.equals(this.method, "POST") && !Objects.equals(this.contentType, ContentType.CONTENT_TYPE_MULTIPART_FORM_DATA_FILE_STREAM)) {
+                    requestBodyBytes = buildRequestBodyBytes();
+                }
+                //System.out.println("[HttpRequestUtil] curl begin");
+                //System.out.println(buildCurlCommand(connection, requestBodyBytes));
+                //System.out.println("[HttpRequestUtil] curl end");
                 if (Objects.equals(this.method, "POST")) {
                     try (DataOutputStream out = new DataOutputStream(connection.getOutputStream())) {
-                        OutputStreamHandlerMap.get(this.contentType).execute(out, this);
+                        if (requestBodyBytes != null) {
+                            out.write(requestBodyBytes);
+                        } else {
+                            OutputStreamHandlerMap.get(this.contentType).execute(out, this);
+                        }
                         out.flush();
                     }
                 }

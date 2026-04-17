@@ -33,10 +33,10 @@ import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.tenant.TenantNotFoundException;
 import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
+import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.core.privateapi.binarystream.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.privateapi.raw.IRawApiComponent;
-import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
@@ -622,9 +622,12 @@ public class AnonymousApiDispatcher {
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
         } else {
             tokenHasEncrypted = false;
-            String originToken = token;
-            token = token.substring(0, token.lastIndexOf("/"));
-            tenant = originToken.substring(originToken.lastIndexOf("/") + 1);
+            tenant = request.getHeader("Tenant");
+            if (StringUtils.isBlank(tenant)) {
+                String originToken = token;
+                token = token.substring(0, token.lastIndexOf("/"));
+                tenant = originToken.substring(originToken.lastIndexOf("/") + 1);
+            }
             Enumeration<String> paraNames = request.getParameterNames();
             while (paraNames.hasMoreElements()) {
                 String p = paraNames.nextElement();
@@ -772,9 +775,12 @@ public class AnonymousApiDispatcher {
             paramObj.putAll(resultObj.getJSONObject("paramObj"));
         } else {
             tokenHasEncrypted = false;
-            String originToken = token;
-            token = token.substring(0, token.lastIndexOf("/"));
-            tenant = originToken.substring(originToken.lastIndexOf("/") + 1);
+            tenant = request.getHeader("Tenant");
+            if (StringUtils.isBlank(tenant)) {
+                String originToken = token;
+                token = token.substring(0, token.lastIndexOf("/"));
+                tenant = originToken.substring(originToken.lastIndexOf("/") + 1);
+            }
             Enumeration<String> paraNames = request.getParameterNames();
             while (paraNames.hasMoreElements()) {
                 String p = paraNames.nextElement();

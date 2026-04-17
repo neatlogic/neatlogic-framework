@@ -44,6 +44,7 @@ import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.AnonymousApiTokenUtil;
+import neatlogic.framework.util.HttpRequestUtil;
 import neatlogic.module.framework.restful.counter.ApiAccessCountService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -539,6 +540,9 @@ public class AnonymousApiDispatcher {
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
         if (!response.isCommitted()) {
+            if (UserContext.get() != null) {
+                HttpRequestUtil.resetResponse(response);
+            }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(returnObj.toJSONString());
         }
@@ -603,6 +607,9 @@ public class AnonymousApiDispatcher {
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
         if (!response.isCommitted()) {
+            if (UserContext.get() != null) {
+                HttpRequestUtil.resetResponse(response);
+            }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(returnObj.toJSONString());
         }
@@ -820,6 +827,9 @@ public class AnonymousApiDispatcher {
             returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
         }
         if (!response.isCommitted()) {
+            if (UserContext.get() != null) {
+                HttpRequestUtil.resetResponse(response);
+            }
             response.setContentType(Config.RESPONSE_TYPE_JSON);
             response.getWriter().print(returnObj.toJSONString());
         }

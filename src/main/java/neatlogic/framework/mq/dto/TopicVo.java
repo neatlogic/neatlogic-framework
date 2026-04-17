@@ -17,6 +17,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.mq.core.IMqHandler;
+import neatlogic.framework.mq.core.ITopic;
 import neatlogic.framework.mq.core.MqHandlerFactory;
 import neatlogic.framework.mq.core.TopicFactory;
 import neatlogic.framework.restful.annotation.EntityField;
@@ -70,6 +71,12 @@ public class TopicVo {
     }
 
     public String getLabel() {
+        if (StringUtils.isNotBlank(name)) {
+            ITopic topic = TopicFactory.getTopic(name);
+            if (topic != null) {
+                return topic.getLabel();
+            }
+        }
         return label;
     }
 

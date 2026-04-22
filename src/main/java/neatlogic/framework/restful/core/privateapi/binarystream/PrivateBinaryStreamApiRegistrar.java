@@ -73,11 +73,6 @@ public class PrivateBinaryStreamApiRegistrar extends PrivateApiTypeRegistrarBase
     }
 
     @Override
-    protected boolean isMcp(IPrivateBinaryStreamApiComponent component) {
-        return component.isMcp();
-    }
-
-    @Override
     protected boolean isBasicSupport(IPrivateBinaryStreamApiComponent component) {
         return component.isBasicSupport();
     }

@@ -27,6 +27,8 @@ public interface ApiMapper {
 
     List<ApiVo> getAllApiByModuleId(@Param("moduleIdList") List<String> moduleIdList);
 
+    List<ApiVo> getMcpApiListByModuleId(@Param("moduleIdList") List<String> moduleIdList);
+
     List<ApiVo> getApiListByTokenList(List<String> tokenList);
 
     int batchUpdate(ApiVo apiVo);

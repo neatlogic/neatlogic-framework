@@ -73,11 +73,6 @@ public class PrivateRawApiRegistrar extends PrivateApiTypeRegistrarBase<IPrivate
     }
 
     @Override
-    protected boolean isMcp(IPrivateRawApiComponent component) {
-        return component.isMcp();
-    }
-
-    @Override
     protected boolean isBasicSupport(IPrivateRawApiComponent component) {
         return component.isBasicSupport();
     }

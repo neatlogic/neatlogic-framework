@@ -73,11 +73,6 @@ public class PrivateMetricApiRegistrar extends PrivateApiTypeRegistrarBase<IPriv
     }
 
     @Override
-    protected boolean isMcp(IPrivateMetricApiComponent component) {
-        return component.isMcp();
-    }
-
-    @Override
     protected boolean isBasicSupport(IPrivateMetricApiComponent component) {
         return component.isBasicSupport();
     }

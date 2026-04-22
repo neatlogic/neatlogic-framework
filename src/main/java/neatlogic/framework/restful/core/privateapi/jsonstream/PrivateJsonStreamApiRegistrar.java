@@ -73,11 +73,6 @@ public class PrivateJsonStreamApiRegistrar extends PrivateApiTypeRegistrarBase<I
     }
 
     @Override
-    protected boolean isMcp(IPrivateJsonStreamApiComponent component) {
-        return component.isMcp();
-    }
-
-    @Override
     protected boolean isBasicSupport(IPrivateJsonStreamApiComponent component) {
         return component.isBasicSupport();
     }

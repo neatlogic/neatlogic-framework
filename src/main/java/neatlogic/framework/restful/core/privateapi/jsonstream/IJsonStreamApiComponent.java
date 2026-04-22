@@ -77,16 +77,6 @@ public interface IJsonStreamApiComponent {
     }
 
     /**
-     * 是否作为MCP工具
-     *
-     * @return true false
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    default boolean isMcp() {
-        return false;
-    }
-
-    /**
      * 是否支持Basic认证
      *
      * @return true false

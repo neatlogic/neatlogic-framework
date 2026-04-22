@@ -68,11 +68,6 @@ public abstract class PrivateApiTypeRegistrarBase<T> implements IPrivateApiTypeR
     protected abstract Integer getNeedAudit(T component);
 
     /**
-     * 判断组件是否作为 MCP 工具。
-     */
-    protected abstract boolean isMcp(T component);
-
-    /**
      * 判断组件是否支持 Basic 认证。
      */
     protected abstract boolean isBasicSupport(T component);
@@ -110,7 +105,6 @@ public abstract class PrivateApiTypeRegistrarBase<T> implements IPrivateApiTypeR
                                 context,
                                 getApiType(),
                                 getNeedAudit(component),
-                                isMcp(component),
                                 isBasicSupport(component),
                                 isSupportAnonymousAccess(component)
                         )

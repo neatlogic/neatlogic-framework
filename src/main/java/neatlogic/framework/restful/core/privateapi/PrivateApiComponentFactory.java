@@ -86,13 +86,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
     }
 
     /**
-     * 获取当前已注册且声明为 MCP 工具的接口列表。
-     */
-    public static List<ApiVo> getMcpApiList() {
-        return apiList.stream().filter(ApiVo::getIsMcp).toList();
-    }
-
-    /**
      * 根据 token 获取接口定义。
      * 优先命中精确 token，未命中时再尝试正则 token，并回填路径变量。
      */
@@ -210,7 +203,7 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
      * 构建系统级 private 接口定义。
      */
     static ApiVo createSystemApiVo(String token, String className, String name, String description, NeatLogicWebApplicationContext context,
-                                   ApiType apiType, Integer needAudit, boolean isMcp, boolean isBasicSupport, boolean supportAnonymousAccess) {
+                                   ApiType apiType, Integer needAudit, boolean isBasicSupport, boolean supportAnonymousAccess) {
         ApiVo apiVo = new ApiVo();
         apiVo.setToken(token);
         apiVo.setHandler(className);
@@ -218,7 +211,6 @@ public class PrivateApiComponentFactory extends ModuleInitializedListenerBase {
         apiVo.setName(name);
         apiVo.setDescription(description);
         apiVo.setIsActive(1);
-        apiVo.setIsMcp(isMcp);
         apiVo.setNeedAudit(needAudit);
         apiVo.setTimeout(0);
         apiVo.setType(apiType.getValue());

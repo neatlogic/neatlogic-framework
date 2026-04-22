@@ -18,6 +18,7 @@ public enum ApiType {
     RAW("raw", "原始模式", "raw/"),
     OBJECT("object", "对象模式", "rest/"),
     STREAM("stream", "json流模式", "stream/"),
+    SSE("sse", "SSE模式", "sse/"),
     BINARY("binary", "字节流模式", "binary/"),
     METRIC("metric", "指标模式", "metrics/"),
     FETCH("fetch", "客户端拉取模式", "fetch/");

@@ -15,69 +15,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package neatlogic.framework.restful.core.privateapi;
+package neatlogic.framework.restful.core.privateapi.sse;
 
 import neatlogic.framework.common.RootComponent;
+import neatlogic.framework.restful.core.privateapi.PrivateApiTypeRegistrarBase;
 import neatlogic.framework.restful.enums.ApiType;
 
-/**
- * 对象型 private API 注册器。
- */
 @RootComponent
-public class PrivateApiRegistrar extends PrivateApiTypeRegistrarBase<IPrivateApiComponent> {
+public class PrivateSseApiRegistrar extends PrivateApiTypeRegistrarBase<IPrivateSseApiComponent> {
 
     @Override
     public int getOrder() {
-        return 10;
+        return 25;
     }
 
     @Override
-    protected Class<IPrivateApiComponent> getComponentClass() {
-        return IPrivateApiComponent.class;
+    protected Class<IPrivateSseApiComponent> getComponentClass() {
+        return IPrivateSseApiComponent.class;
     }
 
     @Override
     protected ApiType getApiType() {
-        return ApiType.OBJECT;
+        return ApiType.SSE;
     }
 
     @Override
-    protected String getClassName(IPrivateApiComponent component) {
+    protected String getClassName(IPrivateSseApiComponent component) {
         return component.getClassName();
     }
 
     @Override
-    protected String getName(IPrivateApiComponent component) {
+    protected String getName(IPrivateSseApiComponent component) {
         return component.getName();
     }
 
     @Override
-    protected String getConfig(IPrivateApiComponent component) {
+    protected String getConfig(IPrivateSseApiComponent component) {
         return component.getConfig();
     }
 
     @Override
-    protected String getToken(IPrivateApiComponent component) {
+    protected String getToken(IPrivateSseApiComponent component) {
         return component.getToken();
     }
 
     @Override
-    protected String getDescription(IPrivateApiComponent component) {
+    protected String getDescription(IPrivateSseApiComponent component) {
         return component.getDescription();
     }
 
     @Override
-    protected Integer getNeedAudit(IPrivateApiComponent component) {
+    protected Integer getNeedAudit(IPrivateSseApiComponent component) {
         return component.needAudit();
     }
 
     @Override
-    protected boolean isBasicSupport(IPrivateApiComponent component) {
+    protected boolean isBasicSupport(IPrivateSseApiComponent component) {
         return component.isBasicSupport();
     }
 
     @Override
-    protected boolean isSupportAnonymousAccess(IPrivateApiComponent component) {
+    protected boolean isSupportAnonymousAccess(IPrivateSseApiComponent component) {
         return component.supportAnonymousAccess().isSupportAnonymousAccess();
     }
 }

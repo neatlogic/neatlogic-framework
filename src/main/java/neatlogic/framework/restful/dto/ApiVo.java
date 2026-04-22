@@ -109,8 +109,8 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
 
     @JSONField(serialize = false)
     private String timezone;
-    @JSONField(serialize = false)
-    private boolean isMcp = false;
+    @EntityField(name = "是否MCP服务", type = ApiParamType.INTEGER)
+    private Integer isMcp = 0;
     @JSONField(serialize = false)
     private String authType;
 
@@ -126,11 +126,11 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
         pathVariableList.add(para);
     }
 
-    public boolean getIsMcp() {
+    public Integer getIsMcp() {
         return isMcp;
     }
 
-    public void setIsMcp(boolean mcp) {
+    public void setIsMcp(Integer mcp) {
         isMcp = mcp;
     }
 

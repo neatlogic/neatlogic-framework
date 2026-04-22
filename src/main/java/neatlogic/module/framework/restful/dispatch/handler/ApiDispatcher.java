@@ -29,11 +29,12 @@ import neatlogic.framework.exception.core.NotFoundEditTargetException;
 import neatlogic.framework.exception.resubmit.ResubmitException;
 import neatlogic.framework.exception.type.*;
 import neatlogic.framework.restful.core.IApiComponent;
+import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.core.privateapi.binarystream.IBinaryStreamApiComponent;
 import neatlogic.framework.restful.core.privateapi.jsonstream.IJsonStreamApiComponent;
 import neatlogic.framework.restful.core.privateapi.metric.IMetricApiComponent;
 import neatlogic.framework.restful.core.privateapi.raw.IRawApiComponent;
-import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
+import neatlogic.framework.restful.core.privateapi.sse.IPrivateSseApiComponent;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiHandlerVo;
 import neatlogic.framework.restful.dto.ApiVo;
@@ -254,6 +255,18 @@ public class ApiDispatcher {
                         } else {
                             returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
+                    } else {
+                        returnObj.putAll(restComponent.help());
+                    }
+                } else {
+                    throw new ComponentNotFoundException("接口组件:" + interfaceVo.getHandler() + "不存在");
+                }
+            } else if (apiType.equals(ApiType.SSE)) {
+                IPrivateSseApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.SSE, IPrivateSseApiComponent.class);
+                if (restComponent != null) {
+                    if (action.equals("doservice")) {
+                        apiAccessCountService.putToken(token);
+                        restComponent.doService(interfaceVo, paramObj, request, response);
                     } else {
                         returnObj.putAll(restComponent.help());
                     }
@@ -673,6 +686,140 @@ public class ApiDispatcher {
         }
     }
 
+    @GetMapping(value = "/sse/**")
+    public void dispatcherForGetSse(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject paramObj = new JSONObject();
+        Enumeration<String> paraNames = request.getParameterNames();
+        while (paraNames.hasMoreElements()) {
+            String p = paraNames.nextElement();
+            String[] vs = request.getParameterValues(p);
+            if (vs.length > 1) {
+                paramObj.put(p, vs);
+            } else {
+                paramObj.put(p, request.getParameter(p));
+            }
+        }
+        JSONObject returnObj = new JSONObject();
+        try {
+            doIt(request, response, token, ApiType.SSE, paramObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        }
+        if (!response.isCommitted()) {
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            response.getWriter().print(returnObj.toJSONString());
+        }
+    }
+
+    @PostMapping(value = "/sse/**")
+    public void dispatcherForPostSse(@RequestBody(required = false) String jsonStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        try {
+            JSONObject paramObj;
+            if (StringUtils.isNotBlank(jsonStr)) {
+                try {
+                    paramObj = JSON.parseObject(jsonStr);
+                } catch (Exception e) {
+                    throw new ParamJSONIrregularException();
+                }
+            } else {
+                paramObj = new JSONObject();
+            }
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
+            }
+            doIt(request, response, token, ApiType.SSE, paramObj, returnObj, "doservice");
+        } catch (ResubmitException ex) {
+            response.setStatus(ResponseCode.RESUBMIT.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (LicenseInvalidException | LicenseExpiredException ex) {
+            response.setStatus(ResponseCode.LICENSE_INVALID.getCode());
+            logger.error(ex.getMessage());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (NotFoundEditTargetException ex) {
+            response.setStatus(ResponseCode.EDIT_TARGET_NOTFOUND.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", $.t(ex.getMessage(), ex.getValues()));
+        } catch (Throwable ex) {
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackTrace(ex));
+            logger.error(ex.getMessage(), ex);
+        }
+        if (!response.isCommitted()) {
+            response.setContentType(Config.RESPONSE_TYPE_JSON);
+            response.getWriter().print(returnObj.toJSONString());
+        }
+    }
+
     @GetMapping(value = "/binary/**")
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -1062,6 +1209,40 @@ public class ApiDispatcher {
         JSONObject returnObj = new JSONObject();
         try {
             doIt(request, response, token, ApiType.BINARY, null, returnObj, "help");
+        } catch (ApiRuntimeException ex) {
+            response.setStatus(ResponseCode.API_RUNTIME.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+            if (ex.getParam() != null) {
+                returnObj.put("Param", ex.getParam());
+            }
+        } catch (PermissionDeniedException ex) {
+            response.setStatus(ResponseCode.PERMISSION_DENIED.getCode());
+            if (logger.isWarnEnabled()) {
+                logger.warn(ex.getMessage(), ex);
+            }
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ex.getMessage());
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            response.setStatus(ResponseCode.EXCEPTION.getCode());
+            returnObj.put("Status", "ERROR");
+            returnObj.put("Message", ExceptionUtils.getStackFrames(ex));
+        }
+        response.setContentType(Config.RESPONSE_TYPE_JSON);
+        response.getWriter().print(returnObj.toJSONString());
+    }
+
+    @GetMapping(value = "/help/sse/**")
+    public void ssehelp(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
+        JSONObject returnObj = new JSONObject();
+        try {
+            doIt(request, response, token, ApiType.SSE, null, returnObj, "help");
         } catch (ApiRuntimeException ex) {
             response.setStatus(ResponseCode.API_RUNTIME.getCode());
             if (logger.isWarnEnabled()) {

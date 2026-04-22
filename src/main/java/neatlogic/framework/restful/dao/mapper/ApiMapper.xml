@@ -30,7 +30,8 @@
                `type`,
                `qps`,
                `timeout`,
-               `need_audit` AS needAudit
+               `need_audit` AS needAudit,
+               `is_mcp` AS isMcp
         FROM `api`
         WHERE token = #{value}
     </select>
@@ -71,7 +72,8 @@
         `type`,
         `qps`,
         `timeout`,
-        `need_audit` AS needAudit
+        `need_audit` AS needAudit,
+        `is_mcp` AS isMcp
         FROM `api`
         WHERE `token` IN
         <foreach collection="list" item="token" separator="," open="(" close=")">
@@ -93,7 +95,8 @@
                `type`,
                `qps`,
                `timeout`,
-               `need_audit` AS needAudit
+               `need_audit` AS needAudit,
+               `is_mcp` AS isMcp
         FROM `api`
         order by `create_time` desc
     </select>
@@ -112,7 +115,8 @@
         `type`,
         `qps`,
         `timeout`,
-        `need_audit` AS needAudit
+        `need_audit` AS needAudit,
+        `is_mcp` AS isMcp
         FROM `api`
         <where>
             <if test="moduleIdList != null and moduleIdList.size() > 0">
@@ -121,6 +125,22 @@
             </if>
         </where>
         order by `create_time` desc
+    </select>
+
+    <select id="getMcpApiListByModuleId" resultType="neatlogic.framework.restful.dto.ApiVo" useCache="true">
+        SELECT `token`,
+        `is_active` AS isActive,
+        `qps`,
+        `need_audit` AS needAudit,
+        `is_mcp` AS isMcp
+        FROM `api`
+        WHERE `is_mcp` = 1
+        AND `is_active` = 1
+        <if test="moduleIdList != null and moduleIdList.size() > 0">
+            AND `module_id` IN
+            <foreach collection="moduleIdList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+        </if>
+        ORDER BY `create_time` DESC
     </select>
 
     <update id="batchUpdate" parameterType="neatlogic.framework.restful.dto.ApiVo">
@@ -170,6 +190,7 @@
          `qps`,
          `timeout`,
          `need_audit`,
+         `is_mcp`,
          `create_time`)
         VALUES (#{name},
                 #{moduleId},
@@ -185,6 +206,7 @@
                 #{qps},
                 #{timeout},
                 #{needAudit},
+                #{isMcp},
                 now(3))
         ON DUPLICATE KEY UPDATE `type`        = #{type},
                                 `handler`     = #{handler},
@@ -196,7 +218,8 @@
                                 `password`    = #{passwordCipher},
                                 `qps`         = #{qps},
                                 `timeout`     = #{timeout},
-                                `need_audit`  = #{needAudit}
+                                `need_audit`  = #{needAudit},
+                                `is_mcp`      = #{isMcp}
     </insert>
 
     <insert id="insertApi" parameterType="neatlogic.framework.restful.dto.ApiVo">
@@ -215,6 +238,7 @@
          `qps`,
          `timeout`,
          `need_audit`,
+         `is_mcp`,
          `create_time`)
         VALUES (#{name},
                 #{moduleId},
@@ -230,6 +254,7 @@
                 #{qps},
                 #{timeout},
                 #{needAudit},
+                #{isMcp},
                 now(3))
     </insert>
 
@@ -249,6 +274,7 @@
          `qps`,
          `timeout`,
          `need_audit`,
+         `is_mcp`,
          `create_time`)
         VALUES (#{name},
                 #{moduleId},
@@ -264,6 +290,7 @@
                 #{qps},
                 #{timeout},
                 #{needAudit},
+                #{isMcp},
                 now(3))
         ON DUPLICATE KEY UPDATE `need_audit`  = #{needAudit}
     </insert>

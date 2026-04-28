@@ -13,6 +13,7 @@
 package neatlogic.module.framework.matrix.rebuilddatabaseview.handler;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.batch.BatchRunner;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.dao.mapper.SchemaMapper;
 import neatlogic.framework.matrix.constvalue.MatrixType;
@@ -28,10 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -97,7 +95,7 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
 
     @Override
     public List<ViewStatusInfo> createOrReplaceView() {
-        List<ViewStatusInfo> resultList = new ArrayList<>();
+        List<ViewStatusInfo> resultList = Collections.synchronizedList(new ArrayList<>());
         int rowNum = matrixMapper.getMatrixViewCount();
         if (rowNum > 0) {
             ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler(MatrixType.VIEW.getValue());
@@ -112,7 +110,9 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
                     List<String> uuidList = matrixViewList.stream().map(MatrixViewVo::getMatrixUuid).collect(Collectors.toList());
                     List<MatrixVo> matrixList = matrixMapper.getMatrixListByUuidList(uuidList);
                     Map<String, String> uuidToNameMap = matrixList.stream().collect(Collectors.toMap(MatrixVo::getUuid, MatrixVo::getName));
-                    for (MatrixViewVo matrixViewVo : matrixViewList) {
+                    BatchRunner<MatrixViewVo> runner = new BatchRunner<>();
+                    runner.execute(matrixViewList, 5, (threadIndex, dataIndex, matrixViewVo) -> {
+                        long startTime = System.currentTimeMillis();
                         String matrixUuid = matrixViewVo.getMatrixUuid();
                         String matrixName = uuidToNameMap.get(matrixUuid);
                         ViewStatusInfo viewStatusInfo = new ViewStatusInfo();
@@ -125,8 +125,24 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
                             viewStatusInfo.setStatus(ViewStatusInfo.Status.FAILURE.toString());
                             viewStatusInfo.setError(e.getMessage());
                         }
+                        viewStatusInfo.setTimeCost(System.currentTimeMillis() - startTime);
                         resultList.add(viewStatusInfo);
-                    }
+                    }, "REBUILD-DATABASE-VIEW-FOR-MATRIXVIEW");
+//                    for (MatrixViewVo matrixViewVo : matrixViewList) {
+//                        String matrixUuid = matrixViewVo.getMatrixUuid();
+//                        String matrixName = uuidToNameMap.get(matrixUuid);
+//                        ViewStatusInfo viewStatusInfo = new ViewStatusInfo();
+//                        viewStatusInfo.setName("matrix_" + matrixUuid);
+//                        viewStatusInfo.setLabel(matrixName);
+//                        try {
+//                            viewDataSourceHandler.buildView(matrixUuid, matrixName, matrixViewVo.getXml());
+//                            viewStatusInfo.setStatus(ViewStatusInfo.Status.SUCCESS.toString());
+//                        } catch (Exception e) {
+//                            viewStatusInfo.setStatus(ViewStatusInfo.Status.FAILURE.toString());
+//                            viewStatusInfo.setError(e.getMessage());
+//                        }
+//                        resultList.add(viewStatusInfo);
+//                    }
                 }
             }
         }

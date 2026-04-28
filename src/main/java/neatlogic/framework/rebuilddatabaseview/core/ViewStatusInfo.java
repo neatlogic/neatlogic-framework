@@ -26,6 +26,8 @@ public class ViewStatusInfo {
 
     private String error;
 
+    private Long timeCost;
+
     public String getName() {
         return name;
     }
@@ -56,5 +58,13 @@ public class ViewStatusInfo {
 
     public void setError(String error) {
         this.error = error;
+    }
+
+    public Long getTimeCost() {
+        return timeCost;
+    }
+
+    public void setTimeCost(Long timeCost) {
+        this.timeCost = timeCost;
     }
 }

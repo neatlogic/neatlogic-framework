@@ -23,9 +23,11 @@ import neatlogic.framework.mq.core.TopicFactory;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class TopicVo {
+public class TopicVo implements Serializable {
+    private static final long serialVersionUID = 2910089979265665138L;
     @EntityField(name = "唯一标识", type = ApiParamType.STRING)
     private String name;
     @EntityField(name = "名称", type = ApiParamType.STRING)

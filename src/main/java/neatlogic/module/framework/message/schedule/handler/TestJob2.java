@@ -29,6 +29,10 @@ import java.util.Date;
 //@Service
 @DisallowConcurrentExecution
 public class TestJob2 extends JobBase {
+    @Override
+    public String getName() {
+        return "定时作业测试二";
+    }
 
     private final Logger logger = LoggerFactory.getLogger(TestJob2.class);
     private final String cron = "* * * * * ?";

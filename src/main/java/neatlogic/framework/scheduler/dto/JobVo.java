@@ -41,6 +41,13 @@ public class JobVo extends BasePageVo {
     @EntityField(name = "定时作业组件名称",
             type = ApiParamType.STRING)
     private String handlerName;
+    @EntityField(name = "定时作业组件所属模块id",
+            type = ApiParamType.STRING)
+    private String moduleId;
+    @EntityField(name = "定时作业组件所属模块名称",
+            type = ApiParamType.STRING)
+    private String moduleName;
+    private List<String> handlerList;
     @EntityField(name = "是否保存执行记录(0:不保存，1:保存)",
             type = ApiParamType.INTEGER)
     private Integer needAudit;
@@ -157,6 +164,52 @@ public class JobVo extends BasePageVo {
 
     public void setHandlerName(String handlerName) {
         this.handlerName = handlerName;
+    }
+
+    public String getModuleId() {
+        if (StringUtils.isNotBlank(moduleId)) {
+            return moduleId;
+        }
+        if (StringUtils.isBlank(handler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(handler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        moduleId = jobClassVo.getModuleId();
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public String getModuleName() {
+        if (StringUtils.isNotBlank(moduleName)) {
+            return moduleName;
+        }
+        if (StringUtils.isBlank(handler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(handler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        moduleName = jobClassVo.getModuleName();
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
+    public List<String> getHandlerList() {
+        return handlerList;
+    }
+
+    public void setHandlerList(List<String> handlerList) {
+        this.handlerList = handlerList;
     }
 
     public JobStatusVo getJobStatus() {

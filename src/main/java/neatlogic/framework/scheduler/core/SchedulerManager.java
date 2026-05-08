@@ -46,6 +46,7 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
 
     private static final Map<String, IJob> jobHandlerMap = new HashMap<>();
     private static final Map<String, JobClassVo> jobClassMap = new HashMap<>();
+    private static final List<JobClassVo> jobClassList = new ArrayList<>();
     private static final List<JobClassVo> publicJobClassList = new ArrayList<>();
     private static final ReentrantLock GLOBAL_LOCK = new ReentrantLock();
     private static SchedulerFactoryBean staticSchedulerFactoryBean;
@@ -70,6 +71,10 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
 
     public static List<JobClassVo> getAllPublicJobClassList() {
         return publicJobClassList;
+    }
+
+    public static List<JobClassVo> getAllJobClassList() {
+        return jobClassList;
     }
 
     public static JobClassVo getJobClassByClassName(String className) {
@@ -241,13 +246,15 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             tmpJobHandlerList.add(job);
             jobHandlerMap.put(job.getClassName(), job);
             JobClassVo jobClassVo = new JobClassVo(job.getClassName(), context.getId());
+            jobClassVo.setName(job.getName());
             jobClassMap.put(job.getClassName(), jobClassVo);
+            jobClassList.add(jobClassVo);
             // 如果定时作业组件没有实现IPublicJob接口，不会插入schedule_job_class表
             if (job instanceof IPublicJob) {
-                IPublicJob publicJob = (IPublicJob) job;
-                jobClassVo.setName(publicJob.getName());
                 jobClassVo.setType(JobClassVo.PUBLIC);
                 publicJobClassList.add(jobClassVo);
+            } else {
+                jobClassVo.setType(JobClassVo.PRIVATE);
             }
         }
         if (CollectionUtils.isNotEmpty(tmpJobHandlerList)) {

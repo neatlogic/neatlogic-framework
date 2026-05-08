@@ -32,6 +32,10 @@ import java.util.List;
 @Component
 @DisallowConcurrentExecution
 public class AuditCleanerJob extends JobBase {
+    @Override
+    public String getName() {
+        return "审计日志定时清理";
+    }
 
     @Resource
     private AuditConfigMapper auditConfigMapper;

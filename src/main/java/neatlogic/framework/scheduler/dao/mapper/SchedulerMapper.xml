@@ -95,6 +95,18 @@
         <if test="handler != null and handler != ''">
             AND a.handler = #{handler}
         </if>
+        <if test="handlerList != null and handlerList.size() > 0">
+            AND a.handler IN
+            <foreach collection="handlerList" item="handlerClassName" open="(" separator="," close=")">
+                #{handlerClassName}
+            </foreach>
+        </if>
+        <if test="isActive != null">
+            AND a.is_active = #{isActive}
+        </if>
+        <if test="needAudit != null">
+            AND a.need_audit = #{needAudit}
+        </if>
     </select>
 
     <resultMap id="jobDetailMap" type="neatlogic.framework.scheduler.dto.JobVo">
@@ -145,6 +157,18 @@
         <if test="handler != null and handler != ''">
             AND a.handler = #{handler}
         </if>
+        <if test="handlerList != null and handlerList.size() > 0">
+            AND a.handler IN
+            <foreach collection="handlerList" item="handlerClassName" open="(" separator="," close=")">
+                #{handlerClassName}
+            </foreach>
+        </if>
+        <if test="isActive != null">
+            AND a.is_active = #{isActive}
+        </if>
+        <if test="needAudit != null">
+            AND a.need_audit = #{needAudit}
+        </if>
         ORDER BY a.`fcd` DESC
         limit #{startNum}, #{pageSize}
     </select>
@@ -166,7 +190,7 @@
                     and job_uuid = #{jobUuid}
                 </when>
                 <otherwise><!--如果不提供jobuuid，则搜索内部作业-->
-                    and not exists (select 1 from schedule_job sj where sj.uuid = job_uuid)
+                    and not exists (select 1 from schedule_job sj_filter where sj_filter.uuid = job_uuid)
                 </otherwise>
             </choose>
             <if test="status != null and status != ''">
@@ -190,18 +214,31 @@
 
     <select id="searchJobAudit" parameterType="neatlogic.framework.scheduler.dto.JobAuditVo"
             resultType="neatlogic.framework.scheduler.dto.JobAuditVo">
-        SELECT id,
-        `job_uuid` AS jobUuid,
-        `start_time` AS startTime,
-        `end_time` AS endTime,
-        `status`,
-        server_id AS serverId,
-        content_hash AS contentHash,
-        `cron`,
-        `next_fire_time` AS nextFireTime
-        FROM `schedule_job_audit`
+        SELECT a.id,
+        a.`job_uuid` AS jobUuid,
+        a.`start_time` AS startTime,
+        a.`end_time` AS endTime,
+        a.`status`,
+        a.server_id AS serverId,
+        a.content_hash AS contentHash,
+        a.`cron`,
+        a.`next_fire_time` AS nextFireTime,
+        COALESCE(sjs.job_group, sjl.job_group) AS jobGroupName,
+        COALESCE(sjs.handler, sjl.job_handler, sj.handler) AS jobHandler
+        FROM `schedule_job_audit` a
+        LEFT JOIN `schedule_job` sj ON a.job_uuid = sj.uuid
+        LEFT JOIN (
+            SELECT job_name, MIN(job_group) AS job_group, MIN(handler) AS handler
+            FROM schedule_job_status
+            GROUP BY job_name
+        ) sjs ON a.job_uuid = sjs.job_name
+        LEFT JOIN (
+            SELECT job_name, MIN(job_group) AS job_group, MIN(job_handler) AS job_handler
+            FROM schedule_job_lock
+            GROUP BY job_name
+        ) sjl ON a.job_uuid = sjl.job_name
         <include refid="searchJobAuditCondition"/>
-        ORDER BY `id` DESC
+        ORDER BY a.`id` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>
 

@@ -12,6 +12,9 @@
 
 package neatlogic.framework.scheduler.dto;
 
+import neatlogic.framework.scheduler.core.SchedulerManager;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Date;
 
 public class JobInfoVo {
@@ -22,13 +25,18 @@ public class JobInfoVo {
     private Date endTime;
     private String type;
     private String jobHandler;
+    private String jobHandlerName;
+    private String moduleId;
+    private String moduleName;
     private Integer needAudit;
     private String tenantUuid;
     private Integer intervalInSeconds;
     private Integer repeatCount;
+    private Integer execCount;
     private String state;
     private Date nextFireTime;
     private Date lastFireTime;
+    private Date lastFinishTime;
 
     public JobInfoVo(){
 
@@ -104,6 +112,52 @@ public class JobInfoVo {
         this.jobHandler = jobHandler;
     }
 
+    public String getJobHandlerName() {
+        return jobHandlerName;
+    }
+
+    public void setJobHandlerName(String jobHandlerName) {
+        this.jobHandlerName = jobHandlerName;
+    }
+
+    public String getModuleId() {
+        if (StringUtils.isNotBlank(moduleId)) {
+            return moduleId;
+        }
+        if (StringUtils.isBlank(jobHandler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(jobHandler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        moduleId = jobClassVo.getModuleId();
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public String getModuleName() {
+        if (StringUtils.isNotBlank(moduleName)) {
+            return moduleName;
+        }
+        if (StringUtils.isBlank(jobHandler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(jobHandler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        moduleName = jobClassVo.getModuleName();
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
     public Integer getNeedAudit() {
         return needAudit;
     }
@@ -136,12 +190,42 @@ public class JobInfoVo {
         this.repeatCount = repeatCount;
     }
 
+    public Integer getExecCount() {
+        return execCount;
+    }
+
+    public void setExecCount(Integer execCount) {
+        this.execCount = execCount;
+    }
+
     public String getState() {
         return state;
     }
 
     public void setState(String state) {
         this.state = state;
+    }
+
+    public String getStateName() {
+        if (state == null) {
+            return null;
+        }
+        switch (state) {
+            case "NORMAL":
+                return "正常";
+            case "PAUSED":
+                return "暂停";
+            case "COMPLETE":
+                return "完成";
+            case "ERROR":
+                return "错误";
+            case "BLOCKED":
+                return "阻塞";
+            case "NONE":
+                return "不存在";
+            default:
+                return state;
+        }
     }
 
     public Date getNextFireTime() {
@@ -158,5 +242,13 @@ public class JobInfoVo {
 
     public void setLastFireTime(Date lastFireTime) {
         this.lastFireTime = lastFireTime;
+    }
+
+    public Date getLastFinishTime() {
+        return lastFinishTime;
+    }
+
+    public void setLastFinishTime(Date lastFinishTime) {
+        this.lastFinishTime = lastFinishTime;
     }
 }

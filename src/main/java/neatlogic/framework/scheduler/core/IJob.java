@@ -41,6 +41,13 @@ public interface IJob extends Job {
     }
 
     /**
+     * 获取定时作业组件名称
+     *
+     * @return 定时作业组件名称
+     */
+    String getName();
+
+    /**
      * 获取分组名称
      *
      * @return 分组名称

@@ -17,6 +17,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.scheduler.core.SchedulerManager;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
 import neatlogic.framework.util.SnowflakeUtil;
@@ -104,6 +105,14 @@ public class JobAuditVo extends BasePageVo {
     private Date nextFireTime;
     @EntityField(name = "作业组名", type = ApiParamType.STRING)
     private String jobGroupName;
+    @EntityField(name = "作业组件类路径", type = ApiParamType.STRING)
+    private String jobHandler;
+    @EntityField(name = "作业组件名称", type = ApiParamType.STRING)
+    private String jobHandlerName;
+    @EntityField(name = "作业组件所属模块id", type = ApiParamType.STRING)
+    private String moduleId;
+    @EntityField(name = "作业组件所属模块名称", type = ApiParamType.STRING)
+    private String moduleName;
 
     public JobAuditVo() {
         this.setPageSize(20);
@@ -231,5 +240,70 @@ public class JobAuditVo extends BasePageVo {
 
     public void setJobGroupName(String jobGroupName) {
         this.jobGroupName = jobGroupName;
+    }
+
+    public String getJobHandler() {
+        return jobHandler;
+    }
+
+    public void setJobHandler(String jobHandler) {
+        this.jobHandler = jobHandler;
+    }
+
+    public String getJobHandlerName() {
+        if (StringUtils.isNotBlank(jobHandlerName)) {
+            return jobHandlerName;
+        }
+        if (StringUtils.isBlank(jobHandler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(jobHandler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        jobHandlerName = jobClassVo.getName();
+        return jobHandlerName;
+    }
+
+    public void setJobHandlerName(String jobHandlerName) {
+        this.jobHandlerName = jobHandlerName;
+    }
+
+    public String getModuleId() {
+        if (StringUtils.isNotBlank(moduleId)) {
+            return moduleId;
+        }
+        if (StringUtils.isBlank(jobHandler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(jobHandler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        moduleId = jobClassVo.getModuleId();
+        return moduleId;
+    }
+
+    public void setModuleId(String moduleId) {
+        this.moduleId = moduleId;
+    }
+
+    public String getModuleName() {
+        if (StringUtils.isNotBlank(moduleName)) {
+            return moduleName;
+        }
+        if (StringUtils.isBlank(jobHandler)) {
+            return null;
+        }
+        JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(jobHandler);
+        if (jobClassVo == null) {
+            return null;
+        }
+        moduleName = jobClassVo.getModuleName();
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
     }
 }

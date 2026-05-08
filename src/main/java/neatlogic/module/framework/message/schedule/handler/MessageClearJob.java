@@ -30,6 +30,10 @@ import java.util.Date;
 @Service
 @DisallowConcurrentExecution
 public class MessageClearJob extends JobBase {
+    @Override
+    public String getName() {
+        return "站内消息定时清理";
+    }
 
     @Resource
     private MessageMapper messageMapper;

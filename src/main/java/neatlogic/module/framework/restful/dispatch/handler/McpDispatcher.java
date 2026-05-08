@@ -266,10 +266,9 @@ public class McpDispatcher {
             }
             JSONObject arguments = params.getJSONObject("arguments");
             Object output = invokeTool(scope, params.getString("name"), arguments == null ? new JSONObject() : arguments);
-            content.put("text", output instanceof String ? output : JSON.toJSONString(output));
-            if (output instanceof JSONObject || output instanceof JSONArray) {
-                result.put("structuredContent", output);
-            }
+            Object jsonOutput = toJsonCompatibleObject(output);
+            content.put("text", JSON.toJSONString(jsonOutput));
+            result.put("structuredContent", getStructuredContent(jsonOutput));
             result.put("isError", false);
         } catch (Exception ex) {
             content.put("text", ex.getMessage());
@@ -298,10 +297,18 @@ public class McpDispatcher {
     private JSONObject getOutputSchema(ApiVo api) {
         IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
         JSONObject helpObj = comp == null ? null : comp.help();
-        return getSchemaFromHelpList(helpObj == null ? null : helpObj.getJSONArray("output"), true);
+        JSONArray outputList = helpObj == null ? null : helpObj.getJSONArray("output");
+        if (outputList == null || outputList.isEmpty()) {
+            return new JSONObject();
+        }
+        return getSchemaFromHelpList(outputList, true, true);
     }
 
     private JSONObject getSchemaFromHelpList(JSONArray paramList, boolean allowNestedObject) {
+        return getSchemaFromHelpList(paramList, allowNestedObject, false);
+    }
+
+    private JSONObject getSchemaFromHelpList(JSONArray paramList, boolean allowNestedObject, boolean wrapBlankNameWithReturn) {
         JSONObject schema = new JSONObject();
         schema.put("type", "object");
         JSONObject properties = new JSONObject();
@@ -311,7 +318,10 @@ public class McpDispatcher {
                 JSONObject param = paramList.getJSONObject(i);
                 String name = param.getString("name");
                 if (StringUtils.isBlank(name)) {
-                    continue;
+                    if (!wrapBlankNameWithReturn) {
+                        continue;
+                    }
+                    name = "Return";
                 }
                 properties.put(name, getParamSchema(param, allowNestedObject));
                 if (param.getBooleanValue("isRequired")) {
@@ -326,6 +336,22 @@ public class McpDispatcher {
         return schema;
     }
 
+    private Object toJsonCompatibleObject(Object output) {
+        if (output == null || output instanceof JSONObject || output instanceof JSONArray || output instanceof String || output instanceof Number || output instanceof Boolean) {
+            return output;
+        }
+        return JSON.toJSON(output);
+    }
+
+    private JSONObject getStructuredContent(Object jsonOutput) {
+        if (jsonOutput instanceof JSONObject) {
+            return (JSONObject) jsonOutput;
+        }
+        JSONObject structuredContent = new JSONObject();
+        structuredContent.put("Return", jsonOutput);
+        return structuredContent;
+    }
+
     private Object getExample(ApiVo api) {
         IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
         if (comp == null) {
@@ -338,20 +364,18 @@ public class McpDispatcher {
     private JSONObject getParamSchema(JSONObject input, boolean allowNestedObject) {
         JSONObject schema = new JSONObject();
         JSONArray children = input.getJSONArray("children");
-        if (allowNestedObject && children != null && !children.isEmpty()) {
-            String inputType = input.getString("type");
-            if (Objects.equals(inputType, "jsonArray")) {
-                schema.put("type", "array");
-                JSONObject itemSchema = new JSONObject();
-                itemSchema.put("type", "object");
-                itemSchema.put("properties", buildChildProperties(children));
-                schema.put("items", itemSchema);
-            } else {
-                schema.put("type", "object");
-                schema.put("properties", buildChildProperties(children));
-            }
+        String inputType = input.getString("type");
+        if (allowNestedObject && Objects.equals(inputType, "jsonArray")) {
+            schema.put("type", "array");
+            JSONObject itemSchema = new JSONObject();
+            itemSchema.put("type", "object");
+            itemSchema.put("properties", buildChildProperties(children));
+            schema.put("items", itemSchema);
+        } else if (allowNestedObject && children != null && !children.isEmpty()) {
+            schema.put("type", "object");
+            schema.put("properties", buildChildProperties(children));
         } else {
-            schema.put("type", getJsonSchemaType(input.getString("type")));
+            schema.put("type", getJsonSchemaType(inputType));
         }
         if (StringUtils.isNotBlank(input.getString("description"))) {
             schema.put("description", input.getString("description"));
@@ -380,6 +404,9 @@ public class McpDispatcher {
 
     private JSONObject buildChildProperties(JSONArray children) {
         JSONObject properties = new JSONObject();
+        if (children == null) {
+            return properties;
+        }
         for (int i = 0; i < children.size(); i++) {
             JSONObject child = children.getJSONObject(i);
             String childName = child.getString("name");

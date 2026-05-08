@@ -14,6 +14,4 @@ package neatlogic.framework.scheduler.core;
 
 public interface IPublicJob extends IJob {
 
-    String getName();
-
 }

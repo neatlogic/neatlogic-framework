@@ -38,6 +38,11 @@ import java.util.Objects;
 @Component
 @DisallowConcurrentExecution
 public class NotifyContentJob extends JobBase {
+    @Override
+    public String getName() {
+        return "通知内容定时发送";
+    }
+
 	static Logger logger = LoggerFactory.getLogger(NotifyContentJob.class);
 
 	@Autowired

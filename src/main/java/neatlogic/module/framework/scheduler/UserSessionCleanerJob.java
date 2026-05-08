@@ -30,6 +30,10 @@ import java.util.Date;
 @Component
 @DisallowConcurrentExecution
 public class UserSessionCleanerJob extends JobBase {
+    @Override
+    public String getName() {
+        return "用户会话定时清理";
+    }
 
     @Resource
     private UserSessionMapper userSessionMapper;

@@ -29,6 +29,10 @@ import java.util.Objects;
 @Component
 @DisallowConcurrentExecution
 public class IssueSystemNoticeJob extends JobBase {
+    @Override
+    public String getName() {
+        return "系统公告定时发布";
+    }
 
     @Resource
     private SystemNoticeMapper systemNoticeMapper;

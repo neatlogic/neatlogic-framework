@@ -42,6 +42,11 @@ import java.util.stream.Collectors;
 @DisallowConcurrentExecution
 public class LicenseValidJob extends JobBase {
     @Override
+    public String getName() {
+        return "许可证规则定时校验";
+    }
+
+    @Override
     public String getGroupName() {
         return TenantContext.get().getTenantUuid() + "-LICENSE-VALID-GROUP";
     }

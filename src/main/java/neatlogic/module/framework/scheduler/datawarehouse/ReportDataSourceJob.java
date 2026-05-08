@@ -35,6 +35,11 @@ import java.util.Objects;
 @Component
 @DisallowConcurrentExecution
 public class ReportDataSourceJob extends JobBase {
+    @Override
+    public String getName() {
+        return "数据仓库数据源同步";
+    }
+
     //static Logger logger = LoggerFactory.getLogger(ReportDataSourceJob.class);
 
     @Resource

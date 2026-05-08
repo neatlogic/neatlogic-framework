@@ -33,6 +33,11 @@ import java.util.List;
 @Component
 @DisallowConcurrentExecution
 public class ReportDataExpireJob extends JobBase {
+    @Override
+    public String getName() {
+        return "数据仓库过期数据清理";
+    }
+
     //static Logger logger = LoggerFactory.getLogger(ReportDataSourceJob.class);
 
     @Resource

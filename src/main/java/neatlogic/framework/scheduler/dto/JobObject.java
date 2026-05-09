@@ -25,6 +25,7 @@ public class JobObject implements Serializable {
     private String tenantUuid;
     private Integer intervalInSeconds;
     private Integer repeatCount;
+    private Boolean cronMisfireDoNothing = false;
 //	private Date loadTime = new Date();
 
     private Map<String, Object> dataMap;
@@ -45,6 +46,7 @@ public class JobObject implements Serializable {
         this.tenantUuid = builder.tenantUuid;
         this.type = builder.type;
         this.intervalInSeconds = builder.intervalInSeconds;
+        this.cronMisfireDoNothing = builder.cronMisfireDoNothing;
         this.dataMap = builder.dataMap;
         this.propMap = builder.propMap;
 
@@ -120,6 +122,7 @@ public class JobObject implements Serializable {
         private String type = "private";
         private Integer intervalInSeconds;
         private Integer repeatCount;
+        private Boolean cronMisfireDoNothing = false;
         private Map<String, Object> dataMap;
         private Map<String, Object> propMap;
         private Integer isTest = 0;
@@ -181,6 +184,11 @@ public class JobObject implements Serializable {
             return this;
         }
 
+        public Builder withCronMisfireDoNothing() {
+            cronMisfireDoNothing = true;
+            return this;
+        }
+
         public Builder setIsTest(Integer _isTest) {
             isTest = _isTest;
             return this;
@@ -234,5 +242,8 @@ public class JobObject implements Serializable {
         return repeatCount;
     }
 
+    public Boolean getCronMisfireDoNothing() {
+        return cronMisfireDoNothing;
+    }
 
 }

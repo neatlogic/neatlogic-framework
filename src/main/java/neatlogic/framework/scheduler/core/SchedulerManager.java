@@ -139,7 +139,11 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
 
                 TriggerBuilder<Trigger> triggerBuilder = TriggerBuilder.newTrigger().withIdentity(jobName, jobGroup);
                 if (StringUtils.isNotBlank(jobObject.getCron()) && CronExpression.isValidExpression(jobObject.getCron())) {
-                    triggerBuilder.withSchedule(CronScheduleBuilder.cronSchedule(jobObject.getCron()));
+                    CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule(jobObject.getCron());
+                    if (Boolean.TRUE.equals(jobObject.getCronMisfireDoNothing())) {
+                        cronScheduleBuilder = cronScheduleBuilder.withMisfireHandlingInstructionDoNothing();
+                    }
+                    triggerBuilder.withSchedule(cronScheduleBuilder);
                 } else if (jobObject.getIntervalInSeconds() != null && jobObject.getIntervalInSeconds() > 0) {
                     SimpleScheduleBuilder ssb = SimpleScheduleBuilder.simpleSchedule();
                     ssb = ssb.withIntervalInSeconds(jobObject.getIntervalInSeconds());

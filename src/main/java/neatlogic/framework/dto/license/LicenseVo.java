@@ -20,11 +20,14 @@ import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class LicenseVo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -6838171580022855520L;
     @EntityField(name = "nfd.licensevo.entityfield.name.dburl", type = ApiParamType.STRING)
     private String dbUrl;
     @EntityField(name = "nfd.licensevo.entityfield.name.purchaser", type = ApiParamType.STRING)

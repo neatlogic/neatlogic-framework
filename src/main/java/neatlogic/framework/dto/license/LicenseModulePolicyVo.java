@@ -17,9 +17,12 @@ import neatlogic.framework.common.constvalue.license.ILicensePolicy;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.LicenseUtil;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class LicenseModulePolicyVo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -8796462006813643694L;
     @EntityField(name = "common.key", type = ApiParamType.STRING)
     String key;
     @EntityField(name = "common.value", type = ApiParamType.STRING)

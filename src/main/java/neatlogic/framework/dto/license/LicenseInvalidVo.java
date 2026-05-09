@@ -16,10 +16,13 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.restful.annotation.EntityField;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 public class LicenseInvalidVo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 4222540422886183549L;
     @EntityField(name = "模块组", type = ApiParamType.JSONARRAY)
     private List<ModuleGroupVo> moduleGroupVos;
     @EntityField(name = "类型", type = ApiParamType.STRING)

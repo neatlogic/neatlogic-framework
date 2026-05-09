@@ -20,10 +20,13 @@ import neatlogic.framework.util.LicenseUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 public class LicenseModuleVo implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1028907252219734230L;
     @EntityField(name = "common.modulegroup", type = ApiParamType.STRING)
     String module;
 

@@ -18,7 +18,7 @@ public class ImportExportTypeInconsistencyException extends ApiRuntimeException 
 
     private static final long serialVersionUID = 8277880771507304466L;
 
-    public ImportExportTypeInconsistencyException(String sourceType, String targetType) {
-        super("nfie.importexporttypeinconsistencyexception.importexporttypeinconsistencyexception", sourceType, targetType);
+    public ImportExportTypeInconsistencyException(String targetTypeName) {
+        super("nfie.importexporttypeinconsistencyexception.importexporttypeinconsistencyexception", targetTypeName);
     }
 }

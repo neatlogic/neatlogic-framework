@@ -129,6 +129,17 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                             out.write(buf, 0, len);
                         }
                         ImportExportVo mainImportExportVo = JSONObject.parseObject(new String(out.toByteArray(), StandardCharsets.UTF_8), ImportExportVo.class);
+                        if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
+                            String targetTypeName = targetType;
+                            ImportExportHandler importExportHandler = getHandler(targetType);
+                            if (importExportHandler != null) {
+                                ImportExportHandlerType type = importExportHandler.getType();
+                                if (type != null) {
+                                    targetTypeName = type.getText();
+                                }
+                            }
+                            throw new ImportExportTypeInconsistencyException(targetTypeName);
+                        }
                         ImportExportHandler importExportHandler = getHandler(mainImportExportVo.getType());
                         if (importExportHandler == null) {
                             throw new ImportExportHandlerNotFoundException(mainImportExportVo.getType());
@@ -136,9 +147,9 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         if (!importExportHandler.checkImportAuth(mainImportExportVo)) {
                             throw new ImportNoAuthException();
                         }
-                        if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
-                            throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), targetType);
-                        }
+//                        if (!Objects.equals(mainImportExportVo.getType(), targetType)) {
+//                            throw new ImportExportTypeInconsistencyException(mainImportExportVo.getType(), targetType);
+//                        }
                         boolean alreadyExists = false;
                         JSONObject resultObj = new JSONObject();
                         ImportExportBaseInfoVo mainImportExportBaseInfoVo = new ImportExportBaseInfoVo(mainImportExportVo.getType(), mainImportExportVo.getPrimaryKey(), mainImportExportVo.getName());

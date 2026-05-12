@@ -91,7 +91,7 @@ public class SubscribeStartupComponent extends StartupBase {
                         Set<SubscribeVo> activeSubscribeList = entry.getValue();
                         for (SubscribeVo subVo : activeSubscribeList) {
                             try {
-                                if (!SubscribeManager.needReconnect(subVo)) {
+                                if (SubscribeManager.needReconnect(subVo)) {
                                     try {
                                         SubscribeManager.reconnect(subVo);
                                         subVo.setError(null);

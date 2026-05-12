@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class ActiveMqArtemisHandler implements IMqHandler {
     private static final Logger logger = LoggerFactory.getLogger(ActiveMqArtemisHandler.class);
-    private static final Map<Long, MessageConsumer> consumerMap = new ConcurrentHashMap<>();
+    private static final Map<Long, ArtemisConsumerHolder> consumerMap = new ConcurrentHashMap<>();
 
     private final String brokerUrl = Config.JMS_URL();
     private final String user = Config.JMS_USER();
@@ -62,25 +62,34 @@ public class ActiveMqArtemisHandler implements IMqHandler {
                 throw new SubscribeHandlerNotFoundException(subVo.getClassName());
             }
             String topicName = subVo.getTopicName().toLowerCase();
-            String queueName = TenantContext.get().getTenantUuid() + "/" + topicName;
+            String tenantUuid = TenantContext.get().getTenantUuid();
+            String queueName = buildQueueName(tenantUuid, topicName);
             subVo.setTenantUuid(TenantContext.get().getTenantUuid());
 
-            try (ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password)) {
-                try (Connection connection = connectionFactory.createConnection()) {
-                    connection.start();
-                    Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-                    Destination destination = new ActiveMQQueue(queueName);
-                    MessageConsumer consumer = session.createConsumer(destination);
-                    consumer.setMessageListener(message -> {
-                        try {
-                            subscribeHandler.onMessage(subVo, message);
-                        } catch (Exception ex) {
-                            logger.error("消费消息失败: {}", ex.getMessage(), ex);
-                        }
-                    });
-                    consumerMap.put(subVo.getId(), consumer);
-                }
+            ActiveMQConnectionFactory connectionFactory = null;
+            Connection connection = null;
+            Session session = null;
+            MessageConsumer consumer = null;
+            try {
+                connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
+                connection = connectionFactory.createConnection();
+                connection.start();
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Destination destination = new ActiveMQQueue(queueName);
+                consumer = session.createConsumer(destination);
+                consumer.setMessageListener(message -> {
+                    try {
+                        subscribeHandler.onMessage(subVo, message);
+                    } catch (Exception ex) {
+                        logger.error("消费消息失败: {}", ex.getMessage(), ex);
+                    }
+                });
+                consumerMap.put(subVo.getId(), new ArtemisConsumerHolder(connectionFactory, connection, session, consumer));
             } catch (Exception ex) {
+                closeQuietly(consumer, "关闭消费者失败");
+                closeQuietly(session, "关闭会话失败");
+                closeQuietly(connection, "关闭连接失败");
+                closeQuietly(connectionFactory, "关闭连接工厂失败");
                 throw new SubscribeTopicException(topicName, subVo.getName(), ex.getMessage());
             }
         }
@@ -100,20 +109,15 @@ public class ActiveMqArtemisHandler implements IMqHandler {
 
     @Override
     public void destroy(SubscribeVo subscribeVo) {
-        MessageConsumer consumer = consumerMap.get(subscribeVo.getId());
-        if (consumer != null) {
-            try {
-                consumer.close();
-            } catch (JMSException e) {
-                logger.error("关闭消费者失败: {}", e.getMessage());
-            }
-            consumerMap.remove(subscribeVo.getId());
+        ArtemisConsumerHolder holder = consumerMap.remove(subscribeVo.getId());
+        if (holder != null) {
+            holder.close();
         }
     }
 
     @Override
     public void send(String topicName, String content) {
-        String queueName = TenantContext.get().getTenantUuid() + "/" + topicName.toLowerCase();
+        String queueName = buildQueueName(TenantContext.get().getTenantUuid(), topicName);
         try (ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
              Connection connection = connectionFactory.createConnection();
              Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
@@ -136,7 +140,8 @@ public class ActiveMqArtemisHandler implements IMqHandler {
     @Override
     public List<HealthcheckResultVo> healthCheck(SubscribeVo subVo) {
         List<HealthcheckResultVo> errorList = new ArrayList<>();
-        String queueName = subVo.getTopicName();  // Artemis 中也叫 queue
+        String tenantUuid = StringUtils.defaultIfBlank(TenantContext.get().getTenantUuid(), subVo.getTenantUuid());
+        String queueName = buildQueueName(tenantUuid, subVo.getTopicName());
 
         try (ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl)) {
             if (StringUtils.isNotBlank(user)) {
@@ -170,5 +175,45 @@ public class ActiveMqArtemisHandler implements IMqHandler {
             errorList.add(new HealthcheckResultVo("健康检查失败，异常：" + e.getMessage(), "error"));
         }
         return errorList;
+    }
+
+    private static String buildQueueName(String tenantUuid, String topicName) {
+        String normalizedTopicName = StringUtils.lowerCase(topicName);
+        if (StringUtils.isBlank(tenantUuid)) {
+            return normalizedTopicName;
+        }
+        return tenantUuid + "/" + normalizedTopicName;
+    }
+
+    private static void closeQuietly(AutoCloseable closeable, String errorMessage) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (Exception e) {
+                logger.error("{}: {}", errorMessage, e.getMessage(), e);
+            }
+        }
+    }
+
+    private static final class ArtemisConsumerHolder implements AutoCloseable {
+        private final Connection connection;
+        private final Session session;
+        private final MessageConsumer consumer;
+        private final ActiveMQConnectionFactory connectionFactory;
+
+        private ArtemisConsumerHolder(ActiveMQConnectionFactory connectionFactory, Connection connection, Session session, MessageConsumer consumer) {
+            this.connectionFactory = connectionFactory;
+            this.connection = connection;
+            this.session = session;
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void close() {
+            closeQuietly(consumer, "关闭消费者失败");
+            closeQuietly(session, "关闭会话失败");
+            closeQuietly(connection, "关闭连接失败");
+            closeQuietly(connectionFactory, "关闭连接工厂失败");
+        }
     }
 }

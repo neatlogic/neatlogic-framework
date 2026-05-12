@@ -47,27 +47,32 @@ public abstract class TopicBase<T> implements ITopic<T> {
         if (content != null) {
             AfterTransactionJob<T> job = new AfterTransactionJob<>("JMS-SENDER");
             job.execute(content, t -> {
-                String topicName = this.getName().toLowerCase(Locale.ROOT);
-                TopicVo topicVo = mqTopicMapper.getTopicByName(topicName);
-                //如果数据库没有主题设置数据，尝试在内存中加载
-                if (topicVo == null) {
-                    topicVo = TopicFactory.getTopicByName(topicName);
-                }
-                if (topicVo != null && StringUtils.isNotBlank(topicVo.getHandler()) && Objects.equals(topicVo.getIsActive(), 1)) {
-                    IMqHandler handler = MqHandlerFactory.getMqHandler(topicVo.getHandler());
-                    if (handler != null && handler.isEnable()) {
-                        JSONObject contentObj = generateTopicContent(topicVo, content);
-                        if (MapUtils.isNotEmpty(contentObj)) {
-                            String msg = contentObj.toString();
-                            try {
-                                handler.send(topicName, msg);
-                                //jmsTemplate.convertAndSend(TenantContext.get().getTenantUuid() + "/" + topicName, msg);
-                            } catch (Exception ex) {
-                                logger.error("发送消息到{}/{}失败，异常：{}", TenantContext.get().getTenantUuid(), topicName, ex.getMessage());
+                try {
+                    String topicName = this.getName().toLowerCase(Locale.ROOT);
+                    TopicVo topicVo = mqTopicMapper.getTopicByName(topicName);
+                    //如果数据库没有主题设置数据，尝试在内存中加载
+                    if (topicVo == null) {
+                        topicVo = TopicFactory.getTopicByName(topicName);
+                    }
+                    if (topicVo != null && StringUtils.isNotBlank(topicVo.getHandler()) && Objects.equals(topicVo.getIsActive(), 1)) {
+                        IMqHandler handler = MqHandlerFactory.getMqHandler(topicVo.getHandler());
+                        if (handler != null && handler.isEnable()) {
+                            JSONObject contentObj = null;
+                            contentObj = generateTopicContent(topicVo, content);
+                            if (MapUtils.isNotEmpty(contentObj)) {
+                                String msg = contentObj.toString();
+                                try {
+                                    handler.send(topicName, msg);
+                                    //jmsTemplate.convertAndSend(TenantContext.get().getTenantUuid() + "/" + topicName, msg);
+                                } catch (Exception ex) {
+                                    logger.error("发送消息到{}/{}失败，异常：{}", TenantContext.get().getTenantUuid(), topicName, ex.getMessage());
+                                }
+                                logger.info("send msg to topic[{}/{}]{}", TenantContext.get().getTenantUuid(), topicName, msg);
                             }
-                            logger.info("send msg to topic[{}/{}]{}", TenantContext.get().getTenantUuid(), topicName, msg);
                         }
                     }
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
             });
         }

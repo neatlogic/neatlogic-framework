@@ -12,12 +12,14 @@
 
 package neatlogic.framework.listener;
 
+import neatlogic.framework.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.util.Date;
 
 @WebListener
 public class TomcatStartupListener implements ServletContextListener {
@@ -26,22 +28,8 @@ public class TomcatStartupListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        // 服务器启动时在日志文件输出一行记录
-        String message = "应用服务正在启动...";
-        if (logger.isErrorEnabled()) {
-            logger.error(message);
-        }
-        if (logger.isWarnEnabled()) {
-            logger.warn(message);
-        }
-        if (logger.isInfoEnabled()) {
-            logger.info(message);
-        }
-        if (logger.isDebugEnabled()) {
-            logger.debug(message);
-        }
-        if (logger.isTraceEnabled()) {
-            logger.trace(message);
-        }
+        // 服务器启动时在out日志文件输出一行记录
+        String message = String.format("[%s] 应用服务正在启动...", TimeUtil.convertDateToString(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        System.out.println(message);
     }
 }

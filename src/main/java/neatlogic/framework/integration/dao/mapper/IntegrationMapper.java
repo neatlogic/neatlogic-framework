@@ -14,11 +14,13 @@ package neatlogic.framework.integration.dao.mapper;
 
 import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.dto.AuthorityVo;
-import neatlogic.framework.integration.dto.IntegrationAuthorityVo;
 import neatlogic.framework.integration.dto.IntegrationAuditVo;
+import neatlogic.framework.integration.dto.IntegrationAuthorityVo;
+import neatlogic.framework.integration.dto.IntegrationRateLimitVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface IntegrationMapper {
@@ -79,6 +81,18 @@ public interface IntegrationMapper {
     int updateIntegrationActive(IntegrationVo integrationVo);
 
     int deleteIntegrationByUuid(String uuid);
+
+    int insertIntegrationRateLimitIfAbsent(String integrationUuid);
+
+    IntegrationRateLimitVo getIntegrationRateLimitForUpdate(String integrationUuid);
+
+    Date getDatabaseCurrentTime();
+
+    int resetIntegrationRateLimit(@Param("integrationUuid") String integrationUuid, @Param("windowStartTime") Date windowStartTime);
+
+    int increaseIntegrationRateLimitCounter(String integrationUuid);
+
+    int deleteIntegrationRateLimitByIntegrationUuid(String integrationUuid);
 
     int deleteIntegrationAuthorityByIntegrationUuidAndAction(@Param("integrationUuid") String integrationUuid, @Param("action") String action);
 

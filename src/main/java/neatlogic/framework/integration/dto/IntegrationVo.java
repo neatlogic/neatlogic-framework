@@ -91,6 +91,11 @@ public class IntegrationVo extends BaseEditorVo {
         return uuid;
     }
 
+    @JSONField(serialize = false)
+    public String getUuidWithoutGenerate() {
+        return uuid;
+    }
+
     public void setUuid(String uuid) {
         this.uuid = uuid;
     }

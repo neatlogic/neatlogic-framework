@@ -219,6 +219,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             integrationAuditVo.setParam(requestParamObj.toJSONString());
         }
 
+        IntegrationRateLimitManager.acquire(integrationVo);
 
         HttpURLConnection connection = null;
         try {

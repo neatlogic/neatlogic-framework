@@ -465,6 +465,46 @@
         WHERE `uuid` = #{value}
     </delete>
 
+    <insert id="insertIntegrationRateLimitIfAbsent" parameterType="java.lang.String">
+        INSERT IGNORE INTO `integration_rate_limit` (`integration_uuid`, `window_start_time`, `counter`, `lcd`)
+        VALUES (#{value}, NULL, 0, NOW(3))
+    </insert>
+
+    <select id="getIntegrationRateLimitForUpdate" parameterType="java.lang.String"
+            resultType="neatlogic.framework.integration.dto.IntegrationRateLimitVo">
+        SELECT `integration_uuid`  AS integrationUuid,
+               `window_start_time` AS windowStartTime,
+               `counter`
+        FROM `integration_rate_limit`
+        WHERE `integration_uuid` = #{value}
+            FOR UPDATE
+    </select>
+
+    <select id="getDatabaseCurrentTime" resultType="java.util.Date">
+        SELECT NOW(3)
+    </select>
+
+    <update id="resetIntegrationRateLimit">
+        UPDATE `integration_rate_limit`
+        SET `window_start_time` = #{windowStartTime},
+            `counter`           = 1,
+            `lcd`               = NOW(3)
+        WHERE `integration_uuid` = #{integrationUuid}
+    </update>
+
+    <update id="increaseIntegrationRateLimitCounter" parameterType="java.lang.String">
+        UPDATE `integration_rate_limit`
+        SET `counter` = `counter` + 1,
+            `lcd`     = NOW(3)
+        WHERE `integration_uuid` = #{value}
+    </update>
+
+    <delete id="deleteIntegrationRateLimitByIntegrationUuid" parameterType="java.lang.String">
+        DELETE
+        FROM `integration_rate_limit`
+        WHERE `integration_uuid` = #{value}
+    </delete>
+
     <delete id="deleteIntegrationAuthorityByIntegrationUuidAndAction">
         DELETE
         FROM `integration_authority`

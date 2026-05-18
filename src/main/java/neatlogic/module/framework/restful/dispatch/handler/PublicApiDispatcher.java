@@ -198,8 +198,6 @@ public class PublicApiDispatcher {
                         returnObj.put("TimeCost", endtime - starttime);
                         returnObj.put("Return", returnV);
                         returnObj.put("Status", "OK");
-//                        returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
-                        returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                     } else {
                         returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                     }
@@ -222,8 +220,6 @@ public class PublicApiDispatcher {
                         returnObj.put("TimeCost", endtime - starttime);
                         returnObj.put("Return", returnV);
                         returnObj.put("Status", "OK");
-//                        returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
-                        returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                     } else {
                         returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                     }
@@ -246,8 +242,6 @@ public class PublicApiDispatcher {
                         returnObj.put("TimeCost", endtime - starttime);
                         returnObj.put("Return", returnV);
                         returnObj.put("Status", "OK");
-//                        returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
-                        returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                     } else {
                         returnObj.putAll(JSONObject.parseObject(JSONObject.toJSONString(returnV)));
                     }

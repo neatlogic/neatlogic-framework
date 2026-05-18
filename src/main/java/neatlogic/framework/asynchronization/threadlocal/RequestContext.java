@@ -13,8 +13,6 @@
 package neatlogic.framework.asynchronization.threadlocal;
 
 import neatlogic.framework.common.util.IpUtil;
-import neatlogic.framework.dto.healthcheck.RequestSqlAuditVo;
-import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.restful.constvalue.RejectSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -44,10 +42,6 @@ public class RequestContext implements Serializable {
     private Double tenantRate;
     //语言
     Locale locale;
-    //收集该请求执行的sql语句
-//    private List<SqlAuditVo> sqlAuditList = Collections.synchronizedList(new ArrayList<>());
-
-    private RequestSqlAuditVo requestSqlAuditVo;
 
     public String getUrl() {
         return url;
@@ -122,41 +116,11 @@ public class RequestContext implements Serializable {
         this.locale = locale;
     }
 
-//    public List<SqlAuditVo> getSqlAuditList() {
-//        return sqlAuditList;
-//    }
-//
-//    public void setSqlAuditList(List<SqlAuditVo> sqlAuditList) {
-//        this.sqlAuditList = sqlAuditList;
-//    }
-
-    public void addSqlAudit(SqlAuditVo sqlAuditVo) {
-//        sqlAuditList.add(sqlAuditVo);
-        if (requestSqlAuditVo == null) {
-            requestSqlAuditVo = new RequestSqlAuditVo();
-        }
-        requestSqlAuditVo.addSqlAudit(sqlAuditVo);
-    }
-
-    public RequestSqlAuditVo getRequestSqlAuditVo() {
-        if (requestSqlAuditVo != null) {
-            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
-            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
-        }
-        return requestSqlAuditVo;
-    }
-
-    public void setRequestSqlAuditVo(RequestSqlAuditVo requestSqlAuditVo) {
-        this.requestSqlAuditVo = requestSqlAuditVo;
-    }
-
     public static RequestContext init(RequestContext _requestContext) {
         RequestContext context = new RequestContext();
         if (_requestContext != null) {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
-//            context.setSqlAuditList(_requestContext.getSqlAuditList());
-            context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
             context.setRemoteAddr(_requestContext.getRemoteAddr());
             context.setParam(_requestContext.getParam());
             String tempUrl = _requestContext.getUrl();

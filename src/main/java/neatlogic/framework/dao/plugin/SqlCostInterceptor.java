@@ -15,7 +15,6 @@ package neatlogic.framework.dao.plugin;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
-import neatlogic.framework.dto.healthcheck.RequestSqlAuditVo;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
 import org.apache.commons.collections4.CollectionUtils;
@@ -66,9 +65,6 @@ public class SqlCostInterceptor implements Interceptor {
     private static final Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
     // 判断是否真的访问了数据库，用于区分一级/二级缓存命中情况
     private static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
-    // URL监控用ThreadLocal暂存一次HTTP请求内的所有SQL，请求结束时再统一写入内存列表
-    private static final ThreadLocal<RequestSqlAuditVo> REQUEST_SQL_AUDIT_INSTANCE = new ThreadLocal<>();
-
     public static class SqlIdMap {
         private static final Set<String> sqlSet = new HashSet<>();
 
@@ -139,15 +135,12 @@ public class SqlCostInterceptor implements Interceptor {
     }
 
     public static void completeRequestSqlAudit() {
-        RequestSqlAuditVo requestSqlAuditVo = REQUEST_SQL_AUDIT_INSTANCE.get();
-        try {
-            // 请求结束时统一落入URL监控列表，避免每条SQL都生成一行请求记录
-            if (requestSqlAuditVo != null && requestSqlAuditVo.getSqlCount() > 0) {
-                SqlAuditManager.addRequestSqlAudit(requestSqlAuditVo);
-            }
-        } finally {
-            // 请求结束或异步线程结束后清理ThreadLocal，避免线程复用时串数据
-            REQUEST_SQL_AUDIT_INSTANCE.remove();
+        RequestContext requestContext = RequestContext.get();
+        if (requestContext != null && requestContext.getRequestSqlAuditVo() != null && requestContext.getRequestSqlAuditVo().getSqlCount() > 0) {
+            // 请求结束时从RequestContext读取URL监控聚合对象，避免拦截器额外维护ThreadLocal状态
+            SqlAuditManager.addRequestSqlAudit(requestContext.getRequestSqlAuditVo());
+            // 落库后清空RequestContext中的聚合对象，防止后续release前重复写入
+            requestContext.setRequestSqlAuditVo(null);
         }
     }
 
@@ -195,14 +188,10 @@ public class SqlCostInterceptor implements Interceptor {
                     SqlAuditManager.addSqlAudit(sqlAuditVo);
                 }
                 if (isMonitorUrl) {
-                    RequestSqlAuditVo requestSqlAuditVo = REQUEST_SQL_AUDIT_INSTANCE.get();
-                    if (requestSqlAuditVo == null) {
-                        // URL监控按一次HTTP请求聚合，第一次SQL执行时创建当前请求的聚合对象
-                        requestSqlAuditVo = new RequestSqlAuditVo();
-                        requestSqlAuditVo.setUrl(requestUrl);
-                        REQUEST_SQL_AUDIT_INSTANCE.set(requestSqlAuditVo);
+                    if (RequestContext.get() != null) {
+                        // URL监控聚合对象统一保存在RequestContext，确保同一次HTTP请求内的SQL都追加到同一个对象
+                        RequestContext.get().addSqlAudit(sqlAuditVo);
                     }
-                    requestSqlAuditVo.addSqlAudit(sqlAuditVo);
                 }
             }
             return val;

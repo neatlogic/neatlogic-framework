@@ -14,7 +14,6 @@ package neatlogic.framework.asynchronization.thread;
 
 import neatlogic.framework.asynchronization.threadlocal.*;
 import neatlogic.framework.cache.threadlocal.CacheContext;
-import neatlogic.framework.dao.plugin.SqlCostInterceptor;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -163,8 +162,6 @@ public abstract class NeatLogicThread implements Runnable, Comparable<NeatLogicT
             if (countDownLatch != null) {
                 countDownLatch.countDown();
             }
-            // URL SQL监控在线程结束时也要清理ThreadLocal，避免异步线程复用串数据
-            SqlCostInterceptor.completeRequestSqlAudit();
             // 清除所有threadlocal
             if (TenantContext.get() != null) {
                 TenantContext.get().release();

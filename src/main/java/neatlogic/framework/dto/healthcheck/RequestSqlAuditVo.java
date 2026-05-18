@@ -16,10 +16,21 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
 public class RequestSqlAuditVo {
+    // URL监控按一次HTTP请求聚合，这里保存当前请求的URL用于前端展示和搜索
+    private String url;
+    // URL监控表格需要展示请求发生时间，取当前请求第一条SQL的执行时间
+    private Date runTime;
+    // URL监控表格需要展示租户、用户和线程，便于定位具体请求来源
+    private String tenant;
+    private String userId;
+    private String threadName;
+    // URL监控表格需要展示本次请求执行了多少条SQL
+    private int sqlCount = 0;
     // 没有使用缓存的总耗时
     private long notUseCacheTotalTimeCost = 0;
     // 总耗时
@@ -41,6 +52,14 @@ public class RequestSqlAuditVo {
 
     public synchronized void addSqlAudit(SqlAuditVo sqlAuditVo) {
         if (sqlAuditVo != null) {
+            // 第一次追加SQL时同步基础信息，确保URL监控表格每行都是完整的一次请求记录
+            if (this.runTime == null) {
+                this.runTime = sqlAuditVo.getRunTime();
+                this.tenant = sqlAuditVo.getTenant();
+                this.userId = sqlAuditVo.getUserId();
+                this.threadName = sqlAuditVo.getThreadName();
+            }
+            this.sqlCount++;
             int notUseCacheCount = 0;
             long notUseCacheTimeCost = 0;
             long timeCost = sqlAuditVo.getTimeCost();
@@ -67,6 +86,50 @@ public class RequestSqlAuditVo {
             sameIdSqlAuditVo.getUseCacheLevelList().add(sqlAuditVo.getUseCacheLevel());
             sameIdSqlAuditVo.getSqlList().add(sqlAuditVo.getSql());
         }
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public Date getRunTime() {
+        return runTime;
+    }
+
+    public void setRunTime(Date runTime) {
+        this.runTime = runTime;
+    }
+
+    public String getTenant() {
+        return tenant;
+    }
+
+    public void setTenant(String tenant) {
+        this.tenant = tenant;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getThreadName() {
+        return threadName;
+    }
+
+    public void setThreadName(String threadName) {
+        this.threadName = threadName;
+    }
+
+    public int getSqlCount() {
+        return sqlCount;
     }
 
     public static class SameIdSqlAuditVo {

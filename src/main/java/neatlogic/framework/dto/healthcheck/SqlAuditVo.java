@@ -35,6 +35,8 @@ public class SqlAuditVo extends BasePageVo {
     private String userId;
     @EntityField(name = "使用到的缓存级别", type = ApiParamType.STRING)
     private String useCacheLevel;
+    @EntityField(name = "线程名称", type = ApiParamType.STRING)
+    private String threadName;
 
     public String getId() {
         return id;
@@ -98,5 +100,13 @@ public class SqlAuditVo extends BasePageVo {
 
     public void setUseCacheLevel(String useCacheLevel) {
         this.useCacheLevel = useCacheLevel;
+    }
+
+    public String getThreadName() {
+        return threadName;
+    }
+
+    public void setThreadName(String threadName) {
+        this.threadName = threadName;
     }
 }

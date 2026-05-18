@@ -48,10 +48,12 @@ public class NeatLogicDatabaseIdProvider implements DatabaseIdProvider {
             DatabaseVendor vendor = null;
             DatabaseMetaData metaData = con.getMetaData();
             String databaseProductName = metaData.getDatabaseProductName();
+            DatasourceManager.setDatabaseVersion(metaData.getDatabaseProductVersion());
             if (Objects.equals(databaseProductName, DatabaseVendor.MYSQL.getName())) {
                 try (Statement statement = con.createStatement(); ResultSet resultSet = statement.executeQuery("SELECT @@version")) {
                     if (resultSet.next()) {
                         String databaseProductVersion = resultSet.getString(1);
+                        DatasourceManager.setDatabaseVersion(databaseProductVersion);
                         if (databaseProductVersion.contains(DatabaseVendor.TIDB.getName())) {// 8.0.11-TiDB-v7.4.0
                             vendor = DatabaseVendor.TIDB;
                         } else if (databaseProductVersion.contains(DatabaseVendor.OCEAN_BASE.getName())) {// 5.7.25-OceanBase_CE-v4.2.0.0

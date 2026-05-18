@@ -39,7 +39,7 @@ public class RequestSqlAuditVo {
         return this.sameIdSqlAuditList;
     }
 
-    public void addSqlAudit(SqlAuditVo sqlAuditVo) {
+    public synchronized void addSqlAudit(SqlAuditVo sqlAuditVo) {
         if (sqlAuditVo != null) {
             int notUseCacheCount = 0;
             long notUseCacheTimeCost = 0;

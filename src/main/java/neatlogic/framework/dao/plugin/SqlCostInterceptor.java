@@ -90,6 +90,11 @@ public class SqlCostInterceptor implements Interceptor {
                     }
                 }
             }
+//            for (String str : sqlSet) {
+//                if (id.contains(str)) {
+//                    return true;
+//                }
+//            }
             if (id.contains(".")) {
                 id = id.substring(id.lastIndexOf(".") + 1);
             }
@@ -118,6 +123,7 @@ public class SqlCostInterceptor implements Interceptor {
                     String sqlId = mappedStatement.getId(); // 获取到节点的id,即sql语句的id
                     if (SqlIdMap.isExists(sqlId)) {
                         sqlAuditVo = new SqlAuditVo();
+                        sqlAuditVo.setThreadName(Thread.currentThread().getName());
                         if (TenantContext.get() != null) {
                             sqlAuditVo.setTenant(TenantContext.get().getTenantUuid());
                         }

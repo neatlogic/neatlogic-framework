@@ -144,9 +144,9 @@ public class RequestContext implements Serializable {
         if (_requestContext != null) {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
+            context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
             context.setRemoteAddr(_requestContext.getRemoteAddr());
             context.setParam(_requestContext.getParam());
-            context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
             String tempUrl = _requestContext.getUrl();
             if (tempUrl == null) {
                 tempUrl = StringUtils.EMPTY;

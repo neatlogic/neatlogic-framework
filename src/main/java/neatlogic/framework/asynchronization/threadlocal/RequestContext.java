@@ -13,6 +13,8 @@
 package neatlogic.framework.asynchronization.threadlocal;
 
 import neatlogic.framework.common.util.IpUtil;
+import neatlogic.framework.dto.healthcheck.RequestSqlAuditVo;
+import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.restful.constvalue.RejectSource;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
@@ -42,6 +44,8 @@ public class RequestContext implements Serializable {
     private Double tenantRate;
     //语言
     Locale locale;
+
+    private RequestSqlAuditVo requestSqlAuditVo;
 
     public String getUrl() {
         return url;
@@ -116,6 +120,25 @@ public class RequestContext implements Serializable {
         this.locale = locale;
     }
 
+    public void addSqlAudit(SqlAuditVo sqlAuditVo) {
+        if (requestSqlAuditVo == null) {
+            requestSqlAuditVo = new RequestSqlAuditVo();
+        }
+        requestSqlAuditVo.addSqlAudit(sqlAuditVo);
+    }
+
+    public RequestSqlAuditVo getRequestSqlAuditVo() {
+        if (requestSqlAuditVo != null) {
+            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
+            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
+        }
+        return requestSqlAuditVo;
+    }
+
+    public void setRequestSqlAuditVo(RequestSqlAuditVo requestSqlAuditVo) {
+        this.requestSqlAuditVo = requestSqlAuditVo;
+    }
+
     public static RequestContext init(RequestContext _requestContext) {
         RequestContext context = new RequestContext();
         if (_requestContext != null) {
@@ -123,6 +146,7 @@ public class RequestContext implements Serializable {
             context.setLocale(_requestContext.getLocale());
             context.setRemoteAddr(_requestContext.getRemoteAddr());
             context.setParam(_requestContext.getParam());
+            context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
             String tempUrl = _requestContext.getUrl();
             if (tempUrl == null) {
                 tempUrl = StringUtils.EMPTY;

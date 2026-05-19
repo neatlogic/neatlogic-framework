@@ -510,6 +510,19 @@ public class FormUtil {
             for (int i = 0; i < dataConfigList.size(); i++) {
                 JSONObject dataObj = dataConfigList.getJSONObject(i);
                 resultList.addAll(getFormAttributeList(dataObj, parent2));
+                if (Objects.equals("formtable", dataObj.getString("handler"))) {
+                    FormAttributeParentVo parent3 = new FormAttributeParentVo(dataObj.getString("uuid"), dataObj.getString("label"), "formtable", parent2);
+                    JSONObject config2 = dataObj.getJSONObject("config");
+                    if (MapUtils.isNotEmpty(config2)) {
+                        JSONArray dataConfigList2 = config2.getJSONArray("dataConfig");
+                        if (CollectionUtils.isNotEmpty(dataConfigList2)) {
+                            for (int j = 0; j < dataConfigList2.size(); j++) {
+                                JSONObject dataObj2 = dataConfigList2.getJSONObject(j);
+                                resultList.addAll(getFormAttributeList(dataObj2, parent3));
+                            }
+                        }
+                    }
+                }
             }
         } else if (Objects.equals(FormHandler.FORMSUBASSEMBLY.getHandler(), handler)) {
             FormAttributeParentVo parent2 = new FormAttributeParentVo(componentObj.getString("uuid"), componentObj.getString("label"), FormHandler.FORMSUBASSEMBLY.getHandler(), parent);

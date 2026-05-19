@@ -125,6 +125,7 @@ public class RequestContext implements Serializable {
             // URL监控聚合对象保存在RequestContext，确保一次HTTP请求只生成一条请求级审计记录
             requestSqlAuditVo = new RequestSqlAuditVo();
             requestSqlAuditVo.setUrl(this.url);
+            requestSqlAuditVo.setThreadName(Thread.currentThread().getName());
         }
         requestSqlAuditVo.addSqlAudit(sqlAuditVo);
     }

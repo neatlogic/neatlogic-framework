@@ -55,9 +55,12 @@ public class RequestSqlAuditVo {
             // 第一次追加SQL时同步基础信息，确保URL监控表格每行都是完整的一次请求记录
             if (this.runTime == null) {
                 this.runTime = sqlAuditVo.getRunTime();
+            }
+            if (StringUtils.isBlank(this.tenant) && StringUtils.isNotBlank(sqlAuditVo.getTenant())) {
                 this.tenant = sqlAuditVo.getTenant();
+            }
+            if (StringUtils.isBlank(this.userId) && StringUtils.isNotBlank(sqlAuditVo.getUserId())) {
                 this.userId = sqlAuditVo.getUserId();
-                this.threadName = sqlAuditVo.getThreadName();
             }
             this.sqlCount++;
             int notUseCacheCount = 0;
@@ -82,9 +85,10 @@ public class RequestSqlAuditVo {
             sameIdSqlAuditVo.setTotalTimeCost(sameIdSqlAuditVo.getTotalTimeCost() + timeCost);
             sameIdSqlAuditVo.setNotUseCacheTotalTimeCost(sameIdSqlAuditVo.getNotUseCacheTotalTimeCost() + notUseCacheTimeCost);
             sameIdSqlAuditVo.setNotUseCacheCount(sameIdSqlAuditVo.getNotUseCacheCount() + notUseCacheCount);
-            sameIdSqlAuditVo.getTimeCostList().add(timeCost);
-            sameIdSqlAuditVo.getUseCacheLevelList().add(sqlAuditVo.getUseCacheLevel());
-            sameIdSqlAuditVo.getSqlList().add(sqlAuditVo.getSql());
+//            sameIdSqlAuditVo.getTimeCostList().add(timeCost);
+//            sameIdSqlAuditVo.getUseCacheLevelList().add(sqlAuditVo.getUseCacheLevel());
+//            sameIdSqlAuditVo.getSqlList().add(sqlAuditVo.getSql());
+            sameIdSqlAuditVo.getSqlAuditList().add(sqlAuditVo);
         }
     }
 
@@ -148,6 +152,8 @@ public class RequestSqlAuditVo {
         // sql语句列表
         private final List<String> sqlList = Collections.synchronizedList(new ArrayList<>());
 
+        private final List<SqlAuditVo> sqlAuditList = Collections.synchronizedList(new ArrayList<>());
+
         public SameIdSqlAuditVo(String id) {
             this.id = id;
         }
@@ -190,6 +196,10 @@ public class RequestSqlAuditVo {
 
         public List<String> getSqlList() {
             return sqlList;
+        }
+
+        public List<SqlAuditVo> getSqlAuditList() {
+            return sqlAuditList;
         }
     }
 }

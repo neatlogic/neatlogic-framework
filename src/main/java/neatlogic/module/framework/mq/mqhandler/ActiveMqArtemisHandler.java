@@ -26,6 +26,7 @@ import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jms.support.JmsUtils;
 import org.springframework.stereotype.Component;
 
 import javax.jms.*;
@@ -51,7 +52,7 @@ public class ActiveMqArtemisHandler implements IMqHandler {
 
     @Override
     public String getLabel() {
-        return "ActiveMQ Artemis";
+        return "ActiveMQ Artemis Queue";
     }
 
     @Override
@@ -86,10 +87,10 @@ public class ActiveMqArtemisHandler implements IMqHandler {
                 });
                 consumerMap.put(subVo.getId(), new ArtemisConsumerHolder(connectionFactory, connection, session, consumer));
             } catch (Exception ex) {
-                closeQuietly(consumer, "关闭消费者失败");
-                closeQuietly(session, "关闭会话失败");
-                closeQuietly(connection, "关闭连接失败");
-                closeQuietly(connectionFactory, "关闭连接工厂失败");
+                JmsUtils.closeMessageConsumer(consumer);
+                JmsUtils.closeSession(session);
+                JmsUtils.closeConnection(connection);
+                closeConnectionFactory(connectionFactory);
                 throw new SubscribeTopicException(topicName, subVo.getName(), ex.getMessage());
             }
         }
@@ -118,17 +119,26 @@ public class ActiveMqArtemisHandler implements IMqHandler {
     @Override
     public void send(String topicName, String content) {
         String queueName = buildQueueName(TenantContext.get().getTenantUuid(), topicName);
-        try (ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
-             Connection connection = connectionFactory.createConnection();
-             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
-
+        ActiveMQConnectionFactory connectionFactory = null;
+        Connection connection = null;
+        Session session = null;
+        MessageProducer producer = null;
+        try {
+            connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
+            connection = connectionFactory.createConnection();
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Destination destination = new ActiveMQQueue(queueName);
-            MessageProducer producer = session.createProducer(destination);
+            producer = session.createProducer(destination);
             TextMessage message = session.createTextMessage(content);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             producer.send(message);
         } catch (Exception ex) {
             logger.error("发送消息到 Artemis 失败，异常：{}", ex.getMessage());
+        } finally {
+            JmsUtils.closeMessageProducer(producer);
+            JmsUtils.closeSession(session);
+            JmsUtils.closeConnection(connection);
+            closeConnectionFactory(connectionFactory);
         }
     }
 
@@ -143,36 +153,43 @@ public class ActiveMqArtemisHandler implements IMqHandler {
         String tenantUuid = StringUtils.defaultIfBlank(TenantContext.get().getTenantUuid(), subVo.getTenantUuid());
         String queueName = buildQueueName(tenantUuid, subVo.getTopicName());
 
-        try (ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory(brokerUrl)) {
+        ActiveMQConnectionFactory factory = null;
+        Connection connection = null;
+        Session session = null;
+        QueueBrowser browser = null;
+        try {
+            factory = new ActiveMQConnectionFactory(brokerUrl);
             if (StringUtils.isNotBlank(user)) {
                 factory.setUser(user);
                 factory.setPassword(password);
             }
 
-            try (Connection connection = factory.createConnection()) {
-                connection.start();
-                try (Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE)) {
-                    Queue queue = session.createQueue(queueName);
-                    try (QueueBrowser browser = session.createBrowser(queue)) {
-                        Enumeration<?> messages = browser.getEnumeration();
-                        int depth = 0;
-                        while (messages.hasMoreElements()) {
-                            messages.nextElement();
-                            depth++;
-                        }
-                        if (depth > 1000) {
-                            errorList.add(new HealthcheckResultVo("消息消费严重滞后，滞后消息 " + depth + " 条", "error"));
-                        } else if (depth > 0) {
-                            errorList.add(new HealthcheckResultVo("消息消费存在滞后，滞后消息 " + depth + " 条", "warning"));
-                        } else {
-                            errorList.add(new HealthcheckResultVo("无消费滞后消息", "normal"));
-                        }
-                    }
-                }
+            connection = factory.createConnection();
+            connection.start();
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            Queue queue = session.createQueue(queueName);
+            browser = session.createBrowser(queue);
+            Enumeration<?> messages = browser.getEnumeration();
+            int depth = 0;
+            while (messages.hasMoreElements()) {
+                messages.nextElement();
+                depth++;
+            }
+            if (depth > 1000) {
+                errorList.add(new HealthcheckResultVo("消息消费严重滞后，滞后消息 " + depth + " 条", "error"));
+            } else if (depth > 0) {
+                errorList.add(new HealthcheckResultVo("消息消费存在滞后，滞后消息 " + depth + " 条", "warning"));
+            } else {
+                errorList.add(new HealthcheckResultVo("无消费滞后消息", "normal"));
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             errorList.add(new HealthcheckResultVo("健康检查失败，异常：" + e.getMessage(), "error"));
+        } finally {
+            JmsUtils.closeQueueBrowser(browser);
+            JmsUtils.closeSession(session);
+            JmsUtils.closeConnection(connection);
+            closeConnectionFactory(factory);
         }
         return errorList;
     }
@@ -185,13 +202,14 @@ public class ActiveMqArtemisHandler implements IMqHandler {
         return tenantUuid + "/" + normalizedTopicName;
     }
 
-    private static void closeQuietly(AutoCloseable closeable, String errorMessage) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (Exception e) {
-                logger.error("{}: {}", errorMessage, e.getMessage(), e);
-            }
+    private static void closeConnectionFactory(ActiveMQConnectionFactory connectionFactory) {
+        if (connectionFactory == null) {
+            return;
+        }
+        try {
+            connectionFactory.close();
+        } catch (Exception e) {
+            logger.error("close factory failed: {}", e.getMessage(), e);
         }
     }
 
@@ -210,10 +228,10 @@ public class ActiveMqArtemisHandler implements IMqHandler {
 
         @Override
         public void close() {
-            closeQuietly(consumer, "关闭消费者失败");
-            closeQuietly(session, "关闭会话失败");
-            closeQuietly(connection, "关闭连接失败");
-            closeQuietly(connectionFactory, "关闭连接工厂失败");
+            JmsUtils.closeMessageConsumer(consumer);
+            JmsUtils.closeSession(session);
+            JmsUtils.closeConnection(connection);
+            closeConnectionFactory(connectionFactory);
         }
     }
 }

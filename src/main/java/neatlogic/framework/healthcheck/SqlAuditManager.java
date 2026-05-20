@@ -18,6 +18,7 @@ import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SqlAuditManager {
     private static final List<SqlAuditVo> sqlAuditList = new ArrayList<>();
@@ -60,11 +61,23 @@ public class SqlAuditManager {
 
     public static void addRequestSqlAudit(RequestSqlAuditVo requestSqlAuditVo) {
         synchronized (requestSqlAuditList) {
+            for (RequestSqlAuditVo requestSqlAudit : requestSqlAuditList) {
+                if (Objects.equals(requestSqlAudit.getId(), requestSqlAuditVo.getId())) {
+                    return;
+                }
+            }
             // URL监控同样限制最大缓存条数，避免长时间开启监控导致内存持续增长
             if (requestSqlAuditList.size() == MAX_SIZE) {
                 requestSqlAuditList.remove(0);
             }
-            requestSqlAuditList.add(requestSqlAuditVo);
+            RequestSqlAuditVo requestSqlAudit = new RequestSqlAuditVo(requestSqlAuditVo.getId(), requestSqlAuditVo.getUrl(), requestSqlAuditVo.getThreadName());
+            for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : requestSqlAuditVo.getSameIdSqlAuditList()) {
+                for (SqlAuditVo sqlAuditVo : sameIdSqlAuditVo.getSqlAuditList()) {
+                    requestSqlAudit.addSqlAudit(sqlAuditVo);
+                }
+            }
+            RequestSqlAuditVo.countAndSort(requestSqlAudit);
+            requestSqlAuditList.add(requestSqlAudit);
         }
     }
 

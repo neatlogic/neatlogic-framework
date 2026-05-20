@@ -22,8 +22,8 @@ import javax.servlet.ServletRequestListener;
 public class ThreadlocalClearListener implements ServletRequestListener {
     @Override
     public void requestDestroyed(ServletRequestEvent event) {
-        // URL SQL监控需要在请求销毁前统一写入请求级审计列表
-        SqlCostInterceptor.completeRequestSqlAudit();
+//        // URL SQL监控需要在请求销毁前统一写入请求级审计列表
+//        SqlCostInterceptor.completeRequestSqlAudit();
         // 清除所有threadlocal
         if (TenantContext.get() != null) {
             TenantContext.get().release();

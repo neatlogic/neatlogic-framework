@@ -15,7 +15,9 @@ package neatlogic.framework.asynchronization.threadlocal;
 import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.dto.healthcheck.RequestSqlAuditVo;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
+import neatlogic.framework.healthcheck.SqlAuditManager;
 import neatlogic.framework.restful.constvalue.RejectSource;
+import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
@@ -123,18 +125,16 @@ public class RequestContext implements Serializable {
     public void addSqlAudit(SqlAuditVo sqlAuditVo) {
         if (requestSqlAuditVo == null) {
             // URL监控聚合对象保存在RequestContext，确保一次HTTP请求只生成一条请求级审计记录
-            requestSqlAuditVo = new RequestSqlAuditVo();
-            requestSqlAuditVo.setUrl(this.url);
-            requestSqlAuditVo.setThreadName(Thread.currentThread().getName());
+            requestSqlAuditVo = new RequestSqlAuditVo(SnowflakeUtil.uniqueLong(), this.url, Thread.currentThread().getName());
         }
         requestSqlAuditVo.addSqlAudit(sqlAuditVo);
     }
 
     public RequestSqlAuditVo getRequestSqlAuditVo() {
-        if (requestSqlAuditVo != null) {
-            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
-            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
-        }
+//        if (requestSqlAuditVo != null) {
+//            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
+//            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
+//        }
         return requestSqlAuditVo;
     }
 
@@ -204,6 +204,10 @@ public class RequestContext implements Serializable {
     }
 
     public void release() {
+        // 请求结束时从RequestContext读取URL监控聚合对象，避免拦截器额外维护ThreadLocal状态
+        if (this.requestSqlAuditVo != null) {
+            SqlAuditManager.addRequestSqlAudit(this.requestSqlAuditVo);
+        }
         MDC.clear();
         instance.remove();
     }

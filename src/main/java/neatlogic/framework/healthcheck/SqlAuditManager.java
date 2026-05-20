@@ -73,7 +73,17 @@ public class SqlAuditManager {
             RequestSqlAuditVo requestSqlAudit = new RequestSqlAuditVo(requestSqlAuditVo.getId(), requestSqlAuditVo.getUrl(), requestSqlAuditVo.getThreadName());
             for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : requestSqlAuditVo.getSameIdSqlAuditList()) {
                 for (SqlAuditVo sqlAuditVo : sameIdSqlAuditVo.getSqlAuditList()) {
-                    requestSqlAudit.addSqlAudit(sqlAuditVo);
+                    SqlAuditVo sqlAudit = new SqlAuditVo();
+                    sqlAudit.setId(sqlAuditVo.getId());
+                    sqlAudit.setTenant(sqlAuditVo.getTenant());
+                    sqlAudit.setUserId(sqlAuditVo.getUserId());
+                    sqlAudit.setTimeCost(sqlAuditVo.getTimeCost());
+                    sqlAudit.setSql(sqlAuditVo.getSql());
+                    sqlAudit.setRunTime(sqlAuditVo.getRunTime());
+                    sqlAudit.setRecordCount(sqlAuditVo.getRecordCount());
+                    sqlAudit.setUseCacheLevel(sqlAuditVo.getUseCacheLevel());
+                    sqlAudit.setThreadName(sqlAuditVo.getThreadName());
+                    requestSqlAudit.addSqlAudit(sqlAudit);
                 }
             }
             RequestSqlAuditVo.countAndSort(requestSqlAudit);

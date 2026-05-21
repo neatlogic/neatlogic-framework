@@ -30,11 +30,14 @@ import org.springframework.stereotype.Component;
 
 import javax.jms.Connection;
 import javax.jms.DeliveryMode;
+import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,13 +77,15 @@ public class ActiveMqArtemisTopicHandler implements IMqHandler {
         try {
             connectionFactory = createConnectionFactory();
             connection = connectionFactory.createConnection();
-            connection.setClientID(buildClientId(tenantUuid, subVo));
+            boolean sharedConsumerSupported = isSharedConsumerSupported();
+            if (isDurable(subVo) && !sharedConsumerSupported) {
+                connection.setClientID(buildClientId(tenantUuid, subVo));
+            }
             connection.start();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             Topic topic = session.createTopic(destinationName);
-            consumer = isDurable(subVo)
-                    ? session.createDurableSubscriber(topic, buildSubscriberName(subVo))
-                    : session.createConsumer(topic);
+            String subscriptionName = buildSubscriptionName(tenantUuid, subVo);
+            consumer = createConsumer(session, topic, subscriptionName, subVo, sharedConsumerSupported);
             subVo.setTenantUuid(tenantUuid);
             consumer.setMessageListener(message -> {
                 try {
@@ -194,12 +199,38 @@ public class ActiveMqArtemisTopicHandler implements IMqHandler {
         return tenantUuid + "/" + topicName;
     }
 
+    private static MessageConsumer createConsumer(Session session, Topic topic, String subscriptionName, SubscribeVo subVo, boolean sharedConsumerSupported)
+            throws JMSException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        if (isDurable(subVo)) {
+            if (sharedConsumerSupported) {
+                Method method = Session.class.getMethod("createSharedDurableConsumer", Topic.class, String.class);
+                return (MessageConsumer) method.invoke(session, topic, subscriptionName);
+            }
+            return session.createDurableSubscriber(topic, subscriptionName);
+        }
+        if (sharedConsumerSupported) {
+            Method method = Session.class.getMethod("createSharedConsumer", Topic.class, String.class);
+            return (MessageConsumer) method.invoke(session, topic, subscriptionName);
+        }
+        return session.createConsumer(topic);
+    }
+
+    private static boolean isSharedConsumerSupported() {
+        try {
+            Session.class.getMethod("createSharedDurableConsumer", Topic.class, String.class);
+            Session.class.getMethod("createSharedConsumer", Topic.class, String.class);
+            return true;
+        } catch (NoSuchMethodException ex) {
+            return false;
+        }
+    }
+
     private static String buildClientId(String tenantUuid, SubscribeVo subVo) {
         return (tenantUuid + "_" + subVo.getId()).replaceAll("[^a-zA-Z0-9_\\-.]", "_");
     }
 
-    private static String buildSubscriberName(SubscribeVo subVo) {
-        String name = StringUtils.defaultIfBlank(subVo.getName(), "subscriber_" + subVo.getId());
+    private static String buildSubscriptionName(String tenantUuid, SubscribeVo subVo) {
+        String name = tenantUuid + "_" + subVo.getId();
         return name.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
     }
 

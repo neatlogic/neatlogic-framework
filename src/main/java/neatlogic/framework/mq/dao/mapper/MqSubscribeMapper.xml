@@ -126,6 +126,7 @@
             error       = #{error},
             config      = #{configStr,typeHandler=CompressHandler},
             server_id   = #{serverId},
+            handler     = #{handler},
             topic_name  = #{topicName},
             name        = #{name}
         WHERE id = #{id}
@@ -152,4 +153,3 @@
         WHERE id = #{value}
     </delete>
 </mapper>
-

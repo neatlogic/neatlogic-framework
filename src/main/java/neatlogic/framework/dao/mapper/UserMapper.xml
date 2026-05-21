@@ -268,20 +268,20 @@
         FROM `user` a
         WHERE a.`vip_level` != 0
     </select>
-    <!-- 分组编辑页面用到该语句，不能使用缓存-->
-    <select id="searchUserUuidList" parameterType="neatlogic.framework.dto.UserVo" resultType="java.lang.String" useCache="false">
-        SELECT
-            a.`uuid`
-        FROM `user` a
-        <if test="isOnline != null and isOnline == 1">
-            join `user_session` us on a.uuid = us.user_uuid
+
+    <sql id="searchUserJoin">
+        <if test="isOnline != null">
+            left join `user_session` us on a.uuid = us.user_uuid
         </if>
-        <if test="teamUuid != null and teamUuid != ''">
+        <if test="(teamUuid != null and teamUuid != '') or (teamUuidList != null and teamUuidList.size() > 0)">
             JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
         </if>
-        <if test="roleUuid != null and roleUuid != ''">
+        <if test="(roleUuid != null and roleUuid != '') or (roleUuidList != null and roleUuidList.size() > 0)">
             JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
         </if>
+    </sql>
+
+    <sql id="searchUserWhere">
         <where>
             <if test="keyword !=null and keyword != ''">
                 (a.`user_id` LIKE CONCAT(#{keyword}, '%')
@@ -291,22 +291,48 @@
             <if test="vipLevel != null">
                 and a.`vip_level` = #{vipLevel}
             </if>
+
             <if test="isActive != null">
                 AND a.`is_active` = #{isActive}
             </if>
+
             <if test="isDelete != null">
                 AND a.`is_delete` = #{isDelete}
             </if>
             <if test="teamUuid != null and teamUuid != ''">
                 AND b.`team_uuid` = #{teamUuid}
             </if>
+            <if test="teamUuidList != null and teamUuidList.size() > 0">
+                AND b.`team_uuid` IN
+                <foreach collection="teamUuidList" item="teamUuidItem" open="(" separator="," close=")">
+                    #{teamUuidItem}
+                </foreach>
+            </if>
             <if test="roleUuid != null and roleUuid != ''">
                 AND d.`role_uuid` = #{roleUuid}
+            </if>
+            <if test="roleUuidList != null and roleUuidList.size() > 0">
+                AND d.`role_uuid` IN
+                <foreach collection="roleUuidList" item="roleUuidItem" open="(" separator="," close=")">
+                    #{roleUuidItem}
+                </foreach>
             </if>
             <if test="isOnline != null and isOnline == 1">
                 and us.`visit_time` &lt; #{expireTime}
             </if>
+            <if test="isOnline != null and isOnline == 0">
+                and (us.`visit_time` &gt; #{expireTime} or us.`visit_time` is null)
+            </if>
         </where>
+    </sql>
+
+    <!-- 分组编辑页面用到该语句，不能使用缓存-->
+    <select id="searchUserUuidList" parameterType="neatlogic.framework.dto.UserVo" resultType="java.lang.String" useCache="false">
+        SELECT
+            a.`uuid`
+        FROM `user` a
+        <include refid="searchUserJoin"/>
+        <include refid="searchUserWhere"/>
         GROUP BY a.`uuid`
         <if test="keyword !=null and keyword != ''">
             ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
@@ -343,25 +369,7 @@
         </foreach>
     </select>
 
-    <select id="searchUserForGroupSearch" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
-        SELECT
-        k.`id`,
-        k.`uuid`,
-        k.`user_id` as `userId`,
-        k.`user_name` as `userName`,
-        k.`email`,
-        k.`phone`,
-        k.`pinyin`,
-        k.`is_active` as `isActive`,
-        k.`user_info` as `userInfo`,
-        k.`vip_level` as `vipLevel`,
-        k.`is_super_admin` as isSuperAdmin,
-        j.`uuid` as `teamUuid`,
-        j.`name` as `teamName`
-        FROM (
-        SELECT
-            a.`uuid`
-        FROM `user` a
+    <sql id="searchUserWhereForGroupSearch">
         WHERE a.`is_active` = 1
         AND a.`is_delete` = 0
         <if test="keyword !=null and keyword != ''">
@@ -408,6 +416,35 @@
             </if>
             )
         </if>
+    </sql>
+
+    <select id="searchUserCountForGroupSearch" parameterType="neatlogic.framework.dto.UserVo" resultType="int" useCache="false">
+        SELECT
+            count(1)
+        FROM `user` a
+        <include refid="searchUserWhereForGroupSearch"/>
+    </select>
+
+    <select id="searchUserForGroupSearch" parameterType="neatlogic.framework.dto.UserVo" resultMap="userInfoMap" useCache="false">
+        SELECT
+        k.`id`,
+        k.`uuid`,
+        k.`user_id` as `userId`,
+        k.`user_name` as `userName`,
+        k.`email`,
+        k.`phone`,
+        k.`pinyin`,
+        k.`is_active` as `isActive`,
+        k.`user_info` as `userInfo`,
+        k.`vip_level` as `vipLevel`,
+        k.`is_super_admin` as isSuperAdmin,
+        j.`uuid` as `teamUuid`,
+        j.`name` as `teamName`
+        FROM (
+        SELECT
+            a.`uuid`
+        FROM `user` a
+        <include refid="searchUserWhereForGroupSearch"/>
         <if test="keyword !=null and keyword != ''">
             ORDER BY length(a.`user_id`) asc, length(a.`user_name`) asc, a.`id` DESC
         </if>
@@ -522,45 +559,8 @@
         SELECT
             count(DISTINCT (a.`uuid`))
         FROM `user` a
-        <if test="isOnline != null">
-            left join `user_session` us on a.uuid = us.user_uuid
-        </if>
-        <if test="teamUuid != null and teamUuid != ''">
-            JOIN `user_team` b ON a.`uuid` = b.`user_uuid`
-        </if>
-        <if test="roleUuid != null and roleUuid != ''">
-            JOIN `user_role` d ON a.`uuid` = d.`user_uuid`
-        </if>
-        <where>
-            <if test="keyword !=null and keyword != ''">
-                (a.`user_id` LIKE CONCAT(#{keyword}, '%')
-                OR a.`user_name` LIKE CONCAT(#{keyword}, '%')
-                OR a.email LIKE CONCAT(#{keyword}, '%'))
-            </if>
-            <if test="vipLevel != null">
-                and a.`vip_level` = #{vipLevel}
-            </if>
-
-            <if test="isActive != null">
-                AND a.`is_active` = #{isActive}
-            </if>
-
-            <if test="isDelete != null">
-                AND a.`is_delete` = #{isDelete}
-            </if>
-            <if test="teamUuid != null and teamUuid != ''">
-                AND b.`team_uuid` = #{teamUuid}
-            </if>
-            <if test="roleUuid != null and roleUuid != ''">
-                AND d.`role_uuid` = #{roleUuid}
-            </if>
-            <if test="isOnline != null and isOnline == 1">
-                and us.`visit_time` &lt; #{expireTime}
-            </if>
-            <if test="isOnline != null and isOnline == 0">
-                and (us.`visit_time` &gt; #{expireTime} or us.`visit_time` is null)
-            </if>
-        </where>
+        <include refid="searchUserJoin"/>
+        <include refid="searchUserWhere"/>
     </select>
 
     <select id="getLimitUserPasswordIdList" resultType="long" parameterType="string" useCache="false">

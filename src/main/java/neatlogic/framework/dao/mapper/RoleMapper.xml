@@ -34,14 +34,7 @@
         <result column="description" property="description"/>
     </resultMap>
 
-    <select id="searchRole" parameterType="neatlogic.framework.dto.RoleVo" resultMap="roleMap" useCache="false">
-        SELECT
-        a.`id`,
-        a.`uuid`,
-        a.`name`,
-        a.`description`
-        FROM `role` a
-        LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
+    <sql id="searchRoleWhere">
         <where>
             `is_delete` = 0
             <if test="keyword != null and keyword != ''">
@@ -60,6 +53,18 @@
                 </foreach>
             </if>
         </where>
+    </sql>
+    <select id="searchRole" parameterType="neatlogic.framework.dto.RoleVo" resultMap="roleMap" useCache="false">
+        SELECT
+        a.`id`,
+        a.`uuid`,
+        a.`name`,
+        a.`description`
+        FROM `role` a
+        <if test="(authGroup != null and authGroup != '') or (auth != null and auth != '')">
+            LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
+        </if>
+        <include refid="searchRoleWhere"/>
         GROUP BY a.`uuid`
         ORDER BY a.`id` DESC
         <if test="needPage == true">
@@ -107,17 +112,10 @@
         SELECT
         COUNT(DISTINCT (a.`uuid`))
         FROM `role` a
-        LEFT JOIN `role_authority` b ON a.`uuid` = b.`role_uuid`
-        WHERE `is_delete` = 0
-        <if test="keyword != null and keyword != ''">
-            AND (a.`name` LIKE CONCAT('%', #{keyword}, '%') OR a.`description` LIKE CONCAT('%', #{keyword}, '%'))
+        <if test="(authGroup != null and authGroup != '') or (auth != null and auth != '')">
+            LEFT JOIN `role_authority` c ON a.`uuid` = c.`role_uuid`
         </if>
-        <if test="authGroup != null and authGroup != ''">
-            AND b.`auth_group` = #{authGroup}
-        </if>
-        <if test="auth != null and auth != ''">
-            AND b.`auth` = #{auth}
-        </if>
+        <include refid="searchRoleWhere"/>
     </select>
 
     <select id="searchRoleUserCountByRoleUuid" parameterType="java.lang.String" resultType="int" useCache="false">

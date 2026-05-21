@@ -55,21 +55,26 @@ public class UserGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-        Integer total = groupSearchVo.getTotal();
-        if (total == null) {
-            total = 18;
-        }
-        List<UserVo> userList = new ArrayList<UserVo>();
+//        Integer total = groupSearchVo.getTotal();
+//        if (total == null) {
+//            total = 18;
+//        }
+        List<UserVo> userList = new ArrayList<>();
         UserVo userVo = new UserVo();
-        userVo.setPageSize(total);
-        userVo.setCurrentPage(1);
+        userVo.setPageSize(groupSearchVo.getPageSize());
+        userVo.setCurrentPage(groupSearchVo.getCurrentPage());
         userVo.setKeyword(groupSearchVo.getKeyword());
         //如果存在rangeList 则需要过滤option
         List<String> rangeList = groupSearchVo.getRangeList();
         if (CollectionUtils.isNotEmpty(rangeList)) {
             userService.getUserByRangeList(userVo, rangeList);
         }
-        userList = userMapper.searchUserForGroupSearch(userVo);
+        int rowNum = userMapper.searchUserCountForGroupSearch(userVo);
+        if (rowNum > 0) {
+            groupSearchVo.setRowNum(rowNum);
+            userVo.setRowNum(rowNum);
+            userList = userMapper.searchUserForGroupSearch(userVo);
+        }
         return convertGroupSearchOption(userList);
     }
 
@@ -113,6 +118,6 @@ public class UserGroupHandler implements IGroupSearchHandler {
 
     @Override
     public Boolean isLimit() {
-        return true;
+        return false;
     }
 }

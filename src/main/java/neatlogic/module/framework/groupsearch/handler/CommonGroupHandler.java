@@ -53,13 +53,15 @@ public class CommonGroupHandler implements IGroupSearchHandler {
         }
         List<GroupSearchOptionVo> groupSearchOptionList = new ArrayList<>();
         for (UserType s : UserType.values()) {
-            if ((!excludeStrList.contains(getHeader() + s.getValue()) && (s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue()))) && s.getText().contains(groupSearchVo.getKeyword())) {
+            if ((!excludeStrList.contains(getHeader() + s.getValue()) && (s.getIsDefaultShow() || includeStrList.contains(getHeader() + s.getValue()))) && (StringUtils.isBlank(groupSearchVo.getKeyword()) || s.getText().contains(groupSearchVo.getKeyword()))) {
                 GroupSearchOptionVo groupSearchOptionVo = new GroupSearchOptionVo();
                 groupSearchOptionVo.setValue(getHeader() + s.getValue());
                 groupSearchOptionVo.setText(s.getText());
                 groupSearchOptionList.add(groupSearchOptionVo);
             }
         }
+        groupSearchVo.setPageSize(groupSearchOptionList.size());
+        groupSearchVo.setRowNum(groupSearchOptionList.size());
         return groupSearchOptionList;
     }
 

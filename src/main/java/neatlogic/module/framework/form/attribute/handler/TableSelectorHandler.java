@@ -15,6 +15,7 @@ package neatlogic.module.framework.form.attribute.handler;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.ParamType;
+import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.form.attribute.core.*;
 import neatlogic.framework.form.constvalue.FormConditionModel;
 import neatlogic.framework.form.constvalue.FormHandler;
@@ -729,5 +730,57 @@ public class TableSelectorHandler extends FormHandlerBase {
             JSONObject config1 = dataObj.getJSONObject("config");
             formAttributeHandler.validateExtendAttributeConfig(key + "." + key1, config1);
         }
+    }
+
+    @Override
+    public Object passwordEncryption(Object source, JSONObject configObj) {
+        JSONArray dataArray = null;
+        if (source instanceof JSONArray) {
+            dataArray = (JSONArray) source;
+        }
+        if (CollectionUtils.isEmpty(dataArray)) {
+            return source;
+        }
+
+        JSONArray dataConfig = configObj.getJSONArray("dataConfig");
+        if (CollectionUtils.isNotEmpty(dataConfig)) {
+            for (int i = 0; i < dataConfig.size(); i++) {
+                JSONObject attr = dataConfig.getJSONObject(i);
+                String handler = attr.getString("handler");
+                if (Objects.equals(handler, FormHandler.FORMPASSWORD.getHandler())) {
+                    String uuid = attr.getString("uuid");
+                    for (int j = 0; j < dataArray.size(); j++) {
+                        JSONObject dataObj = dataArray.getJSONObject(j);
+                        if (MapUtils.isNotEmpty(dataObj)) {
+                            String data = dataObj.getString(uuid);
+                            if (StringUtils.isNotBlank(data)) {
+                                dataObj.put(uuid, RC4Util.encrypt(data));
+                            }
+                        }
+                    }
+                } else if (Objects.equals(handler, "formtable")) {
+                    JSONObject config = attr.getJSONObject("config");
+                    if (MapUtils.isEmpty(config)) {
+                        continue;
+                    }
+                    String uuid = attr.getString("uuid");
+                    for (int j = 0; j < dataArray.size(); j++) {
+                        JSONObject dataObj = dataArray.getJSONObject(j);
+                        if (MapUtils.isNotEmpty(dataObj)) {
+                            JSONArray data = dataObj.getJSONArray(uuid);
+                            if (CollectionUtils.isNotEmpty(data)) {
+                                this.passwordEncryption(data, config);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return dataArray;
+    }
+
+    @Override
+    public JSONObject passwordDecryption(Object source, String attributeUuid, JSONObject otherParamConfig) {
+        return withinPasswordDecryption(source, attributeUuid, otherParamConfig);
     }
 }

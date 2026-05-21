@@ -18,18 +18,7 @@
         <result property="rht" column="rht"/>
     </resultMap>
 
-    <select id="searchTeam" parameterType="neatlogic.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
-        SELECT
-        `id`,
-        `uuid`,
-        `name`,
-        `email`,
-        `phone`,
-        `lft`,
-        `rht`,
-        `parent_uuid` AS `parentUuid`,
-        `level`
-        FROM `team`
+    <sql id="searchTeamWhere">
         <where>
             <if test="keyword != null and keyword != ''">
                 and `name` LIKE CONCAT('%', #{keyword}, '%')
@@ -62,6 +51,21 @@
                 )
             </if>
         </where>
+    </sql>
+
+    <select id="searchTeam" parameterType="neatlogic.framework.dto.TeamVo" resultMap="teamMap" useCache="false">
+        SELECT
+        `id`,
+        `uuid`,
+        `name`,
+        `email`,
+        `phone`,
+        `lft`,
+        `rht`,
+        `parent_uuid` AS `parentUuid`,
+        `level`
+        FROM `team`
+        <include refid="searchTeamWhere"/>
         ORDER BY `lft`
         <if test="needPage == true">
             LIMIT #{startNum}, #{pageSize}
@@ -123,9 +127,9 @@
     <select id="searchTeamCount" parameterType="neatlogic.framework.dto.TeamVo" resultType="int" useCache="false">
         SELECT
         COUNT(1)
-        FROM
-        `team`
-        <where>
+        FROM `team`
+        <include refid="searchTeamWhere"/>
+        <!--<where>
             <if test="keyword != null and keyword != ''">
                 and (`name` LIKE CONCAT('%', #{keyword}, '%') or `uuid` = #{keyword})
             </if>
@@ -138,7 +142,7 @@
             <if test="isDelete != null">
                 and `is_delete` = #{isDelete}
             </if>
-        </where>
+        </where>-->
     </select>
     <!-- 分组编辑页面用到该语句，不能使用缓存-->
     <select id="getTeam" parameterType="neatlogic.framework.dto.TeamVo" resultMap="teamMap" useCache="false">

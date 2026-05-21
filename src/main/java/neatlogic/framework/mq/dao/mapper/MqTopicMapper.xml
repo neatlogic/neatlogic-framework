@@ -49,7 +49,8 @@
         INSERT INTO mq_topic (name, label, is_active, handler)
         VALUES (#{name}, #{label}, #{isActive}, #{handler})
         ON DUPLICATE KEY UPDATE label     = #{label},
-                                is_active = #{isActive}
+                                is_active = #{isActive},
+                                handler   = #{handler}
     </insert>
 
     <insert id="saveTopicIsActive" parameterType="neatlogic.framework.mq.dto.TopicVo">

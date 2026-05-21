@@ -56,15 +56,15 @@ public class TeamGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-        Integer total = groupSearchVo.getTotal();
-        if (total == null) {
-            total = 18;
-        }
-        List<TeamVo> teamList = new ArrayList<TeamVo>();
+//        Integer total = groupSearchVo.getTotal();
+//        if (total == null) {
+//            total = 18;
+//        }
+        List<TeamVo> teamList = new ArrayList<>();
         TeamVo teamVo = new TeamVo();
         teamVo.setNeedPage(true);
-        teamVo.setPageSize(total);
-        teamVo.setCurrentPage(1);
+        teamVo.setPageSize(groupSearchVo.getPageSize());
+        teamVo.setCurrentPage(groupSearchVo.getCurrentPage());
         teamVo.setKeyword(groupSearchVo.getKeyword());
         teamVo.setIsDelete(0);
         //如果存在rangeList 则需要过滤option
@@ -97,8 +97,13 @@ public class TeamGroupHandler implements IGroupSearchHandler {
             teamVo.setParentTeamUuidList(new ArrayList<>(parentTeamSet));
             teamVo.setRangeList(rangeList.stream().map(Object::toString).collect(Collectors.toList()));
         }
-        teamList = teamMapper.searchTeam(teamVo);
-        setFullPathAndParentName(teamList);
+        int rowNum = teamMapper.searchTeamCount(teamVo);
+        if (rowNum > 0) {
+            groupSearchVo.setRowNum(rowNum);
+            teamVo.setRowNum(rowNum);
+            teamList = teamMapper.searchTeam(teamVo);
+            setFullPathAndParentName(teamList);
+        }
         return convertGroupSearchOption(teamList);
     }
 
@@ -144,7 +149,7 @@ public class TeamGroupHandler implements IGroupSearchHandler {
 
     @Override
     public Boolean isLimit() {
-        return true;
+        return false;
     }
 
     /**

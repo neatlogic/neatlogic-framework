@@ -19,12 +19,12 @@ import java.util.List;
 
 public class GroupSearchGroupVo {
 
-    @EntityField(name = "common.index", type = ApiParamType.INTEGER)
-    private Integer index;
-    @EntityField(name = "common.islimit", type = ApiParamType.BOOLEAN)
-    private Boolean isLimit;
-    @EntityField(name = "common.hasmore", type = ApiParamType.BOOLEAN)
-    private Boolean isMore;
+//    @EntityField(name = "common.index", type = ApiParamType.INTEGER)
+//    private Integer index;
+//    @EntityField(name = "common.islimit", type = ApiParamType.BOOLEAN)
+//    private Boolean isLimit;
+//    @EntityField(name = "common.hasmore", type = ApiParamType.BOOLEAN)
+//    private Boolean isMore;
     @EntityField(name = "common.sort", type = ApiParamType.INTEGER)
     private Integer sort;
     @EntityField(name = "common.value", type = ApiParamType.STRING)
@@ -34,29 +34,42 @@ public class GroupSearchGroupVo {
 
     private List<GroupSearchOptionVo> dataList;
 
-    public Integer getIndex() {
-        return index;
-    }
 
-    public void setIndex(Integer index) {
-        this.index = index;
-    }
+    @EntityField(name = "common.pagesize", type = ApiParamType.INTEGER)
+    private Integer pageSize = 20;
 
-    public Boolean getIsLimit() {
-        return isLimit;
-    }
+    @EntityField(name = "common.currentpage", type = ApiParamType.INTEGER)
+    private Integer currentPage = 1;
 
-    public void setIsLimit(Boolean limit) {
-        isLimit = limit;
-    }
+    @EntityField(name = "common.pagecount", type = ApiParamType.INTEGER)
+    private Integer pageCount = 0;
 
-    public Boolean getIsMore() {
-        return isMore;
-    }
+    @EntityField(name = "common.rownum", type = ApiParamType.INTEGER)
+    private Integer rowNum = 0;
 
-    public void setIsMore(Boolean more) {
-        isMore = more;
-    }
+//    public Integer getIndex() {
+//        return index;
+//    }
+//
+//    public void setIndex(Integer index) {
+//        this.index = index;
+//    }
+//
+//    public Boolean getIsLimit() {
+//        return isLimit;
+//    }
+//
+//    public void setIsLimit(Boolean limit) {
+//        isLimit = limit;
+//    }
+//
+//    public Boolean getIsMore() {
+//        return isMore;
+//    }
+//
+//    public void setIsMore(Boolean more) {
+//        isMore = more;
+//    }
 
     public Integer getSort() {
         return sort;
@@ -88,5 +101,37 @@ public class GroupSearchGroupVo {
 
     public void setDataList(List<GroupSearchOptionVo> dataList) {
         this.dataList = dataList;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Integer getCurrentPage() {
+        return currentPage;
+    }
+
+    public void setCurrentPage(Integer currentPage) {
+        this.currentPage = currentPage;
+    }
+
+    public Integer getPageCount() {
+        return pageCount;
+    }
+
+    public void setPageCount(Integer pageCount) {
+        this.pageCount = pageCount;
+    }
+
+    public Integer getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(Integer rowNum) {
+        this.rowNum = rowNum;
     }
 }

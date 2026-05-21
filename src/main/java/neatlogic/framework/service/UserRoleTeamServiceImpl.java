@@ -11,14 +11,23 @@ import java.util.stream.Collectors;
 public class UserRoleTeamServiceImpl implements UserRoleTeamService {
 
     @Override
-    public List<GroupSearchGroupVo> searchUserRoleTeam(GroupSearchVo groupSearchVo) {
-        List<String> groupList = groupSearchVo.getGroupList();
-        List<String> excludeList = groupSearchVo.getExcludeList();
+    public List<GroupSearchGroupVo> searchUserRoleTeam(GroupSearchVo groupSearch) {
         int groupCount = 0;
         List<GroupSearchGroupVo> resultArray = new ArrayList<>();
         Map<String, IGroupSearchHandler> handlerMap = GroupSearchHandlerFactory.getComponentMap();
         for (Map.Entry<String, IGroupSearchHandler> handlerEntry : handlerMap.entrySet()) {
             IGroupSearchHandler handler = handlerEntry.getValue();
+            GroupSearchVo groupSearchVo = new GroupSearchVo();
+            groupSearchVo.setValueList(new ArrayList<>(groupSearch.getValueList()));
+            groupSearchVo.setExcludeList(new ArrayList<>(groupSearch.getExcludeList()));
+            groupSearchVo.setIncludeList(new ArrayList<>(groupSearch.getIncludeList()));
+            groupSearchVo.setGroupList(new ArrayList<>(groupSearch.getGroupList()));
+            groupSearchVo.setRangeList(new ArrayList<>(groupSearch.getRangeList()));
+            groupSearchVo.setKeyword(groupSearch.getKeyword());
+            groupSearchVo.setCurrentPage(groupSearch.getCurrentPage());
+            groupSearchVo.setPageSize(groupSearch.getPageSize());
+            List<String> groupList = groupSearchVo.getGroupList();
+            List<String> excludeList = groupSearchVo.getExcludeList();
             if (groupList != null && !groupList.contains(handler.getName())) {
                 continue;
             }
@@ -49,74 +58,78 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
                 }
             }
             groupSearchGroupVo.setDataList(dataList);
-            if (handler.isLimit()) {
-                groupSearchGroupVo.setIndex(0);
-            } else {
-                groupSearchGroupVo.setIndex(groupSearchGroupVo.getDataList().size());
-            }
-            groupSearchGroupVo.setIsLimit(handler.isLimit());
-            groupSearchGroupVo.setIsMore(isMore);
+            groupSearchGroupVo.setCurrentPage(groupSearchVo.getCurrentPage());
+            groupSearchGroupVo.setPageSize(groupSearchVo.getPageSize());
+            groupSearchGroupVo.setPageCount(groupSearchVo.getPageCount());
+            groupSearchGroupVo.setRowNum(groupSearchVo.getRowNum());
+//            if (handler.isLimit()) {
+//                groupSearchGroupVo.setIndex(0);
+//            } else {
+//                groupSearchGroupVo.setIndex(groupSearchGroupVo.getDataList().size());
+//            }
+//            groupSearchGroupVo.setIsLimit(handler.isLimit());
+//            groupSearchGroupVo.setIsMore(isMore);
             resultArray.add(groupSearchGroupVo);
         }
         //排序
         resultArray.sort(Comparator.comparing(GroupSearchGroupVo::getSort));
         //如果是搜索模式
-        if (CollectionUtils.isEmpty(groupSearchVo.getValueList())) {
-            //总显示选项个数,默认18个
-            Integer total = groupSearchVo.getTotal();
-            if (total == null) {
-                total = 18;
-            }
-            //预留“更多”选项位置
-            total = total - groupCount;
-            //计算index位置
-            int i = 0;
-            int totalTmp = 0;
-            HashSet<String> set = new HashSet<>();
-            out:
-            while (totalTmp < total) {
-                for (GroupSearchGroupVo groupSearchGroupVo : resultArray) {
-                    if (groupSearchGroupVo.getIsLimit()) {
-                        List<GroupSearchOptionVo> dataList = groupSearchGroupVo.getDataList();
-                        if (i < dataList.size()) {
-                            int index = groupSearchGroupVo.getIndex();
-                            groupSearchGroupVo.setIndex(++index);
-                            //判断是否还有多余项
-                            if (dataList.size() == index) {
-                                groupSearchGroupVo.setIsMore(false);
-                                total++;
-                            }
-                            dataList.get(i);
-                            if (totalTmp < (total - 1)) {
-                                totalTmp++;
-                            } else {
-                                break out;
-                            }
-
-                        } else {
-                            set.add(groupSearchGroupVo.getValue());
-                        }
-                    } else {
-                        groupSearchGroupVo.setIsMore(false);
-                    }
-                }
-                if (set.size() == groupCount) {
-                    break out;
-                }
-                i++;
-            }
-            //则根据index删掉多余数据
-            for (GroupSearchGroupVo groupSearchGroupVo : resultArray) {
-                List<GroupSearchOptionVo> dataList = groupSearchGroupVo.getDataList();
-                if (CollectionUtils.isEmpty(dataList)) {
-                    groupSearchGroupVo.setIsMore(false);
-                } else {
-                    int index = groupSearchGroupVo.getIndex();
-                    groupSearchGroupVo.setDataList(dataList.subList(0, index));
-                }
-            }
-
-        }
+//        if (CollectionUtils.isEmpty(groupSearchVo.getValueList())) {
+//            //总显示选项个数,默认18个
+//            Integer total = groupSearchVo.getTotal();
+//            if (total == null) {
+//                total = 18;
+//            }
+//            //预留“更多”选项位置
+//            total = total - groupCount;
+//            //计算index位置
+//            int i = 0;
+//            int totalTmp = 0;
+//            HashSet<String> set = new HashSet<>();
+//            out:
+//            while (totalTmp < total) {
+//                for (GroupSearchGroupVo groupSearchGroupVo : resultArray) {
+//                    if (groupSearchGroupVo.getIsLimit()) {
+//                        List<GroupSearchOptionVo> dataList = groupSearchGroupVo.getDataList();
+//                        if (i < dataList.size()) {
+//                            int index = groupSearchGroupVo.getIndex();
+//                            groupSearchGroupVo.setIndex(++index);
+//                            //判断是否还有多余项
+//                            if (dataList.size() == index) {
+//                                groupSearchGroupVo.setIsMore(false);
+//                                total++;
+//                            }
+//                            dataList.get(i);
+//                            if (totalTmp < (total - 1)) {
+//                                totalTmp++;
+//                            } else {
+//                                break out;
+//                            }
+//
+//                        } else {
+//                            set.add(groupSearchGroupVo.getValue());
+//                        }
+//                    } else {
+//                        groupSearchGroupVo.setIsMore(false);
+//                    }
+//                }
+//                if (set.size() == groupCount) {
+//                    break out;
+//                }
+//                i++;
+//            }
+//            //则根据index删掉多余数据
+//            for (GroupSearchGroupVo groupSearchGroupVo : resultArray) {
+//                List<GroupSearchOptionVo> dataList = groupSearchGroupVo.getDataList();
+//                if (CollectionUtils.isEmpty(dataList)) {
+//                    groupSearchGroupVo.setIsMore(false);
+//                } else {
+//                    int index = groupSearchGroupVo.getIndex();
+//                    groupSearchGroupVo.setDataList(dataList.subList(0, index));
+//                }
+//            }
+//
+//        }
         return resultArray;
     }
 }

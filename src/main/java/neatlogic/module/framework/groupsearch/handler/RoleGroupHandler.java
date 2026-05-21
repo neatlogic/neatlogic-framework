@@ -55,15 +55,15 @@ public class RoleGroupHandler implements IGroupSearchHandler {
     @Override
     public List<GroupSearchOptionVo> search(GroupSearchVo groupSearchVo) {
         //总显示选项个数
-        Integer total = groupSearchVo.getTotal();
-        if (total == null) {
-            total = 18;
-        }
-        List<RoleVo> roleList;
+//        Integer total = groupSearchVo.getTotal();
+//        if (total == null) {
+//            total = 18;
+//        }
+        List<RoleVo> roleList = new ArrayList<>();
         RoleVo roleVo = new RoleVo();
         roleVo.setNeedPage(true);
-        roleVo.setPageSize(total);
-        roleVo.setCurrentPage(1);
+        roleVo.setPageSize(groupSearchVo.getPageSize());
+        roleVo.setCurrentPage(groupSearchVo.getCurrentPage());
         roleVo.setKeyword(groupSearchVo.getKeyword());
         //如果存在rangeList 则需要过滤option
         List<String> rangeList = groupSearchVo.getRangeList();
@@ -79,8 +79,13 @@ public class RoleGroupHandler implements IGroupSearchHandler {
             }
             roleVo.setRoleUuidList(roleUuidList);
         }
-        roleList = roleMapper.searchRole(roleVo);
-        roleService.setRoleTeamCountAndRoleUserCount(roleList);
+        int rowNum = roleMapper.searchRoleCount(roleVo);
+        if (rowNum > 0) {
+            groupSearchVo.setRowNum(rowNum);
+            roleVo.setRowNum(rowNum);
+            roleList = roleMapper.searchRole(roleVo);
+            roleService.setRoleTeamCountAndRoleUserCount(roleList);
+        }
         return convertGroupSearchOption(roleList);
     }
 
@@ -117,6 +122,6 @@ public class RoleGroupHandler implements IGroupSearchHandler {
 
     @Override
     public Boolean isLimit() {
-        return true;
+        return false;
     }
 }

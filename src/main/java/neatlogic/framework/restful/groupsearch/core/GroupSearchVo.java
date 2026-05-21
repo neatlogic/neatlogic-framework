@@ -13,14 +13,15 @@
 package neatlogic.framework.restful.groupsearch.core;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.restful.annotation.EntityField;
 
 import java.util.List;
 
-public class GroupSearchVo {
+public class GroupSearchVo extends BasePageVo {
 
-    @EntityField(name = "common.keyword", type = ApiParamType.STRING)
-    private String keyword;
+//    @EntityField(name = "common.keyword", type = ApiParamType.STRING)
+//    private String keyword;
     @EntityField(name = "common.defaultvaluelist", type = ApiParamType.JSONARRAY)
     private List<String> valueList;
     @EntityField(name = "common.excludelist", type = ApiParamType.JSONARRAY)
@@ -36,13 +37,13 @@ public class GroupSearchVo {
     @EntityField(name = "term.rdm.projectid", type = ApiParamType.LONG)
     private Long projectId;
 
-    public String getKeyword() {
-        return keyword;
-    }
-
-    public void setKeyword(String keyword) {
-        this.keyword = keyword;
-    }
+//    public String getKeyword() {
+//        return keyword;
+//    }
+//
+//    public void setKeyword(String keyword) {
+//        this.keyword = keyword;
+//    }
 
     public List<String> getValueList() {
         return valueList;

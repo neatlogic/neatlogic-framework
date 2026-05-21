@@ -65,6 +65,8 @@ public interface UserMapper {
 
     List<UserVo> searchUserDetailInfoByUuidList(List<String> uuidList);
 
+    int searchUserCountForGroupSearch(UserVo userVo);
+
     List<UserVo> searchUserForGroupSearch(UserVo userVo);
 
     List<UserVo> searchUserForSelect(UserVo userVo);

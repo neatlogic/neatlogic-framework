@@ -11,14 +11,23 @@ import java.util.stream.Collectors;
 public class UserRoleTeamServiceImpl implements UserRoleTeamService {
 
     @Override
-    public List<GroupSearchGroupVo> searchUserRoleTeam(GroupSearchVo groupSearchVo) {
-        List<String> groupList = groupSearchVo.getGroupList();
-        List<String> excludeList = groupSearchVo.getExcludeList();
+    public List<GroupSearchGroupVo> searchUserRoleTeam(GroupSearchVo groupSearch) {
         int groupCount = 0;
         List<GroupSearchGroupVo> resultArray = new ArrayList<>();
         Map<String, IGroupSearchHandler> handlerMap = GroupSearchHandlerFactory.getComponentMap();
         for (Map.Entry<String, IGroupSearchHandler> handlerEntry : handlerMap.entrySet()) {
             IGroupSearchHandler handler = handlerEntry.getValue();
+            GroupSearchVo groupSearchVo = new GroupSearchVo();
+            groupSearchVo.setValueList(new ArrayList<>(groupSearch.getValueList()));
+            groupSearchVo.setExcludeList(new ArrayList<>(groupSearch.getExcludeList()));
+            groupSearchVo.setIncludeList(new ArrayList<>(groupSearch.getIncludeList()));
+            groupSearchVo.setGroupList(new ArrayList<>(groupSearch.getGroupList()));
+            groupSearchVo.setRangeList(new ArrayList<>(groupSearch.getRangeList()));
+            groupSearchVo.setKeyword(groupSearch.getKeyword());
+            groupSearchVo.setCurrentPage(groupSearch.getCurrentPage());
+            groupSearchVo.setPageSize(groupSearch.getPageSize());
+            List<String> groupList = groupSearchVo.getGroupList();
+            List<String> excludeList = groupSearchVo.getExcludeList();
             if (groupList != null && !groupList.contains(handler.getName())) {
                 continue;
             }

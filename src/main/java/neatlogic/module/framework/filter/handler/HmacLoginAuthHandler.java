@@ -115,7 +115,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
             StringBuilder sb = new StringBuilder();
             BufferedReader reader;
             if (input != null) {
-                reader = new BufferedReader(new InputStreamReader(input));
+                reader = new BufferedReader(new InputStreamReader(input, StandardCharsets.UTF_8));
                 char[] charBuffer = new char[2048];
                 int bytesRead = -1;
                 while ((bytesRead = reader.read(charBuffer)) > 0) {
@@ -134,6 +134,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         if (logger.isDebugEnabled()) {
             logger.debug("header Authorization = {}", request.getHeader("Authorization"));
             logger.debug("header x-access-key = {}", request.getHeader("x-access-key"));
+            logger.debug("request uri = {}", request.getRequestURI());
             logger.debug("token = {}", token);
             logger.debug("bodyJsonString = {}", bodyJsonString);
             logger.debug("queryString = {}", queryString);

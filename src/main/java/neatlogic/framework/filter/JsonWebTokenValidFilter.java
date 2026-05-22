@@ -150,7 +150,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                             logger.debug("======= getUser succeed: " + userVo.getUuid());
                         } else {
-                            returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth, loginAuth.getType());
+                            String authFailMessage = String.format("%s认证失败，原因：%s", loginAuth.getType(), userVo == null ? "认证插件未返回用户，请检查认证信息是否正确" : "认证插件返回的用户缺少uuid");
+                            returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, loginAuth, authFailMessage);
                             return;
                         }
                     } else {
@@ -158,7 +159,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         return;
                     }
                 } else {
-                    returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, loginAuth.getType());
+                    returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, "认证失败，原因：缺少认证类型，请检查请求头AuthType或租户登录认证配置");
                     return;
                 }
             } else {

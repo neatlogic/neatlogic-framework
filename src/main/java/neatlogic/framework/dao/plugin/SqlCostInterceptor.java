@@ -126,7 +126,12 @@ public class SqlCostInterceptor implements Interceptor {
             if (urlSet.contains("*")) {
                 return true;
             }
-            return urlSet.contains(url);
+            for (String str : urlSet) {
+                if (url.contains(str)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public static boolean isEmpty() {

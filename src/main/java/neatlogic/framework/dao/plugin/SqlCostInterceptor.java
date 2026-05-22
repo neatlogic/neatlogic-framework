@@ -17,6 +17,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
+import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
@@ -41,7 +42,9 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.text.DateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -63,6 +66,7 @@ import java.util.regex.Matcher;
 })
 public class SqlCostInterceptor implements Interceptor {
     private static final Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
+    private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
     // 判断是否真的访问了数据库，用于区分一级/二级缓存命中情况
     private static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
     public static class SqlIdMap {
@@ -273,9 +277,11 @@ public class SqlCostInterceptor implements Interceptor {
         String value = null;
         if (obj instanceof String) {
             value = "'" + obj + "'";
-        } else if (obj instanceof Date) {
-            DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.CHINA);
-            value = "'" + formatter.format(obj) + "'";
+        } else if (obj instanceof Date date) {
+//            DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.CHINA);
+//            value = "'" + formatter.format(obj) + "'";
+            LocalDateTime localDateTime = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+            value = "'" + localDateTime.format(dateTimeFormatter) + "'";
         } else {
             if (obj != null) {
                 value = obj.toString();
@@ -292,6 +298,7 @@ public class SqlCostInterceptor implements Interceptor {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         String sql = boundSql.getSql().replaceAll("[\\s]+", " ");
         if (CollectionUtils.isNotEmpty(parameterMappings) && parameterObject != null) {
+            String regex = "\\?(?=\\s*(?:,\\s*\\?|\\)\\s*;?\\s*$))";
             TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
             if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
                 sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(parameterObject)));
@@ -305,17 +312,17 @@ public class SqlCostInterceptor implements Interceptor {
                         if (obj != null && typeHandler instanceof NeatLogicTypeHandler) {
                             obj = ((NeatLogicTypeHandler) typeHandler).handleParameter(obj);
                         }
-                        sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
+                        sql = sql.replaceFirst(regex, Matcher.quoteReplacement(getParameterValue(obj)));
                     } else if (boundSql.hasAdditionalParameter(propertyName)) {
                         // 动态SQL参数会放在additionalParameter中，这里保持原有替换逻辑
                         Object obj = boundSql.getAdditionalParameter(propertyName);
                         if (obj != null && typeHandler instanceof NeatLogicTypeHandler) {
                             obj = ((NeatLogicTypeHandler) typeHandler).handleParameter(obj);
                         }
-                        sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(obj)));
+                        sql = sql.replaceFirst(regex, Matcher.quoteReplacement(getParameterValue(obj)));
                     } else {
                         // 参数缺失时保留明确占位，防止后续参数错位
-                        sql = sql.replaceFirst("\\?", "缺失");
+                        sql = sql.replaceFirst(regex, "缺失");
                     }
                 }
             }

@@ -143,16 +143,6 @@ public class SqlCostInterceptor implements Interceptor {
         }
     }
 
-    public static void completeRequestSqlAudit() {
-        RequestContext requestContext = RequestContext.get();
-        if (requestContext != null && requestContext.getRequestSqlAuditVo() != null && requestContext.getRequestSqlAuditVo().getSqlCount() > 0) {
-            // 请求结束时从RequestContext读取URL监控聚合对象，避免拦截器额外维护ThreadLocal状态
-            SqlAuditManager.addRequestSqlAudit(requestContext.getRequestSqlAuditVo());
-            // 落库后清空RequestContext中的聚合对象，防止后续release前重复写入
-            requestContext.setRequestSqlAuditVo(null);
-        }
-    }
-
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Method method = invocation.getMethod();

@@ -45,13 +45,9 @@ import java.sql.Connection;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 
 /**
@@ -69,68 +65,68 @@ public class SqlCostInterceptor implements Interceptor {
     // 判断是否真的访问了数据库，用于区分一级/二级缓存命中情况
     private static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
     public static class SqlIdMap {
-        private static final Set<String> sqlSet = new HashSet<>();
+        private static final ConcurrentMap<String, Object> sqlMap = new ConcurrentHashMap<>();
 
         public static void addId(String id) {
-            sqlSet.add(id);
+            sqlMap.put(id, new Object());
         }
 
         public static void removeId(String id) {
-            sqlSet.remove(id);
+            sqlMap.remove(id);
         }
 
         public static void clear() {
-            sqlSet.clear();
+            sqlMap.clear();
         }
 
         public static List<String> getSqlIdList() {
-            return new ArrayList<>(sqlSet);
+            return new ArrayList<>(sqlMap.keySet());
         }
 
         public static boolean isExists(String id) {
-            if (sqlSet.contains("*")) {
+            if (sqlMap.containsKey("*")) {
                 return true;
             }
-            if (sqlSet.contains(id)) {
+            if (sqlMap.containsKey(id)) {
                 return true;
             }
             if (id.contains(".")) {
                 id = id.substring(id.lastIndexOf(".") + 1);
             }
-            return sqlSet.contains(id);
+            return sqlMap.containsKey(id);
         }
 
         public static boolean isEmpty() {
-            return sqlSet.isEmpty();
+            return sqlMap.isEmpty();
         }
     }
 
     public static class UrlMap {
         // URL监控配置和SqlIdMap分开保存，确保两种监控方式互不影响
-        private static final Set<String> urlSet = new HashSet<>();
+        private static final ConcurrentMap<String, Object> urlMap = new ConcurrentHashMap<>();
 
         public static void addUrl(String url) {
-            urlSet.add(url);
+            urlMap.put(url, new Object());
         }
 
         public static void removeUrl(String url) {
-            urlSet.remove(url);
+            urlMap.remove(url);
         }
 
         public static void clear() {
-            urlSet.clear();
+            urlMap.clear();
         }
 
         public static List<String> getUrlList() {
-            return new ArrayList<>(urlSet);
+            return new ArrayList<>(urlMap.keySet());
         }
 
         public static boolean isExists(String url) {
-            if (urlSet.contains("*")) {
+            if (urlMap.containsKey("*")) {
                 return true;
             }
-            for (String str : urlSet) {
-                if (url.contains(str)) {
+            for (Map.Entry<String, Object> entry : urlMap.entrySet()) {
+                if (url.contains(entry.getKey())) {
                     return true;
                 }
             }
@@ -138,7 +134,7 @@ public class SqlCostInterceptor implements Interceptor {
         }
 
         public static boolean isEmpty() {
-            return urlSet.isEmpty();
+            return urlMap.isEmpty();
         }
     }
 

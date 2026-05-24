@@ -83,16 +83,6 @@ public class RequestSqlAuditVo implements Serializable {
             if (StringUtils.isBlank(this.userId) && StringUtils.isNotBlank(sqlAuditVo.getUserId())) {
                 this.userId = sqlAuditVo.getUserId();
             }
-//            this.sqlCount++;
-//            int notUseCacheCount = 0;
-//            long notUseCacheTimeCost = 0;
-//            long timeCost = sqlAuditVo.getTimeCost();
-//            this.totalTimeCost += timeCost;
-//            if (StringUtils.isBlank(sqlAuditVo.getUseCacheLevel())) {
-//                notUseCacheCount = 1;
-//                notUseCacheTimeCost = timeCost;
-//                this.notUseCacheTotalTimeCost += timeCost;
-//            }
             SameIdSqlAuditVo sameIdSqlAuditVo = null;
             for (SameIdSqlAuditVo sameIdSqlAudit : this.sameIdSqlAuditList) {
                 if (Objects.equals(sameIdSqlAudit.getId(), sqlAuditVo.getId())) {
@@ -103,12 +93,6 @@ public class RequestSqlAuditVo implements Serializable {
                 sameIdSqlAuditVo = new SameIdSqlAuditVo(sqlAuditVo.getId());//, timeCost, notUseCacheTimeCost, notUseCacheCount, sqlAuditVo.getUseCacheLevel(), sqlAuditVo.getSql()
                 this.sameIdSqlAuditList.add(sameIdSqlAuditVo);
             }
-//            sameIdSqlAuditVo.setTotalTimeCost(sameIdSqlAuditVo.getTotalTimeCost() + timeCost);
-//            sameIdSqlAuditVo.setNotUseCacheTotalTimeCost(sameIdSqlAuditVo.getNotUseCacheTotalTimeCost() + notUseCacheTimeCost);
-//            sameIdSqlAuditVo.setNotUseCacheCount(sameIdSqlAuditVo.getNotUseCacheCount() + notUseCacheCount);
-//            sameIdSqlAuditVo.getTimeCostList().add(timeCost);
-//            sameIdSqlAuditVo.getUseCacheLevelList().add(sqlAuditVo.getUseCacheLevel());
-//            sameIdSqlAuditVo.getSqlList().add(sqlAuditVo.getSql());
             sameIdSqlAuditVo.getSqlAuditList().add(sqlAuditVo);
         }
     }
@@ -247,9 +231,9 @@ public class RequestSqlAuditVo implements Serializable {
                             sameIdSqlAuditVo.setNotUseCacheCount(sameIdSqlAuditVo.getNotUseCacheCount() + 1);
                             notUseCacheTotalTimeCost += timeCost;
                         }
-//                        sameIdSqlAuditVo.getTimeCostList().add(timeCost);
-//                        sameIdSqlAuditVo.getUseCacheLevelList().add(sqlAuditVo.getUseCacheLevel());
-//                        sameIdSqlAuditVo.getSqlList().add(sqlAuditVo.getSql());
+                        sameIdSqlAuditVo.getTimeCostList().add(timeCost);
+                        sameIdSqlAuditVo.getUseCacheLevelList().add(sqlAuditVo.getUseCacheLevel());
+                        sameIdSqlAuditVo.getSqlList().add(sqlAuditVo.getSql());
                     }
                 }
             }

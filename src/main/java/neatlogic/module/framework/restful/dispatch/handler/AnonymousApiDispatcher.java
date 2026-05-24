@@ -165,6 +165,8 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endTime - startTime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+//                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                         } else {
                             returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
@@ -191,6 +193,8 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+//                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                         } else {
                             returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
@@ -217,6 +221,8 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+//                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                         } else {
                             returnObj.putAll(JSON.parseObject(JSON.toJSONString(returnV)));
                         }
@@ -243,6 +249,8 @@ public class AnonymousApiDispatcher {
                             returnObj.put("TimeCost", endtime - starttime);
                             returnObj.put("Return", returnV);
                             returnObj.put("Status", "OK");
+//                            returnObj.put("sqlList", CollectionUtils.isEmpty(RequestContext.get().getSqlAuditList()) ? null : RequestContext.get().getSqlAuditList());
+                            returnObj.put("requestSqlAudit", RequestContext.get().getRequestSqlAuditVo());
                             if (restComponent.disableReturnCircularReferenceDetect()) {
                                 returnObj.put("_disableDetect", true);
                             }

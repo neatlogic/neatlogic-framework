@@ -132,10 +132,9 @@ public class RequestContext implements Serializable {
 
     public RequestSqlAuditVo getRequestSqlAuditVo() {
         if (requestSqlAuditVo != null) {
-            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
-            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
+            return RequestSqlAuditVo.newInstanceAndCountAndSort(requestSqlAuditVo);
         }
-        return requestSqlAuditVo;
+        return null;
     }
 
     public void setRequestSqlAuditVo(RequestSqlAuditVo requestSqlAuditVo) {
@@ -147,7 +146,7 @@ public class RequestContext implements Serializable {
         if (_requestContext != null) {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
-            context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
+            context.setRequestSqlAuditVo(_requestContext.requestSqlAuditVo);
             context.setRemoteAddr(_requestContext.getRemoteAddr());
             context.setParam(_requestContext.getParam());
             String tempUrl = _requestContext.getUrl();

@@ -70,23 +70,8 @@ public class SqlAuditManager {
             if (requestSqlAuditList.size() == MAX_SIZE) {
                 requestSqlAuditList.remove(0);
             }
-            RequestSqlAuditVo requestSqlAudit = new RequestSqlAuditVo(requestSqlAuditVo.getId(), requestSqlAuditVo.getUrl(), requestSqlAuditVo.getThreadName());
-            for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : requestSqlAuditVo.getSameIdSqlAuditList()) {
-                for (SqlAuditVo sqlAuditVo : sameIdSqlAuditVo.getSqlAuditList()) {
-                    SqlAuditVo sqlAudit = new SqlAuditVo();
-                    sqlAudit.setId(sqlAuditVo.getId());
-                    sqlAudit.setTenant(sqlAuditVo.getTenant());
-                    sqlAudit.setUserId(sqlAuditVo.getUserId());
-                    sqlAudit.setTimeCost(sqlAuditVo.getTimeCost());
-                    sqlAudit.setSql(sqlAuditVo.getSql());
-                    sqlAudit.setRunTime(sqlAuditVo.getRunTime());
-                    sqlAudit.setRecordCount(sqlAuditVo.getRecordCount());
-                    sqlAudit.setUseCacheLevel(sqlAuditVo.getUseCacheLevel());
-                    sqlAudit.setThreadName(sqlAuditVo.getThreadName());
-                    requestSqlAudit.addSqlAudit(sqlAudit);
-                }
-            }
-            RequestSqlAuditVo.countAndSort(requestSqlAudit);
+
+            RequestSqlAuditVo requestSqlAudit = RequestSqlAuditVo.newInstanceAndCountAndSort(requestSqlAuditVo);
             requestSqlAuditList.add(requestSqlAudit);
         }
     }

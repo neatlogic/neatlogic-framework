@@ -212,12 +212,28 @@ public class RequestSqlAuditVo implements Serializable {
         }
     }
 
-    public static void countAndSort(RequestSqlAuditVo requestSqlAuditVo) {
+    public static RequestSqlAuditVo newInstanceAndCountAndSort(RequestSqlAuditVo requestSqlAuditVo) {
         if (requestSqlAuditVo != null) {
+            RequestSqlAuditVo requestSqlAudit = new RequestSqlAuditVo(requestSqlAuditVo.getId(), requestSqlAuditVo.getUrl(), requestSqlAuditVo.getThreadName());
+            for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : requestSqlAuditVo.getSameIdSqlAuditList()) {
+                for (SqlAuditVo sqlAuditVo : sameIdSqlAuditVo.getSqlAuditList()) {
+                    SqlAuditVo sqlAudit = new SqlAuditVo();
+                    sqlAudit.setId(sqlAuditVo.getId());
+                    sqlAudit.setTenant(sqlAuditVo.getTenant());
+                    sqlAudit.setUserId(sqlAuditVo.getUserId());
+                    sqlAudit.setTimeCost(sqlAuditVo.getTimeCost());
+                    sqlAudit.setSql(sqlAuditVo.getSql());
+                    sqlAudit.setRunTime(sqlAuditVo.getRunTime());
+                    sqlAudit.setRecordCount(sqlAuditVo.getRecordCount());
+                    sqlAudit.setUseCacheLevel(sqlAuditVo.getUseCacheLevel());
+                    sqlAudit.setThreadName(sqlAuditVo.getThreadName());
+                    requestSqlAudit.addSqlAudit(sqlAudit);
+                }
+            }
             int sqlCount = 0;
             long totalTimeCost = 0;
             long notUseCacheTotalTimeCost = 0;
-            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
+            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAudit.getSameIdSqlAuditList();
             for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : sameIdSqlAuditList) {
                 List<SqlAuditVo> sqlAuditList = sameIdSqlAuditVo.getSqlAuditList();
                 if (CollectionUtils.isNotEmpty(sqlAuditList)) {
@@ -238,9 +254,11 @@ public class RequestSqlAuditVo implements Serializable {
                 }
             }
             sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
-            requestSqlAuditVo.setSqlCount(sqlCount);
-            requestSqlAuditVo.setTotalTimeCost(totalTimeCost);
-            requestSqlAuditVo.setNotUseCacheTotalTimeCost(notUseCacheTotalTimeCost);
+            requestSqlAudit.setSqlCount(sqlCount);
+            requestSqlAudit.setTotalTimeCost(totalTimeCost);
+            requestSqlAudit.setNotUseCacheTotalTimeCost(notUseCacheTotalTimeCost);
+            return requestSqlAudit;
         }
+        return null;
     }
 }

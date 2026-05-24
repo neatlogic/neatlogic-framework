@@ -287,7 +287,8 @@ public class SqlCostInterceptor implements Interceptor {
         List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
         String sql = boundSql.getSql().replaceAll("[\\s]+", " ");
         if (CollectionUtils.isNotEmpty(parameterMappings) && parameterObject != null) {
-            String regex = "\\?(?=\\s*(?:,\\s*\\?|\\)\\s*;?\\s*$))";
+            // 匹配除了在单引号内的所有问号
+            String regex = "\\?(?=(?:[^']*'[^']*')*[^']*$)";
             TypeHandlerRegistry typeHandlerRegistry = configuration.getTypeHandlerRegistry();
             if (typeHandlerRegistry.hasTypeHandler(parameterObject.getClass())) {
                 sql = sql.replaceFirst("\\?", Matcher.quoteReplacement(getParameterValue(parameterObject)));

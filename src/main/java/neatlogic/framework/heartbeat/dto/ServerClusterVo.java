@@ -17,6 +17,7 @@ public class ServerClusterVo extends BaseEditorVo {
 	private Date heartbeatTime;
 	private String ip;
 	private Date startTime;
+	private String serverGroup;
 
 	public String getHost() {
 		return host;
@@ -75,5 +76,13 @@ public class ServerClusterVo extends BaseEditorVo {
 
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
+	}
+
+	public String getServerGroup() {
+		return serverGroup;
+	}
+
+	public void setServerGroup(String serverGroup) {
+		this.serverGroup = serverGroup;
 	}
 }

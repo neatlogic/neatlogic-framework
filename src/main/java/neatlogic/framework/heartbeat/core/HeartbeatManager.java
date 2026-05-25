@@ -126,7 +126,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     // 将自己的计数器清零
                     serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
                     // 查出正常服务器及计数器加一后的值
-                    List<ServerClusterVo> serverList = serverMapper.getAllServerListByGroup(Config.SCHEDULE_SERVER_GROUP());
+                    List<ServerClusterVo> serverList = serverMapper.getAllServerList();
+//                    List<ServerClusterVo> serverList = serverMapper.getAllServerListByGroup(Config.SCHEDULE_SERVER_GROUP());
                     for (ServerClusterVo serverClusterVo : serverList) {
                         if (Objects.equals(serverClusterVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
                             continue;

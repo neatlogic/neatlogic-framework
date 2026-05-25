@@ -28,6 +28,7 @@ import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.$;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,7 +115,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                 try {
                     // 查找故障服务器
                     List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
-                    List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD(), sameGroupServerIdList);
+                    List<Integer> inactivatedServerIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
+                    List<Integer> serverIdList = ListUtils.retainAll(inactivatedServerIdList, sameGroupServerIdList);
                     for (Integer serverId : serverIdList) {
                         if (getServerLock(serverId)) {
                             // 如果抢到锁，开始处理

@@ -38,8 +38,11 @@ import java.util.concurrent.Executor;
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final String SERVER_ID_FILE = "serverid.conf";
+    private static final String SERVER_GROUP_FILE = "servergroup.config";
+//    private static final String DEFAULT_SERVER_GROUP_ID = "default";
 
     public static int SCHEDULE_SERVER_ID;
+    private static String SCHEDULE_SERVER_GROUP;
 
     private static int SCHEDULE_SERVER_ID_CHECK_ENABLE;// 启用服务器ID检查，防止两台服务器ID相同
     //    public static String SERVER_HOST;
@@ -220,6 +223,10 @@ public class Config {
 
     public static int SCHEDULE_SERVER_ID_CHECK_ENABLE() {
         return SCHEDULE_SERVER_ID_CHECK_ENABLE;
+    }
+
+    public static String SCHEDULE_SERVER_GROUP() {
+        return SCHEDULE_SERVER_GROUP;
     }
 
     public static String NEATLOGIC_HOME() {
@@ -561,6 +568,35 @@ public class Config {
                 throw ex;
             }
         }
+        if (StringUtils.isNotBlank(System.getProperty("serverGroup"))) {
+            SCHEDULE_SERVER_GROUP = System.getProperty("serverGroup").trim();
+        } else {
+            String serverGroup = readResourceContent(SERVER_GROUP_FILE);
+            if (StringUtils.isNotBlank(serverGroup)) {
+                SCHEDULE_SERVER_GROUP = serverGroup.trim();
+            }
+        }
+//        if (StringUtils.isBlank(SCHEDULE_SERVER_GROUP_ID)) {
+//            SCHEDULE_SERVER_GROUP_ID = DEFAULT_SERVER_GROUP_ID;
+//        }
+    }
+
+    private String readResourceContent(String resourceName) {
+        StringBuilder content = new StringBuilder(StringUtils.EMPTY);
+        try (InputStream is = Config.class.getClassLoader().getResourceAsStream(resourceName)) {
+            if (is != null) {
+                try (InputStreamReader in = new InputStreamReader(is, StandardCharsets.UTF_8);
+                     BufferedReader br = new BufferedReader(in)) {
+                    String inLine;
+                    while ((inLine = br.readLine()) != null) {
+                        content.append(inLine);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Optional local grouping config; default group is used when the file does not exist.
+        }
+        return content.toString();
     }
 
     @PostConstruct

@@ -18,11 +18,11 @@ public class UserRoleTeamServiceImpl implements UserRoleTeamService {
         for (Map.Entry<String, IGroupSearchHandler> handlerEntry : handlerMap.entrySet()) {
             IGroupSearchHandler handler = handlerEntry.getValue();
             GroupSearchVo groupSearchVo = new GroupSearchVo();
-            groupSearchVo.setValueList(new ArrayList<>(groupSearch.getValueList()));
-            groupSearchVo.setExcludeList(new ArrayList<>(groupSearch.getExcludeList()));
-            groupSearchVo.setIncludeList(new ArrayList<>(groupSearch.getIncludeList()));
-            groupSearchVo.setGroupList(new ArrayList<>(groupSearch.getGroupList()));
-            groupSearchVo.setRangeList(new ArrayList<>(groupSearch.getRangeList()));
+            groupSearchVo.setValueList(groupSearch.getValueList());
+            groupSearchVo.setExcludeList(groupSearch.getExcludeList());
+            groupSearchVo.setIncludeList(groupSearch.getIncludeList());
+            groupSearchVo.setGroupList(groupSearch.getGroupList());
+            groupSearchVo.setRangeList(groupSearch.getRangeList());
             groupSearchVo.setKeyword(groupSearch.getKeyword());
             groupSearchVo.setCurrentPage(groupSearch.getCurrentPage());
             groupSearchVo.setPageSize(groupSearch.getPageSize());

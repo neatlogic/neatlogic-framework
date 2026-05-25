@@ -36,6 +36,8 @@ public class DatasourceManager {
     // 数据库厂商，mysql、oceanbase、tidb
     private static String databaseId;
 
+    private static String databaseVersion;
+
     public static void setDatabaseId(String _databaseId) {
         if (databaseId == null) {
             databaseId = _databaseId;
@@ -44,6 +46,16 @@ public class DatasourceManager {
 
     public static String getDatabaseId() {
         return databaseId;
+    }
+
+    public static void setDatabaseVersion(String _databaseVersion) {
+        if (databaseVersion == null) {
+            databaseVersion = _databaseVersion;
+        }
+    }
+
+    public static String getDatabaseVersion() {
+        return databaseVersion;
     }
 
     @Resource

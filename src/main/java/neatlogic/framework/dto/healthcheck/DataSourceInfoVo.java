@@ -13,11 +13,29 @@
 package neatlogic.framework.dto.healthcheck;
 
 public class DataSourceInfoVo {
+    private String database;
+    private String databaseVersion;
     private String poolName;
     private int activeConnections;
     private int idleConnections;
     private int threadsAwaitingConnection;
     private int totalConnections;
+
+    public String getDatabase() {
+        return database;
+    }
+
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    public String getDatabaseVersion() {
+        return databaseVersion;
+    }
+
+    public void setDatabaseVersion(String databaseVersion) {
+        this.databaseVersion = databaseVersion;
+    }
 
     public String getPoolName() {
         return poolName;

@@ -15,7 +15,9 @@ package neatlogic.framework.asynchronization.threadlocal;
 import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.dto.healthcheck.RequestSqlAuditVo;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
+import neatlogic.framework.healthcheck.SqlAuditManager;
 import neatlogic.framework.restful.constvalue.RejectSource;
+import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
@@ -44,8 +46,6 @@ public class RequestContext implements Serializable {
     private Double tenantRate;
     //语言
     Locale locale;
-    //收集该请求执行的sql语句
-//    private List<SqlAuditVo> sqlAuditList = Collections.synchronizedList(new ArrayList<>());
 
     private RequestSqlAuditVo requestSqlAuditVo;
 
@@ -122,28 +122,19 @@ public class RequestContext implements Serializable {
         this.locale = locale;
     }
 
-//    public List<SqlAuditVo> getSqlAuditList() {
-//        return sqlAuditList;
-//    }
-//
-//    public void setSqlAuditList(List<SqlAuditVo> sqlAuditList) {
-//        this.sqlAuditList = sqlAuditList;
-//    }
-
     public void addSqlAudit(SqlAuditVo sqlAuditVo) {
-//        sqlAuditList.add(sqlAuditVo);
         if (requestSqlAuditVo == null) {
-            requestSqlAuditVo = new RequestSqlAuditVo();
+            // URL监控聚合对象保存在RequestContext，确保一次HTTP请求只生成一条请求级审计记录
+            requestSqlAuditVo = new RequestSqlAuditVo(SnowflakeUtil.uniqueLong(), this.url, Thread.currentThread().getName());
         }
         requestSqlAuditVo.addSqlAudit(sqlAuditVo);
     }
 
     public RequestSqlAuditVo getRequestSqlAuditVo() {
         if (requestSqlAuditVo != null) {
-            List<RequestSqlAuditVo.SameIdSqlAuditVo> sameIdSqlAuditList = requestSqlAuditVo.getSameIdSqlAuditList();
-            sameIdSqlAuditList.sort((o1, o2) -> Long.compare(o2.getTotalTimeCost(), o1.getTotalTimeCost()));
+            return RequestSqlAuditVo.newInstanceAndCountAndSort(requestSqlAuditVo);
         }
-        return requestSqlAuditVo;
+        return null;
     }
 
     public void setRequestSqlAuditVo(RequestSqlAuditVo requestSqlAuditVo) {
@@ -155,8 +146,7 @@ public class RequestContext implements Serializable {
         if (_requestContext != null) {
             context.setUrl(_requestContext.getUrl());
             context.setLocale(_requestContext.getLocale());
-//            context.setSqlAuditList(_requestContext.getSqlAuditList());
-            context.setRequestSqlAuditVo(_requestContext.getRequestSqlAuditVo());
+            context.setRequestSqlAuditVo(_requestContext.requestSqlAuditVo);
             context.setRemoteAddr(_requestContext.getRemoteAddr());
             context.setParam(_requestContext.getParam());
             String tempUrl = _requestContext.getUrl();
@@ -213,6 +203,10 @@ public class RequestContext implements Serializable {
     }
 
     public void release() {
+        // 请求结束时从RequestContext读取URL监控聚合对象，避免拦截器额外维护ThreadLocal状态
+        if (this.requestSqlAuditVo != null) {
+            SqlAuditManager.addRequestSqlAudit(this.requestSqlAuditVo);
+        }
         MDC.clear();
         instance.remove();
     }

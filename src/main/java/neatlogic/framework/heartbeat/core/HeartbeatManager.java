@@ -100,6 +100,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
         server.setIp(ip);
         server.setStartTime(START_TIME);
+        server.setServerGroup(Config.SCHEDULE_SERVER_GROUP());
         serverMapper.insertServer(server);
 //        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
@@ -112,7 +113,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             protected void execute() {
                 try {
                     // 查找故障服务器
-                    List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
+                    List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
+                    List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD(), sameGroupServerIdList);
                     for (Integer serverId : serverIdList) {
                         if (getServerLock(serverId)) {
                             // 如果抢到锁，开始处理
@@ -124,7 +126,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     // 将自己的计数器清零
                     serverMapper.resetCounterByToServerId(Config.SCHEDULE_SERVER_ID);
                     // 查出正常服务器及计数器加一后的值
-                    List<ServerClusterVo> serverList = serverMapper.getAllServerList();
+                    List<ServerClusterVo> serverList = serverMapper.getAllServerListByGroup(Config.SCHEDULE_SERVER_GROUP());
                     for (ServerClusterVo serverClusterVo : serverList) {
                         if (Objects.equals(serverClusterVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
                             continue;
@@ -154,12 +156,17 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
      * @return boolean
      * @Description: 将故障服务器状态设置为停止，删除与该服务器相关的计数器数据
      */
-    public boolean getServerLock(Integer serverId) {
+    private boolean getServerLock(Integer serverId) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         boolean returnVal = false;
         try {
             ServerClusterVo serverVo = serverMapper.getServerLockByServerId(serverId);
             if (serverVo != null) {
+//                if (!Objects.equals(serverId, Config.SCHEDULE_SERVER_ID)
+//                        && !Objects.equals(serverVo.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
+//                    TransactionUtil.commitTx(transactionStatus);
+//                    return false;
+//                }
                 if (ServerClusterVo.STARTUP.equals(serverVo.getStatus())) {
                     serverVo.setStatus(ServerClusterVo.STOP);
                     serverVo.setFcu(SystemUser.SYSTEM.getUserUuid());
@@ -178,6 +185,17 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             serverMapper.deleteCounterByToServerId(serverId);
         }
         return returnVal;
+    }
+
+    private List<Integer> getSameGroupStartupServerIdList() {
+        List<Integer> serverIdList = serverMapper.getStartupServerIdListByGroup(Config.SCHEDULE_SERVER_GROUP());
+//        if (serverIdList == null) {
+//            serverIdList = new ArrayList<>();
+//        }
+        if (!serverIdList.contains(Config.SCHEDULE_SERVER_ID)) {
+            serverIdList.add(Config.SCHEDULE_SERVER_ID);
+        }
+        return serverIdList;
     }
 
     private void insertTenantServerRunTime() {

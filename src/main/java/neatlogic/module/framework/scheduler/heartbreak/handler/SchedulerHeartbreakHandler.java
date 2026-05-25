@@ -39,8 +39,15 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 	@Resource
 	private TenantMapper tenantMapper;
 
+//	@Resource
+//	private ServerMapper serverMapper;
+
 	@Override
 	public void whenServerInactivated(Integer serverId) {
+//		List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
+//		if (!sameGroupServerIdList.contains(serverId)) {
+//			return;
+//		}
 		//切换到核心库
 		List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
 		
@@ -54,6 +61,7 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			List<JobLockVo> jobLockList = schedulerMapper.getJobLockByServerId(serverId);
 			for (JobLockVo jobLockVo : jobLockList) {
 				jobLockVo.setServerId(Config.SCHEDULE_SERVER_ID);
+//				jobLockVo.setServerIdList(sameGroupServerIdList);
 				schedulerMapper.updateJobLock(jobLockVo);
 				if (!schedulerManager.checkJobIsExists(jobLockVo.getJobName(), jobLockVo.getJobGroup())) {
 					IJob jobHandler = SchedulerManager.getHandler(jobLockVo.getJobHandler());
@@ -65,5 +73,21 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 			}
 		}
 	}
+
+//	private List<Integer> getSameGroupStartupServerIdList() {
+//		List<Integer> serverIdList = new ArrayList<>();
+//		List<ServerClusterVo> serverList = serverMapper.getAllServerListByGroup(Config.SCHEDULE_SERVER_GROUP());
+//		if (serverList != null) {
+//			for (ServerClusterVo server : serverList) {
+//				if (server.getServerId() != null && !serverIdList.contains(server.getServerId())) {
+//					serverIdList.add(server.getServerId());
+//				}
+//			}
+//		}
+//		if (!serverIdList.contains(Config.SCHEDULE_SERVER_ID)) {
+//			serverIdList.add(Config.SCHEDULE_SERVER_ID);
+//		}
+//		return serverIdList;
+//	}
 
 }

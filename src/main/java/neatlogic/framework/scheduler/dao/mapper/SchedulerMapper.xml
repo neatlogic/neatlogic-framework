@@ -294,6 +294,12 @@
         FROM `schedule_job_lock`
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
+        <!--<if test="serverIdList != null and serverIdList.size() > 0">
+          AND server_id IN
+          <foreach collection="serverIdList" item="serverId" open="(" separator="," close=")">
+              #{serverId}
+          </foreach>
+        </if>-->
             FOR
         UPDATE
     </select>
@@ -350,6 +356,12 @@
         FROM `schedule_job_load`
         WHERE `job_name` = #{jobName}
         AND `job_group` = #{jobGroup}
+        <!--<if test="serverIdList != null and serverIdList.size() > 0">
+        AND `server_id` IN
+        <foreach collection="serverIdList" item="serverId" open="(" separator="," close=")">
+            #{serverId}
+        </foreach>
+        </if>-->
     </select>
 
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
@@ -404,6 +416,12 @@
             `lock`      = #{lock}
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
+        <!--<if test="serverIdList != null and serverIdList.size() > 0">
+          AND server_id IN
+          <foreach collection="serverIdList" item="serverId" open="(" separator="," close=")">
+              #{serverId}
+          </foreach>
+        </if>-->
     </update>
 
     <insert id="saveJobData" parameterType="neatlogic.framework.scheduler.dto.JobDataVo">
@@ -505,8 +523,7 @@
     </insert>-->
 
     <delete id="deleteUnusedJobStatus">
-        DELETE
-        FROM schedule_job_status
+        DELETE FROM schedule_job_status
         WHERE next_fire_time &lt; DATE_SUB(NOW(), INTERVAL 1 DAY)<!--留一天空间-->
     </delete>
 
@@ -529,8 +546,7 @@
     </delete>
 
     <delete id="deleteJobStatus">
-        DELETE
-        FROM `schedule_job_status`
+        DELETE FROM `schedule_job_status`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
     </delete>

@@ -36,8 +36,6 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import javax.jms.TextMessage;
 import javax.jms.Topic;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ActiveMqArtemisTopicHandler implements IMqHandler {
     private static final Logger logger = LoggerFactory.getLogger(ActiveMqArtemisTopicHandler.class);
     private static final Map<Long, ArtemisTopicConsumerHolder> consumerMap = new ConcurrentHashMap<>();
+    private static final Map<Long, Object> consumerLockMap = new ConcurrentHashMap<>();
 
     @Override
     public String getName() {
@@ -60,49 +59,53 @@ public class ActiveMqArtemisTopicHandler implements IMqHandler {
 
     @Override
     public boolean create(SubscribeVo subVo) throws SubscribeTopicException {
-        if (consumerMap.containsKey(subVo.getId())) {
-            return true;
-        }
-        ISubscribeHandler subscribeHandler = SubscribeHandlerFactory.getHandler(subVo.getClassName());
-        if (subscribeHandler == null) {
-            throw new SubscribeHandlerNotFoundException(subVo.getClassName());
-        }
-        String tenantUuid = TenantContext.get().getTenantUuid();
-        String topicName = subVo.getTopicName();
-        String destinationName = buildTopicName(tenantUuid, topicName);
-        ActiveMQConnectionFactory connectionFactory = null;
-        Connection connection = null;
-        Session session = null;
-        MessageConsumer consumer = null;
-        try {
-            connectionFactory = createConnectionFactory();
-            connection = connectionFactory.createConnection();
-            boolean sharedConsumerSupported = isSharedConsumerSupported();
-            if (isDurable(subVo) && !sharedConsumerSupported) {
-                connection.setClientID(buildClientId(tenantUuid, subVo));
+        Long subscribeId = subVo.getId();
+        Object lock = consumerLockMap.computeIfAbsent(subscribeId, id -> new Object());
+        synchronized (lock) {
+            if (consumerMap.containsKey(subscribeId)) {
+                return true;
             }
-            connection.start();
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Topic topic = session.createTopic(destinationName);
-            String subscriptionName = buildSubscriptionName(tenantUuid, subVo);
-            consumer = createConsumer(session, topic, subscriptionName, subVo, sharedConsumerSupported);
-            subVo.setTenantUuid(tenantUuid);
-            consumer.setMessageListener(message -> {
-                try {
-                    subscribeHandler.onMessage(subVo, message);
-                } catch (Exception ex) {
-                    logger.error("消费 Artemis Topic 消息失败: {}", ex.getMessage(), ex);
-                }
-            });
-            consumerMap.put(subVo.getId(), new ArtemisTopicConsumerHolder(connectionFactory, connection, session, consumer));
-            return true;
-        } catch (Exception ex) {
-            JmsUtils.closeMessageConsumer(consumer);
-            JmsUtils.closeSession(session);
-            JmsUtils.closeConnection(connection);
-            closeConnectionFactory(connectionFactory);
-            logger.error(ex.getMessage(), ex);
-            throw new SubscribeTopicException(destinationName, subVo.getName(), ex.getMessage());
+            ISubscribeHandler subscribeHandler = SubscribeHandlerFactory.getHandler(subVo.getClassName());
+            if (subscribeHandler == null) {
+                throw new SubscribeHandlerNotFoundException(subVo.getClassName());
+            }
+            String tenantUuid = TenantContext.get().getTenantUuid();
+            String topicName = subVo.getTopicName();
+            String destinationName = buildTopicName(tenantUuid, topicName);
+            ActiveMQConnectionFactory connectionFactory = null;
+            Connection connection = null;
+            Session session = null;
+            MessageConsumer consumer = null;
+            try {
+                connectionFactory = createConnectionFactory();
+                connection = connectionFactory.createConnection();
+                connection.start();
+                session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+                Topic topic = session.createTopic(destinationName);
+                String subscriptionName = buildSubscriptionName(tenantUuid, subVo);
+                boolean durable = isDurable(subVo);
+                consumer = createConsumer(session, topic, subscriptionName, durable);
+                subVo.setTenantUuid(tenantUuid);
+                consumer.setMessageListener(message -> {
+                    try {
+                        subscribeHandler.onMessage(subVo, message);
+                    } catch (Exception ex) {
+                        logger.error("消费 Artemis Topic 消息失败，消息将被丢弃，destination={}, subscriptionName={}, 异常：{}",
+                                destinationName, subscriptionName, ex.getMessage(), ex);
+                    }
+                });
+                consumerMap.put(subscribeId, new ArtemisTopicConsumerHolder(connectionFactory, connection, session, consumer));
+                logger.info("Artemis Topic 订阅启动成功，destination={}, subscriptionName={}, durable={}",
+                        destinationName, subscriptionName, durable);
+                return true;
+            } catch (Exception ex) {
+                JmsUtils.closeMessageConsumer(consumer);
+                JmsUtils.closeSession(session);
+                JmsUtils.closeConnection(connection);
+                closeConnectionFactory(connectionFactory);
+                logger.error(ex.getMessage(), ex);
+                throw new SubscribeTopicException(destinationName, subVo.getName(), ex.getMessage());
+            }
         }
     }
 
@@ -119,9 +122,13 @@ public class ActiveMqArtemisTopicHandler implements IMqHandler {
 
     @Override
     public void destroy(SubscribeVo subscribeVo) {
-        ArtemisTopicConsumerHolder holder = consumerMap.remove(subscribeVo.getId());
-        if (holder != null) {
-            holder.close();
+        Long subscribeId = subscribeVo.getId();
+        Object lock = consumerLockMap.computeIfAbsent(subscribeId, id -> new Object());
+        synchronized (lock) {
+            ArtemisTopicConsumerHolder holder = consumerMap.remove(subscribeId);
+            if (holder != null) {
+                holder.close();
+            }
         }
     }
 
@@ -199,34 +206,12 @@ public class ActiveMqArtemisTopicHandler implements IMqHandler {
         return tenantUuid + "/" + topicName;
     }
 
-    private static MessageConsumer createConsumer(Session session, Topic topic, String subscriptionName, SubscribeVo subVo, boolean sharedConsumerSupported)
-            throws JMSException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        if (isDurable(subVo)) {
-            if (sharedConsumerSupported) {
-                Method method = Session.class.getMethod("createSharedDurableConsumer", Topic.class, String.class);
-                return (MessageConsumer) method.invoke(session, topic, subscriptionName);
-            }
-            return session.createDurableSubscriber(topic, subscriptionName);
+    private static MessageConsumer createConsumer(Session session, Topic topic, String subscriptionName, boolean durable)
+            throws JMSException {
+        if (durable) {
+            return session.createSharedDurableConsumer(topic, subscriptionName);
         }
-        if (sharedConsumerSupported) {
-            Method method = Session.class.getMethod("createSharedConsumer", Topic.class, String.class);
-            return (MessageConsumer) method.invoke(session, topic, subscriptionName);
-        }
-        return session.createConsumer(topic);
-    }
-
-    private static boolean isSharedConsumerSupported() {
-        try {
-            Session.class.getMethod("createSharedDurableConsumer", Topic.class, String.class);
-            Session.class.getMethod("createSharedConsumer", Topic.class, String.class);
-            return true;
-        } catch (NoSuchMethodException ex) {
-            return false;
-        }
-    }
-
-    private static String buildClientId(String tenantUuid, SubscribeVo subVo) {
-        return (tenantUuid + "_" + subVo.getId()).replaceAll("[^a-zA-Z0-9_\\-.]", "_");
+        return session.createSharedConsumer(topic, subscriptionName);
     }
 
     private static String buildSubscriptionName(String tenantUuid, SubscribeVo subVo) {

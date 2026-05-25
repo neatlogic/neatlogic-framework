@@ -34,6 +34,8 @@ public interface ServerMapper {
 
     int updateServerHeartbeatTimeByServerId(int scheduleServerId);
 
+    int updateServerHeartbeatTimeAndServerGroupByServerId(@Param("serverId") int serverId, @Param("serverGroup") String serverGroup);
+
     //INSERT
     int insertServer(ServerClusterVo server);
 

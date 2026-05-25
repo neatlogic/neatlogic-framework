@@ -119,6 +119,14 @@
         WHERE `server_id` = #{value}
     </update>
 
+    <update id="updateServerHeartbeatTimeAndServerGroupByServerId" parameterType="java.lang.Integer">
+        UPDATE `server_status`
+        SET `status`         = 'startup',
+            `server_group` = #{serverGroup},
+            `heartbeat_time` = NOW(3)
+        WHERE `server_id` = #{serverId}
+    </update>
+
     <insert id="insertServer" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
         INSERT INTO server_status(`server_id`, `status`, `heartbeat_rate`, `heartbeat_threshold`, `heartbeat_time`,
                                   `ip`, `server_group`, `fcu`, `fcd`, `start_time`)

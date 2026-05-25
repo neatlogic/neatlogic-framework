@@ -142,7 +142,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                             serverMapper.insertServerCounter(serverCounterVo);
                         }
                     }
-                    serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
+                    serverMapper.updateServerHeartbeatTimeAndServerGroupByServerId(Config.SCHEDULE_SERVER_ID, Config.SCHEDULE_SERVER_GROUP());
+//                    serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
 //                    serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
 //                    insertTenantServerRunTime();
                 } catch (Exception e) {

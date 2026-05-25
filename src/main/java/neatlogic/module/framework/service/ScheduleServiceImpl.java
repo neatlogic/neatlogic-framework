@@ -15,7 +15,6 @@ package neatlogic.module.framework.service;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.crossover.IScheduleCrossoverService;
-import neatlogic.framework.dao.mapper.TenantMapper;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.schedule.SchedulePublicAuthException;
 import neatlogic.framework.heartbeat.dao.mapper.ServerMapper;

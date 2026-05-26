@@ -49,6 +49,20 @@
         FROM `server_status`
     </select>
 
+    <!-- 定时作业配置需要按创建服务器所在组过滤；这里不限制 startup，保证停机服务器创建的作业仍可被同组看到。 -->
+    <select id="getServerIdListByGroup" parameterType="java.lang.String" resultType="java.lang.Integer" useCache="false">
+        SELECT `server_id`
+        FROM `server_status`
+        <choose>
+          <when test="value != null and value != ''">
+              WHERE `server_group` = #{value}
+          </when>
+          <otherwise>
+              WHERE `server_group` IS NULL
+          </otherwise>
+        </choose>
+    </select>
+
     <select id="getStartupServerIdListByGroup" parameterType="java.lang.String" resultType="java.lang.Integer" useCache="false">
         SELECT `server_id`
         FROM `server_status`

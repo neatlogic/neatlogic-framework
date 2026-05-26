@@ -19,8 +19,6 @@ public interface ServerMapper {
 
     List<ServerClusterVo> getAllServerList();
 
-//    List<ServerClusterVo> getAllServerListByGroup(String serverGroup);
-
     List<Integer> getStartupServerIdListByGroup(String serverGroup);
 
     String getUserFunctionValue();

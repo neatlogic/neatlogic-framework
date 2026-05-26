@@ -39,7 +39,6 @@ public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final String SERVER_ID_FILE = "serverid.conf";
     private static final String SERVER_GROUP_FILE = "servergroup.conf";
-//    private static final String DEFAULT_SERVER_GROUP_ID = "default";
 
     public static int SCHEDULE_SERVER_ID;
     private static String SCHEDULE_SERVER_GROUP;
@@ -576,9 +575,6 @@ public class Config {
                 SCHEDULE_SERVER_GROUP = serverGroup.trim();
             }
         }
-//        if (StringUtils.isBlank(SCHEDULE_SERVER_GROUP_ID)) {
-//            SCHEDULE_SERVER_GROUP_ID = DEFAULT_SERVER_GROUP_ID;
-//        }
     }
 
     private String readResourceContent(String resourceName) {

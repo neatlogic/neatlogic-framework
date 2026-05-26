@@ -29,8 +29,6 @@ public interface SchedulerMapper {
 
     List<JobVo> getJobByHandler(String handler);
 
-    List<JobVo> getJobByHandlerAndSourceServerIdList(@Param("handler") String handler, @Param("sourceServerIdList") List<Integer> sourceServerIdList);
-
     int searchJobCount(JobVo jobVo);
 
     List<JobVo> searchJob(JobVo jobVo);

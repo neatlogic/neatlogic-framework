@@ -88,31 +88,6 @@
         WHERE `handler` = #{value}
     </select>
 
-    <select id="getJobByHandlerAndSourceServerIdList" resultMap="jobMap">
-        SELECT a.`uuid`,
-        a.`name`,
-        a.`handler`,
-        a.`begin_time`,
-        a.`end_time`,
-        a.`cron`,
-        a.`is_active`,
-        a.`need_audit`,
-        a.`source_server_id`,
-        d.prop_name,
-        d.prop_value,
-        d.id as prop_id
-        FROM `schedule_job` a
-        LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
-        WHERE `handler` = #{handler}
-        <if test="sourceServerIdList != null and sourceServerIdList.size() > 0">
-            AND (a.source_server_id IS NULL OR a.source_server_id IN
-            <foreach collection="sourceServerIdList" item="sourceServerId" open="(" separator="," close=")">
-                #{sourceServerId}
-            </foreach>
-            )
-        </if>
-    </select>
-
     <select id="searchJobCount" resultType="int">
         SELECT
         count(1)

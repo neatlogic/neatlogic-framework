@@ -12,6 +12,7 @@
 
 package neatlogic.framework.scheduler.core;
 
+import com.alibaba.fastjson.JSON;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.crossover.IServerCrossoverService;
@@ -70,8 +71,12 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
     public void initJob(String tenantUuid) {
         IServerCrossoverService serverCrossoverService = CrossoverServiceFactory.getApi(IServerCrossoverService.class);
         List<Integer> currentGroupServerIdList = serverCrossoverService.getCurrentGroupServerIdList();
-        List<JobVo> jobVoList = schedulerMapper.getJobByHandlerAndSourceServerIdList(this.getClassName(), currentGroupServerIdList);
+        List<JobVo> jobVoList = schedulerMapper.getJobByHandler(this.getClassName());
         for (JobVo jobVo : jobVoList) {
+            if (jobVo.getSourceServerId() != null && !currentGroupServerIdList.contains(jobVo.getSourceServerId())) {
+                System.out.println("jobVo = " + JSON.toJSON(jobVo));
+                continue;
+            }
             if (jobVo.getIsActive().equals(1)) {
                 JobObject jobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), this.getClassName(), tenantUuid)
                         .withCron(jobVo.getCron())

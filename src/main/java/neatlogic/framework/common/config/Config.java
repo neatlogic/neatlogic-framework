@@ -38,7 +38,7 @@ import java.util.concurrent.Executor;
 public class Config {
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final String SERVER_ID_FILE = "serverid.conf";
-    private static final String SERVER_GROUP_FILE = "servergroup.config";
+    private static final String SERVER_GROUP_FILE = "servergroup.conf";
 //    private static final String DEFAULT_SERVER_GROUP_ID = "default";
 
     public static int SCHEDULE_SERVER_ID;

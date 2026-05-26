@@ -61,6 +61,12 @@ public class JobVo extends BasePageVo {
             type = ApiParamType.LONG)
     private Date endTime;
 
+    // 记录定时作业配置最初由哪个应用服务器创建，用于按应用服务分组过滤管理页数据。
+    private Integer sourceServerId;
+
+    // 当前应用服务分组内的服务器ID列表；Mapper 使用它过滤同组创建的定时作业。
+    private List<Integer> sourceServerIdList;
+
     private JobStatusVo jobStatus;
 
     //	@EntityField(name = "定时作业属性列表",
@@ -140,6 +146,22 @@ public class JobVo extends BasePageVo {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Integer getSourceServerId() {
+        return sourceServerId;
+    }
+
+    public void setSourceServerId(Integer sourceServerId) {
+        this.sourceServerId = sourceServerId;
+    }
+
+    public List<Integer> getSourceServerIdList() {
+        return sourceServerIdList;
+    }
+
+    public void setSourceServerIdList(List<Integer> sourceServerIdList) {
+        this.sourceServerIdList = sourceServerIdList;
     }
 
     public String getHandler() {

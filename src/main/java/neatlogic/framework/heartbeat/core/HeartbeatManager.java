@@ -132,6 +132,9 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     List<ServerClusterVo> serverList = serverMapper.getAllServerList();
                     for (ServerClusterVo serverClusterVo : serverList) {
                         if (Objects.equals(serverClusterVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
+                            if (!Objects.equals(serverClusterVo.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
+                                logger.error("应用服务{}所在组为{}，但在数据库表`server_status`中server_group字段值为{}", Config.SCHEDULE_SERVER_ID, Config.SCHEDULE_SERVER_GROUP(), serverClusterVo.getServerGroup());
+                            }
                             continue;
                         }
                         if (Objects.equals(serverClusterVo.getStatus(), ServerClusterVo.STARTUP)) {

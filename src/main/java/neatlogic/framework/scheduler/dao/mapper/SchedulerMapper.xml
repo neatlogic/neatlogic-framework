@@ -13,6 +13,8 @@
         <result column="need_audit" property="needAudit"/>
         <result column="begin_time" property="beginTime"/>
         <result column="end_time" property="endTime"/>
+        <!-- 返回创建服务器ID，供前端表格展示和跨服务组数据排查使用。 -->
+        <result column="source_server_id" property="sourceServerId"/>
         <collection property="propList" ofType="neatlogic.framework.scheduler.dto.JobPropVo">
             <id column="prop_id" property="id"/>
             <result column="prop_name" property="name"/>
@@ -29,6 +31,7 @@
                a.cron,
                a.is_active,
                a.need_audit,
+               a.source_server_id,
                d.prop_name,
                d.prop_value,
                d.id as prop_id
@@ -46,7 +49,8 @@
                `end_time`   AS endTime,
                `cron`,
                `is_active`  AS isActive,
-               `need_audit` AS needAudit
+               `need_audit` AS needAudit,
+               `source_server_id` AS sourceServerId
         FROM `schedule_job`
         WHERE `uuid` = #{value}
     </select>
@@ -75,12 +79,38 @@
                a.`cron`,
                a.`is_active`,
                a.`need_audit`,
+               a.`source_server_id`,
                d.prop_name,
                d.prop_value,
                d.id as prop_id
         FROM `schedule_job` a
                  LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
         WHERE `handler` = #{value}
+    </select>
+
+    <select id="getJobByHandlerAndSourceServerIdList" resultMap="jobMap">
+        SELECT a.`uuid`,
+        a.`name`,
+        a.`handler`,
+        a.`begin_time`,
+        a.`end_time`,
+        a.`cron`,
+        a.`is_active`,
+        a.`need_audit`,
+        a.`source_server_id`,
+        d.prop_name,
+        d.prop_value,
+        d.id as prop_id
+        FROM `schedule_job` a
+        LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+        WHERE `handler` = #{handler}
+        <if test="sourceServerIdList != null and sourceServerIdList.size() > 0">
+            AND (a.source_server_id IS NULL OR a.source_server_id IN
+            <foreach collection="sourceServerIdList" item="sourceServerId" open="(" separator="," close=")">
+                #{sourceServerId}
+            </foreach>
+            )
+        </if>
     </select>
 
     <select id="searchJobCount" resultType="int">
@@ -107,6 +137,14 @@
         <if test="needAudit != null">
             AND a.need_audit = #{needAudit}
         </if>
+        <!-- 兼容旧数据：source_server_id 为空的历史作业对所有服务组可见；新数据仅对同组服务器可见。 -->
+        <if test="sourceServerIdList != null and sourceServerIdList.size() > 0">
+            AND (a.source_server_id IS NULL OR a.source_server_id IN
+            <foreach collection="sourceServerIdList" item="sourceServerId" open="(" separator="," close=")">
+                #{sourceServerId}
+            </foreach>
+            )
+        </if>
     </select>
 
     <resultMap id="jobDetailMap" type="neatlogic.framework.scheduler.dto.JobVo">
@@ -118,6 +156,8 @@
         <result column="need_audit" property="needAudit"/>
         <result column="begin_time" property="beginTime"/>
         <result column="end_time" property="endTime"/>
+        <!-- 返回创建服务器ID，供前端表格展示和跨服务组数据排查使用。 -->
+        <result column="source_server_id" property="sourceServerId"/>
         <association property="jobStatus" resultMap="jobStatusMap"/>
     </resultMap>
 
@@ -141,6 +181,7 @@
         a.cron,
         a.is_active,
         a.need_audit,
+        a.source_server_id,
         sjs.job_name,
         sjs.job_group,
         sjs.last_fire_time,
@@ -168,6 +209,14 @@
         </if>
         <if test="needAudit != null">
             AND a.need_audit = #{needAudit}
+        </if>
+        <!-- 兼容旧数据：source_server_id 为空的历史作业对所有服务组可见；新数据仅对同组服务器可见。 -->
+        <if test="sourceServerIdList != null and sourceServerIdList.size() > 0">
+            AND (a.source_server_id IS NULL OR a.source_server_id IN
+            <foreach collection="sourceServerIdList" item="sourceServerId" open="(" separator="," close=")">
+                #{sourceServerId}
+            </foreach>
+            )
         </if>
         ORDER BY a.`fcd` DESC
         limit #{startNum}, #{pageSize}
@@ -367,7 +416,8 @@
             end_time   = #{endTime},
             cron       = #{cron},
             is_active  = #{isActive},
-            need_audit = #{needAudit}
+            need_audit = #{needAudit},
+            source_server_id = IFNULL(source_server_id, #{sourceServerId})
         WHERE uuid = #{uuid}
     </update>
 
@@ -430,6 +480,8 @@
          `cron`,
          `is_active`,
          `need_audit`,
+         <!-- 新建作业时写入创建服务器ID，供管理页按服务组过滤。 -->
+         `source_server_id`,
          `fcd`)
         VALUES (#{uuid},
                 #{name},
@@ -439,6 +491,7 @@
                 #{cron},
                 #{isActive},
                 #{needAudit},
+                #{sourceServerId},
                 NOW(3))
     </insert>
 

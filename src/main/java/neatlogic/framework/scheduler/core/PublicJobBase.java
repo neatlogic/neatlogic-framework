@@ -13,6 +13,8 @@
 package neatlogic.framework.scheduler.core;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.crossover.CrossoverServiceFactory;
+import neatlogic.framework.crossover.IServerCrossoverService;
 import neatlogic.framework.scheduler.dto.JobClassVo;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.dto.JobVo;
@@ -66,7 +68,9 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
 
     @Override
     public void initJob(String tenantUuid) {
-        List<JobVo> jobVoList = schedulerMapper.getJobByHandler(this.getClassName());
+        IServerCrossoverService serverCrossoverService = CrossoverServiceFactory.getApi(IServerCrossoverService.class);
+        List<Integer> currentGroupServerIdList = serverCrossoverService.getCurrentGroupServerIdList();
+        List<JobVo> jobVoList = schedulerMapper.getJobByHandlerAndSourceServerIdList(this.getClassName(), currentGroupServerIdList);
         for (JobVo jobVo : jobVoList) {
             if (jobVo.getIsActive().equals(1)) {
                 JobObject jobObject = new JobObject.Builder(jobVo.getUuid(), this.getGroupName(), this.getClassName(), tenantUuid)

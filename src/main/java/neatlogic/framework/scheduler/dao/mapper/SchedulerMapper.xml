@@ -294,12 +294,6 @@
         FROM `schedule_job_lock`
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
-        <!--<if test="serverIdList != null and serverIdList.size() > 0">
-          AND server_id IN
-          <foreach collection="serverIdList" item="serverId" open="(" separator="," close=")">
-              #{serverId}
-          </foreach>
-        </if>-->
             FOR
         UPDATE
     </select>
@@ -356,12 +350,6 @@
         FROM `schedule_job_load`
         WHERE `job_name` = #{jobName}
         AND `job_group` = #{jobGroup}
-        <!--<if test="serverIdList != null and serverIdList.size() > 0">
-        AND `server_id` IN
-        <foreach collection="serverIdList" item="serverId" open="(" separator="," close=")">
-            #{serverId}
-        </foreach>
-        </if>-->
     </select>
 
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
@@ -416,12 +404,6 @@
             `lock`      = #{lock}
         WHERE job_name = #{jobName}
           AND job_group = #{jobGroup}
-        <!--<if test="serverIdList != null and serverIdList.size() > 0">
-          AND server_id IN
-          <foreach collection="serverIdList" item="serverId" open="(" separator="," close=")">
-              #{serverId}
-          </foreach>
-        </if>-->
     </update>
 
     <insert id="saveJobData" parameterType="neatlogic.framework.scheduler.dto.JobDataVo">

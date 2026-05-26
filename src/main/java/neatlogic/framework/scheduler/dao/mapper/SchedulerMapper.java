@@ -43,8 +43,6 @@ public interface SchedulerMapper {
 
     JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
-//    JobLockVo getJobLockByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup, @Param("serverIdList") List<Integer> serverIdList);
-
     List<JobLockVo> getJobLockByServerId(Integer serverId);
 
     String getJobLastExecAuditStartTime(@Param("jobUuid") String jobUuid, @Param("status") String status);
@@ -55,8 +53,6 @@ public interface SchedulerMapper {
     int checkJobNameIsExists(JobVo job);
 
     List<JobLoadVo> getJobLoadListByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
-
-//    List<JobLoadVo> getJobLoadListByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup, @Param("serverIdList") List<Integer> serverIdList);
 
 //    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 

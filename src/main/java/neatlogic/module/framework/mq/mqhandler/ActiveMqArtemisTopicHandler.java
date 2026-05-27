@@ -215,7 +215,7 @@ public class ActiveMqArtemisTopicHandler implements IMqHandler {
     }
 
     private static String buildSubscriptionName(String tenantUuid, SubscribeVo subVo) {
-        String name = tenantUuid + "_" + subVo.getId();
+        String name = tenantUuid + "_" + subVo.getName();
         return name.replaceAll("[^a-zA-Z0-9_\\-.]", "_");
     }
 

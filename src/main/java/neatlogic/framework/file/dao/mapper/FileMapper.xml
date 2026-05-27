@@ -67,7 +67,7 @@
         AND `unique_key`
         <choose>
             <when test="uniqueKey != null">
-                #{uniqueKey}
+                = #{uniqueKey}
             </when>
             <otherwise>
                 is null

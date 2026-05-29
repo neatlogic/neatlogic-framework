@@ -208,7 +208,7 @@ public class ScriptRunnerManager {
     private static void initRunner(ExecuteSqlParamVo executeSqlParamVo) throws SQLException {
         Connection connection;
         if (executeSqlParamVo.getTenant() != null) {
-            connection = executeSqlParamVo.getNeatlogicTenantConnectHolder().get();
+            connection = executeSqlParamVo.getNeatlogicTenantConnectHolder().get(executeSqlParamVo.isIdDataDB());
         } else {
             connection = executeSqlParamVo.getNeatlogicConnectHolder().get();
         }

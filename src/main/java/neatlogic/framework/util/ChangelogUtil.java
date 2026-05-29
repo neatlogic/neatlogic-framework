@@ -444,6 +444,15 @@ public class ChangelogUtil {
                                         isError = true;
                                     }
                                 }
+                                Resource[] dataResources = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/**/changelog/" + version + "/neatlogic_tenant_data.sql");
+                                for (Resource dataResource : dataResources) {
+                                    ExecuteSqlParamVo executeSqlParamVo = new ExecuteSqlParamVo(tenant, moduleId, version, dataResource, tenantChangelogSqlHashList, tenantConnectionHolder, neatlogicConnectHolder);
+                                    executeSqlParamVo.setIdDataDB(true);
+                                    boolean isErrorTmp = ScriptRunnerManager.runScriptWithJdbc(executeSqlParamVo);
+                                    if (isErrorTmp) {
+                                        isError = true;
+                                    }
+                                }
                                 //执行整个sql文件
                                 Resource[] resourcesAll = resolver.getResources("classpath*:neatlogic/resources/" + moduleId + "/**/changelog/" + version + "/neatlogic_tenant_all.sql");
                                 for (Resource resourceAll : resourcesAll) {

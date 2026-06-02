@@ -24,6 +24,7 @@ public enum ApiParamType  {
     JSONARRAY("jsonArray", "common.jsonarray"),
     IP("ip", "ip"),
     EMAIL("email", "common.email"),
+    PASSWORD("password", "common.password"),
     REGEX("regex", "common.regex"),
     DOUBLE("double", "common.double"),
     NOAUTH("noAuth", "common.object"),

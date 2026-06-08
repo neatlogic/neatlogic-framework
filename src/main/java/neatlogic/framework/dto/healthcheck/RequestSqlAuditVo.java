@@ -215,8 +215,8 @@ public class RequestSqlAuditVo implements Serializable {
     public static RequestSqlAuditVo newInstanceAndCountAndSort(RequestSqlAuditVo requestSqlAuditVo) {
         if (requestSqlAuditVo != null) {
             RequestSqlAuditVo requestSqlAudit = new RequestSqlAuditVo(requestSqlAuditVo.getId(), requestSqlAuditVo.getUrl(), requestSqlAuditVo.getThreadName());
-            for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : requestSqlAuditVo.getSameIdSqlAuditList()) {
-                for (SqlAuditVo sqlAuditVo : sameIdSqlAuditVo.getSqlAuditList()) {
+            for (RequestSqlAuditVo.SameIdSqlAuditVo sameIdSqlAuditVo : new ArrayList<>(requestSqlAuditVo.getSameIdSqlAuditList())) {
+                for (SqlAuditVo sqlAuditVo : new ArrayList<>(sameIdSqlAuditVo.getSqlAuditList())) {
                     SqlAuditVo sqlAudit = new SqlAuditVo();
                     sqlAudit.setId(sqlAuditVo.getId());
                     sqlAudit.setTenant(sqlAuditVo.getTenant());

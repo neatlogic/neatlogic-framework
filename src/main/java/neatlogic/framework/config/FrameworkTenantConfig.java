@@ -62,4 +62,9 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     public ApiParamType getType() {
         return this.type;
     }
+
+    @Override
+    public String getModuleGroup() {
+        return "framework";
+    }
 }

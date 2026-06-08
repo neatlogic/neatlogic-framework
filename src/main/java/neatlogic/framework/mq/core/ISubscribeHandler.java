@@ -14,6 +14,9 @@ package neatlogic.framework.mq.core;
 
 import neatlogic.framework.mq.dto.SubscribeVo;
 
+import java.util.Collections;
+import java.util.List;
+
 public interface ISubscribeHandler {
     String getName();
 
@@ -26,5 +29,13 @@ public interface ISubscribeHandler {
 
     default String getClassName() {
         return this.getClass().getName();
+    }
+
+    default Integer getIsDurable() {
+        return 0;
+    }
+
+    default List<SubscribeVo> getSystemSubscribeList() {
+        return Collections.emptyList();
     }
 }

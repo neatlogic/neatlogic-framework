@@ -63,6 +63,8 @@ public class SubscribeVo extends BasePageVo {
     private String handlerName;
     @EntityField(name = "是否启用", type = ApiParamType.BOOLEAN)
     private Boolean isEnable;
+    @EntityField(name = "是否系统内置订阅", type = ApiParamType.BOOLEAN)
+    private Boolean isEmbed;
 
     @Override
     public boolean equals(Object o) {
@@ -122,6 +124,17 @@ public class SubscribeVo extends BasePageVo {
             }
         }
         return isEnable;
+    }
+
+    public Boolean getIsEmbed() {
+        if (isEmbed == null) {
+            isEmbed = SubscribeHandlerFactory.hasSystemSubscribe(name);
+        }
+        return isEmbed;
+    }
+
+    public void setIsEmbed(Boolean isEmbed) {
+        this.isEmbed = isEmbed;
     }
 
     public void setTenantUuid(String tenantUuid) {

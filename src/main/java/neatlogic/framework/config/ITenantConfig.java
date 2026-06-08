@@ -41,4 +41,12 @@ public interface ITenantConfig {
     default ApiParamType getType() {
         return null;
     }
+
+    /**
+     * 所属模块组
+     * @return
+     */
+    default String getModuleGroup() {
+        return null;
+    }
 }

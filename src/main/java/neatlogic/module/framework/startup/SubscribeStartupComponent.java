@@ -15,6 +15,7 @@ package neatlogic.module.framework.startup;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.mq.core.SubscribeHandlerFactory;
 import neatlogic.framework.mq.core.SubscribeManager;
 import neatlogic.framework.mq.dao.mapper.MqSubscribeMapper;
 import neatlogic.framework.mq.dto.SubscribeVo;
@@ -46,6 +47,7 @@ public class SubscribeStartupComponent extends StartupBase {
 
     @Override
     public int executeForCurrentTenant() {
+        syncSystemSubscribe();
         SubscribeVo subscribeVo = new SubscribeVo();
         subscribeVo.setIsActive(1);
         //subscribeVo.setServerId(Config.SCHEDULE_SERVER_ID);
@@ -71,6 +73,23 @@ public class SubscribeStartupComponent extends StartupBase {
             subList = mqSubscribeMapper.searchSubscribe(subscribeVo);
         }
         return 0;
+    }
+
+    private void syncSystemSubscribe() {
+        List<SubscribeVo> systemSubscribeList = SubscribeHandlerFactory.getSystemSubscribeList();
+        if (CollectionUtils.isEmpty(systemSubscribeList)) {
+            return;
+        }
+        for (SubscribeVo systemSubscribeVo : systemSubscribeList) {
+            SubscribeVo oldSubscribeVo = mqSubscribeMapper.getSubscribeByName(systemSubscribeVo.getName());
+            if (oldSubscribeVo == null) {
+                mqSubscribeMapper.insertSubscribe(systemSubscribeVo);
+            } else {
+                systemSubscribeVo.setId(oldSubscribeVo.getId());
+                systemSubscribeVo.setIsActive(oldSubscribeVo.getIsActive());
+                mqSubscribeMapper.updateSubscribe(systemSubscribeVo);
+            }
+        }
     }
 
     @Override

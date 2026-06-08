@@ -26,6 +26,7 @@ import java.sql.SQLException;
 public final class ConnectionHolder implements AutoCloseable {
 
     private Connection connection;
+    private Connection dataConnection;
 
     TenantVo tenant = null;
 
@@ -37,6 +38,16 @@ public final class ConnectionHolder implements AutoCloseable {
     }
 
     public Connection get() throws SQLException {
+        return get(false);
+    }
+
+    public Connection get(boolean isData) throws SQLException {
+        if (tenant != null && isData) {
+            if (dataConnection == null || dataConnection.isClosed()) {
+                dataConnection = JdbcUtil.getNeatlogicTenantConnection(tenant, true);
+            }
+            return dataConnection;
+        }
         if (connection == null || connection.isClosed()) {
             if (tenant == null) {
                 connection = JdbcUtil.getNeatlogicConnection();
@@ -54,12 +65,15 @@ public final class ConnectionHolder implements AutoCloseable {
     public void invalidate() throws SQLException {
         //System.out.println("invalidate:" + connection + ":" + connection.getCatalog());
         JdbcUtil.closeConnection(connection);
+        JdbcUtil.closeConnection(dataConnection);
         connection = null;
+        dataConnection = null;
     }
 
     @Override
     public void close() throws SQLException {
         //System.out.println("close:" + connection + ":" + connection.getCatalog());
         JdbcUtil.closeConnection(connection);
+        JdbcUtil.closeConnection(dataConnection);
     }
 }

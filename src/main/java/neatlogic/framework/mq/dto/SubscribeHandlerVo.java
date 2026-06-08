@@ -16,6 +16,7 @@ public class SubscribeHandlerVo {
     private String name;
     private String className;
     private String label;
+    private Boolean isEmbed;
 
     public String getLabel() {
         return label;
@@ -29,6 +30,13 @@ public class SubscribeHandlerVo {
         name = _name;
         label = _label;
         className = _className;
+    }
+
+    public SubscribeHandlerVo(String _name, String _label, String _className, Boolean _isEmbed) {
+        name = _name;
+        label = _label;
+        className = _className;
+        isEmbed = _isEmbed;
     }
 
     public String getName() {
@@ -45,5 +53,13 @@ public class SubscribeHandlerVo {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public Boolean getIsEmbed() {
+        return isEmbed;
+    }
+
+    public void setIsEmbed(Boolean isEmbed) {
+        this.isEmbed = isEmbed;
     }
 }

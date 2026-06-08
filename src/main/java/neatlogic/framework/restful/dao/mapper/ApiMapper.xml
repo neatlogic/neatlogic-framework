@@ -36,6 +36,26 @@
         WHERE token = #{value}
     </select>
 
+    <select id="getApiByTokenWithoutPsw" parameterType="java.lang.String" resultType="neatlogic.framework.restful.dto.ApiVo"
+            useCache="true">
+        SELECT `name`,
+               `module_id`  AS moduleId,
+               `handler`,
+               `username`,
+               `config`,
+               `is_active`  AS isActive,
+               `token`,
+               `expire`,
+               `description`,
+               `type`,
+               `qps`,
+               `timeout`,
+               `need_audit` AS needAudit,
+               `is_mcp` AS isMcp
+        FROM `api`
+        WHERE token = #{value}
+    </select>
+
     <!--<select id="getApiTokenList" parameterType="neatlogic.framework.restful.dto.ApiVo" resultType="java.lang.String"
             useCache="false">
         SELECT
@@ -106,7 +126,6 @@
         `module_id` AS moduleId,
         `handler`,
         `username`,
-        `password` AS passwordCipher,
         `config`,
         `is_active` AS isActive,
         `token`,

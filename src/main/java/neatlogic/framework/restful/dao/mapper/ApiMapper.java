@@ -21,6 +21,8 @@ public interface ApiMapper {
 
     ApiVo getApiByToken(String token);
 
+    ApiVo getApiByTokenWithoutPsw(String token);
+
 //    List<String> getApiTokenList(ApiVo apiVo);
 
     List<ApiVo> getAllApi();

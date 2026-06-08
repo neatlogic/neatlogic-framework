@@ -21,6 +21,9 @@ public class ConfigVo implements Serializable {
     private String value;
     private String description;
     private String type;
+    private String moduleGroup;
+    private String moduleGroupName;
+    private Integer moduleGroupSort;
 
     public String getKey() {
         return key;
@@ -52,5 +55,29 @@ public class ConfigVo implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getModuleGroup() {
+        return moduleGroup;
+    }
+
+    public void setModuleGroup(String moduleGroup) {
+        this.moduleGroup = moduleGroup;
+    }
+
+    public String getModuleGroupName() {
+        return moduleGroupName;
+    }
+
+    public void setModuleGroupName(String moduleGroupName) {
+        this.moduleGroupName = moduleGroupName;
+    }
+
+    public Integer getModuleGroupSort() {
+        return moduleGroupSort;
+    }
+
+    public void setModuleGroupSort(Integer moduleGroupSort) {
+        this.moduleGroupSort = moduleGroupSort;
     }
 }

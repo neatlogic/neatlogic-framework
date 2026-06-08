@@ -687,14 +687,18 @@ public class HttpRequestUtil {
                 //默认使用原来的Content-Disposition，保留原来文件名
                 String contentDisPosition = connection.getHeaderField("Content-Disposition");
                 if (StringUtils.isNotBlank(contentDisPosition)) {
-                    RequestContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
+                    if (RequestContext.get() != null && RequestContext.get().getResponse() != null) {
+                        RequestContext.get().getResponse().setHeader("Content-Disposition", contentDisPosition);
+                    }
                 }
                 if (CollectionUtils.isNotEmpty(responseHeaderList)) {
                     Map<String, List<String>> headersMap = connection.getHeaderFields();
                     for (String header : responseHeaderList) {
                         List<String> buildStatusList = headersMap.get(header);
                         if (CollectionUtils.isNotEmpty(buildStatusList)) {
-                            RequestContext.get().getResponse().setHeader(header, buildStatusList.get(0));
+                            if (RequestContext.get() != null && RequestContext.get().getResponse() != null) {
+                                RequestContext.get().getResponse().setHeader(header, buildStatusList.get(0));
+                            }
                         }
                     }
                 }

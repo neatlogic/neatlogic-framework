@@ -11,17 +11,15 @@ import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.exception.type.ComponentNotFoundException;
 import neatlogic.framework.exception.type.ParamNotExistsException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
-import neatlogic.framework.restful.annotation.OperationType;
-import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
+import neatlogic.framework.restful.mcp.McpToolMetadataBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -36,7 +34,6 @@ import java.util.stream.Collectors;
 public class McpDispatcher {
     private static final String DEFAULT_PROTOCOL_VERSION = "2025-11-25";
     private static final Set<String> SUPPORT_PROTOCOL_VERSION_SET = new HashSet<>(Arrays.asList("2025-06-18", "2025-11-25"));
-    private static final String META_PREFIX = "com.neatlogic/";
 
     @Resource
     private ApiMapper apiMapper;
@@ -219,40 +216,9 @@ public class McpDispatcher {
         apiList.sort(Comparator.comparing(ApiVo::getModuleGroup, Comparator.nullsFirst(String::compareTo))
                 .thenComparing(ApiVo::getToken, Comparator.nullsFirst(String::compareTo)));
         for (ApiVo api : apiList) {
-            toolList.add(getTool(api));
+            toolList.add(McpToolMetadataBuilder.buildTool(api));
         }
         return toolList;
-    }
-
-    private JSONObject getTool(ApiVo api) {
-        JSONObject apiObj = new JSONObject();
-        apiObj.put("name", getToolName(api));
-        apiObj.put("title", api.getName());
-        apiObj.put("description", api.getDescription());
-        apiObj.put("inputSchema", getInputSchema(api));
-        JSONObject annotations = getToolAnnotations(api);
-        if (!annotations.isEmpty()) {
-            apiObj.put("annotations", annotations);
-        }
-        JSONObject outputSchema = getOutputSchema(api);
-        if (!outputSchema.isEmpty()) {
-            apiObj.put("outputSchema", outputSchema);
-        }
-        JSONObject meta = new JSONObject();
-        meta.put(META_PREFIX + "module", api.getModuleGroup());
-        meta.put(META_PREFIX + "token", api.getToken());
-        Object example = getExample(api);
-        if (example != null) {
-            meta.put(META_PREFIX + "example", example);
-        }
-        if (!meta.isEmpty()) {
-            apiObj.put("_meta", meta);
-        }
-        return apiObj;
-    }
-
-    private String getToolName(ApiVo api) {
-        return StringUtils.removeStart(api.getToken(), "/").replaceAll("[^A-Za-z0-9_.-]", ".");
     }
 
     private JSONObject callTool(String scope, JSONObject params) {
@@ -281,59 +247,11 @@ public class McpDispatcher {
 
     private Object invokeTool(String scope, String name, JSONObject arguments) throws Exception {
         for (ApiVo api : getMcpApiList(scope)) {
-            if (Objects.equals(name, getToolName(api)) || Objects.equals(name, api.getToken())) {
+            if (Objects.equals(name, McpToolMetadataBuilder.getToolName(api)) || Objects.equals(name, api.getToken())) {
                 return invokeApi(api.getToken(), arguments);
             }
         }
         throw new ApiNotFoundException(name);
-    }
-
-    private JSONObject getInputSchema(ApiVo api) {
-        IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        JSONObject helpObj = comp == null ? null : comp.help();
-        return getSchemaFromHelpList(helpObj == null ? null : helpObj.getJSONArray("input"), false);
-    }
-
-    private JSONObject getOutputSchema(ApiVo api) {
-        IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        JSONObject helpObj = comp == null ? null : comp.help();
-        JSONArray outputList = helpObj == null ? null : helpObj.getJSONArray("output");
-        if (outputList == null || outputList.isEmpty()) {
-            return new JSONObject();
-        }
-        return getSchemaFromHelpList(outputList, true, true);
-    }
-
-    private JSONObject getSchemaFromHelpList(JSONArray paramList, boolean allowNestedObject) {
-        return getSchemaFromHelpList(paramList, allowNestedObject, false);
-    }
-
-    private JSONObject getSchemaFromHelpList(JSONArray paramList, boolean allowNestedObject, boolean wrapBlankNameWithReturn) {
-        JSONObject schema = new JSONObject();
-        schema.put("type", "object");
-        JSONObject properties = new JSONObject();
-        JSONArray requiredList = new JSONArray();
-        if (paramList != null) {
-            for (int i = 0; i < paramList.size(); i++) {
-                JSONObject param = paramList.getJSONObject(i);
-                String name = param.getString("name");
-                if (StringUtils.isBlank(name)) {
-                    if (!wrapBlankNameWithReturn) {
-                        continue;
-                    }
-                    name = "Return";
-                }
-                properties.put(name, getParamSchema(param, allowNestedObject));
-                if (param.getBooleanValue("isRequired")) {
-                    requiredList.add(name);
-                }
-            }
-        }
-        schema.put("properties", properties);
-        if (!requiredList.isEmpty()) {
-            schema.put("required", requiredList);
-        }
-        return schema;
     }
 
     private Object toJsonCompatibleObject(Object output) {
@@ -352,114 +270,6 @@ public class McpDispatcher {
         return structuredContent;
     }
 
-    private Object getExample(ApiVo api) {
-        IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        if (comp == null) {
-            return null;
-        }
-        JSONObject helpObj = comp.help();
-        return helpObj == null ? null : helpObj.get("example");
-    }
-
-    private JSONObject getParamSchema(JSONObject input, boolean allowNestedObject) {
-        JSONObject schema = new JSONObject();
-        JSONArray children = input.getJSONArray("children");
-        String inputType = input.getString("type");
-        if (allowNestedObject && Objects.equals(inputType, "jsonArray")) {
-            schema.put("type", "array");
-            JSONObject itemSchema = new JSONObject();
-            itemSchema.put("type", "object");
-            itemSchema.put("properties", buildChildProperties(children));
-            schema.put("items", itemSchema);
-        } else if (allowNestedObject && children != null && !children.isEmpty()) {
-            schema.put("type", "object");
-            schema.put("properties", buildChildProperties(children));
-        } else {
-            schema.put("type", getJsonSchemaType(inputType));
-        }
-        if (StringUtils.isNotBlank(input.getString("description"))) {
-            schema.put("description", input.getString("description"));
-        }
-        if (input.getInteger("maxLength") != null) {
-            schema.put("maxLength", input.getInteger("maxLength"));
-        }
-        String rule = input.getString("rule");
-        if (StringUtils.isNotBlank(rule)) {
-            if (Objects.equals(input.getString("type"), "enum")) {
-                JSONArray enumList = new JSONArray();
-                for (String item : rule.split(",")) {
-                    if (StringUtils.isNotBlank(item)) {
-                        enumList.add(item);
-                    }
-                }
-                if (!enumList.isEmpty()) {
-                    schema.put("enum", enumList);
-                }
-            } else {
-                schema.put("pattern", rule);
-            }
-        }
-        return schema;
-    }
-
-    private JSONObject buildChildProperties(JSONArray children) {
-        JSONObject properties = new JSONObject();
-        if (children == null) {
-            return properties;
-        }
-        for (int i = 0; i < children.size(); i++) {
-            JSONObject child = children.getJSONObject(i);
-            String childName = child.getString("name");
-            if (StringUtils.isBlank(childName)) {
-                continue;
-            }
-            properties.put(childName, getParamSchema(child, true));
-        }
-        return properties;
-    }
-
-    private JSONObject getToolAnnotations(ApiVo api) {
-        JSONObject annotations = new JSONObject();
-        annotations.put("title", api.getName());
-        OperationTypeEnum operationType = getOperationType(api);
-        if (operationType == null || Objects.equals(operationType, OperationTypeEnum.SEARCH)) {
-            annotations.put("readOnlyHint", true);
-            annotations.put("destructiveHint", false);
-            annotations.put("idempotentHint", true);
-            annotations.put("openWorldHint", false);
-            return annotations;
-        }
-        annotations.put("readOnlyHint", false);
-        annotations.put("destructiveHint", Objects.equals(operationType, OperationTypeEnum.DELETE));
-        annotations.put("idempotentHint", false);
-        annotations.put("openWorldHint", false);
-        return annotations;
-    }
-
-    private OperationTypeEnum getOperationType(ApiVo api) {
-        IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        if (comp == null) {
-            return null;
-        }
-        Class<?> clazz = ClassUtils.getUserClass(comp.getClass());
-        OperationType operationType = clazz.getAnnotation(OperationType.class);
-        return operationType == null ? null : operationType.type();
-    }
-
-    private String getJsonSchemaType(String type) {
-        if (Objects.equals(type, "int") || Objects.equals(type, "long")) {
-            return "integer";
-        } else if (Objects.equals(type, "double")) {
-            return "number";
-        } else if (Objects.equals(type, "boolean")) {
-            return "boolean";
-        } else if (Objects.equals(type, "jsonObject")) {
-            return "object";
-        } else if (Objects.equals(type, "jsonArray")) {
-            return "array";
-        }
-        return "string";
-    }
 
     private List<ApiVo> getMcpApiList(String scope) throws CloneNotSupportedException {
         Map<String, ApiVo> dbMcpApiMap = getDbMcpApiMap();
@@ -472,7 +282,7 @@ public class McpDispatcher {
             if (StringUtils.isNotBlank(scope) && !Objects.equals(scope, api.getModuleGroup())) {
                 continue;
             }
-            ApiVo clonedApi = (ApiVo) api.clone();
+            ApiVo clonedApi = api.clone();
             clonedApi.setIsMcp(1);
             clonedApi.setQps(dbApi.getQps());
             clonedApi.setNeedAudit(dbApi.getNeedAudit());

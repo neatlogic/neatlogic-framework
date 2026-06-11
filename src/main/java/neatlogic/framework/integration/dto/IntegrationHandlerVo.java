@@ -1,13 +1,12 @@
 package neatlogic.framework.integration.dto;
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.integration.core.IIntegrationHandler;
 import neatlogic.framework.integration.core.IntegrationHandlerFactory;
 import neatlogic.framework.restful.annotation.EntityField;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
 
 public class IntegrationHandlerVo {
 	@EntityField(name = "名称", type = ApiParamType.STRING)
@@ -20,6 +19,8 @@ public class IntegrationHandlerVo {
 	private List<PatternVo> outputPattern;
 	@EntityField(name = "是否拥有参数模板", type = ApiParamType.INTEGER)
 	private Integer hasPattern;
+	@EntityField(name = "支持的请求方式", type = ApiParamType.JSONARRAY)
+	private String[] methodList;
 
 	@SuppressWarnings("unused")
 	private IntegrationHandlerVo() {
@@ -79,6 +80,20 @@ public class IntegrationHandlerVo {
 
 	public void setHasPattern(Integer hasPattern) {
 		this.hasPattern = hasPattern;
+	}
+
+	public String[] getMethodList() {
+		if (methodList == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				methodList = integrationHandler.getMethod();
+			}
+		}
+		return methodList;
+	}
+
+	public void setMethodList(String[] methodList) {
+		this.methodList = methodList;
 	}
 
 }

@@ -563,7 +563,7 @@ public class HttpRequestUtil {
             connection.connect();
             return connection;
         } catch (Exception ex) {
-            logger.error(this.url + "-" + ex.getMessage(), ex);
+            logger.error(this.url + ", " + ex.getMessage(), ex);
             this.error = ExceptionUtils.getStackTrace(ex);
             this.errorMsg = ex.getMessage();
         }
@@ -638,7 +638,7 @@ public class HttpRequestUtil {
                 }
                 this.errorMsg = message;
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                logger.error(this.url + ", " + e.getMessage(), e);
                 this.error = ExceptionUtils.getStackTrace(e);
                 this.errorMsg = e.getMessage();
             } finally {

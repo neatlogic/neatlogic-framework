@@ -16,8 +16,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.dao.plugin;
 
 import com.alibaba.fastjson.JSON;
-import com.mysql.cj.jdbc.exceptions.MySQLQueryInterruptedException;
-import com.mysql.cj.jdbc.exceptions.MySQLTransactionRollbackException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
@@ -37,10 +35,7 @@ import org.springframework.transaction.TransactionTimedOutException;
 
 import javax.sql.DataSource;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Intercepts({
         @Signature(type = Executor.class, method = "update", args = {MappedStatement.class, Object.class}),
@@ -64,7 +59,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
             while (targetException instanceof InvocationTargetException) {
                 targetException = ((InvocationTargetException) targetException).getTargetException();
             }
-            if (targetException instanceof MySQLTransactionRollbackException) {
+            if (targetException instanceof SQLTransactionRollbackException) {
                 Logger logger = LoggerFactory.getLogger("deadlockAudit");
                 logger.error(targetException.getMessage(), targetException);
                 Configuration configuration = ms.getConfiguration();
@@ -101,7 +96,7 @@ public class ExceptionCatchInterceptor implements Interceptor {
                         logger.error(e.getMessage(), e);
                     }
                 }
-            } else if (targetException instanceof MySQLQueryInterruptedException
+            } else if (targetException instanceof SQLNonTransientException
                     || targetException instanceof TransactionTimedOutException
             ) {
                 Logger logger = LoggerFactory.getLogger("sqlTimeoutAudit");

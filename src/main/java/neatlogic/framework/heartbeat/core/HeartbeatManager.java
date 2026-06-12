@@ -76,9 +76,16 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     ip = userFunctionValue;
                 }
             }
+            if (Objects.equals(ip, "localhost")) {
+                ip = "127.0.0.1";
+            }
             ServerClusterVo serverVo = serverMapper.getServerByServerId(Config.SCHEDULE_SERVER_ID);
             if (serverVo != null && StringUtils.isNotBlank(serverVo.getIp())) {
-                if (!Objects.equals(serverVo.getIp(), ip)) {
+                String oldIp = serverVo.getIp();
+                if (Objects.equals(oldIp, "localhost")) {
+                    oldIp = "127.0.0.1";
+                }
+                if (!Objects.equals(oldIp, ip) && Objects.equals(serverVo.getStatus(), ServerClusterVo.STARTUP)) {
                     System.err.println($.t("nfhc.heartbeatmanager.myinit.startupfailureprompt", Config.SCHEDULE_SERVER_ID, serverVo.getIp()));
                     System.exit(1);
                 }

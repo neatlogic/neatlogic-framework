@@ -2,11 +2,16 @@ package neatlogic.framework.dto.loginaudit;
 
 import neatlogic.framework.common.dto.BasePageVo;
 
+import java.io.Serial;
 import java.util.Date;
+import java.util.List;
 
 public class LoginAuditSearchVo extends BasePageVo {
+    @Serial
+    private static final long serialVersionUID = 5271912550863395508L;
     private Date startTime;
     private Date endTime;
+    private List<String> teamUuidList;
 
     public Date getStartTime() {
         return startTime;
@@ -22,5 +27,13 @@ public class LoginAuditSearchVo extends BasePageVo {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public List<String> getTeamUuidList() {
+        return teamUuidList;
+    }
+
+    public void setTeamUuidList(List<String> teamUuidList) {
+        this.teamUuidList = teamUuidList;
     }
 }

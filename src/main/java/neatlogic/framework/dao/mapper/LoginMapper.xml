@@ -95,6 +95,19 @@
         LIMIT #{startNum}, #{pageSize}
     </select>
 
+    <select id="getLastLoginAuditByUserUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.loginaudit.LoginAuditVo">
+        SELECT
+        a.`id`,
+        a.`user_uuid` AS userUuid,
+        a.`ip`,
+        a.`login_time` AS loginTime,
+        a.`login_method` AS loginMethod
+        FROM `login_audit` a
+        WHERE a.`user_uuid` = #{value}
+        ORDER BY a.`id` DESC
+        LIMIT 1
+    </select>
+
     <insert id="updateLoginCaptcha" parameterType="neatlogic.framework.dto.captcha.LoginCaptchaVo">
         INSERT INTO `login_captcha` (`session_id`, `code`, `expired_time`)
         VALUES (#{sessionId}, #{code}, #{expiredTime})

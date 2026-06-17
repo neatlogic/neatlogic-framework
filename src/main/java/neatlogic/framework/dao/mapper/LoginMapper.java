@@ -36,6 +36,8 @@ public interface LoginMapper {
 
     List<LoginAuditVo> getLoginAuditList(LoginAuditSearchVo searchVo);
 
+    LoginAuditVo getLastLoginAuditByUserUuid(String userUuid);
+
     Integer updateLoginCaptcha(LoginCaptchaVo loginCaptchaVo);
 
     Integer updateLoginFailedCount(LoginFailedCountVo loginFailedCountVo);

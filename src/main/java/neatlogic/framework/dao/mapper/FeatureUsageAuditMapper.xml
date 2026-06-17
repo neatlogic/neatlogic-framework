@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Copyright (C) 2025  TechSure Co., Ltd.  All Rights Reserved.
+  ~ This file is part of the NeatLogic software.
+  ~ Licensed under the NeatLogic Sustainable Use License (NSUL), Version 4.x – 2025.
+  ~ You may use this file only in compliance with the License.
+  ~ See the LICENSE file distributed with this work for the full license text.
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.FeatureUsageAuditMapper">
+
+    <sql id="getFeatureUsageAuditWhere">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <if test="menu_name == null or menu_name == ''">
+                    AND `menu_name` like concat('%', #{keyword}, '%')
+                </if>
+            </if>
+            <if test="moduleGroup != null and moduleGroup != ''">
+                `module_group` = #{moduleGroup}
+            </if>
+            <if test="menu_name != null and menu_name != ''">
+                `menu_name` = #{menuName}
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND `start_time` &gt;= #{startTime}
+                AND `start_time` &lt;= #{endTime}
+            </if>
+            <if test="loginAuditId != null">
+                `login_audit_id` = #{loginAuditId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFeatureUsageAuditCount" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `feature_usage_audit`
+        <include refid="getFeatureUsageAuditWhere"/>
+    </select>
+
+    <select id="getFeatureUsageAuditList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
+        SELECT
+            `id`,
+            `user_uuid`,
+            `module_group`,
+            `menu_path`,
+            `menu_name`,
+            `url`,
+            `start_time`,
+            `end_time`,
+            `duration`,
+            `login_audit_id`
+        FROM `feature_usage_audit`
+        <include refid="getFeatureUsageAuditWhere"/>
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <sql id="getFeatureWhere">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <if test="menu_name == null or menu_name == ''">
+                    AND `menu_name` like concat('%', #{keyword}, '%')
+                </if>
+            </if>
+            <if test="moduleGroup != null and moduleGroup != ''">
+                `module_group` = #{moduleGroup}
+            </if>
+            <if test="menu_name != null and menu_name != ''">
+                `menu_name` = #{menuName}
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND `start_time` &gt;= #{startTime}
+                AND `start_time` &lt;= #{endTime}
+            </if>
+            <if test="loginAuditId != null">
+                `login_audit_id` = #{loginAuditId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFeatureCount" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="int">
+        select COUNT(1) from (
+            SELECT
+            `module_group`, `menu_name`
+            FROM `feature_usage_audit`
+            <include refid="getFeatureWhere"/>
+            GROUP BY `module_group`, `menu_name`
+            ORDER BY `module_group`, `menu_name`
+        ) a
+    </select>
+
+    <select id="getFeatureList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
+        SELECT
+        `module_group`, `menu_name`, COUNT(1) AS usedCount
+        FROM `feature_usage_audit`
+        <include refid="getFeatureWhere"/>
+        GROUP BY `module_group`, `menu_name`
+        ORDER BY `module_group`, `menu_name`
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertFeatureUsageAudit" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
+        INSERT INTO `feature_usage_audit`(
+            `id`,
+            `user_uuid`,
+            `module_group`,
+            `menu_name`,
+            `menu_path`,
+            `url`,
+            `start_time`,
+            `end_time`,
+            `duration`,
+            `login_audit_id`
+        )
+        VALUES (
+            #{id},
+            #{userUuid},
+            #{moduleGroup},
+            #{menuName},
+            #{menuPath},
+            #{url},
+            #{startTime},
+            #{endTime},
+            #{duration},
+            #{loginAuditId}
+        )
+    </insert>
+</mapper>

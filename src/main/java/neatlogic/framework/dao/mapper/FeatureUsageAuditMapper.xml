@@ -17,21 +17,24 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 <if test="menuName == null or menuName == ''">
-                    AND `menu_name` like concat('%', #{keyword}, '%')
+                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `menu_name` LIKE CONCAT('%', #{keyword}, '%'))
                 </if>
             </if>
             <if test="moduleGroup != null and moduleGroup != ''">
-                `module_group` = #{moduleGroup}
+                AND `module_group` = #{moduleGroup}
             </if>
             <if test="menuName != null and menuName != ''">
-                `menu_name` = #{menuName}
+                AND `menu_name` = #{menuName}
             </if>
             <if test="startTime != null and endTime != null">
                 AND `start_time` &gt;= #{startTime}
                 AND `start_time` &lt;= #{endTime}
             </if>
             <if test="loginAuditId != null">
-                `login_audit_id` = #{loginAuditId}
+                AND `login_audit_id` = #{loginAuditId}
+            </if>
+            <if test="userUuid != null and userUuid != ''">
+                AND `user_uuid` = #{userUuid}
             </if>
         </where>
     </sql>
@@ -64,24 +67,24 @@
         <where>
             <if test="keyword != null and keyword != ''">
                 <if test="menuName == null or menuName == ''">
-                    AND `menu_name` like concat('%', #{keyword}, '%')
+                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `menu_name` LIKE CONCAT('%', #{keyword}, '%'))
                 </if>
             </if>
             <if test="moduleGroup != null and moduleGroup != ''">
-                `module_group` = #{moduleGroup}
+                AND `module_group` = #{moduleGroup}
             </if>
             <if test="menuName != null and menuName != ''">
-                `menu_name` = #{menuName}
+                AND `menu_name` = #{menuName}
             </if>
             <if test="startTime != null and endTime != null">
                 AND `start_time` &gt;= #{startTime}
                 AND `start_time` &lt;= #{endTime}
             </if>
             <if test="loginAuditId != null">
-                `login_audit_id` = #{loginAuditId}
+                AND `login_audit_id` = #{loginAuditId}
             </if>
             <if test="userUuid != null and userUuid != ''">
-                `user_uuid` = #{userUuid}
+                AND `user_uuid` = #{userUuid}
             </if>
         </where>
     </sql>

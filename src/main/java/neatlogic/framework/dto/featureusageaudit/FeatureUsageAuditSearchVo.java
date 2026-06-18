@@ -20,6 +20,7 @@ public class FeatureUsageAuditSearchVo extends BasePageVo {
     private static final long serialVersionUID = 5271912550863395608L;
 
     private String moduleGroup;
+    private String userUuid;
     private String menuPath;
     private String menuName;
     private Date startTime;
@@ -32,6 +33,14 @@ public class FeatureUsageAuditSearchVo extends BasePageVo {
 
     public void setModuleGroup(String moduleGroup) {
         this.moduleGroup = moduleGroup;
+    }
+
+    public String getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
     }
 
     public String getMenuPath() {

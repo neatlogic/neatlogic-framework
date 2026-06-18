@@ -23,31 +23,31 @@ public class FeatureUsageAuditVo implements Serializable {
     @Serial
     private static final long serialVersionUID = -3637843643859009471L;
 
-    @EntityField(name = "id", type = ApiParamType.LONG)
+    @EntityField(name = "主键ID", type = ApiParamType.LONG)
     private Long id;
 
-    @EntityField(name = "userUuid", type = ApiParamType.STRING)
+    @EntityField(name = "用户UUID", type = ApiParamType.STRING)
     private String userUuid;
 
-    @EntityField(name = "moduleGroup", type = ApiParamType.STRING)
+    @EntityField(name = "模块组", type = ApiParamType.STRING)
     private String moduleGroup;
 
-    @EntityField(name = "moduleGroupName", type = ApiParamType.STRING)
+    @EntityField(name = "模块组名称", type = ApiParamType.STRING)
     private String moduleGroupName;
 
-    @EntityField(name = "menuPath", type = ApiParamType.STRING)
+    @EntityField(name = "功能路径", type = ApiParamType.STRING)
     private String menuPath;
 
-    @EntityField(name = "menuName", type = ApiParamType.STRING)
+    @EntityField(name = "功能名称", type = ApiParamType.STRING)
     private String menuName;
 
-    @EntityField(name = "startTime", type = ApiParamType.LONG)
+    @EntityField(name = "开始时间", type = ApiParamType.LONG)
     private Date startTime;
 
-    @EntityField(name = "endTime", type = ApiParamType.LONG)
+    @EntityField(name = "结束时间", type = ApiParamType.LONG)
     private Date endTime;
 
-    @EntityField(name = "duration", type = ApiParamType.LONG)
+    @EntityField(name = "使用时长", type = ApiParamType.LONG)
     private Long duration;
 
     @EntityField(name = "url", type = ApiParamType.STRING)

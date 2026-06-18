@@ -16,14 +16,14 @@
     <sql id="getFeatureUsageAuditWhere">
         <where>
             <if test="keyword != null and keyword != ''">
-                <if test="menu_name == null or menu_name == ''">
+                <if test="menuName == null or menuName == ''">
                     AND `menu_name` like concat('%', #{keyword}, '%')
                 </if>
             </if>
             <if test="moduleGroup != null and moduleGroup != ''">
                 `module_group` = #{moduleGroup}
             </if>
-            <if test="menu_name != null and menu_name != ''">
+            <if test="menuName != null and menuName != ''">
                 `menu_name` = #{menuName}
             </if>
             <if test="startTime != null and endTime != null">
@@ -46,15 +46,15 @@
     <select id="getFeatureUsageAuditList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
         SELECT
             `id`,
-            `user_uuid`,
-            `module_group`,
-            `menu_path`,
-            `menu_name`,
+            `user_uuid` AS userUuid,
+            `module_group` AS moduleGroup,
+            `menu_path` AS menuPath,
+            `menu_name` AS menuName,
             `url`,
-            `start_time`,
-            `end_time`,
+            `start_time` AS startTime,
+            `end_time` AS endTime,
             `duration`,
-            `login_audit_id`
+            `login_audit_id` AS loginAuditId
         FROM `feature_usage_audit`
         <include refid="getFeatureUsageAuditWhere"/>
         LIMIT #{startNum}, #{pageSize}
@@ -63,14 +63,14 @@
     <sql id="getFeatureWhere">
         <where>
             <if test="keyword != null and keyword != ''">
-                <if test="menu_name == null or menu_name == ''">
+                <if test="menuName == null or menuName == ''">
                     AND `menu_name` like concat('%', #{keyword}, '%')
                 </if>
             </if>
             <if test="moduleGroup != null and moduleGroup != ''">
                 `module_group` = #{moduleGroup}
             </if>
-            <if test="menu_name != null and menu_name != ''">
+            <if test="menuName != null and menuName != ''">
                 `menu_name` = #{menuName}
             </if>
             <if test="startTime != null and endTime != null">
@@ -79,6 +79,9 @@
             </if>
             <if test="loginAuditId != null">
                 `login_audit_id` = #{loginAuditId}
+            </if>
+            <if test="userUuid != null and userUuid != ''">
+                `user_uuid` = #{userUuid}
             </if>
         </where>
     </sql>
@@ -96,7 +99,9 @@
 
     <select id="getFeatureList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
         SELECT
-        `module_group`, `menu_name`, COUNT(1) AS usedCount
+        `module_group` AS moduleGroup,
+        `menu_name` AS menuName,
+        COUNT(1) AS usedCount
         FROM `feature_usage_audit`
         <include refid="getFeatureWhere"/>
         GROUP BY `module_group`, `menu_name`

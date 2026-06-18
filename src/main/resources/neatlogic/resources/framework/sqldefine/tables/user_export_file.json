@@ -1,0 +1,96 @@
+{
+  "moduleId": "framework",
+  "name": "user_export_file",
+  "label": "用户导入文件信息表",
+  "description": "用户导入文件信息表 可用于框架相关的状态跟踪等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(255)",
+      "description": "文件名称。"
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "所属用户，引用user的user_uuid，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "type",
+      "type": "varchar(200)",
+      "description": "功能类型。"
+    },
+    {
+      "name": "content_type",
+      "type": "varchar(200)",
+      "description": "mime类型。"
+    },
+    {
+      "name": "config",
+      "type": "text",
+      "description": "信息。"
+    },
+    {
+      "name": "is_read",
+      "type": "tinyint(1)",
+      "description": "是否已读。"
+    },
+    {
+      "name": "status",
+      "type": "varchar(50)",
+      "description": "状态。"
+    },
+    {
+      "name": "start_time",
+      "type": "timestamp(3)",
+      "description": "开始时间。"
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp(3)",
+      "description": "结束时间。"
+    },
+    {
+      "name": "path",
+      "type": "varchar(255)",
+      "description": "路径。"
+    },
+    {
+      "name": "size",
+      "type": "bigint",
+      "description": "文件大小。"
+    },
+    {
+      "name": "error",
+      "type": "mediumtext",
+      "description": "错误信息。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "idx_user_uuid_start_time",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid",
+        "start_time"
+      ],
+      "description": "普通索引，覆盖 user_uuid、start_time 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

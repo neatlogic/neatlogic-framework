@@ -1,0 +1,50 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_view",
+  "label": "矩阵视图表",
+  "description": "矩阵视图表 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "矩阵uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "file_id",
+      "type": "bigint",
+      "description": "配置文件。"
+    },
+    {
+      "name": "config",
+      "type": "longtext",
+      "description": "config。"
+    },
+    {
+      "name": "file_name",
+      "type": "varchar(100)",
+      "description": "上传配置文件名称。"
+    },
+    {
+      "name": "xml",
+      "type": "longtext",
+      "description": "上传配置文件内容。"
+    },
+    {
+      "name": "error",
+      "type": "text",
+      "description": "错误信息。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "主键索引，覆盖 matrix_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "moduleId": "framework",
+  "name": "user",
+  "label": "用户信息表",
+  "description": "用户信息表 可用于框架相关的启用状态筛选、时间维度统计、关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "全局唯一id，跨环境导入用，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "user_id",
+      "type": "varchar(100)",
+      "description": "用户Id，数据库中要求唯一，适合用于精确查询和去重判断。"
+    },
+    {
+      "name": "user_name",
+      "type": "varchar(50)",
+      "description": "用户名。"
+    },
+    {
+      "name": "email",
+      "type": "varchar(60)",
+      "description": "邮箱，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "phone",
+      "type": "char(11)",
+      "description": "电话。"
+    },
+    {
+      "name": "pinyin",
+      "type": "varchar(50)",
+      "description": "拼音。"
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint(1)",
+      "description": "是否激活(1：激活，0：未激活)。"
+    },
+    {
+      "name": "user_info",
+      "type": "mediumtext",
+      "description": "额外属性。"
+    },
+    {
+      "name": "vip_level",
+      "type": "tinyint",
+      "description": "VIP等级(0,1,2,3,4,5)。"
+    },
+    {
+      "name": "is_delete",
+      "type": "tinyint(1)",
+      "description": "是否已删除。"
+    },
+    {
+      "name": "token",
+      "type": "varchar(32)",
+      "description": "随机生成的令牌，用于hmac认证方式签名，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "is_super_admin",
+      "type": "tinyint(1)",
+      "description": "是否超级管理员。"
+    },
+    {
+      "name": "source",
+      "type": "varchar(50)",
+      "description": "来源。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "创建人。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "修改时间。"
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "修改人。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "主键索引，覆盖 uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "email",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "email"
+      ],
+      "description": "普通索引，覆盖 email 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "普通索引，覆盖 id 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "token",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "token"
+      ],
+      "description": "普通索引，覆盖 token 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "user_id_idx",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "user_id"
+      ],
+      "description": "唯一索引，覆盖 user_id 字段，适合用于精确检索、唯一性判断和去重查询。"
+    }
+  ]
+}

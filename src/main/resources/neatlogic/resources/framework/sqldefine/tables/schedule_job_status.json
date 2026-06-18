@@ -1,0 +1,66 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_status",
+  "label": "定时作业状态表",
+  "description": "定时作业状态表 可用于框架相关的时间维度统计等报表查询场景。",
+  "fields": [
+    {
+      "name": "job_name",
+      "type": "varchar(100)",
+      "description": "job uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "job_group",
+      "type": "varchar(200)",
+      "description": "job组，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "handler",
+      "type": "varchar(255)",
+      "description": "处理器。"
+    },
+    {
+      "name": "next_fire_time",
+      "type": "timestamp(3)",
+      "description": "下一次被唤醒时间。"
+    },
+    {
+      "name": "last_fire_time",
+      "type": "timestamp(3)",
+      "description": "最后一次被唤醒时间。"
+    },
+    {
+      "name": "last_finish_time",
+      "type": "timestamp(3)",
+      "description": "最后一次完成时间。"
+    },
+    {
+      "name": "exec_count",
+      "type": "int",
+      "description": "执行次数。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "最后更新时间。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "job_name",
+        "job_group"
+      ],
+      "description": "主键索引，覆盖 job_name、job_group 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

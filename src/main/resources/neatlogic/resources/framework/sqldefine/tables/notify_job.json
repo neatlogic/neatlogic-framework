@@ -1,0 +1,75 @@
+{
+  "moduleId": "framework",
+  "name": "notify_job",
+  "label": "通知定时任务表",
+  "description": "通知定时任务表 可用于框架相关的启用状态筛选、时间维度统计等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "任务名称。"
+    },
+    {
+      "name": "cron",
+      "type": "varchar(50)",
+      "description": "cron。"
+    },
+    {
+      "name": "handler",
+      "type": "varchar(255)",
+      "description": "插件。"
+    },
+    {
+      "name": "notify_handler",
+      "type": "varchar(255)",
+      "description": "通知方式插件。"
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "配置信息。"
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint",
+      "description": "1：启用；0：禁用。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "创建人。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "修改时间。"
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "修改人。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

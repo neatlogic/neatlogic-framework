@@ -1,0 +1,225 @@
+{
+  "moduleId": "framework",
+  "tables": [
+    {
+      "name": "matrix",
+      "label": "矩阵信息表",
+      "description": "矩阵信息表 可用于框架相关的时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "matrix_attribute",
+      "label": "矩阵自定义属性表",
+      "description": "矩阵自定义属性表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "matrix_ci",
+      "label": "cmdb模型矩阵",
+      "description": "cmdb模型矩阵 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "matrix_cmdb_custom_view",
+      "label": "CMDB自定义视图矩阵配置表",
+      "description": "CMDB自定义视图矩阵配置表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "matrix_external",
+      "label": "矩阵外部数据源配置信息表",
+      "description": "矩阵外部数据源配置信息表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "matrix_view",
+      "label": "矩阵视图表",
+      "description": "矩阵视图表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "notify_config",
+      "label": "通知配置表",
+      "description": "通知配置表 可用于框架相关的启用状态筛选等报表查询场景。"
+    },
+    {
+      "name": "notify_job",
+      "label": "通知定时任务表",
+      "description": "通知定时任务表 可用于框架相关的启用状态筛选、时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "notify_job_receiver",
+      "label": "通知定时任务接收者表",
+      "description": "通知定时任务接收者表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "notify_policy",
+      "label": "通知策略信息表",
+      "description": "通知策略信息表 可用于框架相关的时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "region",
+      "label": "地域表",
+      "description": "地域表 可用于框架相关的启用状态筛选、关联查询等报表查询场景。"
+    },
+    {
+      "name": "region_team",
+      "label": "框架region_team表",
+      "description": "框架region_team表，属于框架模块的数据表。 可用于框架相关的时间维度统计、关联查询等报表查询场景。"
+    },
+    {
+      "name": "role",
+      "label": "角色表",
+      "description": "角色表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "role_authority",
+      "label": "角色授权表",
+      "description": "角色授权表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "schedule_job",
+      "label": "定时作业信息表",
+      "description": "定时作业信息表 可用于框架相关的启用状态筛选、时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "schedule_job_audit",
+      "label": "定时作业日志表",
+      "description": "定时作业日志表 可用于框架相关的状态跟踪、关联查询等报表查询场景。"
+    },
+    {
+      "name": "schedule_job_audit_detail",
+      "label": "定时作业日志详情表",
+      "description": "定时作业日志详情表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "schedule_job_data",
+      "label": "定时作业过程数据",
+      "description": "定时作业过程数据 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "schedule_job_load",
+      "label": "框架schedule_job_load表",
+      "description": "框架schedule_job_load表，属于框架模块的数据表。 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "schedule_job_load_time",
+      "label": "定时作业锁表",
+      "description": "定时作业锁表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "schedule_job_lock",
+      "label": "定时作业锁表",
+      "description": "定时作业锁表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "schedule_job_prop",
+      "label": "定时作业参数表",
+      "description": "定时作业参数表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "schedule_job_status",
+      "label": "定时作业状态表",
+      "description": "定时作业状态表 可用于框架相关的时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "system_notice",
+      "label": "系统公告表",
+      "description": "系统公告表 可用于框架相关的状态跟踪、时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "system_notice_recipient",
+      "label": "系统公告通知对象表",
+      "description": "系统公告通知对象表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "system_notice_user",
+      "label": "系统公告用户接收表",
+      "description": "系统公告用户接收表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "system_role",
+      "label": "重要系统对应相关信息",
+      "description": "重要系统对应相关信息 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "team",
+      "label": "分组信息表",
+      "description": "分组信息表 可用于框架相关的时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "team_role",
+      "label": "分组与角色关系表",
+      "description": "分组与角色关系表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "team_user_title",
+      "label": "分组领导职务关系表",
+      "description": "分组领导职务关系表 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "user",
+      "label": "用户信息表",
+      "description": "用户信息表 可用于框架相关的启用状态筛选、时间维度统计、关联查询等报表查询场景。"
+    },
+    {
+      "name": "user_agent",
+      "label": "用户授权代理表",
+      "description": "用户授权代理表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_authority",
+      "label": "用户授权表",
+      "description": "用户授权表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_data",
+      "label": "用户数据",
+      "description": "用户数据 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_export_file",
+      "label": "用户导入文件信息表",
+      "description": "用户导入文件信息表 可用于框架相关的状态跟踪等报表查询场景。"
+    },
+    {
+      "name": "user_password",
+      "label": "用户密码表",
+      "description": "用户密码表 可用于框架相关的启用状态筛选、时间维度统计、关联查询等报表查询场景。"
+    },
+    {
+      "name": "user_profile",
+      "label": "用户个性化配置",
+      "description": "用户个性化配置 可用于框架相关的关联查询等报表查询场景。"
+    },
+    {
+      "name": "user_role",
+      "label": "角色成员关系表",
+      "description": "角色成员关系表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_session",
+      "label": "用户session表",
+      "description": "用户session表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_session_content",
+      "label": "用户会话",
+      "description": "用户会话 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_team",
+      "label": "分组成员关系表",
+      "description": "分组成员关系表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "user_title",
+      "label": "用户职务表",
+      "description": "用户职务表 可用于框架相关数据的查询、筛选和报表展示。"
+    },
+    {
+      "name": "worktime",
+      "label": "服务窗口",
+      "description": "服务窗口 可用于框架相关的启用状态筛选、时间维度统计等报表查询场景。"
+    },
+    {
+      "name": "worktime_range",
+      "label": "服务窗口时间段范围表",
+      "description": "服务窗口时间段范围表 可用于框架相关数据的查询、筛选和报表展示。"
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "moduleId": "framework",
+  "name": "team",
+  "label": "分组信息表",
+  "description": "分组信息表 可用于框架相关的时间维度统计等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "id，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "全局唯一id，跨环境导入用，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "名称。"
+    },
+    {
+      "name": "phone",
+      "type": "varchar(20)",
+      "description": "电话。"
+    },
+    {
+      "name": "email",
+      "type": "varchar(255)",
+      "description": "邮件地址。"
+    },
+    {
+      "name": "description",
+      "type": "mediumtext",
+      "description": "领域组上报描述。"
+    },
+    {
+      "name": "parent_uuid",
+      "type": "char(32)",
+      "description": "父节点id，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "lft",
+      "type": "int",
+      "description": "左编码，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "rht",
+      "type": "int",
+      "description": "右编码，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "level",
+      "type": "varchar(50)",
+      "description": "级别，如公司，部门。"
+    },
+    {
+      "name": "is_delete",
+      "type": "tinyint(1)",
+      "description": "是否已删除。"
+    },
+    {
+      "name": "upward_uuid_path",
+      "type": "text",
+      "description": "向上uuid路径。"
+    },
+    {
+      "name": "upward_name_path",
+      "type": "text",
+      "description": "向上名称路径。"
+    },
+    {
+      "name": "source",
+      "type": "varchar(30)",
+      "description": "数据来源。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "创建人。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "最后更新时间。"
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "修改人。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "主键索引，覆盖 uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "普通索引，覆盖 id 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_lft_rht",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "lft",
+        "rht"
+      ],
+      "description": "普通索引，覆盖 lft、rht 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_parent_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "parent_uuid"
+      ],
+      "description": "普通索引，覆盖 parent_uuid 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_rht_lft",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "rht",
+        "lft"
+      ],
+      "description": "普通索引，覆盖 rht、lft 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

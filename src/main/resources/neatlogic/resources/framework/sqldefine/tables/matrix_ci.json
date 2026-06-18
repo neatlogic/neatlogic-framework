@@ -1,0 +1,35 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_ci",
+  "label": "cmdb模型矩阵",
+  "description": "cmdb模型矩阵 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "矩阵uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "ci_id",
+      "type": "bigint",
+      "description": "ci模型id。"
+    },
+    {
+      "name": "config",
+      "type": "longtext",
+      "description": "配置信息。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "主键索引，覆盖 matrix_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_cmdb_custom_view",
+  "label": "CMDB自定义视图矩阵配置表",
+  "description": "CMDB自定义视图矩阵配置表 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "矩阵UUID，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "custom_view_id",
+      "type": "bigint",
+      "description": "自定义视图ID。"
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "配置信息。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "主键索引，覆盖 matrix_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

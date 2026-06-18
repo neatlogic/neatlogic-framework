@@ -1,0 +1,65 @@
+{
+  "moduleId": "framework",
+  "name": "notify_policy",
+  "label": "通知策略信息表",
+  "description": "通知策略信息表 可用于框架相关的时间维度统计等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "主键，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(100)",
+      "description": "名称。"
+    },
+    {
+      "name": "handler",
+      "type": "varchar(100)",
+      "description": "不同类型策略处理器。"
+    },
+    {
+      "name": "is_default",
+      "type": "tinyint(1)",
+      "description": "是否是默认通知策略。"
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "json格式配置信息。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "创建人。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "修改时间。"
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "修改人。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

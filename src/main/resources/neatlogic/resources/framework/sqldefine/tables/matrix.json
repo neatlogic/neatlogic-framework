@@ -1,0 +1,85 @@
+{
+  "moduleId": "framework",
+  "name": "matrix",
+  "label": "矩阵信息表",
+  "description": "矩阵信息表 可用于框架相关的时间维度统计等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "自增主键，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "唯一表示id，数据库中要求唯一，适合用于精确查询和去重判断。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "矩阵名称。"
+    },
+    {
+      "name": "label",
+      "type": "varchar(50)",
+      "description": "唯一标识，数据库中要求唯一，适合用于精确查询和去重判断。"
+    },
+    {
+      "name": "type",
+      "type": "varchar(50)",
+      "description": "custom,自定义 external外部数据。"
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "创建人。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "修改人。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "修改时间。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "label",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "label"
+      ],
+      "description": "唯一索引，覆盖 label 字段，适合用于精确检索、唯一性判断和去重查询。"
+    },
+    {
+      "name": "uuid",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "uuid"
+      ],
+      "description": "唯一索引，覆盖 uuid 字段，适合用于精确检索、唯一性判断和去重查询。"
+    }
+  ]
+}

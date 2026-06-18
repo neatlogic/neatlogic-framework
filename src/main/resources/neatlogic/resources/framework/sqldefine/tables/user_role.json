@@ -1,0 +1,56 @@
+{
+  "moduleId": "framework",
+  "name": "user_role",
+  "label": "角色成员关系表",
+  "description": "角色成员关系表 可用于框架相关数据的查询、筛选和报表展示。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "自增id，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "用户uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "role_uuid",
+      "type": "char(32)",
+      "description": "引用role的uuid，作为当前表记录的主键或唯一定位字段。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "user_uuid",
+        "role_uuid"
+      ],
+      "description": "主键索引，覆盖 user_uuid、role_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "普通索引，覆盖 id 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_role_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "role_uuid"
+      ],
+      "description": "普通索引，覆盖 role_uuid 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

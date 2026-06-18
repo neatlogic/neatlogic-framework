@@ -117,6 +117,18 @@ public class TenantContext implements Serializable {
         return this;
     }
 
+    /**
+     * 清理指定租户的模块组缓存。
+     * 租户禁用、删除、重新启用时需要清掉旧模块视图。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public static void removeTenantCache(String tenantUuid) {
+        if (StringUtils.isNotBlank(tenantUuid)) {
+            tenantModuleGroupListMap.remove(tenantUuid);
+        }
+    }
+
     public static TenantContext get() {
         if (instance.get() == null) {
             init();

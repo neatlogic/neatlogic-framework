@@ -33,6 +33,8 @@ public class DatasourceManager {
 
     private static NeatLogicRoutingDataSource datasource;
 
+    private static final String TENANT_DATA_DATASOURCE_SUFFIX = "_DATA";
+
     // 数据库厂商，mysql、oceanbase、tidb
     private static String databaseId;
 
@@ -77,11 +79,53 @@ public class DatasourceManager {
         return (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
     }
 
+    /**
+     * 获取租户数据仓库在Java路由数据源中的键。
+     * 注意：路由键统一使用大写_DATA，物理库名仍然是小写_data。
+     *
+     * @param tenantUuid 租户uuid
+     * @return 租户数据仓库的数据源键
+     */
+    public static String getTenantDataDatasourceKey(String tenantUuid) {
+        return tenantUuid + TENANT_DATA_DATASOURCE_SUFFIX;
+    }
+
     public static void removeDatasource(String tenantUuid) {
         if (datasourceMap.containsKey(tenantUuid)) {
             NeatLogicBasicDataSource dataSource = (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
             dataSource.close();
             datasourceMap.remove(tenantUuid);
+        }
+    }
+
+    /**
+     * 移除租户事务库、正式_DATA和历史_data三个数据源键。
+     * 数据源必须先从映射中移除再关闭连接池，否则路由数据源仍会持有旧键。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public static synchronized void removeTenantDatasource(String tenantUuid) {
+        if (StringUtils.isBlank(tenantUuid)) {
+            return;
+        }
+        removeDatasourceByKey(tenantUuid);
+        removeDatasourceByKey(getTenantDataDatasourceKey(tenantUuid));
+        removeDatasourceByKey(tenantUuid + "_data");
+        refreshRoutingDataSource();
+    }
+
+    /**
+     * 从数据源映射中移除指定键并关闭连接池。
+     * 调用方负责在批量移除完成后统一刷新路由数据源。
+     *
+     * @param key 数据源键
+     */
+    private static void removeDatasourceByKey(String key) {
+        if (datasourceMap.containsKey(key)) {
+            NeatLogicBasicDataSource dataSource = (NeatLogicBasicDataSource) datasourceMap.remove(key);
+            if (dataSource != null) {
+                dataSource.close();
+            }
         }
     }
 
@@ -116,6 +160,14 @@ public class DatasourceManager {
 
     public static void addDynamicDataSource(String tenantUuid, NeatLogicBasicDataSource neatlogicBasicDataSource) {
         datasourceMap.put(tenantUuid, neatlogicBasicDataSource);
+        refreshRoutingDataSource();
+    }
+
+    /**
+     * 将数据源映射重新设置到Spring路由数据源。
+     * 租户完整卸载后必须刷新，否则路由层仍可能持有旧目标配置。
+     */
+    private static void refreshRoutingDataSource() {
         datasource.setTargetDataSources(datasourceMap);
         if (datasourceMap.containsKey("master")) {
             datasource.setDefaultTargetDataSource(datasourceMap.get("master"));

@@ -36,10 +36,10 @@ public class FeatureUsageAuditVo implements Serializable {
     private String moduleGroupName;
 
     @EntityField(name = "功能路径", type = ApiParamType.STRING)
-    private String menuPath;
+    private String featurePath;
 
     @EntityField(name = "功能名称", type = ApiParamType.STRING)
-    private String menuName;
+    private String featureName;
 
     @EntityField(name = "开始时间", type = ApiParamType.LONG)
     private Date startTime;
@@ -91,20 +91,20 @@ public class FeatureUsageAuditVo implements Serializable {
         this.moduleGroupName = moduleGroupName;
     }
 
-    public String getMenuPath() {
-        return menuPath;
+    public String getFeaturePath() {
+        return featurePath;
     }
 
-    public void setMenuPath(String menuPath) {
-        this.menuPath = menuPath;
+    public void setFeaturePath(String featurePath) {
+        this.featurePath = featurePath;
     }
 
-    public String getMenuName() {
-        return menuName;
+    public String getFeatureName() {
+        return featureName;
     }
 
-    public void setMenuName(String menuName) {
-        this.menuName = menuName;
+    public void setFeatureName(String featureName) {
+        this.featureName = featureName;
     }
 
     public Date getStartTime() {

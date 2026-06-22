@@ -16,15 +16,15 @@
     <sql id="getFeatureUsageAuditWhere">
         <where>
             <if test="keyword != null and keyword != ''">
-                <if test="menuName == null or menuName == ''">
-                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `menu_name` LIKE CONCAT('%', #{keyword}, '%'))
+                <if test="featureName == null or featureName == ''">
+                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `feature_name` LIKE CONCAT('%', #{keyword}, '%'))
                 </if>
             </if>
             <if test="moduleGroup != null and moduleGroup != ''">
                 AND `module_group` = #{moduleGroup}
             </if>
-            <if test="menuName != null and menuName != ''">
-                AND `menu_name` = #{menuName}
+            <if test="featureName != null and featureName != ''">
+                AND `feature_name` = #{featureName}
             </if>
             <if test="startTime != null and endTime != null">
                 AND `start_time` &gt;= #{startTime}
@@ -51,8 +51,8 @@
             `id`,
             `user_uuid` AS userUuid,
             `module_group` AS moduleGroup,
-            `menu_path` AS menuPath,
-            `menu_name` AS menuName,
+            `feature_path` AS featurePath,
+            `feature_name` AS featureName,
             `url`,
             `start_time` AS startTime,
             `end_time` AS endTime,
@@ -66,15 +66,15 @@
     <sql id="getFeatureWhere">
         <where>
             <if test="keyword != null and keyword != ''">
-                <if test="menuName == null or menuName == ''">
-                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `menu_name` LIKE CONCAT('%', #{keyword}, '%'))
+                <if test="featureName == null or featureName == ''">
+                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `feature_name` LIKE CONCAT('%', #{keyword}, '%'))
                 </if>
             </if>
             <if test="moduleGroup != null and moduleGroup != ''">
                 AND `module_group` = #{moduleGroup}
             </if>
-            <if test="menuName != null and menuName != ''">
-                AND `menu_name` = #{menuName}
+            <if test="featureName != null and featureName != ''">
+                AND `feature_name` = #{featureName}
             </if>
             <if test="startTime != null and endTime != null">
                 AND `start_time` &gt;= #{startTime}
@@ -92,23 +92,23 @@
     <select id="getFeatureCount" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="int">
         select COUNT(1) from (
             SELECT
-            `module_group`, `menu_name`
+            `module_group`, `feature_name`
             FROM `feature_usage_audit`
             <include refid="getFeatureWhere"/>
-            GROUP BY `module_group`, `menu_name`
-            ORDER BY `module_group`, `menu_name`
+            GROUP BY `module_group`, `feature_name`
+            ORDER BY `module_group`, `feature_name`
         ) a
     </select>
 
     <select id="getFeatureList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
         SELECT
         `module_group` AS moduleGroup,
-        `menu_name` AS menuName,
+        `feature_name` AS featureName,
         COUNT(1) AS usedCount
         FROM `feature_usage_audit`
         <include refid="getFeatureWhere"/>
-        GROUP BY `module_group`, `menu_name`
-        ORDER BY `module_group`, `menu_name`
+        GROUP BY `module_group`, `feature_name`
+        ORDER BY `module_group`, `feature_name`
         limit #{startNum}, #{pageSize}
     </select>
 
@@ -117,8 +117,8 @@
             `id`,
             `user_uuid`,
             `module_group`,
-            `menu_name`,
-            `menu_path`,
+            `feature_name`,
+            `feature_path`,
             `url`,
             `start_time`,
             `end_time`,
@@ -129,8 +129,8 @@
             #{id},
             #{userUuid},
             #{moduleGroup},
-            #{menuName},
-            #{menuPath},
+            #{featureName},
+            #{featurePath},
             #{url},
             #{startTime},
             #{endTime},

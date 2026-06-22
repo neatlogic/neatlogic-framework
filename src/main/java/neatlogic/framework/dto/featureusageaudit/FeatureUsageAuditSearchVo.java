@@ -21,8 +21,8 @@ public class FeatureUsageAuditSearchVo extends BasePageVo {
 
     private String moduleGroup;
     private String userUuid;
-    private String menuPath;
-    private String menuName;
+    private String featurePath;
+    private String featureName;
     private Date startTime;
     private Date endTime;
     private Long loginAuditId;
@@ -43,20 +43,20 @@ public class FeatureUsageAuditSearchVo extends BasePageVo {
         this.userUuid = userUuid;
     }
 
-    public String getMenuPath() {
-        return menuPath;
+    public String getFeaturePath() {
+        return featurePath;
     }
 
-    public void setMenuPath(String menuPath) {
-        this.menuPath = menuPath;
+    public void setFeaturePath(String featurePath) {
+        this.featurePath = featurePath;
     }
 
-    public String getMenuName() {
-        return menuName;
+    public String getFeatureName() {
+        return featureName;
     }
 
-    public void setMenuName(String menuName) {
-        this.menuName = menuName;
+    public void setFeatureName(String featureName) {
+        this.featureName = featureName;
     }
 
     public Date getStartTime() {

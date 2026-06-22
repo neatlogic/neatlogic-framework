@@ -1,14 +1,14 @@
 CREATE TABLE IF NOT EXISTS `feature_usage_audit` (
-    `id` bigint NOT NULL COMMENT '主键ID',
-    `user_uuid` char(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户UUID',
-    `module_group` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '模块组',
-    `feature_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '功能路径',
-    `feature_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '功能名称',
-    `url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'URL',
-    `start_time` timestamp(3) NOT NULL COMMENT '开始时间',
-    `end_time` timestamp(3) NOT NULL COMMENT '结束时间',
-    `duration` bigint NOT NULL COMMENT '持续时间（毫秒）',
-    `login_audit_id` bigint DEFAULT NULL COMMENT '登录记录ID',
+    `id` BIGINT NOT NULL COMMENT '主键ID',
+    `user_uuid` CHAR(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '用户UUID',
+    `module_group` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块组',
+    `feature_path` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '功能路径',
+    `feature_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '功能名称',
+    `start_time` TIMESTAMP(3) NOT NULL COMMENT '开始时间',
+    `end_time` TIMESTAMP(3) NOT NULL COMMENT '结束时间',
+    `duration` BIGINT NOT NULL COMMENT '持续时间（毫秒）',
+    `login_audit_id` BIGINT NOT NULL COMMENT '登录记录ID',
     PRIMARY KEY (`id`),
-    KEY `idx_login_audit_id` (`login_audit_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='功能使用审计';
+    KEY `idx_login_audit_id` (`login_audit_id`),
+    KEY `idx_start_time` (`start_time`)
+    ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='功能使用审计';

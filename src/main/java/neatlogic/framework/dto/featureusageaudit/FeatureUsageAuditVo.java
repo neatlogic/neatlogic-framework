@@ -50,9 +50,6 @@ public class FeatureUsageAuditVo implements Serializable {
     @EntityField(name = "使用时长", type = ApiParamType.LONG)
     private Long duration;
 
-    @EntityField(name = "url", type = ApiParamType.STRING)
-    private String url;
-
     @EntityField(name = "登录记录ID", type = ApiParamType.LONG)
     private Long loginAuditId;
 
@@ -129,14 +126,6 @@ public class FeatureUsageAuditVo implements Serializable {
 
     public void setDuration(Long duration) {
         this.duration = duration;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public Long getLoginAuditId() {

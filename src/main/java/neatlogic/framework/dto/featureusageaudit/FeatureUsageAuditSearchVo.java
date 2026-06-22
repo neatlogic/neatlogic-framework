@@ -14,25 +14,25 @@ import neatlogic.framework.common.dto.BasePageVo;
 
 import java.io.Serial;
 import java.util.Date;
+import java.util.List;
 
 public class FeatureUsageAuditSearchVo extends BasePageVo {
     @Serial
     private static final long serialVersionUID = 5271912550863395608L;
 
-    private String moduleGroup;
+    private List<String> moduleGroupList;
     private String userUuid;
-    private String featurePath;
-    private String featureName;
+    private List<String> featureNameList;
     private Date startTime;
     private Date endTime;
     private Long loginAuditId;
 
-    public String getModuleGroup() {
-        return moduleGroup;
+    public List<String> getModuleGroupList() {
+        return moduleGroupList;
     }
 
-    public void setModuleGroup(String moduleGroup) {
-        this.moduleGroup = moduleGroup;
+    public void setModuleGroupList(List<String> moduleGroupList) {
+        this.moduleGroupList = moduleGroupList;
     }
 
     public String getUserUuid() {
@@ -43,20 +43,12 @@ public class FeatureUsageAuditSearchVo extends BasePageVo {
         this.userUuid = userUuid;
     }
 
-    public String getFeaturePath() {
-        return featurePath;
+    public List<String> getFeatureNameList() {
+        return featureNameList;
     }
 
-    public void setFeaturePath(String featurePath) {
-        this.featurePath = featurePath;
-    }
-
-    public String getFeatureName() {
-        return featureName;
-    }
-
-    public void setFeatureName(String featureName) {
-        this.featureName = featureName;
+    public void setFeatureNameList(List<String> featureNameList) {
+        this.featureNameList = featureNameList;
     }
 
     public Date getStartTime() {

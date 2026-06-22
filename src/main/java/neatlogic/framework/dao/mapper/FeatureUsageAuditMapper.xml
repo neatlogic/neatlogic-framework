@@ -15,16 +15,31 @@
 
     <sql id="getFeatureUsageAuditWhere">
         <where>
-            <if test="keyword != null and keyword != ''">
-                <if test="featureName == null or featureName == ''">
-                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `feature_name` LIKE CONCAT('%', #{keyword}, '%'))
+            <!--<if test="keyword != null and keyword != ''">
+                <if test="(moduleGroupList == null or moduleGroupList.size() == 0) or (featureNameList == null or featureNameList.size() == 0)">
+                    AND (
+                    <trim>
+                        <if test="moduleGroupList == null or moduleGroupList.size() == 0">
+                            OR `module_group` LIKE CONCAT('%', #{keyword}, '%')
+                        </if>
+                        <if test="featureNameList == null and featureNameList.size() == 0">
+                            OR `feature_name` LIKE CONCAT('%', #{keyword}, '%')
+                        </if>
+                    </trim>
+                    )
                 </if>
+            </if>-->
+            <if test="moduleGroupList != null and moduleGroupList.size() > 0">
+                AND `module_group` IN
+                <foreach collection="moduleGroupList" item="moduleGroup" open="(" separator="," close=")">
+                    #{moduleGroup}
+                </foreach>
             </if>
-            <if test="moduleGroup != null and moduleGroup != ''">
-                AND `module_group` = #{moduleGroup}
-            </if>
-            <if test="featureName != null and featureName != ''">
-                AND `feature_name` = #{featureName}
+            <if test="featureNameList != null and featureNameList.size() > 0">
+                AND `feature_name` IN
+                <foreach collection="featureNameList" item="featureName" open="(" separator="," close=")">
+                    #{featureName}
+                </foreach>
             </if>
             <if test="startTime != null and endTime != null">
                 AND `start_time` &gt;= #{startTime}
@@ -66,15 +81,21 @@
     <sql id="getFeatureWhere">
         <where>
             <if test="keyword != null and keyword != ''">
-                <if test="featureName == null or featureName == ''">
-                    AND (`module_group` LIKE CONCAT('%', #{keyword}, '%') OR `feature_name` LIKE CONCAT('%', #{keyword}, '%'))
+                <if test="featureNameList == null or featureNameList.size() == 0">
+                    AND `feature_name` LIKE CONCAT('%', #{keyword}, '%')
                 </if>
             </if>
-            <if test="moduleGroup != null and moduleGroup != ''">
-                AND `module_group` = #{moduleGroup}
+            <if test="moduleGroupList != null and moduleGroupList.size() > 0">
+                AND `module_group` IN
+                <foreach collection="moduleGroupList" item="moduleGroup" open="(" separator="," close=")">
+                    #{moduleGroup}
+                </foreach>
             </if>
-            <if test="featureName != null and featureName != ''">
-                AND `feature_name` = #{featureName}
+            <if test="featureNameList != null and featureNameList.size() > 0">
+                AND `feature_name` IN
+                <foreach collection="featureNameList" item="featureName" open="(" separator="," close=")">
+                    #{featureName}
+                </foreach>
             </if>
             <if test="startTime != null and endTime != null">
                 AND `start_time` &gt;= #{startTime}

@@ -159,4 +159,9 @@
             #{loginAuditId}
         )
     </insert>
+
+    <delete id="deleteFeatureUsageAuditByDayBefore" parameterType="java.lang.Integer">
+        DELETE FROM `feature_usage_audit`
+        WHERE `start_time` &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
 </mapper>

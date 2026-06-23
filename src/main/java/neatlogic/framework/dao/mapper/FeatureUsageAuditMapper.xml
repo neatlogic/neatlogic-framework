@@ -116,6 +116,7 @@
         SELECT
         `module_group` AS moduleGroup,
         `feature_name` AS featureName,
+        SUM(`duration`) AS duration,
         COUNT(1) AS usedCount
         FROM `feature_usage_audit`
         <include refid="getFeatureWhere"/>

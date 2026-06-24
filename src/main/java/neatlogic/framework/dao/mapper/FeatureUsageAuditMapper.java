@@ -25,7 +25,7 @@ public interface FeatureUsageAuditMapper {
 
     List<FeatureUsageAuditVo> getFeatureList(FeatureUsageAuditSearchVo searchVo);
 
-    int insertFeatureUsageAudit(FeatureUsageAuditVo featureUsageAuditVo);
+    int insertFeatureUsageAuditList(List<FeatureUsageAuditVo> featureUsageAuditVoList);
 
     int deleteFeatureUsageAuditByDayBefore(int dayBefore);
 }

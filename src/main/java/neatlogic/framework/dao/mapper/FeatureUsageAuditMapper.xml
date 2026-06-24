@@ -125,7 +125,7 @@
         limit #{startNum}, #{pageSize}
     </select>
 
-    <insert id="insertFeatureUsageAudit" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
+    <insert id="insertFeatureUsageAuditList">
         INSERT INTO `feature_usage_audit`(
             `id`,
             `user_uuid`,
@@ -137,17 +137,20 @@
             `duration`,
             `login_audit_id`
         )
-        VALUES (
-            #{id},
-            #{userUuid},
-            #{moduleGroup},
-            #{featureName},
-            #{featurePath},
-            #{startTime},
-            #{endTime},
-            #{duration},
-            #{loginAuditId}
-        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.userUuid},
+                #{item.moduleGroup},
+                #{item.featureName},
+                #{item.featurePath},
+                #{item.startTime},
+                #{item.endTime},
+                #{item.duration},
+                #{item.loginAuditId}
+            )
+        </foreach>
     </insert>
 
     <delete id="deleteFeatureUsageAuditByDayBefore" parameterType="java.lang.Integer">

@@ -54,6 +54,8 @@ public interface SchedulerMapper {
 
     List<JobLoadVo> getJobLoadListByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
+    ScheduleJobSourceVo getJobSourceByJobNameAndJobGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+
 //    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 
     // UPDATE
@@ -71,6 +73,8 @@ public interface SchedulerMapper {
 
     // INSERT
     int insertJob(JobVo job);
+
+    int insertJobSource(ScheduleJobSourceVo jobSource);
 
     int insertJobStatus(JobStatusVo jobStatus);
 
@@ -90,6 +94,8 @@ public interface SchedulerMapper {
 
     // DELETE
     int deleteJobByUuid(String uuid);
+
+    int deleteJobSourceByJobNameAndJobGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
     int deleteJobPropByJobUuid(String jobUuid);
 

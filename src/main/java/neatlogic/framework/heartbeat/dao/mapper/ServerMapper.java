@@ -19,9 +19,6 @@ public interface ServerMapper {
 
     List<ServerClusterVo> getAllServerList();
 
-    // 查询同一个应用服务分组下的所有服务器，用于兼容已停机服务器创建的定时作业数据。
-    List<Integer> getServerIdListByGroup(String serverGroup);
-
     List<Integer> getStartupServerIdListByGroup(String serverGroup);
 
     String getUserFunctionValue();

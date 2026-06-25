@@ -14,7 +14,8 @@
         <result column="begin_time" property="beginTime"/>
         <result column="end_time" property="endTime"/>
         <!-- 返回创建服务器ID，供前端表格展示和跨服务组数据排查使用。 -->
-        <result column="source_server_id" property="sourceServerId"/>
+        <result column="server_id" property="sourceServerId"/>
+        <result column="server_group" property="sourceServerGroup"/>
         <collection property="propList" ofType="neatlogic.framework.scheduler.dto.JobPropVo">
             <id column="prop_id" property="id"/>
             <result column="prop_name" property="name"/>
@@ -31,12 +32,14 @@
                a.cron,
                a.is_active,
                a.need_audit,
-               a.source_server_id,
+               c.server_id,
+               c.server_group,
                d.prop_name,
                d.prop_value,
                d.id as prop_id
         FROM schedule_job a
                  LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+        LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`uuid`
         WHERE a.uuid = #{uuid}
     </select>
 
@@ -49,8 +52,7 @@
                `end_time`   AS endTime,
                `cron`,
                `is_active`  AS isActive,
-               `need_audit` AS needAudit,
-               `source_server_id` AS sourceServerId
+               `need_audit` AS needAudit
         FROM `schedule_job`
         WHERE `uuid` = #{value}
     </select>
@@ -79,21 +81,29 @@
                a.`cron`,
                a.`is_active`,
                a.`need_audit`,
-               a.`source_server_id`,
+               c.`server_id`,
+               c.`server_group`,
                d.prop_name,
                d.prop_value,
                d.id as prop_id
         FROM `schedule_job` a
                  LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
+        LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`uuid`
         WHERE `handler` = #{value}
     </select>
 
-    <select id="searchJobCount" resultType="int">
-        SELECT
-        count(1)
-        FROM schedule_job a
+    <sql id="searchJobWhere">
         WHERE
-        1=1
+        (c.`job_name` IS NULL
+        <choose>
+            <when test="sourceServerGroup != null and sourceServerGroup != ''">
+                OR c.`server_group` = #{sourceServerGroup}
+            </when>
+            <otherwise>
+                OR c.`server_group` IS NULL
+            </otherwise>
+        </choose>
+        )
         <if test="keyword != null and keyword != ''">
             AND a.name like CONCAT('%',#{keyword}, '%')
         </if>
@@ -112,14 +122,14 @@
         <if test="needAudit != null">
             AND a.need_audit = #{needAudit}
         </if>
-        <!-- 兼容旧数据：source_server_id 为空的历史作业对所有服务组可见；新数据仅对同组服务器可见。 -->
-        <if test="sourceServerIdList != null and sourceServerIdList.size() > 0">
-            AND (a.source_server_id IS NULL OR a.source_server_id IN
-            <foreach collection="sourceServerIdList" item="sourceServerId" open="(" separator="," close=")">
-                #{sourceServerId}
-            </foreach>
-            )
-        </if>
+    </sql>
+
+    <select id="searchJobCount" resultType="int">
+        SELECT
+        count(1)
+        FROM schedule_job a
+        LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`uuid`
+        <include refid="searchJobWhere"/>
     </select>
 
     <resultMap id="jobDetailMap" type="neatlogic.framework.scheduler.dto.JobVo">
@@ -132,7 +142,8 @@
         <result column="begin_time" property="beginTime"/>
         <result column="end_time" property="endTime"/>
         <!-- 返回创建服务器ID，供前端表格展示和跨服务组数据排查使用。 -->
-        <result column="source_server_id" property="sourceServerId"/>
+        <result column="server_id" property="sourceServerId"/>
+        <result column="server_group" property="sourceServerGroup"/>
         <association property="jobStatus" resultMap="jobStatusMap"/>
     </resultMap>
 
@@ -156,7 +167,8 @@
         a.cron,
         a.is_active,
         a.need_audit,
-        a.source_server_id,
+        c.server_id,
+        c.server_group,
         sjs.job_name,
         sjs.job_group,
         sjs.last_fire_time,
@@ -165,34 +177,8 @@
         sjs.exec_count
         FROM schedule_job a
         LEFT JOIN schedule_job_status sjs ON a.uuid = sjs.job_name
-        WHERE
-        1=1
-        <if test="keyword != null and keyword != ''">
-            AND a.name like CONCAT('%',#{keyword}, '%')
-        </if>
-        <if test="handler != null and handler != ''">
-            AND a.handler = #{handler}
-        </if>
-        <if test="handlerList != null and handlerList.size() > 0">
-            AND a.handler IN
-            <foreach collection="handlerList" item="handlerClassName" open="(" separator="," close=")">
-                #{handlerClassName}
-            </foreach>
-        </if>
-        <if test="isActive != null">
-            AND a.is_active = #{isActive}
-        </if>
-        <if test="needAudit != null">
-            AND a.need_audit = #{needAudit}
-        </if>
-        <!-- 兼容旧数据：source_server_id 为空的历史作业对所有服务组可见；新数据仅对同组服务器可见。 -->
-        <if test="sourceServerIdList != null and sourceServerIdList.size() > 0">
-            AND (a.source_server_id IS NULL OR a.source_server_id IN
-            <foreach collection="sourceServerIdList" item="sourceServerId" open="(" separator="," close=")">
-                #{sourceServerId}
-            </foreach>
-            )
-        </if>
+        LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`uuid`
+        <include refid="searchJobWhere"/>
         ORDER BY a.`fcd` DESC
         limit #{startNum}, #{pageSize}
     </select>
@@ -376,6 +362,19 @@
         AND `job_group` = #{jobGroup}
     </select>
 
+    <select id="getJobSourceByJobNameAndJobGroup" resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        SELECT
+            `job_name` AS jobName,
+            `job_group` AS jobGroup,
+            `server_id` AS serverId,
+            `server_group` AS serverGroup,
+            `fcu`,
+            `fcd`
+        FROM `schedule_job_source`
+        WHERE `job_name` = #{jobName}
+          AND `job_group` = #{jobGroup}
+    </select>
+
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
         UPDATE
             `schedule_job_lock`
@@ -391,8 +390,7 @@
             end_time   = #{endTime},
             cron       = #{cron},
             is_active  = #{isActive},
-            need_audit = #{needAudit},
-            source_server_id = IFNULL(source_server_id, #{sourceServerId})
+            need_audit = #{needAudit}
         WHERE uuid = #{uuid}
     </update>
 
@@ -455,8 +453,6 @@
          `cron`,
          `is_active`,
          `need_audit`,
-         <!-- 新建作业时写入创建服务器ID，供管理页按服务组过滤。 -->
-         `source_server_id`,
          `fcd`)
         VALUES (#{uuid},
                 #{name},
@@ -466,7 +462,22 @@
                 #{cron},
                 #{isActive},
                 #{needAudit},
-                #{sourceServerId},
+                NOW(3))
+    </insert>
+
+    <insert id="insertJobSource" parameterType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        INSERT IGNORE INTO schedule_job_source
+        (`job_name`,
+         `job_group`,
+         `server_id`,
+         `server_group`,
+         `fcu`,
+         `fcd`)
+        VALUES (#{jobName},
+                #{jobGroup},
+                #{serverId},
+                #{serverGroup},
+                #{fcu},
                 NOW(3))
     </insert>
 
@@ -553,6 +564,13 @@
         DELETE
         FROM `schedule_job`
         WHERE `uuid` = #{value}
+    </delete>
+
+    <delete id="deleteJobSourceByJobNameAndJobGroup">
+        DELETE
+        FROM `schedule_job_source`
+        WHERE `job_name` = #{jobName}
+          AND `job_group` = #{jobGroup}
     </delete>
 
     <delete id="deleteJobStatus">

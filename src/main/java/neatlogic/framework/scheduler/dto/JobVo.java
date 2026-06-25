@@ -63,6 +63,7 @@ public class JobVo extends BasePageVo {
 
     // 记录定时作业配置最初由哪个应用服务器创建，用于按应用服务分组过滤管理页数据。
     private Integer sourceServerId;
+    private String sourceServerGroup;
 
     // 当前应用服务分组内的服务器ID列表；Mapper 使用它过滤同组创建的定时作业。
     private List<Integer> sourceServerIdList;
@@ -154,6 +155,14 @@ public class JobVo extends BasePageVo {
 
     public void setSourceServerId(Integer sourceServerId) {
         this.sourceServerId = sourceServerId;
+    }
+
+    public String getSourceServerGroup() {
+        return sourceServerGroup;
+    }
+
+    public void setSourceServerGroup(String sourceServerGroup) {
+        this.sourceServerGroup = sourceServerGroup;
     }
 
     public List<Integer> getSourceServerIdList() {

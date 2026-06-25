@@ -112,6 +112,20 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         return false;
     }
 
+    public void saveJobSource(JobObject jobObject) {
+        ScheduleJobSourceVo scheduleJobSource = schedulerMapper.getJobSourceByJobNameAndJobGroup(jobObject.getJobName(), jobObject.getJobGroup());
+        if (scheduleJobSource == null) {
+            ScheduleJobSourceVo scheduleJobSourceVo = new ScheduleJobSourceVo();
+            scheduleJobSourceVo.setJobName(jobObject.getJobName());
+            scheduleJobSourceVo.setJobGroup(jobObject.getJobGroup());
+            scheduleJobSourceVo.setServerId(Config.SCHEDULE_SERVER_ID);
+            scheduleJobSourceVo.setServerGroup(Config.SCHEDULE_SERVER_GROUP());
+            scheduleJobSourceVo.setFcu(UserContext.get().getUserUuid());
+            scheduleJobSourceVo.setLcu(UserContext.get().getUserUuid());
+            schedulerMapper.insertJobSource(scheduleJobSourceVo);
+        }
+    }
+
     /**
      * 加载定时作业，同时设置定时作业状态和锁
      *
@@ -119,6 +133,13 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
      * @return 日期
      */
     public Date loadJob(JobObject jobObject) {
+        // 只加载相同分组或不属于任何分组(历史旧数据)的作业
+        ScheduleJobSourceVo scheduleJobSource = schedulerMapper.getJobSourceByJobNameAndJobGroup(jobObject.getJobName(), jobObject.getJobGroup());
+        if (scheduleJobSource != null) {
+            if (!Objects.equals(scheduleJobSource.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
+                return null;
+            }
+        }
         // 如果结束时间比当前时间早，就不加载了
         if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {
             return null;

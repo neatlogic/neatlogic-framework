@@ -113,12 +113,14 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             @Override
             protected void execute() {
                 try {
-                    // 查找故障服务器
-                    List<Integer> inactivatedServerIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
                     // 只会接管同组的故障服务器
                     List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
-                    List<Integer> serverIdList = ListUtils.retainAll(inactivatedServerIdList, sameGroupServerIdList);
+                    // 查找故障服务器
+                    List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
                     for (Integer serverId : serverIdList) {
+                        if (!sameGroupServerIdList.contains(serverId)) {
+                            continue;
+                        }
                         if (getServerLock(serverId)) {
                             // 如果抢到锁，开始处理
                             for (IHeartbreakHandler observer : set) {

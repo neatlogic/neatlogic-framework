@@ -1,0 +1,70 @@
+{
+  "moduleId": "framework",
+  "name": "region",
+  "label": "地域表",
+  "description": "地域表 可用于框架相关的启用状态筛选、关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "全局唯一id，跨环境导入用，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(100)",
+      "description": "名称。"
+    },
+    {
+      "name": "parent_id",
+      "type": "bigint",
+      "description": "父级id。"
+    },
+    {
+      "name": "worktime_uuid",
+      "type": "char(32)",
+      "description": "服务窗口uuid。"
+    },
+    {
+      "name": "is_active",
+      "type": "int",
+      "description": "是否启用。"
+    },
+    {
+      "name": "lft",
+      "type": "int",
+      "description": "左编码。"
+    },
+    {
+      "name": "rht",
+      "type": "int",
+      "description": "右编码。"
+    },
+    {
+      "name": "upward_id_path",
+      "type": "text",
+      "description": "所有父节点id路径。"
+    },
+    {
+      "name": "upward_name_pupward_name_path",
+      "type": "text",
+      "description": "所有父节点name路径。"
+    },
+    {
+      "name": "upward_name_path",
+      "type": "text",
+      "description": "地域表的upward_name_path字段。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

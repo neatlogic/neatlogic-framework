@@ -1,7 +1,6 @@
 package neatlogic.framework.common.util;
 
 import neatlogic.framework.store.mysql.DatasourceManager;
-import neatlogic.framework.store.mysql.NeatLogicBasicDataSource;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
@@ -23,13 +22,16 @@ public class TenantUtil {
         }
     }
 
+    /**
+     * 从内存租户集合移除租户，并卸载该租户相关数据源。
+     * 数据源需要交给数据源管理器从路由映射中移除并关闭，不能只关闭连接池。
+     *
+     * @param tenant 租户uuid
+     */
     public static void removeTenant(String tenant) {
         if (StringUtils.isNotBlank(tenant)) {
             tenantSet.remove(tenant);
-            NeatLogicBasicDataSource tenantDataSource = DatasourceManager.getDatasource(tenant);
-            if (tenantDataSource != null) {
-                tenantDataSource.close();
-            }
+            DatasourceManager.removeTenantDatasource(tenant);
         }
     }
 

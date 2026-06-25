@@ -1,0 +1,50 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_prop",
+  "label": "定时作业参数表",
+  "description": "定时作业参数表 可用于框架相关数据的查询、筛选和报表展示。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "job_uuid",
+      "type": "char(50)",
+      "description": "引用schedule_job的uuid，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "prop_name",
+      "type": "varchar(100)",
+      "description": "属性名称。"
+    },
+    {
+      "name": "prop_value",
+      "type": "mediumtext",
+      "description": "属性值。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "idx_jobuuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "job_uuid"
+      ],
+      "description": "普通索引，覆盖 job_uuid 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

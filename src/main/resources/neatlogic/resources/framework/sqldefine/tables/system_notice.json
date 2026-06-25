@@ -1,0 +1,95 @@
+{
+  "moduleId": "framework",
+  "name": "system_notice",
+  "label": "系统公告表",
+  "description": "系统公告表 可用于框架相关的状态跟踪、时间维度统计等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "title",
+      "type": "varchar(50)",
+      "description": "标题。"
+    },
+    {
+      "name": "content",
+      "type": "mediumtext",
+      "description": "内容。"
+    },
+    {
+      "name": "start_time",
+      "type": "timestamp(3)",
+      "description": "生效时间。"
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp(3)",
+      "description": "失效时间。"
+    },
+    {
+      "name": "status",
+      "type": "enum('not_issued','issued','stopped')",
+      "description": "not_issued:未下发；issued:已下发；stopped:停用。"
+    },
+    {
+      "name": "pop_up",
+      "type": "enum('longshow','close')",
+      "description": "longshow:持续弹窗；close:不弹窗。"
+    },
+    {
+      "name": "ignore_read",
+      "type": "tinyint(1)",
+      "description": "是否忽略已读，1:是；0:否:-1:不设置。"
+    },
+    {
+      "name": "issue_time",
+      "type": "timestamp(3)",
+      "description": "最近一次下发时间，已建立普通索引，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "创建时间。"
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "创建人。"
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "修改时间。"
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "修改人。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "idx_issue_time",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "issue_time"
+      ],
+      "description": "普通索引，覆盖 issue_time 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

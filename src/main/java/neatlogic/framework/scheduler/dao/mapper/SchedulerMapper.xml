@@ -606,6 +606,15 @@
         WHERE `server_id` = #{serverId}
           AND `server_start_time` != #{serverStartTime}
     </delete>
+    <delete id="deleteAllJobLoad">
+        DELETE FROM `schedule_job_load`
+    </delete>
+    <delete id="deleteAllJobStatus">
+        DELETE FROM `schedule_job_status`
+    </delete>
+    <delete id="deleteAllJobLock">
+        DELETE FROM `schedule_job_lock`
+    </delete>
     <!--<delete id="deleteJobLoadTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadTimeVo">
         DELETE
         FROM `schedule_job_load_time`

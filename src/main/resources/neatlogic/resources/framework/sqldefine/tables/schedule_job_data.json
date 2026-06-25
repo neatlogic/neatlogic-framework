@@ -1,0 +1,36 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_data",
+  "label": "定时作业过程数据",
+  "description": "定时作业过程数据 可用于框架相关数据的查询、筛选和报表展示。",
+  "fields": [
+    {
+      "name": "job_uuid",
+      "type": "char(32)",
+      "description": "作业唯一id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "data_name",
+      "type": "varchar(100)",
+      "description": "属性名，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "data_value",
+      "type": "varchar(500)",
+      "description": "属性值。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "job_uuid",
+        "data_name"
+      ],
+      "description": "主键索引，覆盖 job_uuid、data_name 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

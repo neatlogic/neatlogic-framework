@@ -1,0 +1,37 @@
+{
+  "moduleId": "framework",
+  "name": "system_notice_recipient",
+  "label": "系统公告通知对象表",
+  "description": "系统公告通知对象表 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "system_notice_id",
+      "type": "bigint",
+      "description": "系统公告ID，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "通知对象uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "type",
+      "type": "enum('common','user','team','role')",
+      "description": "类型(common,user,team,role)，作为当前表记录的主键或唯一定位字段。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "system_notice_id",
+        "uuid",
+        "type"
+      ],
+      "description": "主键索引，覆盖 system_notice_id、uuid、type 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

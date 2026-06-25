@@ -55,6 +55,18 @@ public class RateLimiterTokenBucket {
         return tenantRateLimiter.tryAcquire();
     }
 
+    /**
+     * 移除指定租户的限流桶。
+     * 租户禁用、删除后不保留旧租户的限流状态。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public static void removeTenant(String tenantUuid) {
+        if (StringUtils.isNotBlank(tenantUuid)) {
+            tenantRateLimiterMap.remove(tenantUuid);
+        }
+    }
+
 //    // -Xms10m -Xmx10m -XX:+PrintGCDetails
 //    public static void main(String[] args) {
 //        List<String> tenantUuidList = Arrays.asList("develop", "test", "szbank");

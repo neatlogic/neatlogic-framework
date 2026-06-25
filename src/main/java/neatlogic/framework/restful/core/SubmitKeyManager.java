@@ -67,6 +67,18 @@ public class SubmitKeyManager {
         SUBMIT_MAP.clear();
     }
 
+    /**
+     * 清理指定租户的提交防重复key。
+     * 租户运行时卸载后不应保留旧租户的提交窗口状态。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public static void clearByTenant(String tenantUuid) {
+        if (tenantUuid != null) {
+            SUBMIT_MAP.keySet().removeIf(key -> key.startsWith(tenantUuid + " "));
+        }
+    }
+
     public static Map<String, Long> getAll() {
         return new HashMap<>(SUBMIT_MAP); // 防止外部修改原始 map
     }

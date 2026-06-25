@@ -31,6 +31,7 @@ import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
@@ -239,6 +240,66 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             logger.error(e.getMessage(), e);
         }
         return flag;
+    }
+
+    /**
+     * 卸载当前JVM中指定租户的Quartz作业。
+     * 按作业对象中的租户uuid精确匹配，避免使用分组前缀误伤uuid相似的租户。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public void unloadTenantJobs(String tenantUuid) {
+        if (StringUtils.isBlank(tenantUuid)) {
+            return;
+        }
+        GLOBAL_LOCK.lock();
+        try {
+            Scheduler scheduler = schedulerFactoryBean.getScheduler();
+            for (String groupName : scheduler.getJobGroupNames()) {
+                Set<JobKey> jobKeySet = scheduler.getJobKeys(GroupMatcher.jobGroupEquals(groupName));
+                for (JobKey jobKey : jobKeySet) {
+                    JobDetail jobDetail = scheduler.getJobDetail(jobKey);
+                    if (jobDetail == null) {
+                        continue;
+                    }
+                    Object jobObject = jobDetail.getJobDataMap().get("jobObject");
+                    if (jobObject instanceof JobObject && tenantUuid.equals(((JobObject) jobObject).getTenantUuid())) {
+                        scheduler.deleteJob(jobKey);
+                    }
+                }
+            }
+        } catch (SchedulerException e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            GLOBAL_LOCK.unlock();
+        }
+    }
+
+    /**
+     * 重新加载指定租户已启用模块下的调度作业。
+     * 显式切回租户库，避免主库数据源模式下生成以null开头的作业分组。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public void loadTenantJobs(String tenantUuid) {
+        if (StringUtils.isBlank(tenantUuid)) {
+            return;
+        }
+        TenantContext.get().switchTenant(tenantUuid);
+        TenantContext.get().setUseMasterDatabase(false);
+        TenantContext.get().switchDefaultDatabase();
+        UserContext.init(SystemUser.SYSTEM);
+        for (IJob jobHandler : new ArrayList<>(jobHandlerMap.values())) {
+            JobClassVo jobClassVo = jobClassMap.get(jobHandler.getClassName());
+            if (jobClassVo != null && TenantContext.get().containsModule(jobClassVo.getModuleId())) {
+                jobHandler.initJob(tenantUuid);
+            }
+        }
+        schedulerMapper.deleteUnusedJobStatus();
+        JobLoadVo jobLoadVo = new JobLoadVo();
+        jobLoadVo.setServerId(Config.SCHEDULE_SERVER_ID);
+        jobLoadVo.setServerStartTime(HeartbeatManager.START_TIME);
+        schedulerMapper.deleteJobLoadByServerIdAndServerStartTime(jobLoadVo);
     }
 
     @Override

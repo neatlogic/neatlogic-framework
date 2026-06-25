@@ -1,0 +1,67 @@
+{
+  "moduleId": "framework",
+  "name": "system_notice_user",
+  "label": "系统公告用户接收表",
+  "description": "系统公告用户接收表 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "system_notice_id",
+      "type": "bigint",
+      "description": "系统公告ID，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "用户uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "is_read",
+      "type": "tinyint(1)",
+      "description": "1:已读；0:未读。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "system_notice_id",
+        "user_uuid"
+      ],
+      "description": "主键索引，覆盖 system_notice_id、user_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "idx_notice_id_and_user_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "system_notice_id",
+        "user_uuid"
+      ],
+      "description": "普通索引，覆盖 system_notice_id、user_uuid 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_system_notice_id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "system_notice_id"
+      ],
+      "description": "普通索引，覆盖 system_notice_id 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_user_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid"
+      ],
+      "description": "普通索引，覆盖 user_uuid 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

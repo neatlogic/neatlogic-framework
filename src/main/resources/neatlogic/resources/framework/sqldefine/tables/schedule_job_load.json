@@ -1,0 +1,42 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_load",
+  "label": "框架schedule_job_load表",
+  "description": "框架schedule_job_load表，属于框架模块的数据表。 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "job_name",
+      "type": "varchar(100)",
+      "description": "schedule_job表的uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "job_group",
+      "type": "varchar(100)",
+      "description": "job组，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "server_id",
+      "type": "int",
+      "description": "服务ID，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "server_start_time",
+      "type": "timestamp(3)",
+      "description": "服务启动时间。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "job_name",
+        "job_group",
+        "server_id"
+      ],
+      "description": "主键索引，覆盖 job_name、job_group、server_id 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

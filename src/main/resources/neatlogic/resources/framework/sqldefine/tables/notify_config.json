@@ -1,0 +1,50 @@
+{
+  "moduleId": "framework",
+  "name": "notify_config",
+  "label": "通知配置表",
+  "description": "通知配置表 可用于框架相关的启用状态筛选等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "主键ID，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "name",
+      "type": "varchar(250)",
+      "description": "名称。"
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint(1)",
+      "description": "是否激活。"
+    },
+    {
+      "name": "is_default",
+      "type": "tinyint(1)",
+      "description": "是否是默认配置。"
+    },
+    {
+      "name": "type",
+      "type": "varchar(100)",
+      "description": "通知类型。"
+    },
+    {
+      "name": "config",
+      "type": "text",
+      "description": "配置。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

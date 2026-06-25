@@ -22,7 +22,6 @@ import neatlogic.framework.documentonline.dto.DocumentOnlineConfigVo;
 import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.dto.DocumentOnlineVo;
 import neatlogic.framework.documentonline.exception.DocumentOnlineJarNameIllegalException;
-import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.HtmlUtil;
 import org.apache.commons.collections4.CollectionUtils;
@@ -528,7 +527,7 @@ public class DocumentOnlineManager {
         List<String> mappingJsonLocationPatternList = new ArrayList<>();
         List<String> mdFileLocationPatternList = new ArrayList<>();
         File[] listFiles = documentOnlineHome.listFiles();
-        if (listFiles != null) {
+        if (listFiles != null && listFiles.length > 0) {
             for (File file : listFiles) {
                 mappingJsonLocationPatternList.add("jar:file:" + documentOnlineHomeDirPath + "/" + file.getName() + "!/neatlogic/**/documentonline-mapping.json");
                 mdFileLocationPatternList.add("jar:file:" + documentOnlineHomeDirPath + "/" +  file.getName() + "!/neatlogic/**/*.md");

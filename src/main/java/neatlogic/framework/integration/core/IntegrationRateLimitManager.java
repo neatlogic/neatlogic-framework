@@ -38,6 +38,14 @@ public class IntegrationRateLimitManager {
         integrationMapper = _integrationMapper;
     }
 
+    public static void resetState(String integrationUuid) {
+        if (StringUtils.isBlank(integrationUuid)) {
+            return;
+        }
+        // 保存集成配置后清空旧窗口，双活节点下一次调用会基于数据库状态重新计数。
+        integrationMapper.deleteIntegrationRateLimitByIntegrationUuid(integrationUuid);
+    }
+
     public static void acquire(IntegrationVo integrationVo) {
         if (integrationVo == null || integrationVo.getConfig() == null) {
             return;

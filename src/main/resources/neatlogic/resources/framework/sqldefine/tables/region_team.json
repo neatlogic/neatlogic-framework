@@ -1,0 +1,41 @@
+{
+  "moduleId": "framework",
+  "name": "region_team",
+  "label": "框架region_team表",
+  "description": "框架region_team表，属于框架模块的数据表。 可用于框架相关的时间维度统计、关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "region_id",
+      "type": "bigint",
+      "description": "地域id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "team_uuid",
+      "type": "char(32)",
+      "description": "分组uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "checked_children",
+      "type": "tinyint(1)",
+      "description": "是否包括子分组。"
+    },
+    {
+      "name": "update_time",
+      "type": "bigint",
+      "description": "更新标识。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "region_id",
+        "team_uuid"
+      ],
+      "description": "主键索引，覆盖 region_id、team_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

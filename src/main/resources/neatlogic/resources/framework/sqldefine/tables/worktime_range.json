@@ -1,0 +1,66 @@
+{
+  "moduleId": "framework",
+  "name": "worktime_range",
+  "label": "服务窗口时间段范围表",
+  "description": "服务窗口时间段范围表 可用于框架相关数据的查询、筛选和报表展示。",
+  "fields": [
+    {
+      "name": "worktime_uuid",
+      "type": "varchar(50)",
+      "description": "worktime表的uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "year",
+      "type": "int",
+      "description": "年份。"
+    },
+    {
+      "name": "date",
+      "type": "varchar(10)",
+      "description": "日期。"
+    },
+    {
+      "name": "start_time",
+      "type": "bigint",
+      "description": "开始时间戳，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "end_time",
+      "type": "bigint",
+      "description": "结束时间戳，已建立普通索引，适合用于过滤、关联或排序查询。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "worktime_uuid",
+        "start_time"
+      ],
+      "description": "主键索引，覆盖 worktime_uuid、start_time 字段，适合用于唯一定位记录和主表关联查询。"
+    },
+    {
+      "name": "idx_endtime",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "end_time"
+      ],
+      "description": "普通索引，覆盖 end_time 字段，适合用于过滤、关联或排序查询。"
+    },
+    {
+      "name": "idx_starttime",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "start_time"
+      ],
+      "description": "普通索引，覆盖 start_time 字段，适合用于过滤、关联或排序查询。"
+    }
+  ]
+}

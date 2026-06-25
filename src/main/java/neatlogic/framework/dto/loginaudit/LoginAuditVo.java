@@ -2,7 +2,9 @@ package neatlogic.framework.dto.loginaudit;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class LoginAuditVo implements Serializable {
     @Serial
@@ -12,6 +14,7 @@ public class LoginAuditVo implements Serializable {
     private String ip;
     private Date loginTime;
     private String loginMethod;
+    private List<String> teamNameList = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -51,5 +54,13 @@ public class LoginAuditVo implements Serializable {
 
     public void setLoginMethod(String loginMethod) {
         this.loginMethod = loginMethod;
+    }
+
+    public List<String> getTeamNameList() {
+        return teamNameList;
+    }
+
+    public void setTeamNameList(List<String> teamNameList) {
+        this.teamNameList = teamNameList;
     }
 }

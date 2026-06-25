@@ -40,6 +40,35 @@
         WHERE `user_id` = #{value} for update
     </select>
 
+    <sql id="getLoginAuditWhere">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (
+                b.`uuid` = #{keyword}
+                OR b.`user_id` = #{keyword}
+                OR b.`user_name` LIKE CONCAT(#{keyword}, '%')
+                OR a.`ip` LIKE CONCAT(#{keyword}, '%')
+                OR a.`login_method` LIKE CONCAT(#{keyword}, '%')
+                )
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND a.`login_time` &gt;= #{startTime}
+                AND a.`login_time` &lt;= #{endTime}
+            </if>
+            <if test="teamUuidList != null and teamUuidList.size() > 0">
+                AND EXISTS (
+                SELECT 1
+                FROM `user_team` ut
+                WHERE ut.`user_uuid` = a.`user_uuid`
+                AND ut.`team_uuid` IN
+                <foreach collection="teamUuidList" item="teamUuid" open="(" separator="," close=")">
+                    #{teamUuid}
+                </foreach>
+                )
+            </if>
+        </where>
+    </sql>
+
     <select id="getLoginAuditCount" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditSearchVo" resultType="int">
         SELECT
             count(1)
@@ -47,19 +76,7 @@
         <if test="keyword != null and keyword != ''">
             JOIN `user` b ON b.`uuid` = a.`user_uuid`
         </if>
-        <where>
-            <if test="keyword != null and keyword != ''">
-                AND (
-                b.`uuid` = #{keyword}
-                OR b.`user_id` = #{keyword}
-                OR b.`user_name` LIKE CONCAT(#{keyword}, '%')
-                )
-            </if>
-            <if test="startTime != null and endTime != null">
-                AND a.`login_time` &gt;= #{startTime}
-                AND a.`login_time` &lt;= #{endTime}
-            </if>
-        </where>
+        <include refid="getLoginAuditWhere"/>
     </select>
 
     <select id="getLoginAuditList" parameterType="neatlogic.framework.dto.loginaudit.LoginAuditSearchVo" resultType="neatlogic.framework.dto.loginaudit.LoginAuditVo">
@@ -73,21 +90,7 @@
         <if test="keyword != null and keyword != ''">
             JOIN `user` b ON b.`uuid` = a.`user_uuid`
         </if>
-        <where>
-            <if test="keyword != null and keyword != ''">
-            AND (
-                b.`uuid` = #{keyword}
-                OR b.`user_id` = #{keyword}
-                OR b.`user_name` LIKE CONCAT(#{keyword}, '%')
-                OR a.`ip` LIKE CONCAT(#{keyword}, '%')
-                OR a.`login_method` LIKE CONCAT(#{keyword}, '%')
-            )
-            </if>
-            <if test="startTime != null and endTime != null">
-                AND a.`login_time` &gt;= #{startTime}
-                AND a.`login_time` &lt;= #{endTime}
-            </if>
-        </where>
+        <include refid="getLoginAuditWhere"/>
         ORDER BY `id` DESC
         LIMIT #{startNum}, #{pageSize}
     </select>

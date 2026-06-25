@@ -16,6 +16,10 @@ public interface IIntegrationHandler {
         return ClassUtils.getUserClass(this.getClass()).getSimpleName();
     }
 
+    default String[] getMethod() {
+        return new String[]{"get", "post"};
+    }
+
     IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom);
 
     Integer hasPattern();

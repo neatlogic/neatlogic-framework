@@ -1,0 +1,55 @@
+{
+  "moduleId": "framework",
+  "name": "system_role",
+  "label": "重要系统对应相关信息",
+  "description": "重要系统对应相关信息 可用于框架相关的关联查询等报表查询场景。",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "数据库id，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "system_id",
+      "type": "varchar(255)",
+      "description": "系统在CMDB上的编号。"
+    },
+    {
+      "name": "cn_sysname",
+      "type": "varchar(255)",
+      "description": "中文简称。"
+    },
+    {
+      "name": "en_sysname",
+      "type": "varchar(255)",
+      "description": "英文简称。"
+    },
+    {
+      "name": "role_name",
+      "type": "varchar(255)",
+      "description": "对应运维A岗名字。"
+    },
+    {
+      "name": "role_number",
+      "type": "varchar(255)",
+      "description": "对应运维A岗工号。"
+    },
+    {
+      "name": "is_check",
+      "type": "varchar(100)",
+      "description": "是否已检核,1是，0否。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

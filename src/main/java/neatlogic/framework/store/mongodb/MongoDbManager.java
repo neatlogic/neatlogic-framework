@@ -61,6 +61,20 @@ public class MongoDbManager {
         mongoDatabaseMap.put(mongoDbVo.getTenantUuid(), mongoDbVo.getDatabase());
     }
 
+    /**
+     * 关闭并移除指定租户的Mongo客户端和库名缓存。
+     * 租户禁用、删除时需要释放客户端，重新启用时再按主库配置重建。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public static synchronized void removeDynamicDataSource(String tenantUuid) {
+        MongoClient mongoClient = mongoDbMap.remove(tenantUuid);
+        if (mongoClient != null) {
+            mongoClient.close();
+        }
+        mongoDatabaseMap.remove(tenantUuid);
+    }
+
     public static String getDatabase(String tenantUuid) {
         return mongoDatabaseMap.get(tenantUuid);
     }

@@ -1,0 +1,36 @@
+{
+  "moduleId": "framework",
+  "name": "team_role",
+  "label": "分组与角色关系表",
+  "description": "分组与角色关系表 可用于框架相关数据的查询、筛选和报表展示。",
+  "fields": [
+    {
+      "name": "team_uuid",
+      "type": "char(32)",
+      "description": "引用team的uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "role_uuid",
+      "type": "char(32)",
+      "description": "引用role的uuid，作为当前表记录的主键或唯一定位字段。"
+    },
+    {
+      "name": "checked_children",
+      "type": "tinyint",
+      "description": "是否穿透选择子节点。"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "team_uuid",
+        "role_uuid"
+      ],
+      "description": "主键索引，覆盖 team_uuid、role_uuid 字段，适合用于唯一定位记录和主表关联查询。"
+    }
+  ]
+}

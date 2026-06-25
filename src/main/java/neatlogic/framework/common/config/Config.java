@@ -638,7 +638,7 @@ public class Config {
             MQ_SUBSCRIBE_RECONNECT_PERIOD = Integer.parseInt(prop.getProperty("mq.subscribe.reconnect.period", "60"));
             HOME_URL = prop.getProperty("home.url");
             MASTER_HOME_URL = prop.getProperty("master.home.url");
-            BACK_END_URL = prop.getProperty("back.end.url");
+            BACK_END_URL = prop.getProperty("back.end.url", "http://127.0.0.1:8282/");
             USER_EXPIRETIME = prop.getProperty("user.expiretime", "60");
             LOGIN_CAPTCHA_EXPIRED_TIME = Integer.parseInt(prop.getProperty("login.captcha.expired.time", "60"));
             LOGIN_FAILED_TIMES_CAPTCHA = Integer.parseInt(prop.getProperty("login.failed.times.captcha", "3"));

@@ -113,5 +113,29 @@ public interface SchedulerMapper {
 
     int deleteJobLoadByServerIdAndServerStartTime(JobLoadVo jobLoadVo);
 
+    /**
+     * 清空当前租户库中的作业加载记录。
+     * 仅用于租户运行时卸载，不删除作业业务定义表schedule_job。
+     *
+     * @return 删除行数
+     */
+    int deleteAllJobLoad();
+
+    /**
+     * 清空当前租户库中的作业状态记录。
+     * 仅用于租户运行时卸载，不删除作业业务定义表schedule_job。
+     *
+     * @return 删除行数
+     */
+    int deleteAllJobStatus();
+
+    /**
+     * 清空当前租户库中的作业锁记录。
+     * 仅用于租户运行时卸载，不删除作业业务定义表schedule_job。
+     *
+     * @return 删除行数
+     */
+    int deleteAllJobLock();
+
 //    int deleteJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 }

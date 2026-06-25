@@ -144,6 +144,30 @@ public class NeatLogicCache implements Cache {
         // MyBatis 接口要求，但 Ehcache3 不需要
     }
 
+    /**
+     * 清理指定租户的MyBatis二级缓存。
+     * 租户禁用、删除、重新启用时需要移除租户uuid前缀的缓存实例。
+     *
+     * @param tenantUuid 租户uuid
+     */
+    public static void clearTenant(String tenantUuid) {
+        if (StringUtils.isBlank(tenantUuid)) {
+            return;
+        }
+        String tenantPrefix = tenantUuid + ":";
+        CACHE_MAP.keySet().removeIf(cacheName -> {
+            if (cacheName.startsWith(tenantPrefix)) {
+                org.ehcache.Cache<Object, Object> cache = CACHE_MANAGER.getCache(cacheName, Object.class, Object.class);
+                if (cache != null) {
+                    cache.clear();
+                }
+                CACHE_MANAGER.removeCache(cacheName);
+                return true;
+            }
+            return false;
+        });
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

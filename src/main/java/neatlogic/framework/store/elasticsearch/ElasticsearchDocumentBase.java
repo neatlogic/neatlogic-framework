@@ -13,12 +13,14 @@
 package neatlogic.framework.store.elasticsearch;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.mapping.Property;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
 import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.elasticsearch.indices.DeleteIndexRequest;
-import co.elastic.clients.elasticsearch.indices.GetIndexResponse;
+import co.elastic.clients.elasticsearch.indices.GetMappingResponse;
 import co.elastic.clients.elasticsearch.indices.RefreshRequest;
+import co.elastic.clients.transport.endpoints.BooleanResponse;
 import neatlogic.framework.asynchronization.thread.NeatLogicThread;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -40,14 +42,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocument<T> {
     static Logger logger = LoggerFactory.getLogger(ElasticsearchDocumentBase.class);
     private static final ConcurrentHashMap<Long, Object> LOCK_MAP = new ConcurrentHashMap<>();
+    private static final Set<String> CALIBRATED_INDEX_MAPPING_SET = ConcurrentHashMap.newKeySet();
+    private static final ConcurrentHashMap<String, Object> CALIBRATE_LOCK_MAP = new ConcurrentHashMap<>();
 
 
     private static Object getLock(Long key) {
@@ -103,6 +105,7 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
                 if (client == null) {
                     throw new ElasticSearchClientNotFoundException();
                 }
+                autoCalibrateIndexMappingIfNeeded(client);
                 UpdateRequest<Object, Map<String, Object>> updateRequest = new UpdateRequest.Builder<Object, Map<String, Object>>()
                         .index(getCurrentIndexName())
                         .id(targetId.toString())          // 文档 ID
@@ -177,6 +180,80 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
 
     protected abstract void myCreateIndex(ElasticsearchVo elasticsearchVo);
 
+    /**
+     * 子类提供创建索引时的完整字段定义；基类用它和旧索引 mapping 做全量字段比对并补齐缺失字段。
+     */
+    protected Map<String, Property> getCreateIndexMappingPropertyMap(ElasticsearchVo elasticsearchVo) {
+        return Collections.emptyMap();
+    }
+
+    private void autoCalibrateIndexMappingIfNeeded(ElasticsearchClient client) throws Exception {
+        ElasticsearchVo elasticsearchVo = SpringContextUtil.getBean(ElasticsearchMapper.class).getTenantElasticsearchByTenantUuid(TenantContext.get().getTenantUuid());
+        if (elasticsearchVo == null) {
+            return;
+        }
+        Map<String, Property> expectedPropertyMap = getCreateIndexMappingPropertyMap(elasticsearchVo);
+        if (expectedPropertyMap == null || expectedPropertyMap.isEmpty()) {
+            return;
+        }
+        String indexName = this.getCurrentIndexName();
+        String cacheKey = indexName + "#" + this.getClass().getName();
+        if (CALIBRATED_INDEX_MAPPING_SET.contains(cacheKey)) {
+            return;
+        }
+        Object lock = CALIBRATE_LOCK_MAP.computeIfAbsent(cacheKey, key -> new Object());
+        synchronized (lock) {
+            if (CALIBRATED_INDEX_MAPPING_SET.contains(cacheKey)) {
+                return;
+            }
+            doAutoCalibrateIndexMapping(client, indexName, expectedPropertyMap);
+            CALIBRATED_INDEX_MAPPING_SET.add(cacheKey);
+        }
+    }
+
+    private void doAutoCalibrateIndexMapping(ElasticsearchClient client, String indexName, Map<String, Property> expectedPropertyMap) throws Exception {
+        GetMappingResponse response = client.indices().getMapping(g -> g.index(indexName));
+        Map<String, Property> currentPropertyMap = Collections.emptyMap();
+        if (response.result() != null && !response.result().isEmpty()) {
+            if (response.result().containsKey(indexName)) {
+                currentPropertyMap = response.result().get(indexName).mappings().properties();
+            } else {
+                currentPropertyMap = response.result().values().iterator().next().mappings().properties();
+            }
+        }
+        if (currentPropertyMap == null) {
+            currentPropertyMap = Collections.emptyMap();
+        }
+        Map<String, Property> missingPropertyMap = new HashMap<>();
+        for (Map.Entry<String, Property> entry : expectedPropertyMap.entrySet()) {
+            Property currentProperty = currentPropertyMap.get(entry.getKey());
+            if (currentProperty == null) {
+                missingPropertyMap.put(entry.getKey(), entry.getValue());
+            } else if (!isSameIndexMappingPropertyType(currentProperty, entry.getValue())) {
+                logger.warn("Elasticsearch index '{}' field '{}' type is {}, expected {}, cannot auto calibrate existing field type.",
+                        indexName, entry.getKey(), currentProperty._kind(), entry.getValue()._kind());
+            }
+        }
+        if (!missingPropertyMap.isEmpty()) {
+            client.indices().putMapping(p -> {
+                p.index(indexName);
+                missingPropertyMap.forEach(p::properties);
+                return p;
+            });
+            logger.info("Elasticsearch index '{}' auto calibrated mapping fields: {}", indexName, missingPropertyMap.keySet());
+        }
+    }
+
+    private boolean isSameIndexMappingPropertyType(Property currentProperty, Property expectedProperty) {
+        if (currentProperty == null || expectedProperty == null || !Objects.equals(currentProperty._kind(), expectedProperty._kind())) {
+            return false;
+        }
+        if (expectedProperty.isDate()) {
+            return Objects.equals(currentProperty.date().format(), expectedProperty.date().format());
+        }
+        return true;
+    }
+
     // 判断索引是否存在
     @Override
     public final boolean isIndexExists(String indexName) {
@@ -185,10 +262,9 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
             if (client == null) {
                 throw new ElasticSearchClientNotFoundException();
             }
-            GetIndexResponse response = client.indices().get(g -> g.index(indexName));
-            return response.result().containsKey(indexName);
+            BooleanResponse response = client.indices().exists(e -> e.index(indexName));
+            return response.value();
         } catch (Exception e) {
-            // 索引不存在会抛异常
             logger.error(e.getMessage(), e);
             return false;
         }
@@ -257,6 +333,7 @@ public abstract class ElasticsearchDocumentBase<T> implements IElasticsearchDocu
             if (client == null) {
                 throw new ElasticSearchClientNotFoundException();
             }
+            autoCalibrateIndexMappingIfNeeded(client);
             // 创建或更新文档
             IndexRequest<Map<String, Object>> request = new IndexRequest.Builder<Map<String, Object>>()
                     .index(getCurrentIndexName())

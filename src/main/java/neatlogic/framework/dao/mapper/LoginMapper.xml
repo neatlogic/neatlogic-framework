@@ -66,6 +66,25 @@
                 </foreach>
                 )
             </if>
+            <if test="(moduleGroupList != null and moduleGroupList.size() > 0) or (featureNameList != null and featureNameList.size() > 0)">
+                AND EXISTS (
+                SELECT 1
+                FROM `feature_usage_audit` fua
+                WHERE fua.`login_audit_id` = a.`id`
+                <if test="moduleGroupList != null and moduleGroupList.size() > 0">
+                    AND fua.`module_group` IN
+                    <foreach collection="moduleGroupList" item="moduleGroup" open="(" separator="," close=")">
+                        #{moduleGroup}
+                    </foreach>
+                </if>
+                <if test="featureNameList != null and featureNameList.size() > 0">
+                    AND fua.`feature_name` IN
+                    <foreach collection="featureNameList" item="featureName" open="(" separator="," close=")">
+                        #{featureName}
+                    </foreach>
+                </if>
+                )
+            </if>
         </where>
     </sql>
 
@@ -93,6 +112,19 @@
         <include refid="getLoginAuditWhere"/>
         ORDER BY `id` DESC
         LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <select id="getLastLoginAuditByUserUuid" parameterType="java.lang.String" resultType="neatlogic.framework.dto.loginaudit.LoginAuditVo">
+        SELECT
+        a.`id`,
+        a.`user_uuid` AS userUuid,
+        a.`ip`,
+        a.`login_time` AS loginTime,
+        a.`login_method` AS loginMethod
+        FROM `login_audit` a
+        WHERE a.`user_uuid` = #{value}
+        ORDER BY a.`id` DESC
+        LIMIT 1
     </select>
 
     <insert id="updateLoginCaptcha" parameterType="neatlogic.framework.dto.captcha.LoginCaptchaVo">

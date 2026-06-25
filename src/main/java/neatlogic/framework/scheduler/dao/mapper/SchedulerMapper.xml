@@ -81,14 +81,11 @@
                a.`cron`,
                a.`is_active`,
                a.`need_audit`,
-               c.`server_id`,
-               c.`server_group`,
                d.prop_name,
                d.prop_value,
                d.id as prop_id
         FROM `schedule_job` a
                  LEFT JOIN schedule_job_prop d ON a.uuid = d.job_uuid
-        LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`uuid`
         WHERE `handler` = #{value}
     </select>
 

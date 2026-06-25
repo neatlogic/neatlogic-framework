@@ -65,9 +65,6 @@ public class JobVo extends BasePageVo {
     private Integer sourceServerId;
     private String sourceServerGroup;
 
-    // 当前应用服务分组内的服务器ID列表；Mapper 使用它过滤同组创建的定时作业。
-    private List<Integer> sourceServerIdList;
-
     private JobStatusVo jobStatus;
 
     //	@EntityField(name = "定时作业属性列表",
@@ -163,14 +160,6 @@ public class JobVo extends BasePageVo {
 
     public void setSourceServerGroup(String sourceServerGroup) {
         this.sourceServerGroup = sourceServerGroup;
-    }
-
-    public List<Integer> getSourceServerIdList() {
-        return sourceServerIdList;
-    }
-
-    public void setSourceServerIdList(List<Integer> sourceServerIdList) {
-        this.sourceServerIdList = sourceServerIdList;
     }
 
     public String getHandler() {

@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS `schedule_job_source` (
     `fcu` char(32) COLLATE utf8mb4_general_ci NOT NULL COMMENT '创建人',
     `fcd` timestamp(3) NOT NULL COMMENT '创建时间',
     PRIMARY KEY (`job_name`,`job_group`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='调度作业数据来源表';

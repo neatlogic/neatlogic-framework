@@ -19,6 +19,7 @@ import neatlogic.framework.datawarehouse.dto.DataSourceDataVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -52,8 +53,8 @@ public class ReportDataExpireJob extends JobBase {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
-        schedulerManager.loadJob(jobObject);
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
+        schedulerManager.loadJob(jobObject, triggerType);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class ReportDataExpireJob extends JobBase {
                 .withCron("0 0 1 * * ?")
                 //.withCron("0 * * * * ?")//测试用
                 .build();
-        this.reloadJob(jobObject);
+        this.reloadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
     }
 
     @Override

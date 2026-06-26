@@ -16,6 +16,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.scheduler.dto.JobClassVo;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.dto.JobVo;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +44,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
         String tenantUuid = jobObject.getTenantUuid();
         // 切换租户库
         TenantContext.get().switchTenant(tenantUuid);
@@ -58,7 +59,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
                     .withPropList(jobVo.getPropList())
                     .setType("public")
                     .build();
-            schedulerManager.loadJob(newJobObject);
+            schedulerManager.loadJob(newJobObject, triggerType);
         } else {
             schedulerManager.unloadJob(jobObject);
         }
@@ -77,7 +78,7 @@ public abstract class PublicJobBase extends JobBase implements IPublicJob {
                         .setType("public")
                         .withPropList(jobVo.getPropList())
                         .build();
-                schedulerManager.loadJob(jobObject);
+                schedulerManager.loadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
             }
         }
     }

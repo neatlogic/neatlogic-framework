@@ -27,6 +27,7 @@ import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.scheduler.core.IJob;
 import neatlogic.framework.scheduler.core.SchedulerManager;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.service.UserService;
 import neatlogic.framework.systemnotice.dao.mapper.SystemNoticeMapper;
@@ -227,7 +228,7 @@ public class SystemNoticeServiceImpl implements SystemNoticeService, ISystemNoti
                     .withIntervalInSeconds(60 * 60)
                     .withRepeatCount(0)
                     .build();
-            schedulerManager.loadJob(jobObject);
+            schedulerManager.loadJob(jobObject, JobLoadTriggerType.INITIAL_CREATE);
         }
         return true;
     }

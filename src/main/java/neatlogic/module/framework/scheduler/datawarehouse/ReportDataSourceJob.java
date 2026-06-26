@@ -18,6 +18,7 @@ import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import neatlogic.framework.datawarehouse.service.DataSourceService;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -59,7 +60,7 @@ public class ReportDataSourceJob extends JobBase {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
         String tenantUuid = jobObject.getTenantUuid();
         TenantContext.get().switchTenant(tenantUuid);
         DataSourceVo dataSourceVo = reportDataSourceMapper.getDataSourceById(Long.valueOf(jobObject.getJobName()));
@@ -68,7 +69,7 @@ public class ReportDataSourceJob extends JobBase {
                     .withCron(dataSourceVo.getCronExpression())
                     .addData("datasourceId", dataSourceVo.getId())
                     .build();
-            schedulerManager.loadJob(newJobObject);
+            schedulerManager.loadJob(newJobObject, triggerType);
         } else {
             schedulerManager.unloadJob(jobObject);
         }
@@ -83,7 +84,7 @@ public class ReportDataSourceJob extends JobBase {
                         .withCron(vo.getCronExpression())
                         .addData("datasourceId", vo.getId())
                         .build();
-                schedulerManager.loadJob(newJobObject);
+                schedulerManager.loadJob(newJobObject, JobLoadTriggerType.SERVER_RESTART);
             }
         }
     }

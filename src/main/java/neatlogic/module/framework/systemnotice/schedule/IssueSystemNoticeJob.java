@@ -15,6 +15,7 @@ package neatlogic.module.framework.systemnotice.schedule;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import neatlogic.framework.systemnotice.dao.mapper.SystemNoticeMapper;
 import neatlogic.framework.systemnotice.dto.SystemNoticeVo;
 import neatlogic.module.framework.systemnotice.service.SystemNoticeService;
@@ -46,7 +47,7 @@ public class IssueSystemNoticeJob extends JobBase {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
         String tenantUuid = jobObject.getTenantUuid();
         TenantContext.get().switchTenant(tenantUuid);
         Long noticeId = Long.valueOf(jobObject.getJobName());
@@ -58,7 +59,7 @@ public class IssueSystemNoticeJob extends JobBase {
                     .withIntervalInSeconds(60 * 60)
                     .withRepeatCount(0);
             JobObject newJobObject = newJobObjectBuilder.build();
-            schedulerManager.loadJob(newJobObject);
+            schedulerManager.loadJob(newJobObject, triggerType);
         }
     }
 
@@ -68,7 +69,7 @@ public class IssueSystemNoticeJob extends JobBase {
         for(Long noticeId : noticeIdList) {
             JobObject.Builder jobObjectBuilder = new JobObject.Builder(noticeId.toString(), this.getGroupName(), this.getClassName(), TenantContext.get().getTenantUuid());
             JobObject jobObject = jobObjectBuilder.build();
-            this.reloadJob(jobObject);
+            this.reloadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
         }
 
     }

@@ -22,6 +22,7 @@ import neatlogic.framework.scheduler.core.SchedulerManager;
 import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.JobLockVo;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -59,7 +60,7 @@ public class SchedulerHeartbreakHandler implements IHeartbreakHandler {
 					IJob jobHandler = SchedulerManager.getHandler(jobLockVo.getJobHandler());
 					if (jobHandler != null) {
 						JobObject jobObject = new JobObject.Builder(jobLockVo.getJobName(), jobLockVo.getJobGroup(), jobLockVo.getJobHandler(), tenantVo.getUuid()).build();
-						jobHandler.reloadJob(jobObject);
+						jobHandler.reloadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
 					}
 				}
 			}

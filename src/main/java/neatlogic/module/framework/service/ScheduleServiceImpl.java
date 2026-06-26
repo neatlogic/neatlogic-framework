@@ -26,6 +26,7 @@ import neatlogic.framework.scheduler.dao.mapper.SchedulerMapper;
 import neatlogic.framework.scheduler.dto.JobLoadVo;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.dto.JobVo;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import neatlogic.framework.scheduler.exception.ScheduleHandlerNotFoundException;
 import neatlogic.framework.scheduler.exception.ScheduleJobNotFoundException;
 import org.springframework.stereotype.Service;
@@ -70,7 +71,7 @@ public class ScheduleServiceImpl implements IScheduleCrossoverService {
                 .setIsTest(1)
                 .setTestUser(UserContext.get().getUserUuid(true))
                 .setType(jobHandler.getType()).build();
-        schedulerManager.loadJob(jobObject);
+        schedulerManager.loadJob(jobObject, JobLoadTriggerType.INITIAL_CREATE);
     }
 
     @Override

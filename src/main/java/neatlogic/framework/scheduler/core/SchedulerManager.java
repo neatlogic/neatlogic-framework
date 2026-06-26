@@ -144,13 +144,12 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
     public Date loadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
         if (triggerType == JobLoadTriggerType.INITIAL_CREATE) {
             saveJobSource(jobObject);
-        } else if (triggerType == JobLoadTriggerType.SERVER_RESTART) {
-            // 重启服务器时，只加载相同分组或不属于任何分组(历史旧数据)的作业
-            ScheduleJobSourceVo scheduleJobSource = schedulerMapper.getJobSourceByJobNameAndJobGroup(jobObject.getJobName(), jobObject.getJobGroup());
-            if (scheduleJobSource != null) {
-                if (!Objects.equals(scheduleJobSource.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
-                    return null;
-                }
+        }
+        // 重启服务器时，只加载相同分组或不属于任何分组(历史旧数据)的作业
+        ScheduleJobSourceVo scheduleJobSource = schedulerMapper.getJobSourceByJobNameAndJobGroup(jobObject.getJobName(), jobObject.getJobGroup());
+        if (scheduleJobSource != null) {
+            if (!Objects.equals(scheduleJobSource.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
+                return null;
             }
         }
         // 如果结束时间比当前时间早，就不加载了

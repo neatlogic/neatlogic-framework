@@ -12,6 +12,8 @@ public class LoginAuditSearchVo extends BasePageVo {
     private Date startTime;
     private Date endTime;
     private List<String> teamUuidList;
+    private List<String> moduleGroupList;
+    private List<String> featureNameList;
 
     public Date getStartTime() {
         return startTime;
@@ -35,5 +37,21 @@ public class LoginAuditSearchVo extends BasePageVo {
 
     public void setTeamUuidList(List<String> teamUuidList) {
         this.teamUuidList = teamUuidList;
+    }
+
+    public List<String> getModuleGroupList() {
+        return moduleGroupList;
+    }
+
+    public void setModuleGroupList(List<String> moduleGroupList) {
+        this.moduleGroupList = moduleGroupList;
+    }
+
+    public List<String> getFeatureNameList() {
+        return featureNameList;
+    }
+
+    public void setFeatureNameList(List<String> featureNameList) {
+        this.featureNameList = featureNameList;
     }
 }

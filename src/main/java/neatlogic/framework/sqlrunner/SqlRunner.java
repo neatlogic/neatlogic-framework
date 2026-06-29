@@ -30,7 +30,10 @@ import javax.sql.DataSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -189,6 +192,7 @@ public class SqlRunner {
             BoundSql boundSql = mappedStatement.getBoundSql(paramMap);
             String sql = boundSql.getSql();
             sqlInfo.setSql(sql);
+            sqlInfo.setExecutableSql(SqlCostInterceptor.getSql(mappedStatement, paramMap));
             List<ParameterMapping> parameterMappingList = boundSql.getParameterMappings();
             sqlInfo.setParameterList(parameterMappingList.stream().map(ParameterMapping::getProperty).collect(Collectors.toList()));
             List<ResultMap> resultMaps = mappedStatement.getResultMaps();

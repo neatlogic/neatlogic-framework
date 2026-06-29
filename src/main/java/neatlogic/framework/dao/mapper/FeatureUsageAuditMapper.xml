@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+  ~ Copyright (C) 2025  TechSure Co., Ltd.  All Rights Reserved.
+  ~ This file is part of the NeatLogic software.
+  ~ Licensed under the NeatLogic Sustainable Use License (NSUL), Version 4.x – 2025.
+  ~ You may use this file only in compliance with the License.
+  ~ See the LICENSE file distributed with this work for the full license text.
+  ~ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="neatlogic.framework.dao.mapper.FeatureUsageAuditMapper">
+
+    <sql id="getFeatureUsageAuditWhere">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <if test="featureNameList == null or featureNameList.size() == 0">
+                    AND `feature_name` LIKE CONCAT('%', #{keyword}, '%')
+                </if>
+            </if>
+            <if test="moduleGroupList != null and moduleGroupList.size() > 0">
+                AND `module_group` IN
+                <foreach collection="moduleGroupList" item="moduleGroup" open="(" separator="," close=")">
+                    #{moduleGroup}
+                </foreach>
+            </if>
+            <if test="featureNameList != null and featureNameList.size() > 0">
+                AND `feature_name` IN
+                <foreach collection="featureNameList" item="featureName" open="(" separator="," close=")">
+                    #{featureName}
+                </foreach>
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND `start_time` &gt;= #{startTime}
+                AND `start_time` &lt;= #{endTime}
+            </if>
+            <if test="loginAuditId != null">
+                AND `login_audit_id` = #{loginAuditId}
+            </if>
+            <if test="userUuid != null and userUuid != ''">
+                AND `user_uuid` = #{userUuid}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFeatureUsageAuditCount" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM `feature_usage_audit`
+        <include refid="getFeatureUsageAuditWhere"/>
+    </select>
+
+    <select id="getFeatureUsageAuditList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
+        SELECT
+            `id`,
+            `user_uuid` AS userUuid,
+            `module_group` AS moduleGroup,
+            `feature_path` AS featurePath,
+            `feature_name` AS featureName,
+            `start_time` AS startTime,
+            `end_time` AS endTime,
+            `duration`,
+            `login_audit_id` AS loginAuditId
+        FROM `feature_usage_audit`
+        <include refid="getFeatureUsageAuditWhere"/>
+        ORDER BY `ID` DESC
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <sql id="getFeatureWhere">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <if test="featureNameList == null or featureNameList.size() == 0">
+                    AND `feature_name` LIKE CONCAT('%', #{keyword}, '%')
+                </if>
+            </if>
+            <if test="moduleGroupList != null and moduleGroupList.size() > 0">
+                AND `module_group` IN
+                <foreach collection="moduleGroupList" item="moduleGroup" open="(" separator="," close=")">
+                    #{moduleGroup}
+                </foreach>
+            </if>
+            <if test="featureNameList != null and featureNameList.size() > 0">
+                AND `feature_name` IN
+                <foreach collection="featureNameList" item="featureName" open="(" separator="," close=")">
+                    #{featureName}
+                </foreach>
+            </if>
+            <if test="startTime != null and endTime != null">
+                AND `start_time` &gt;= #{startTime}
+                AND `start_time` &lt;= #{endTime}
+            </if>
+            <if test="loginAuditId != null">
+                AND `login_audit_id` = #{loginAuditId}
+            </if>
+            <if test="userUuid != null and userUuid != ''">
+                AND `user_uuid` = #{userUuid}
+            </if>
+        </where>
+    </sql>
+
+    <select id="getFeatureCount" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="int">
+        select COUNT(1) from (
+            SELECT
+            `module_group`, `feature_name`
+            FROM `feature_usage_audit`
+            <include refid="getFeatureWhere"/>
+            GROUP BY `module_group`, `feature_name`
+            ORDER BY `module_group`, `feature_name`
+        ) a
+    </select>
+
+    <select id="getFeatureList" parameterType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditSearchVo" resultType="neatlogic.framework.dto.featureusageaudit.FeatureUsageAuditVo">
+        SELECT
+        `module_group` AS moduleGroup,
+        `feature_name` AS featureName,
+        SUM(`duration`) AS duration,
+        COUNT(1) AS usedCount
+        FROM `feature_usage_audit`
+        <include refid="getFeatureWhere"/>
+        GROUP BY `module_group`, `feature_name`
+        ORDER BY `module_group`, `feature_name`
+        limit #{startNum}, #{pageSize}
+    </select>
+
+    <insert id="insertFeatureUsageAuditList">
+        INSERT INTO `feature_usage_audit`(
+            `id`,
+            `user_uuid`,
+            `module_group`,
+            `feature_name`,
+            `feature_path`,
+            `start_time`,
+            `end_time`,
+            `duration`,
+            `login_audit_id`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.userUuid},
+                #{item.moduleGroup},
+                #{item.featureName},
+                #{item.featurePath},
+                #{item.startTime},
+                #{item.endTime},
+                #{item.duration},
+                #{item.loginAuditId}
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteFeatureUsageAuditByDayBefore" parameterType="java.lang.Integer">
+        DELETE FROM `feature_usage_audit`
+        WHERE `start_time` &lt; DATE_SUB(CURRENT_DATE, INTERVAL #{value} DAY)
+    </delete>
+</mapper>

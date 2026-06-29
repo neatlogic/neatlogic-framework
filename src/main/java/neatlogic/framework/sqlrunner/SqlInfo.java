@@ -52,6 +52,10 @@ public class SqlInfo {
      */
     private List<String> parameterList;
     /**
+     * 用于诊断展示的已绑定参数SQL语句
+     */
+    private String executableSql;
+    /**
      * 是否需要分页
      */
     private Boolean needPage = false;
@@ -132,6 +136,14 @@ public class SqlInfo {
 
     public void setParameterList(List<String> parameterList) {
         this.parameterList = parameterList;
+    }
+
+    public String getExecutableSql() {
+        return executableSql;
+    }
+
+    public void setExecutableSql(String executableSql) {
+        this.executableSql = executableSql;
     }
 
     public Boolean getNeedPage() {

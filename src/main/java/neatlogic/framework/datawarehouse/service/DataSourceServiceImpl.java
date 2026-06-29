@@ -27,6 +27,7 @@ import neatlogic.framework.datawarehouse.exceptions.ReportDataSourceIsSyncingExc
 import neatlogic.framework.scheduler.core.IJob;
 import neatlogic.framework.scheduler.core.SchedulerManager;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
 import neatlogic.framework.transaction.core.EscapeTransactionJob;
 import neatlogic.module.framework.scheduler.datawarehouse.ReportDataSourceJob;
@@ -214,8 +215,9 @@ public class DataSourceServiceImpl implements DataSourceService {
                 .withCron(dataSourceVo.getCronExpression())
                 .addData("datasourceId", dataSourceVo.getId())
                 .build();
+        schedulerManager.saveJobSource(jobObject);
         if (Objects.equals(dataSourceVo.getIsActive(), 1) && StringUtils.isNotBlank(dataSourceVo.getCronExpression())) {
-            Date nextFireTime = schedulerManager.loadJob(jobObject);
+            Date nextFireTime = schedulerManager.loadJob(jobObject, JobLoadTriggerType.INITIAL_CREATE);
             dataSourceMapper.updateDataSourceNextFireTimeById(dataSourceVo.getId(), nextFireTime);
         } else {
             schedulerManager.unloadJob(jobObject);

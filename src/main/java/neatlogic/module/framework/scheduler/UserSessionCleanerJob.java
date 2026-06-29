@@ -17,6 +17,7 @@ import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.mapper.UserSessionMapper;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
@@ -49,8 +50,8 @@ public class UserSessionCleanerJob extends JobBase {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
-        schedulerManager.loadJob(jobObject);
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
+        schedulerManager.loadJob(jobObject, triggerType);
     }
 
     @Override
@@ -60,7 +61,7 @@ public class UserSessionCleanerJob extends JobBase {
                 .withCron("0 0,30 * * * ?")
                 //.withIntervalInSeconds(3)//test
                 .build();
-        this.reloadJob(jobObject);
+        this.reloadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
     }
 
     @Override

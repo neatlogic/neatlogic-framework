@@ -19,6 +19,7 @@ import neatlogic.framework.auditconfig.dao.mapper.AuditConfigMapper;
 import neatlogic.framework.auditconfig.dto.AuditConfigVo;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
 import org.springframework.stereotype.Component;
@@ -51,8 +52,8 @@ public class AuditCleanerJob extends JobBase {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
-        schedulerManager.loadJob(jobObject);
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
+        schedulerManager.loadJob(jobObject, triggerType);
     }
 
     @Override
@@ -62,7 +63,7 @@ public class AuditCleanerJob extends JobBase {
                 .withCron("0 0 2 * * ?")
                 //.withCron("0 * * * * ?")//测试用
                 .build();
-        this.reloadJob(jobObject);
+        this.reloadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
     }
 
     @Override

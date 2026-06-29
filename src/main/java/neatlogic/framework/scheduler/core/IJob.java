@@ -16,6 +16,7 @@ import neatlogic.framework.scheduler.annotation.Param;
 import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.dto.JobPropVo;
 import neatlogic.framework.scheduler.dto.JobVo;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.util.ClassUtils;
@@ -82,7 +83,20 @@ public interface IJob extends Job {
      *
      * @param jobObject 作业信息
      */
-    void reloadJob(JobObject jobObject);
+    default void reloadJob(JobObject jobObject) {
+        reloadJob(jobObject, JobLoadTriggerType.DO_NOTHING);
+        // TODO 为了避免有些没有修改的模块报错，暂时增加这个默认方法
+    }
+
+    /**
+     * 重新加载单个作业
+     *
+     * @param jobObject 作业信息
+     * @param triggerType 触发点
+     */
+    default void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
+        // TODO 为了避免有些没有修改的模块报错，暂时增加这个默认方法
+    }
 
     /**
      * 加载当前类的租户作业

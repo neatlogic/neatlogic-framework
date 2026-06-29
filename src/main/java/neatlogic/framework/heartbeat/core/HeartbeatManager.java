@@ -28,6 +28,7 @@ import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.$;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,6 +101,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
         server.setHeartbeatThreshold(Config.SERVER_HEARTBEAT_THRESHOLD());
         server.setIp(ip);
         server.setStartTime(START_TIME);
+        server.setServerGroup(Config.SCHEDULE_SERVER_GROUP());
         serverMapper.insertServer(server);
 //        serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
         ScheduledExecutorService heartbeatService = Executors.newScheduledThreadPool(1, r -> {
@@ -111,9 +113,14 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             @Override
             protected void execute() {
                 try {
+                    // 只会接管同组的故障服务器
+                    List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
                     // 查找故障服务器
                     List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
                     for (Integer serverId : serverIdList) {
+                        if (!sameGroupServerIdList.contains(serverId)) {
+                            continue;
+                        }
                         if (getServerLock(serverId)) {
                             // 如果抢到锁，开始处理
                             for (IHeartbreakHandler observer : set) {
@@ -127,6 +134,9 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                     List<ServerClusterVo> serverList = serverMapper.getAllServerList();
                     for (ServerClusterVo serverClusterVo : serverList) {
                         if (Objects.equals(serverClusterVo.getServerId(), Config.SCHEDULE_SERVER_ID)) {
+                            if (!Objects.equals(serverClusterVo.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
+                                logger.error("应用服务{}所在组为{}，但在数据库表`server_status`中server_group字段值为{}", Config.SCHEDULE_SERVER_ID, Config.SCHEDULE_SERVER_GROUP(), serverClusterVo.getServerGroup());
+                            }
                             continue;
                         }
                         if (Objects.equals(serverClusterVo.getStatus(), ServerClusterVo.STARTUP)) {
@@ -137,7 +147,8 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
                             serverMapper.insertServerCounter(serverCounterVo);
                         }
                     }
-                    serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
+                    serverMapper.updateServerHeartbeatTimeAndServerGroupByServerId(Config.SCHEDULE_SERVER_ID, Config.SCHEDULE_SERVER_GROUP());
+//                    serverMapper.updateServerHeartbeatTimeByServerId(Config.SCHEDULE_SERVER_ID);
 //                    serverMapper.insertServerRunTime(Config.SCHEDULE_SERVER_ID, START_TIME);
 //                    insertTenantServerRunTime();
                 } catch (Exception e) {
@@ -154,7 +165,7 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
      * @return boolean
      * @Description: 将故障服务器状态设置为停止，删除与该服务器相关的计数器数据
      */
-    public boolean getServerLock(Integer serverId) {
+    private boolean getServerLock(Integer serverId) {
         TransactionStatus transactionStatus = TransactionUtil.openTx();
         boolean returnVal = false;
         try {
@@ -178,6 +189,14 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             serverMapper.deleteCounterByToServerId(serverId);
         }
         return returnVal;
+    }
+
+    private List<Integer> getSameGroupStartupServerIdList() {
+        List<Integer> serverIdList = serverMapper.getStartupServerIdListByGroup(Config.SCHEDULE_SERVER_GROUP());
+        if (!serverIdList.contains(Config.SCHEDULE_SERVER_ID)) {
+            serverIdList.add(Config.SCHEDULE_SERVER_ID);
+        }
+        return serverIdList;
     }
 
     private void insertTenantServerRunTime() {

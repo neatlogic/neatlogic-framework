@@ -23,6 +23,7 @@ import neatlogic.framework.dto.license.LicenseVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.LicenseUtil;
 import neatlogic.framework.util.TimeUtil;
@@ -57,8 +58,8 @@ public class LicenseValidJob extends JobBase {
     }
 
     @Override
-    public void reloadJob(JobObject jobObject) {
-        schedulerManager.loadJob(jobObject);
+    public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
+        schedulerManager.loadJob(jobObject, triggerType);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class LicenseValidJob extends JobBase {
                 .withCron("0 50 * * * ?")
                 //.withIntervalInSeconds(10)
                 .build();
-        this.reloadJob(jobObject);
+        this.reloadJob(jobObject, JobLoadTriggerType.SERVER_RESTART);
     }
 
     @Override

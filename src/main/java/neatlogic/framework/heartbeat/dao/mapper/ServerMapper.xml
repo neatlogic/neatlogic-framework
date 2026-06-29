@@ -13,7 +13,8 @@
         SELECT `host`,
                `server_id` AS serverId,
                `status`,
-               `ip`
+               `ip`,
+               `server_group` AS serverGroup
         FROM server_status
         WHERE `server_id` = #{serverId}
             FOR
@@ -25,7 +26,8 @@
         SELECT `host`,
                `server_id` AS serverId,
                `status`,
-               `ip`
+               `ip`,
+               `server_group` AS serverGroup
         FROM server_status
         WHERE `server_id` != #{serverId} and `status` = 'startup'
     </select>
@@ -39,11 +41,26 @@
                `heartbeat_threshold` AS heartbeatThreshold,
                `heartbeat_time`      AS heartbeatTime,
                `ip`                  AS ip,
+               `server_group`     AS serverGroup,
                `fcu`,
                `fcd`,
                `lcu`,
                `lcd`
         FROM `server_status`
+    </select>
+
+    <select id="getStartupServerIdListByGroup" parameterType="java.lang.String" resultType="java.lang.Integer" useCache="false">
+        SELECT `server_id`
+        FROM `server_status`
+        WHERE `status` = 'startup'
+        <choose>
+          <when test="value != null and value != ''">
+              AND `server_group` = #{value}
+          </when>
+          <otherwise>
+              AND `server_group` IS NULL
+          </otherwise>
+        </choose>
     </select>
 
     <select id="getUserFunctionValue" resultType="java.lang.String">
@@ -75,15 +92,24 @@
         WHERE `server_id` = #{value}
     </update>
 
+    <update id="updateServerHeartbeatTimeAndServerGroupByServerId" parameterType="java.lang.Integer">
+        UPDATE `server_status`
+        SET `status`         = 'startup',
+            `server_group` = #{serverGroup},
+            `heartbeat_time` = NOW(3)
+        WHERE `server_id` = #{serverId}
+    </update>
+
     <insert id="insertServer" parameterType="neatlogic.framework.heartbeat.dto.ServerClusterVo">
         INSERT INTO server_status(`server_id`, `status`, `heartbeat_rate`, `heartbeat_threshold`, `heartbeat_time`,
-                                  `ip`, `fcu`, `fcd`, `start_time`)
-        VALUES (#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{ip}, #{fcu}, NOW(3), #{startTime})
+                                  `ip`, `server_group`, `fcu`, `fcd`, `start_time`)
+        VALUES (#{serverId}, #{status}, #{heartbeatRate}, #{heartbeatThreshold}, NOW(3), #{ip}, #{serverGroup}, #{fcu}, NOW(3), #{startTime})
         ON DUPLICATE KEY UPDATE `status`              = #{status},
                                 `heartbeat_rate`      = #{heartbeatRate},
                                 `heartbeat_threshold` = #{heartbeatThreshold},
                                 `heartbeat_time`      = NOW(3),
                                 `ip`                  = #{ip},
+                                `server_group`        = #{serverGroup},
                                 `lcu`                 = #{lcu},
                                 `lcd`                 = NOW(3),
                                 `start_time`          = #{startTime}

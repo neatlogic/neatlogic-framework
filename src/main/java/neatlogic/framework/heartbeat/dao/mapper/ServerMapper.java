@@ -19,6 +19,8 @@ public interface ServerMapper {
 
     List<ServerClusterVo> getAllServerList();
 
+    List<Integer> getStartupServerIdListByGroup(String serverGroup);
+
     String getUserFunctionValue();
 
     //UPDATE
@@ -29,6 +31,8 @@ public interface ServerMapper {
     int resetCounterByToServerId(int toServerId);
 
     int updateServerHeartbeatTimeByServerId(int scheduleServerId);
+
+    int updateServerHeartbeatTimeAndServerGroupByServerId(@Param("serverId") int serverId, @Param("serverGroup") String serverGroup);
 
     //INSERT
     int insertServer(ServerClusterVo server);

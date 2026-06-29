@@ -24,6 +24,7 @@ import neatlogic.framework.notify.exception.NotifyContentHandlerNotFoundExceptio
 import neatlogic.framework.notify.exception.NotifyHandlerNotFoundException;
 import neatlogic.framework.scheduler.core.JobBase;
 import neatlogic.framework.scheduler.dto.JobObject;
+import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
@@ -60,13 +61,13 @@ public class NotifyContentJob extends JobBase {
     }
 
 	@Override
-	public void reloadJob(JobObject jobObject) {
+	public void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
 		String tenantUuid = jobObject.getTenantUuid();
 		TenantContext.get().switchTenant(tenantUuid);
         NotifyJobVo jobVo = notifyJobMapper.getJobBaseInfoById(Long.valueOf(jobObject.getJobName()));
 		if (jobVo != null && Objects.equals(jobVo.getIsActive(),1)) {
 			JobObject newJobObject = new JobObject.Builder(jobVo.getId().toString(), this.getGroupName(), this.getClassName(), tenantUuid).withCron(jobVo.getCron()).addData("notifyContentJobId", jobVo.getId()).build();
-			schedulerManager.loadJob(newJobObject);
+			schedulerManager.loadJob(newJobObject, triggerType);
 		} else {
 			schedulerManager.unloadJob(jobObject);
 		}
@@ -79,7 +80,7 @@ public class NotifyContentJob extends JobBase {
 		if(CollectionUtils.isNotEmpty(jobList)){
 			for(NotifyJobVo vo : jobList){
 				JobObject newJobObject = new JobObject.Builder(vo.getId().toString(), this.getGroupName(), this.getClassName(), tenantUuid).withCron(vo.getCron()).addData("notifyContentJobId",vo.getId()).build();
-				schedulerManager.loadJob(newJobObject);
+				schedulerManager.loadJob(newJobObject, JobLoadTriggerType.SERVER_RESTART);
 			}
 		}
 	}

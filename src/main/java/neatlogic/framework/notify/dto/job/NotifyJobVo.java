@@ -55,6 +55,10 @@ public class NotifyJobVo extends BaseEditorVo {
 	@EntityField(name = "发送次数", type = ApiParamType.INTEGER)
 	private Integer execCount;
 
+	// 记录定时作业配置最初由哪个应用服务器创建，用于按应用服务分组过滤管理页数据。
+	private Integer sourceServerId;
+	private String sourceServerGroup;
+
 	public Long getId() {
 		if (id == null) {
 			id = SnowflakeUtil.uniqueLong();
@@ -210,5 +214,21 @@ public class NotifyJobVo extends BaseEditorVo {
 
 	public void setToVoList(JSONArray toVoList) {
 		this.toVoList = toVoList;
+	}
+
+	public Integer getSourceServerId() {
+		return sourceServerId;
+	}
+
+	public void setSourceServerId(Integer sourceServerId) {
+		this.sourceServerId = sourceServerId;
+	}
+
+	public String getSourceServerGroup() {
+		return sourceServerGroup;
+	}
+
+	public void setSourceServerGroup(String sourceServerGroup) {
+		this.sourceServerGroup = sourceServerGroup;
 	}
 }

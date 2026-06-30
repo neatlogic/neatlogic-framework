@@ -51,16 +51,30 @@
 		WHERE `id` = #{value}
 	</select>
 
+	<sql id="searchJobWhere">
+		<where>
+			(c.`job_name` IS NULL
+			<choose>
+				<when test="sourceServerGroup != null and sourceServerGroup != ''">
+					OR c.`server_group` = #{sourceServerGroup}
+				</when>
+				<otherwise>
+					OR c.`server_group` IS NULL
+				</otherwise>
+			</choose>
+			)
+			<if test="keyword != null and keyword != ''">
+				and a.`name` LIKE CONCAT('%', #{keyword}, '%')
+			</if>
+		</where>
+	</sql>
+
 	<select id="searchJobCount" parameterType="neatlogic.framework.notify.dto.job.NotifyJobVo" resultType="int">
 		SELECT
 		COUNT(1)
-		FROM
-		`notify_job`
-		<where>
-		<if test="keyword != null and keyword != ''">
-			and `name` LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		</where>
+		FROM `notify_job` a
+		LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`id`
+		<include refid="searchJobWhere"/>
 	</select>
 
 	<select id="searchJob" parameterType="neatlogic.framework.notify.dto.job.NotifyJobVo" resultType="neatlogic.framework.notify.dto.job.NotifyJobVo">
@@ -71,13 +85,12 @@
 		a.`notify_handler` as notifyHandler,
 		a.`cron`,
 		a.`is_active` as isActive,
-		(select `next_fire_time` from `schedule_job_status` where `job_name` = CONCAT(a.`id`,'')) as nextFireTime
+		(select `next_fire_time` from `schedule_job_status` where `job_name` = CONCAT(a.`id`,'')) as nextFireTime,
+		c.server_id AS sourceServerId,
+		c.server_group AS sourceServerGroup
 		from `notify_job` a
-		<where>
-		<if test="keyword != null and keyword != ''">
-			and a.`name` LIKE CONCAT('%', #{keyword}, '%')
-		</if>
-		</where>
+		LEFT JOIN `schedule_job_source` c ON c.`job_name` = a.`id`
+		<include refid="searchJobWhere"/>
 		order by a.`lcd` desc
 		<if test="needPage == true">
 			LIMIT #{startNum}, #{pageSize}

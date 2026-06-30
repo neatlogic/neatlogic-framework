@@ -174,6 +174,11 @@ public abstract class JobBase implements IJob {
             schedulerManager.deleteJob(jobName, jobGroup);
             return;
         }
+        if (!schedulerManager.checkJobSourceServerGroup(jobName, jobGroup)) {
+            logger.error("执行定时作业(jobName={},jobGroup={})时，该作业不属于{}服务器组", jobName, jobGroup, Config.SCHEDULE_SERVER_GROUP());
+            schedulerManager.deleteJob(jobName, jobGroup);
+            return;
+        }
         // 从job组名中获取租户uuid,切换到租户的数据源
         TenantContext.init(tenantUuid);//.setUseMasterDatabase(false);
         UserContext.init(SystemUser.SYSTEM);

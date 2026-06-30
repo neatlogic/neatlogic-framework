@@ -131,6 +131,17 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         schedulerMapper.deleteJobSourceByJobNameAndJobGroup(jobObject.getJobName(), jobObject.getJobGroup());
     }
 
+    public boolean checkJobSourceServerGroup(String jobName, String jobGroup) {
+        // 重启服务器时，只加载相同分组或不属于任何分组(历史旧数据)的作业
+        ScheduleJobSourceVo scheduleJobSource = schedulerMapper.getJobSourceByJobNameAndJobGroup(jobName, jobGroup);
+        if (scheduleJobSource != null) {
+            if (!Objects.equals(scheduleJobSource.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Date loadJob(JobObject jobObject) {
         return loadJob(jobObject, JobLoadTriggerType.DO_NOTHING);
     }
@@ -146,11 +157,8 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
             saveJobSource(jobObject);
         }
         // 重启服务器时，只加载相同分组或不属于任何分组(历史旧数据)的作业
-        ScheduleJobSourceVo scheduleJobSource = schedulerMapper.getJobSourceByJobNameAndJobGroup(jobObject.getJobName(), jobObject.getJobGroup());
-        if (scheduleJobSource != null) {
-            if (!Objects.equals(scheduleJobSource.getServerGroup(), Config.SCHEDULE_SERVER_GROUP())) {
-                return null;
-            }
+        if (!checkJobSourceServerGroup(jobObject.getJobName(), jobObject.getJobGroup())) {
+            return null;
         }
         // 如果结束时间比当前时间早，就不加载了
         if (jobObject.getEndTime() != null && jobObject.getEndTime().before(new Date())) {

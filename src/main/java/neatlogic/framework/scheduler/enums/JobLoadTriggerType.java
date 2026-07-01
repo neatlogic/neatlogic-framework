@@ -13,7 +13,7 @@ package neatlogic.framework.scheduler.enums;
 public enum JobLoadTriggerType {
     INITIAL_CREATE("initial_create", "首次添加作业时加载作业，此时需要保存作业来源服务器组"),
     SERVER_RESTART("server_restart", "重启服务器时加载作业，此时需要根据作业来源服务器组判断是否需要加载该作业"),
-    DO_NOTHING("do_nothing", "什么都不做，为了兼容没有修改到的模块代码"),
+//    DO_NOTHING("do_nothing", "什么都不做，为了兼容没有修改到的模块代码"),
     ;
     private final String value;
     private final String text;

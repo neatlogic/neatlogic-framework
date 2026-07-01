@@ -142,10 +142,6 @@ public class SchedulerManager extends ModuleInitializedListenerBase {
         return true;
     }
 
-    public Date loadJob(JobObject jobObject) {
-        return loadJob(jobObject, JobLoadTriggerType.DO_NOTHING);
-    }
-
     /**
      * 加载定时作业，同时设置定时作业状态和锁
      *

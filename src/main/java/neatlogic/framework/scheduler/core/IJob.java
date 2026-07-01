@@ -82,21 +82,9 @@ public interface IJob extends Job {
      * 重新加载单个作业
      *
      * @param jobObject 作业信息
-     */
-    default void reloadJob(JobObject jobObject) {
-        reloadJob(jobObject, JobLoadTriggerType.DO_NOTHING);
-        // TODO 为了避免有些没有修改的模块报错，暂时增加这个默认方法
-    }
-
-    /**
-     * 重新加载单个作业
-     *
-     * @param jobObject 作业信息
      * @param triggerType 触发点
      */
-    default void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType) {
-        // TODO 为了避免有些没有修改的模块报错，暂时增加这个默认方法
-    }
+    void reloadJob(JobObject jobObject, JobLoadTriggerType triggerType);
 
     /**
      * 加载当前类的租户作业

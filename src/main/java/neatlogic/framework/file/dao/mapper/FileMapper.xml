@@ -97,6 +97,13 @@
         WHERE name = #{value}
     </select>
 
+    <select id="searchFileTypeConfigList" resultType="neatlogic.framework.file.dto.FileTypeVo">
+        SELECT `name`,
+               `config`
+        FROM `filetype_config`
+        ORDER BY `name`
+    </select>
+
     <select id="getFileListByIdList" parameterType="java.util.List" resultType="neatlogic.framework.file.dto.FileVo">
         SELECT
         `id`,
@@ -180,10 +187,21 @@
                 #{uniqueKey})
     </insert>
 
+    <insert id="saveFileTypeConfig" parameterType="neatlogic.framework.file.dto.FileTypeVo">
+        INSERT INTO `filetype_config` (`name`, `config`)
+        VALUES (#{name}, #{config})
+        ON DUPLICATE KEY UPDATE `config` = #{config}
+    </insert>
+
+    <delete id="deleteFileTypeConfig" parameterType="java.lang.String">
+        DELETE
+        FROM `filetype_config`
+        WHERE `name` = #{value}
+    </delete>
+
     <delete id="deleteFile" parameterType="java.lang.Long">
         DELETE
         FROM `file`
         WHERE `id` = #{fileId}
     </delete>
 </mapper>
-

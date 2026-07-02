@@ -29,6 +29,8 @@ public interface FileMapper {
 
     FileTypeVo getFileTypeConfigByType(String name);
 
+    List<FileTypeVo> searchFileTypeConfigList();
+
     List<FileVo> getFileListByIdList(List<Long> idList);
 
     List<FileVo> getFileDetailListByIdList(List<Long> idList);
@@ -36,6 +38,10 @@ public interface FileMapper {
     void updateFile(FileVo fileVo);
 
     int insertFile(FileVo fileVo);
+
+    void saveFileTypeConfig(FileTypeVo fileTypeVo);
+
+    void deleteFileTypeConfig(String name);
 
     void deleteFile(Long fileId);
 }

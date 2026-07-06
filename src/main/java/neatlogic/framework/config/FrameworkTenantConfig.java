@@ -24,11 +24,13 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     LOGIN_NEED_LOCK("login.need.lock", "0","nfc.frameworktenantconfig.loginneedlock"),
     PASSWORD_NEED_EXPIRED_CHECK("password.need.expired.check", "0","nfc.frameworktenantconfig.passwordneedexpiredcheck"),
     PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
+    TENANT_DEFAULT_LANGUAGE("tenant.default.language", "zh", ApiParamType.STRING, "zh,en", "nfc.frameworktenantconfig.tenantdefaultlanguage"),
     ;
 
     String key;
     String value;
     ApiParamType type;
+    String rule;
     String description;
 
     FrameworkTenantConfig(String key, String value, String description) {
@@ -41,6 +43,14 @@ public enum FrameworkTenantConfig implements ITenantConfig{
         this.key = key;
         this.value = value;
         this.type = type;
+        this.description = description;
+    }
+
+    FrameworkTenantConfig(String key, String value, ApiParamType type, String rule, String description) {
+        this.key = key;
+        this.value = value;
+        this.type = type;
+        this.rule = rule;
         this.description = description;
     }
 
@@ -61,6 +71,11 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     @Override
     public ApiParamType getType() {
         return this.type;
+    }
+
+    @Override
+    public String getRule() {
+        return this.rule;
     }
 
     @Override

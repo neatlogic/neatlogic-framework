@@ -140,6 +140,8 @@ public class TenantController {
             }
             // 是否允许移动端下载附件
             data.put("mobileFileDownloadEnabled", ConfigManager.getConfig(FrameworkTenantConfig.MOBILE_FILE_DOWNLOAD_ENABLED));
+            // 前端初始化语言必须在 VueI18n 创建前确定，因此随租户检查一起返回租户级默认语言。
+            data.put("defaultLanguage", ConfigManager.getConfig(FrameworkTenantConfig.TENANT_DEFAULT_LANGUAGE));
 
             ReturnJson.success(data, response);
         } catch (Exception e) {

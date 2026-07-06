@@ -43,6 +43,13 @@ public interface ITenantConfig {
     }
 
     /**
+     * 校验规则
+     */
+    default String getRule() {
+        return null;
+    }
+
+    /**
      * 所属模块组
      * @return
      */

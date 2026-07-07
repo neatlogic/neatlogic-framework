@@ -37,6 +37,7 @@ import neatlogic.framework.file.dto.FileVo;
 import neatlogic.framework.heartbeat.dao.mapper.ServerMapper;
 import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.integration.authentication.enums.AuthenticateType;
+import neatlogic.framework.util.FileSafeUtil;
 import neatlogic.framework.util.HttpRequestUtil;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -51,6 +52,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -163,17 +165,7 @@ public class FileServiceImpl implements IFileCrossoverService {
 
     @Override
     public JSONObject readLocalFile(String path, int startIndex, int offset) {
-        String dataHome = Config.AUDIT_HOME()+ TenantContext.get().getTenantUuid();
-        String prefix = "${home}";
-        if (path.startsWith(prefix)) {
-            path = path.substring(prefix.length());
-            path = dataHome + path;
-        } else {
-            throw new FilePathIllegalException(path);
-        }
-        if (!path.startsWith("file:")) {
-            path = "file:" + path;
-        }
+        String resolvedPath = getAuditFilePath(path);
         JSONObject resultObj = new JSONObject();
         boolean hasMore = false;
         /*
@@ -184,7 +176,7 @@ public class FileServiceImpl implements IFileCrossoverService {
             hasMore = true;
         }
         resultObj.put("hasMore", hasMore);
-        try (InputStream in = FileUtil.getData(path)) {
+        try (InputStream in = FileUtil.getData(resolvedPath)) {
             if (in != null) {
                 in.skip(startIndex);
                 byte[] buff = new byte[1024];
@@ -255,18 +247,8 @@ public class FileServiceImpl implements IFileCrossoverService {
 
     @Override
     public void downloadLocalFile(String path, int startIndex, int offset, HttpServletResponse response) {
-        String dataHome = Config.AUDIT_HOME() + TenantContext.get().getTenantUuid();
-        String prefix = "${home}";
-        if (path.startsWith(prefix)) {
-            path = path.substring(prefix.length());
-            path = dataHome + path;
-        } else {
-            throw new FilePathIllegalException(path);
-        }
-        if (!path.startsWith("file:")) {
-            path = "file:" + path;
-        }
-        try (InputStream in = FileUtil.getData(path)) {
+        String resolvedPath = getAuditFilePath(path);
+        try (InputStream in = FileUtil.getData(resolvedPath)) {
             if (in != null) {
                 in.skip(startIndex);
                 String fileNameEncode = neatlogic.framework.util.FileUtil.getEncodedFileName("AUDIT_DETAIL.log");
@@ -291,6 +273,25 @@ public class FileServiceImpl implements IFileCrossoverService {
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
+        }
+    }
+
+    private String getAuditFilePath(String path) {
+        String prefix = "${home}";
+        if (!StringUtils.startsWith(path, prefix)) {
+            throw new FilePathIllegalException(path);
+        }
+        String auditRootPath = Config.AUDIT_HOME() + TenantContext.get().getTenantUuid();
+        String relativePath = path.substring(prefix.length());
+        while (relativePath.startsWith("/") || relativePath.startsWith("\\")) {
+            relativePath = relativePath.substring(1);
+        }
+        try {
+            File file = FileSafeUtil.getPath(relativePath, auditRootPath);
+            // 审计详情只允许读取当前租户审计目录下的真实文件，避免${home}/../逃逸到宿主机其他目录。
+            return "file:" + file.getPath();
+        } catch (Exception ex) {
+            throw new FilePathIllegalException(path);
         }
     }
 

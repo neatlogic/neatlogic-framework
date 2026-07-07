@@ -13,6 +13,7 @@
 package neatlogic.framework.file.dto;
 
 import neatlogic.framework.exception.file.FilePathIllegalException;
+import neatlogic.framework.util.FileSafeUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -71,5 +72,23 @@ public class AuditFilePathVo {
 
     public Integer getServerId() {
         return serverId;
+    }
+
+    public boolean isInHomeDirectory(String directoryName) {
+        String normalizedPath = StringUtils.defaultString(path).replace("\\", "/");
+        String prefix = "${home}/";
+        if (!normalizedPath.startsWith(prefix)) {
+            return false;
+        }
+        String relativePath;
+        try {
+            // 审计业务目录白名单只接受安全相对路径，避免${home}/apiaudit/../integrationaudit这类目录混淆。
+            relativePath = FileSafeUtil.getSafeRelativePath(normalizedPath.substring(prefix.length()));
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+        int index = relativePath.indexOf("/");
+        String firstDirectory = index == -1 ? relativePath : relativePath.substring(0, index);
+        return StringUtils.equals(firstDirectory, directoryName);
     }
 }

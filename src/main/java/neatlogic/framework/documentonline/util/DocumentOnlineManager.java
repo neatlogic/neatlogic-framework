@@ -23,6 +23,7 @@ import neatlogic.framework.documentonline.dto.DocumentOnlineDirectoryVo;
 import neatlogic.framework.documentonline.dto.DocumentOnlineVo;
 import neatlogic.framework.documentonline.exception.DocumentOnlineJarNameIllegalException;
 import neatlogic.framework.util.$;
+import neatlogic.framework.util.FileSafeUtil;
 import neatlogic.framework.util.HtmlUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.IOUtils;
@@ -459,13 +460,14 @@ public class DocumentOnlineManager {
     }
 
     public static String getResourceLocationPatternByFilePath(String filePath) {
-        String locationPattern = null;
-        if (filePath.startsWith("jar:file:")) {
-            locationPattern = filePath;
-        } else {
-            locationPattern = "classpath:" + filePath;
-        }
-        return locationPattern;
+        // 在线文档资源下载的安全边界统一交给FileSafeUtil，避免classpath/jar路径校验散落在业务类中。
+        return FileSafeUtil.getSafeClasspathResourceLocationPattern(
+                filePath,
+                Config.DATA_HOME() + OUTSIDE_WAR_DOCUMENTS_ONLINE_JARS,
+                Arrays.asList(COMMERCIAL_JAR_NAME_PREFIX, COMMUNITY_JAR_NAME_PREFIX),
+                SUFFIX,
+                "neatlogic/"
+        );
     }
 
     public static String getWithinJarAbsoluteFilePathByURL(URL url) {

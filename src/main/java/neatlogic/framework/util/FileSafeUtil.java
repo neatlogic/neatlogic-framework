@@ -1,9 +1,14 @@
 package neatlogic.framework.util;
 
+import neatlogic.framework.common.config.Config;
+import neatlogic.framework.exception.file.FileNameNotNullException;
+import neatlogic.framework.exception.file.FileNotFoundException;
+import neatlogic.framework.exception.file.FilePathIllegalException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +17,9 @@ import java.util.Collection;
 import java.util.List;
 
 public final class FileSafeUtil {
+    private static final Logger logger = LoggerFactory.getLogger(FileSafeUtil.class);
+    private static final String FORBIDDEN_PATH_CONFIG_KEY = "file.safe.forbidden.path";
+
     private FileSafeUtil() {
     }
 
@@ -20,7 +28,7 @@ public final class FileSafeUtil {
      */
     public static String getUploadFileName(String fileName) {
         if (StringUtils.isBlank(fileName)) {
-            throw new IllegalArgumentException("上传文件名不能为空");
+            throw new FileNameNotNullException();
         }
         String normalizedFileName = fileName.replace("\\", "/");
         return new File(normalizedFileName).getName();
@@ -34,8 +42,10 @@ public final class FileSafeUtil {
         File directory = StringUtils.isBlank(relativePath) ? root : new File(root, relativePath).getCanonicalFile();
         File file = new File(directory, fileName).getCanonicalFile();
         if (!isSubPath(root, directory) || !isSubPath(root, file)) {
-            throw new IllegalArgumentException("文件路径不合法");
+            throw new FilePathIllegalException(file.getPath());
         }
+        validateFilePathAllowed(root, directory);
+        validateFilePathAllowed(root, file);
         return file;
     }
 
@@ -46,8 +56,9 @@ public final class FileSafeUtil {
         File root = new File(rootPath).getCanonicalFile();
         File file = new File(root, StringUtils.defaultString(childPath)).getCanonicalFile();
         if (!isSubPath(root, file)) {
-            throw new IllegalArgumentException("文件路径不合法");
+            throw new FilePathIllegalException(file.getPath());
         }
+        validateFilePathAllowed(root, file);
         return file;
     }
 
@@ -57,7 +68,7 @@ public final class FileSafeUtil {
     public static File getDownloadFile(String path, String rootPath) throws IOException {
         File file = getPath(path, rootPath);
         if (!file.exists() || !file.isFile()) {
-            throw new FileNotFoundException("文件不存在，请检查路径！");
+            throw new FileNotFoundException(FileNotFoundException.Type.NONEXISTENT, path);
         }
         return file;
     }
@@ -67,7 +78,7 @@ public final class FileSafeUtil {
      */
     public static File getPath(String path, String rootPath) throws IOException {
         if (StringUtils.isBlank(path)) {
-            throw new IllegalArgumentException("文件路径不能为空");
+            throw new FilePathIllegalException(path);
         }
         File root = new File(rootPath).getCanonicalFile();
         File file = new File(decode(path));
@@ -77,8 +88,9 @@ public final class FileSafeUtil {
         file = file.getCanonicalFile();
         // 以rootPath作为文件接口安全边界，避免../../和软链接逃逸到宿主机其他目录。
         if (!isSubPath(root, file)) {
-            throw new IllegalArgumentException("文件路径不合法");
+            throw new FilePathIllegalException(file.getPath());
         }
+        validateFilePathAllowed(root, file);
         return file;
     }
 
@@ -88,7 +100,7 @@ public final class FileSafeUtil {
     public static File getValidatedDirectory(String path, String rootPath) throws IOException {
         File directory = getPath(path, rootPath);
         if (!directory.exists() || !directory.isDirectory()) {
-            throw new IllegalArgumentException("保存路径不存在");
+            throw new FileNotFoundException(FileNotFoundException.Type.NONEXISTENT, path);
         }
         return directory;
     }
@@ -99,7 +111,7 @@ public final class FileSafeUtil {
     public static File getValidatedPath(String path, String rootPath) throws IOException {
         File file = getPath(path, rootPath);
         if (!file.exists()) {
-            throw new IllegalArgumentException("文件不存在");
+            throw new FileNotFoundException(FileNotFoundException.Type.NONEXISTENT, path);
         }
         return file;
     }
@@ -114,9 +126,52 @@ public final class FileSafeUtil {
         if (!isSubPath(root, canonicalDirectory)
                 || !isSubPath(root, file)
                 || !canonicalDirectory.getCanonicalPath().equals(file.getParentFile().getCanonicalPath())) {
-            throw new IllegalArgumentException("文件路径不合法");
+            throw new FilePathIllegalException(file.getPath());
         }
+        validateFilePathAllowed(root, canonicalDirectory);
+        validateFilePathAllowed(root, file);
         return file;
+    }
+
+    /**
+     * 递归校验目录内文件是否落入禁止访问路径，避免打包下载绕过单文件路径限制。
+     */
+    public static void validateNoForbiddenPathInDirectory(File root, File directory) throws IOException {
+        if (directory == null) {
+            return;
+        }
+        File canonicalRoot = root.getCanonicalFile();
+        File canonicalFile = directory.getCanonicalFile();
+        if (!isSubPath(canonicalRoot, canonicalFile)) {
+            throw new FilePathIllegalException(canonicalFile.getPath());
+        }
+        validateFilePathAllowed(canonicalRoot, canonicalFile);
+        if (!canonicalFile.isDirectory()) {
+            return;
+        }
+        File[] childList = canonicalFile.listFiles();
+        if (childList == null) {
+            return;
+        }
+        for (File child : childList) {
+            validateNoForbiddenPathInDirectory(canonicalRoot, child);
+        }
+    }
+
+    /**
+     * 校验本地文件是否落入file.safe.forbidden.path配置的禁止访问路径。
+     */
+    public static void validateFilePathAllowed(File root, File file) throws IOException {
+        if (root == null || file == null) {
+            return;
+        }
+        File canonicalRoot = root.getCanonicalFile();
+        File canonicalFile = file.getCanonicalFile();
+        for (File forbiddenPath : getForbiddenPathList(canonicalRoot)) {
+            if (isSubPath(forbiddenPath, canonicalFile)) {
+                throw new FilePathIllegalException(canonicalFile.getPath());
+            }
+        }
     }
 
     /**
@@ -127,7 +182,8 @@ public final class FileSafeUtil {
         try {
             normalizedPath = decode(path).replace("\\", "/");
         } catch (IOException ex) {
-            throw new IllegalArgumentException("文件路径不合法", ex);
+            logger.error("decode safe relative path failed, path: {}", path, ex);
+            throw new FilePathIllegalException(path);
         }
         while (normalizedPath.startsWith("/")) {
             normalizedPath = normalizedPath.substring(1);
@@ -142,7 +198,7 @@ public final class FileSafeUtil {
                 continue;
             }
             if ("..".equals(item) || item.contains(":")) {
-                throw new IllegalArgumentException("文件路径不合法");
+                throw new FilePathIllegalException(path);
             }
             safePathList.add(item);
         }
@@ -158,15 +214,16 @@ public final class FileSafeUtil {
         try {
             path = decode(filePath).replace("\\", "/");
         } catch (IOException ex) {
-            throw new IllegalArgumentException("文件路径不合法", ex);
+            logger.error("decode classpath resource path failed, path: {}", filePath, ex);
+            throw new FilePathIllegalException(filePath);
         }
         if (StringUtils.isBlank(path) || path.contains("../") || path.endsWith("/..")) {
-            throw new IllegalArgumentException("文件路径不合法");
+            throw new FilePathIllegalException(filePath);
         }
         if (path.startsWith("jar:file:")) {
             int separatorIndex = path.indexOf("!/");
             if (separatorIndex == -1) {
-                throw new IllegalArgumentException("文件路径不合法");
+                throw new FilePathIllegalException(filePath);
             }
             String jarPath = path.substring("jar:file:".length(), separatorIndex);
             String entryPath = path.substring(separatorIndex + 2);
@@ -180,15 +237,16 @@ public final class FileSafeUtil {
                         || !isAllowedFileNamePrefix(jarFileName, allowedJarNamePrefixList)
                         || !isSubPath(jarRoot, jarFile)
                         || !isSafeClasspathResourcePath(entryPath, classpathRootPrefix)) {
-                    throw new IllegalArgumentException("文件路径不合法");
+                    throw new FilePathIllegalException(filePath);
                 }
                 return "jar:file:" + jarFile.getPath().replace("\\", "/") + "!/" + entryPath.replace("\\", "/");
             } catch (IOException ex) {
-                throw new IllegalArgumentException("文件路径不合法", ex);
+                logger.error("validate jar resource path failed, path: {}", filePath, ex);
+                throw new FilePathIllegalException(filePath);
             }
         }
         if (!isSafeClasspathResourcePath(path, classpathRootPrefix)) {
-            throw new IllegalArgumentException("文件路径不合法");
+            throw new FilePathIllegalException(filePath);
         }
         return "classpath:" + path;
     }
@@ -220,6 +278,30 @@ public final class FileSafeUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * 从配置读取禁止访问的本地路径，支持相对业务根目录或绝对路径，默认空列表保持兼容。
+     */
+    private static List<File> getForbiddenPathList(File root) throws IOException {
+        String pathConfig = Config.getProperties().getProperty(FORBIDDEN_PATH_CONFIG_KEY, StringUtils.EMPTY);
+        List<File> pathList = new ArrayList<>();
+        if (StringUtils.isBlank(pathConfig)) {
+            return pathList;
+        }
+        String[] pathArray = pathConfig.split(",");
+        for (String path : pathArray) {
+            String normalizedPath = StringUtils.trimToEmpty(path);
+            if (StringUtils.isBlank(normalizedPath)) {
+                continue;
+            }
+            File forbiddenPath = new File(normalizedPath);
+            if (!forbiddenPath.isAbsolute()) {
+                forbiddenPath = new File(root, normalizedPath);
+            }
+            pathList.add(forbiddenPath.getCanonicalFile());
+        }
+        return pathList;
     }
 
     /**

@@ -290,7 +290,8 @@ public class FileServiceImpl implements IFileCrossoverService {
             File file = FileSafeUtil.getPath(relativePath, auditRootPath);
             // 审计详情只允许读取当前租户审计目录下的真实文件，避免${home}/../逃逸到宿主机其他目录。
             return "file:" + file.getPath();
-        } catch (Exception ex) {
+        } catch (IOException ex) {
+            logger.error("validate audit file path failed, path: {}", path, ex);
             throw new FilePathIllegalException(path);
         }
     }

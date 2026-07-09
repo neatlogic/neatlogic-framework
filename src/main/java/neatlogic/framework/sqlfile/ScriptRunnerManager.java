@@ -241,32 +241,16 @@ public class ScriptRunnerManager {
 //            System.out.println(executeSqlParamVo.getRunner());
 //            executeSqlParamVo.getRunner().runScript((new StringReader("SELECT CONNECTION_ID();")));
 //            System.out.println(executeSqlParamVo.getLogStrWriter());
-            executeSqlParamVo.getRunner().runScript(new StringReader(executeSqlParamVo.getSql()));
+            try {
+                executeSqlParamVo.getRunner().runScript(new StringReader(executeSqlParamVo.getSql()));
+            } catch (Exception ex) {
+                logger.error("执行changelog sql异常: {}", ex.getMessage(), ex);
+                recordChangelogFailure(executeSqlParamVo, tenantUuid, sqlHash, ex.getMessage());
+                return executeSqlParamVo.isError();
+            }
             ChangelogAuditVo changelogAuditVo;
             if (StringUtils.isNotBlank(executeSqlParamVo.getErrStrWriter().toString())) {
-                String error;
-                if (executeSqlParamVo.getTenant() == null) {
-                    error = String.format("  ✖%s.%s.%s:%s", executeSqlParamVo.getModuleId(), executeSqlParamVo.getVersion(), executeSqlParamVo.getSqlFile(), executeSqlParamVo.getErrStrWriter());
-                } else {
-                    error = String.format("  ✖%s.%s.%s.%s:%s", executeSqlParamVo.getTenant().getName(), executeSqlParamVo.getModuleId(), executeSqlParamVo.getVersion(), executeSqlParamVo.getSqlFile(), executeSqlParamVo.getErrStrWriter());
-                }
-                //预防链接因TCP静默断开导致链接已死则需要新建链接，否则系统会继续用死链接导致后续所有执行sql都CommunicationsException
-                if (executeSqlParamVo.getErrStrWriter() != null && StringUtils.isNotBlank(executeSqlParamVo.getErrStrWriter().toString()) && executeSqlParamVo.getErrStrWriter().toString().contains("CommunicationsException")) {
-                    executeSqlParamVo.invalidate();
-                }
-                //tenantModuleDmlSqlVo = new TenantModuleDmlSqlVo(tenant.getUuid(), moduleId, sqlMd5, 0, errStrWriter.toString(), type);
-                int ignored = 0;
-                if (ignoreKeyList.stream().anyMatch(o -> executeSqlParamVo.getErrStrWriter().toString().toLowerCase(Locale.ROOT).contains(o))) {
-                    ignored = 1;
-                } else {
-                    System.out.println(error);
-                    executeSqlParamVo.setError(true);
-                }
-                changelogAuditVo = new ChangelogAuditVo(tenantUuid, executeSqlParamVo.getModuleId(), sqlHash, executeSqlParamVo.getVersion(), error, 0, ignored);
-                insertChangelogAudit(changelogAuditVo, executeSqlParamVo.getNeatlogicConnectHolder());
-                insertChangelogAuditDetail(sqlHash, executeSqlParamVo.getSql(), executeSqlParamVo.getNeatlogicConnectHolder());
-                executeSqlParamVo.getErrStrWriter().getBuffer().setLength(0);
-                executeSqlParamVo.getLogStrWriter().getBuffer().setLength(0);
+                recordChangelogFailure(executeSqlParamVo, tenantUuid, sqlHash, null);
             } else {
                 changelogAuditVo = new ChangelogAuditVo(tenantUuid, executeSqlParamVo.getModuleId(), sqlHash, executeSqlParamVo.getVersion(), 1);
                 executeSqlParamVo.getChangelogSqlHashList().add(sqlHash);
@@ -275,6 +259,40 @@ public class ScriptRunnerManager {
             }
         }
         return executeSqlParamVo.isError();
+    }
+
+    /**
+     * 记录changelog SQL失败信息；ScriptRunner可能直接抛异常，不能只依赖errWriter分支。
+     */
+    private static void recordChangelogFailure(ExecuteSqlParamVo executeSqlParamVo, String tenantUuid, String sqlHash, String exceptionMessage) throws Exception {
+        String writerError = executeSqlParamVo.getErrStrWriter() == null ? StringUtils.EMPTY : executeSqlParamVo.getErrStrWriter().toString();
+        String errorMessage = StringUtils.defaultIfBlank(writerError, exceptionMessage);
+        String error;
+        if (executeSqlParamVo.getTenant() == null) {
+            error = String.format("  ✖%s.%s.%s:%s", executeSqlParamVo.getModuleId(), executeSqlParamVo.getVersion(), executeSqlParamVo.getSqlFile(), errorMessage);
+        } else {
+            error = String.format("  ✖%s.%s.%s.%s:%s", executeSqlParamVo.getTenant().getName(), executeSqlParamVo.getModuleId(), executeSqlParamVo.getVersion(), executeSqlParamVo.getSqlFile(), errorMessage);
+        }
+        //预防链接因TCP静默断开导致链接已死则需要新建链接，否则系统会继续用死链接导致后续所有执行sql都CommunicationsException
+        if (StringUtils.contains(errorMessage, "CommunicationsException")) {
+            executeSqlParamVo.invalidate();
+        }
+        int ignored = 0;
+        if (ignoreKeyList.stream().anyMatch(o -> StringUtils.defaultString(errorMessage).toLowerCase(Locale.ROOT).contains(o))) {
+            ignored = 1;
+        } else {
+            System.out.println(error);
+            executeSqlParamVo.setError(true);
+        }
+        ChangelogAuditVo changelogAuditVo = new ChangelogAuditVo(tenantUuid, executeSqlParamVo.getModuleId(), sqlHash, executeSqlParamVo.getVersion(), error, 0, ignored);
+        insertChangelogAudit(changelogAuditVo, executeSqlParamVo.getNeatlogicConnectHolder());
+        insertChangelogAuditDetail(sqlHash, executeSqlParamVo.getSql(), executeSqlParamVo.getNeatlogicConnectHolder());
+        if (executeSqlParamVo.getErrStrWriter() != null) {
+            executeSqlParamVo.getErrStrWriter().getBuffer().setLength(0);
+        }
+        if (executeSqlParamVo.getLogStrWriter() != null) {
+            executeSqlParamVo.getLogStrWriter().getBuffer().setLength(0);
+        }
     }
 
     /**

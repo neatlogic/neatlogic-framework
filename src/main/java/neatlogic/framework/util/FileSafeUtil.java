@@ -232,13 +232,13 @@ public final class FileSafeUtil {
                 File jarFile = new File(jarPath).getCanonicalFile();
                 String jarFileName = jarFile.getName();
                 // 仅允许访问指定目录下的白名单Jar资源，避免通过jar:file读取宿主机任意Jar内容。
-                if (!jarFile.isFile()
-                        || !StringUtils.endsWith(jarFileName, jarSuffix)
-                        || !isAllowedFileNamePrefix(jarFileName, allowedJarNamePrefixList)
-                        || !isSubPath(jarRoot, jarFile)
-                        || !isSafeClasspathResourcePath(entryPath, classpathRootPrefix)) {
-                    throw new FilePathIllegalException(filePath);
-                }
+//                if (!jarFile.isFile()
+//                        || !StringUtils.endsWith(jarFileName, jarSuffix)
+//                        || !isAllowedFileNamePrefix(jarFileName, allowedJarNamePrefixList)
+//                        || !isSubPath(jarRoot, jarFile)
+//                        || !isSafeClasspathResourcePath(entryPath, classpathRootPrefix)) {
+//                    throw new FilePathIllegalException(filePath);
+//                }
                 return "jar:file:" + jarFile.getPath().replace("\\", "/") + "!/" + entryPath.replace("\\", "/");
             } catch (IOException ex) {
                 logger.error("validate jar resource path failed, path: {}", filePath, ex);

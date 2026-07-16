@@ -211,6 +211,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         response.setStatus(responseCode.getCode());
         redirectObj.put("DirectUrl", loginAuth.directUrl());
         redirectObj.put("IsAutoDirect", loginAuth.isAutoDirect());
+        //最终导致认证失败的 authType
+        redirectObj.put("authType", loginAuth.getType());
         if (ex != null) {
             redirectObj.put("stackTrace", ExceptionUtils.getStackFrames(ex));
         }

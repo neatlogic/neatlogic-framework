@@ -25,6 +25,7 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     PASSWORD_NEED_EXPIRED_CHECK("password.need.expired.check", "0","nfc.frameworktenantconfig.passwordneedexpiredcheck"),
     PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
     TENANT_DEFAULT_LANGUAGE("tenant.default.language", "zh", ApiParamType.STRING, "zh,en", "nfc.frameworktenantconfig.tenantdefaultlanguage"),
+    IS_DEBUG("is.debug", "0", ApiParamType.INTEGER, "0,1", "nfc.frameworktenantconfig.isdebug"),
     ;
 
     String key;

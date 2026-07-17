@@ -20,6 +20,7 @@ import java.lang.annotation.*;
  * 对系统用户权限豁免
  */
 @Target(ElementType.TYPE)
+@Repeatable(AuthUsers.class)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AuthUser {

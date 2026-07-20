@@ -109,6 +109,8 @@ public class JobAuditVo extends BasePageVo {
     private String jobHandler;
     @EntityField(name = "作业组件名称", type = ApiParamType.STRING)
     private String jobHandlerName;
+    @JSONField(serialize = false)
+    private transient List<String> jobHandlerList;
     @EntityField(name = "作业组件所属模块id", type = ApiParamType.STRING)
     private String moduleId;
     @EntityField(name = "作业组件所属模块名称", type = ApiParamType.STRING)
@@ -267,6 +269,14 @@ public class JobAuditVo extends BasePageVo {
 
     public void setJobHandlerName(String jobHandlerName) {
         this.jobHandlerName = jobHandlerName;
+    }
+
+    public List<String> getJobHandlerList() {
+        return jobHandlerList;
+    }
+
+    public void setJobHandlerList(List<String> jobHandlerList) {
+        this.jobHandlerList = jobHandlerList;
     }
 
     public String getModuleId() {

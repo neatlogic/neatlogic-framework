@@ -144,6 +144,8 @@ public class TenantController {
             data.put("defaultLanguage", ConfigManager.getConfig(FrameworkTenantConfig.TENANT_DEFAULT_LANGUAGE));
             //是否debug模式。如果 debug 模式，则移动端认证失败页面展示认证相关信息
             data.put("isDebug", ConfigManager.getConfig(FrameworkTenantConfig.IS_DEBUG));
+            data.put("matrixColumnDataSearchForbatchInputParamSearchParamListSize", ConfigManager.getConfig(FrameworkTenantConfig.MATRIX_COLUMNDATA_SEARCHFORBATCH_INPUTPARAM_SEARCHPARAMLIST_SIZE));
+            data.put("matrixColumnDataSearchForbatchRequestConcurrency", ConfigManager.getConfig(FrameworkTenantConfig.MATRIX_COLUMNDATA_SEARCHFORBATCH_REQUEST_CONCURRENCY));
 
             ReturnJson.success(data, response);
         } catch (Exception e) {

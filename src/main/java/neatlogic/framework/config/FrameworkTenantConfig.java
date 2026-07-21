@@ -26,6 +26,8 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
     TENANT_DEFAULT_LANGUAGE("tenant.default.language", "zh", ApiParamType.STRING, "zh,en", "nfc.frameworktenantconfig.tenantdefaultlanguage"),
     IS_DEBUG("is.debug", "0", ApiParamType.INTEGER, "0,1", "nfc.frameworktenantconfig.isdebug"),
+    MATRIX_COLUMNDATA_SEARCHFORBATCH_INPUTPARAM_SEARCHPARAMLIST_SIZE("matrix.columnData.searchForbatch.inputParam.searchParamList.size", "50", ApiParamType.INTEGER, "nfc.frameworktenantconfig.matrixcolumndatasearchforbatchinputparamsearchparamlistsize"),
+    MATRIX_COLUMNDATA_SEARCHFORBATCH_REQUEST_CONCURRENCY("matrix.columnData.searchForbatch.request.concurrency", "1", ApiParamType.INTEGER, "nfc.frameworktenantconfig.matrixcolumndatasearchforbatchrequestconcurrency"),
     ;
 
     String key;

@@ -49,7 +49,7 @@ import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     //前端定时心跳的时间
-    private static final int WEB_HEARTBEAT_INTERVAL= 60;
+    public static final int WEB_HEARTBEAT_INTERVAL= 60;
 
     @Resource
     private UserSessionMapper userSessionMapper;

@@ -35,8 +35,6 @@ public class LicenseVo implements Serializable {
     @EntityField(name = "common.createdate", type = ApiParamType.LONG)
     private Long createDate;
     @EntityField(name = "nfd.licensevo.entityfield.name.expirationdate", type = ApiParamType.LONG)
-    // 兼容历史许可证使用 yyyy-MM-dd 字符串，而字段以毫秒 Long 保存。
-    @JSONField(deserializeUsing = LicenseDateDeserializer.class)
     private Long expirationDate;
     @EntityField(name = "nfd.licensevo.entityfield.name.enddate", type = ApiParamType.LONG)
     private Long endDate;

@@ -13,7 +13,7 @@
 package neatlogic.framework.util;
 
 
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.constvalue.license.ILicensePolicy;
 import neatlogic.framework.dto.license.LicenseInvalidVo;
 import neatlogic.framework.dto.license.LicenseVo;
@@ -60,7 +60,6 @@ public class LicenseUtil {
             return null;
         }
         String license = new String(Objects.requireNonNull(RSAUtils.decryptByPublicKey(Base64Utils.decode(decodeData), licencePK)), StandardCharsets.UTF_8);
-            // Fastjson 2.0.62 的 JSONObject.toJavaObject(Class) 走 Map 转 Bean 路径，未执行许可证日期字段的 deserializeUsing。
-        return JSON.parseObject(license, LicenseVo.class);
+        return JSONObject.parseObject(license).toJavaObject(LicenseVo.class);
     }
 }

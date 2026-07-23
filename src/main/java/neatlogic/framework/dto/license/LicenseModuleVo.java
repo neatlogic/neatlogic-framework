@@ -12,6 +12,7 @@
 
 package neatlogic.framework.dto.license;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
@@ -31,6 +32,8 @@ public class LicenseModuleVo implements Serializable {
     String module;
 
     @EntityField(name = "nfd.licensevo.entityfield.name.expirationdate", type = ApiParamType.LONG)
+    // 兼容历史许可证使用 yyyy-MM-dd 字符串，而字段以毫秒 Long 保存。
+    @JSONField(deserializeUsing = LicenseDateDeserializer.class)
     private Long expirationDate;
 
     @EntityField(name = "common.policy", type = ApiParamType.JSONOBJECT)

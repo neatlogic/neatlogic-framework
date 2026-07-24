@@ -10,9 +10,8 @@
 
 package neatlogic.framework.portal.widget.core;
 
-public interface IPortalWidget {
+public interface IPortalWidgetGroup {
     String getValue();
     String getText();
     Integer getSort();
-    IPortalWidgetGroup getGroup();
 }

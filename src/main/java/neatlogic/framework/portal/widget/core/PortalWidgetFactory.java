@@ -10,6 +10,9 @@
 
 package neatlogic.framework.portal.widget.core;
 
+import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleVo;
+import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +58,26 @@ public class PortalWidgetFactory {
     }
 
     public static List<IPortalWidget> getPortalWidgetListByModuleGroup(String moduleGroup) {
-        return null;
+        List<IPortalWidget> result = new ArrayList<>();
+        if (StringUtils.isBlank(moduleGroup)) {
+            result.addAll(set);
+        } else {
+            for (IPortalWidget portalWidget : set) {
+                String className = portalWidget.getClass().getName();
+                if ("framework".equals(moduleGroup) && className.startsWith("neatlogic.framework.")) {
+                    result.add(portalWidget);
+                    continue;
+                }
+                for (ModuleVo moduleVo : ModuleUtil.getAllModuleList()) {
+                    if (moduleGroup.equals(moduleVo.getGroup())
+                            && className.startsWith("neatlogic.module." + moduleVo.getId() + ".")) {
+                        result.add(portalWidget);
+                        break;
+                    }
+                }
+            }
+        }
+        result.sort(Comparator.comparing(IPortalWidget::getValue));
+        return result;
     }
 }

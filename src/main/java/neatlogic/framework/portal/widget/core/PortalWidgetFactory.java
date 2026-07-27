@@ -33,7 +33,7 @@ public class PortalWidgetFactory {
 //            Collections.addAll(set, c.getEnumConstants());
             IPortalWidget[] enumConstants = c.getEnumConstants();
             for (IPortalWidget portalWidget : enumConstants) {
-                System.out.println("portalWidget = " + portalWidget.getClass().getName());
+//                System.out.println("portalWidget = " + portalWidget.getClass().getName());
                 if (map.containsKey(portalWidget.getValue())) {
                     logger.error("门户小部件 '" + portalWidget.getClass().getSimpleName() + "(" + portalWidget.getValue() + ")' 重复了");
                     System.exit(1);

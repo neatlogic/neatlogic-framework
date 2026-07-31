@@ -14,5 +14,4 @@ public interface IPortalWidget {
     String getValue();
     String getText();
     Integer getSort();
-    IPortalWidgetGroup getGroup();
 }

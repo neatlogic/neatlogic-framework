@@ -11,26 +11,23 @@
 package neatlogic.framework.portal.widget;
 
 import neatlogic.framework.portal.widget.core.IPortalWidget;
-import neatlogic.framework.portal.widget.core.IPortalWidgetGroup;
 
 public enum FrameworkPortalWidget implements IPortalWidget {
-    welcomeOverview("welcomeOverview", "欢迎概况", 1, FrameworkPortalWidgetGroup.frameworkGroup1),
-    todayFocus("todayFocus", "今日关注", 2, FrameworkPortalWidgetGroup.frameworkGroup1),
-    quickEntry("quickEntry", "快捷入口", 3, FrameworkPortalWidgetGroup.frameworkGroup2),
-    notice("notice", "系统通知", 4, FrameworkPortalWidgetGroup.frameworkGroup2),
-    recentAccess("recentAccess", "最近访问", 5, FrameworkPortalWidgetGroup.frameworkGroup2),
-    calendar("calendar", "日历提醒", 6, FrameworkPortalWidgetGroup.frameworkGroup2),
+    welcomeOverview("welcomeOverview", "欢迎概况", 1),
+    todayFocus("todayFocus", "今日关注", 2),
+    quickEntry("quickEntry", "快捷入口", 3),
+    notice("notice", "系统通知", 4),
+    recentAccess("recentAccess", "最近访问", 5),
+    calendar("calendar", "日历提醒", 6),
     ;
     private final String value;
     private final String text;
     private final Integer sort;
-    private final IPortalWidgetGroup group;
 
-    FrameworkPortalWidget(String value, String text, Integer sort, IPortalWidgetGroup group) {
+    FrameworkPortalWidget(String value, String text, Integer sort) {
         this.value = value;
         this.text = text;
         this.sort = sort;
-        this.group = group;
     }
 
     @Override
@@ -46,10 +43,5 @@ public enum FrameworkPortalWidget implements IPortalWidget {
     @Override
     public Integer getSort() {
         return this.sort;
-    }
-
-    @Override
-    public IPortalWidgetGroup getGroup() {
-        return this.group;
     }
 }

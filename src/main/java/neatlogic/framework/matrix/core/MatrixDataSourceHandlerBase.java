@@ -176,6 +176,11 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
         }
         dataVo.setColumnList(distinctColumList);
         List<Map<String, JSONObject>> resultList = mySearchTableDataNew(dataVo);
+        searchVo.setCurrentPage(dataVo.getCurrentPage());
+        searchVo.setPageSize(dataVo.getPageSize());
+        searchVo.setMaxPageSize(dataVo.getMaxPageSize());
+        searchVo.setRowNum(dataVo.getRowNum());
+        searchVo.setNeedPage(dataVo.getNeedPage());
         return resultList;
     }
 

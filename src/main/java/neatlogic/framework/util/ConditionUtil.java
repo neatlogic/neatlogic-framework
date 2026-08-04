@@ -7,6 +7,7 @@ import neatlogic.framework.util.javascript.JavascriptUtil;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.script.ScriptException;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class ConditionUtil {
@@ -61,46 +62,32 @@ public class ConditionUtil {
                     String dataStr = curentValueList.get(0);
                     boolean result = false;
                     String left = targetValueList.get(0);
-                    if (dataStr.length() > left.length()) {
-                        result = true;
-                    } else if (dataStr.length() < left.length()) {
-                        result = false;
-                    } else {
-                        result = dataStr.compareTo(left) >= 0;
-                    }
+                    result = compare(dataStr, left) >= 0;
                     if (result && targetValueList.size() == 2) {
                         String right = targetValueList.get(1);
-                        if (dataStr.length() > right.length()) {
-                            result = false;
-                        } else if (dataStr.length() < right.length()) {
-                            result = true;
-                        } else {
-                            result = dataStr.compareTo(right) <= 0;
-                        }
+                        result = compare(dataStr, right) <= 0;
                     }
                     return result;
                 case GREATERTHAN:
                     if (CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
                         return false;
                     }
-                    if (curentValueList.get(0).length() > targetValueList.get(0).length()) {
-                        return true;
-                    } else if (curentValueList.get(0).length() < targetValueList.get(0).length()) {
+                    return compare(curentValueList.get(0), targetValueList.get(0)) > 0;
+                case GREATERTHANOREQUAL:
+                    if (CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
                         return false;
-                    } else {
-                        return curentValueList.get(0).compareTo(targetValueList.get(0)) > 0;
                     }
+                    return compare(curentValueList.get(0), targetValueList.get(0)) >= 0;
                 case LESSTHAN:
                     if (CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
                         return false;
                     }
-                    if (curentValueList.get(0).length() > targetValueList.get(0).length()) {
+                    return compare(curentValueList.get(0), targetValueList.get(0)) < 0;
+                case LESSTHANOREQUAL:
+                    if (CollectionUtils.isEmpty(targetValueList) || CollectionUtils.isEmpty(curentValueList)) {
                         return false;
-                    } else if (curentValueList.get(0).length() < targetValueList.get(0).length()) {
-                        return true;
-                    } else {
-                        return curentValueList.get(0).compareTo(targetValueList.get(0)) < 0;
                     }
+                    return compare(curentValueList.get(0), targetValueList.get(0)) <= 0;
                 case ISNULL:
                     return CollectionUtils.isEmpty(curentValueList);
                 case ISNOTNULL:
@@ -110,5 +97,20 @@ public class ConditionUtil {
                     return false;
             }
         }
+    }
+
+    /**
+     * 数字条件使用 BigDecimal 比较；非数字值保留原有的长度加字典序比较语义，兼容日期等历史条件。
+     */
+    private static int compare(String currentValue, String targetValue) {
+        if (isDecimal(currentValue) && isDecimal(targetValue)) {
+            return new BigDecimal(currentValue).compareTo(new BigDecimal(targetValue));
+        }
+        int lengthCompare = Integer.compare(currentValue.length(), targetValue.length());
+        return lengthCompare != 0 ? lengthCompare : currentValue.compareTo(targetValue);
+    }
+
+    private static boolean isDecimal(String value) {
+        return value != null && value.matches("[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:[eE][+-]?\\d+)?");
     }
 }

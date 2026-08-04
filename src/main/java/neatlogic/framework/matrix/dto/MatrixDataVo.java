@@ -56,6 +56,41 @@ public class MatrixDataVo extends BasePageVo {
      */
     private List<String> notNullColumnList;
 
+    public MatrixDataVo() {
+    }
+
+    public MatrixDataVo(MatrixDataVo dataVo) {
+        this.matrixUuid = dataVo.getMatrixUuid();
+        this.matrixLabel = dataVo.getMatrixLabel();
+        this.columnList = dataVo.getColumnList() != null ? new ArrayList<>(dataVo.getColumnList()) : null;
+        this.columnUniqueIdentifierList = dataVo.getColumnUniqueIdentifierList() != null ? new ArrayList<>(dataVo.getColumnUniqueIdentifierList()) : null;
+        this.sourceColumnList = dataVo.getSourceColumnList() != null ? new ArrayList<>(dataVo.getSourceColumnList()) : null;
+        this.uuidList = dataVo.getUuidList() != null ? new ArrayList<>(dataVo.getUuidList()) : null;
+        this.uuidColumn = dataVo.getUuidColumn();
+        this.keywordColumn = dataVo.getKeywordColumn();
+        this.keywordColumnUniqueIdentifier = dataVo.getKeywordColumnUniqueIdentifier();
+        this.keywordExpression = dataVo.getKeywordExpression();
+        this.uuid = dataVo.getUuid();
+        this.attrType = dataVo.getAttrType();
+        this.attributeValueList = dataVo.getAttributeValueList() != null ? new ArrayList<>(dataVo.getAttributeValueList()) : null;
+        this.filterList = dataVo.getFilterList() != null ? new ArrayList<>(dataVo.getFilterList()) : null;
+        this.arrayColumnList = dataVo.getArrayColumnList() != null ? new ArrayList<>(dataVo.getArrayColumnList()) : null;
+        this.attrFilterList = dataVo.getAttrFilterList() != null ? new JSONArray().fluentAddAll(dataVo.getAttrFilterList()) : null;
+        this.relFilterList = dataVo.getRelFilterList() != null ? new JSONArray().fluentAddAll(dataVo.getRelFilterList()) : null;
+        this.filterCiEntityId = dataVo.getFilterCiEntityId();
+        this.filterCiId = dataVo.getFilterCiId();
+        this.distinct = dataVo.getDistinct();
+        this.defaultValueFilterList = dataVo.getDefaultValueFilterList() != null ? new ArrayList<>(dataVo.getDefaultValueFilterList()) : null;
+        this.notNullColumnList = dataVo.getNotNullColumnList() != null ? new ArrayList<>(dataVo.getNotNullColumnList()) : null;
+        this.setCurrentPage(dataVo.getCurrentPage());
+        this.setPageSize(dataVo.getPageSize());
+        this.setMaxPageSize(dataVo.getMaxPageSize());
+        this.setRowNum(dataVo.getRowNum());
+        this.setNeedPage(dataVo.getNeedPage());
+        this.setDefaultValue(dataVo.getDefaultValue());
+        this.setKeyword(dataVo.getKeyword());
+    }
+
     public String getMatrixUuid() {
         return matrixUuid;
     }

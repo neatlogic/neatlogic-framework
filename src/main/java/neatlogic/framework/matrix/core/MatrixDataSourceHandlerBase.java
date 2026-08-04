@@ -165,7 +165,8 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
     protected abstract JSONObject myTableDataSearch(MatrixDataVo dataVo);
 
     @Override
-    public List<Map<String, JSONObject>> searchTableDataNew(MatrixDataVo dataVo) {
+    public List<Map<String, JSONObject>> searchTableDataNew(MatrixDataVo searchVo) {
+        MatrixDataVo dataVo = new MatrixDataVo(searchVo);
         /** 属性集合去重 **/
         List<String> distinctColumList = new ArrayList<>();
         for (String column : dataVo.getColumnList()) {
@@ -175,6 +176,11 @@ public abstract class MatrixDataSourceHandlerBase implements IMatrixDataSourceHa
         }
         dataVo.setColumnList(distinctColumList);
         List<Map<String, JSONObject>> resultList = mySearchTableDataNew(dataVo);
+        searchVo.setCurrentPage(dataVo.getCurrentPage());
+        searchVo.setPageSize(dataVo.getPageSize());
+        searchVo.setMaxPageSize(dataVo.getMaxPageSize());
+        searchVo.setRowNum(dataVo.getRowNum());
+        searchVo.setNeedPage(dataVo.getNeedPage());
         return resultList;
     }
 

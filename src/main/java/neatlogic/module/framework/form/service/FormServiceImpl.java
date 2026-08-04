@@ -434,6 +434,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 );
                 defaultValueFilterList.add(matrixDefaultValueFilterVo);
                 dataVo.setDefaultValueFilterList(defaultValueFilterList);
+                dataVo.setCurrentPage(1);
                 for (int i = 0; i < 10; i++) {
                     List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableDataNew(dataVo);
                     for (Map<String, JSONObject> tbody : tbodyList) {
@@ -473,6 +474,7 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 );
                 defaultValueFilterList.add(matrixDefaultValueFilterVo);
                 dataVo.setDefaultValueFilterList(defaultValueFilterList);
+                dataVo.setCurrentPage(1);
                 for (int i = 0; i < 10; i++) {
                     List<Map<String, JSONObject>> tbodyList = matrixDataSourceHandler.searchTableDataNew(dataVo);
                     for (Map<String, JSONObject> tbody : tbodyList) {

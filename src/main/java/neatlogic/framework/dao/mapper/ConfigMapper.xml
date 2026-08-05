@@ -38,6 +38,9 @@
         `value` = #{value}
     </insert>
 
+    <delete id="deleteConfigByKey" parameterType="java.lang.String">
+        DELETE FROM `config`
+        WHERE `key` = #{value}
+    </delete>
 
 </mapper>
-

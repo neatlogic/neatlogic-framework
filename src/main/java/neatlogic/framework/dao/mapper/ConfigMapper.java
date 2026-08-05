@@ -23,4 +23,6 @@ public interface ConfigMapper {
     List<ConfigVo> getConfigListByKeyList(List<String> keyList);
 
     int insertConfig(ConfigVo configVo);
+
+    int deleteConfigByKey(String key);
 }

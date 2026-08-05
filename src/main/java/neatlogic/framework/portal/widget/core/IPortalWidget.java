@@ -10,8 +10,15 @@
 
 package neatlogic.framework.portal.widget.core;
 
+import neatlogic.framework.portal.widgetdata.core.IPortalWidgetDataHandler;
+
+import java.util.List;
+
 public interface IPortalWidget {
     String getValue();
     String getText();
     Integer getSort();
+    default List<Class<? extends IPortalWidgetDataHandler>> getPortalWidgetDataHandlerClassList() {
+        return List.of();
+    }
 }

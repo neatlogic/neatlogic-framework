@@ -30,10 +30,8 @@ public class PortalWidgetFactory {
         Reflections reflections = new Reflections("neatlogic");
         Set<Class<? extends IPortalWidget>> classSet = reflections.getSubTypesOf(IPortalWidget.class);
         for (Class<? extends IPortalWidget> c : classSet) {
-//            Collections.addAll(set, c.getEnumConstants());
             IPortalWidget[] enumConstants = c.getEnumConstants();
             for (IPortalWidget portalWidget : enumConstants) {
-//                System.out.println("portalWidget = " + portalWidget.getClass().getName());
                 if (map.containsKey(portalWidget.getValue())) {
                     logger.error("门户小部件 '" + portalWidget.getClass().getSimpleName() + "(" + portalWidget.getValue() + ")' 重复了");
                     System.exit(1);
@@ -43,15 +41,6 @@ public class PortalWidgetFactory {
             }
         }
     }
-
-//    public static IPortalWidget getPortalWidget(String value) {
-//        for (IPortalWidget portalWidget : set) {
-//            if (Objects.equals(portalWidget.getValue(), value)) {
-//                return portalWidget;
-//            }
-//        }
-//        return null;
-//    }
 
     public static IPortalWidget getPortalWidget(String name) {
         return map.get(name);

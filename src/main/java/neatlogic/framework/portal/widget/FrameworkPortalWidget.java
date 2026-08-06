@@ -14,9 +14,9 @@ import neatlogic.framework.portal.widget.core.IPortalWidget;
 import neatlogic.framework.util.$;
 
 public enum FrameworkPortalWidget implements IPortalWidget {
-    WELCOME_OVERVIEW("welcomeOverview", "欢迎概况", 1),
+    WELCOME_OVERVIEW("welcomeOverview", "nfpw.frameworkportalwidget.text.welcomeoverview", 1),
 //    todayFocus("todayFocus", "今日关注", 2),
-    QUICK_ENTRY("quickEntry", "快捷入口", 2),
+    QUICK_ENTRY("quickEntry", "nfpw.frameworkportalwidget.text.quickentry", 2),
 //    notice("notice", "系统通知", 4),
 //    recentAccess("recentAccess", "最近访问", 5),
 //    calendar("calendar", "日历提醒", 6),

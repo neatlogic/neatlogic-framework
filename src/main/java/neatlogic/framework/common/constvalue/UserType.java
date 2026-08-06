@@ -14,24 +14,23 @@ package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.dto.UserTypeVo;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.I18n;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public enum UserType implements IUserType {
-    ALL("alluser", new I18n("所有人"), true),
-    LOGIN_USER("loginuser", new I18n("当前登录人"), false),
-    LOGIN_TEAM("loginteam", new I18n("当前登录人所在组"), false),
-    LOGIN_DEPARTMENT("logindepartment", new I18n("当前登录人所在部"), false),
-    LOGIN_CENTER("logincenter", new I18n("当前登录人所在中心"), false),
-    VIP_USER("vipuser", new I18n("vip用户"), false);
+    ALL("alluser", "common.alluser", true),
+    LOGIN_USER("loginuser", "common.loginuser", false),
+    LOGIN_TEAM("loginteam", "common.loginteam", false),
+    LOGIN_DEPARTMENT("logindepartment", "common.logindepartment", false),
+    LOGIN_CENTER("logincenter", "common.logincenter", false),
+    VIP_USER("vipuser", "common.vipuser", false);
 
     private final String status;
-    private final I18n text;
+    private final String text;
     private final Boolean isDefaultShow;
 
-    UserType(String _status, I18n _text, Boolean _isDefaultShow) {
+    UserType(String _status, String _text, Boolean _isDefaultShow) {
         this.status = _status;
         this.text = _text;
         this.isDefaultShow = _isDefaultShow;
@@ -42,7 +41,7 @@ public enum UserType implements IUserType {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return $.t(text);
     }
 
     public Boolean getIsDefaultShow() {

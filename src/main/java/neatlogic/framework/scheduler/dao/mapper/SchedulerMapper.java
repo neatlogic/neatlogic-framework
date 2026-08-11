@@ -56,6 +56,15 @@ public interface SchedulerMapper {
 
     ScheduleJobSourceVo getJobSourceByJobNameAndJobGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
+    /** 查询作业来源总数，供管理页分页使用。 */
+    int searchJobSourceCount(ScheduleJobSourceSearchVo searchVo);
+
+    /** 查询作业来源列表，并补充作业名称和处理器信息。 */
+    List<ScheduleJobSourceVo> searchJobSource(ScheduleJobSourceSearchVo searchVo);
+
+    /** 查询已有服务器组，供管理页编辑控件复用。 */
+//    List<String> getJobSourceServerGroupList();
+
 //    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 
     // UPDATE
@@ -71,10 +80,16 @@ public interface SchedulerMapper {
 
     int updateJobLock(JobLockVo jobLock);
 
+    /** 按作业来源复合主键批量更新服务器组。 */
+//    int updateJobSourceServerGroup(@Param("jobSourceList") List<ScheduleJobSourceVo> jobSourceList,
+//                                   @Param("serverGroup") String serverGroup);
+
     // INSERT
     int insertJob(JobVo job);
 
     int insertJobSource(ScheduleJobSourceVo jobSource);
+
+    int insertJobSourceList(List<ScheduleJobSourceVo> jobSourceList);
 
     int insertJobStatus(JobStatusVo jobStatus);
 

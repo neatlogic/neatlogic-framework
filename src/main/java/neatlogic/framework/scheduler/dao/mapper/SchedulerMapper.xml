@@ -413,6 +413,66 @@
           AND `job_group` = #{jobGroup}
     </select>
 
+    <!-- 作业来源管理页的列表和计数共用相同查询条件，避免分页结果不一致。 -->
+    <sql id="searchJobSourceWhere">
+        <where>
+            <!--<if test="keyword != null and keyword != ''">
+                AND (
+                    COALESCE(sj.`name`, s.`job_name`) LIKE CONCAT('%', #{keyword}, '%')
+                    OR s.`job_group` LIKE CONCAT('%', #{keyword}, '%')
+                    OR COALESCE(sj.`handler`, sjs.`handler`, sjl.`job_handler`) LIKE CONCAT('%', #{keyword}, '%')
+                    OR CAST(s.`server_id` AS CHAR) LIKE CONCAT('%', #{keyword}, '%')
+                    OR s.`server_group` LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>-->
+            <if test="keyword != null and keyword != ''">
+                s.`job_group` LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <!-- 关联配置表和运行态表，仅用于补充作业来源管理页的显示名称与作业模块。 -->
+    <sql id="searchJobSourceFrom">
+        FROM `schedule_job_source` s
+        LEFT JOIN `schedule_job` sj
+            ON sj.`uuid` = s.`job_name`
+        LEFT JOIN `schedule_job_status` sjs
+            ON sjs.`job_name` = s.`job_name`
+            AND sjs.`job_group` = s.`job_group`
+        LEFT JOIN `schedule_job_lock` sjl
+            ON sjl.`job_name` = s.`job_name`
+            AND sjl.`job_group` = s.`job_group`
+    </sql>
+
+    <select id="searchJobSourceCount" parameterType="neatlogic.framework.scheduler.dto.ScheduleJobSourceSearchVo" resultType="int">
+        SELECT COUNT(1)
+        <include refid="searchJobSourceFrom"/>
+        <include refid="searchJobSourceWhere"/>
+    </select>
+
+    <select id="searchJobSource" parameterType="neatlogic.framework.scheduler.dto.ScheduleJobSourceSearchVo"
+            resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        SELECT s.`job_name` AS jobName,
+               s.`job_group` AS jobGroup,
+               s.`server_id` AS serverId,
+               s.`server_group` AS serverGroup,
+               s.`fcu`,
+               s.`fcd`
+        <include refid="searchJobSourceFrom"/>
+        <include refid="searchJobSourceWhere"/>
+        ORDER BY s.`fcd` DESC, s.`job_name`, s.`job_group`
+        LIMIT #{startNum}, #{pageSize}
+    </select>
+
+    <!-- 返回全部非空服务器组；编辑控件仍允许录入新的服务器组。 -->
+    <!--<select id="getJobSourceServerGroupList" resultType="java.lang.String">
+        SELECT DISTINCT `server_group`
+        FROM `schedule_job_source`
+        WHERE `server_group` IS NOT NULL
+          AND `server_group` != ''
+        ORDER BY `server_group`
+    </select>-->
+
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
         UPDATE
             `schedule_job_lock`
@@ -431,6 +491,16 @@
             need_audit = #{needAudit}
         WHERE uuid = #{uuid}
     </update>
+
+    <!-- 使用(job_name, job_group)复合主键批量修改服务器组，兼容单行编辑和批量编辑。 -->
+    <!--<update id="updateJobSourceServerGroup">
+        UPDATE `schedule_job_source`
+        SET `server_group` = #{serverGroup}
+        WHERE (`job_name`, `job_group`) IN
+        <foreach collection="jobSourceList" item="jobSource" open="(" separator="," close=")">
+            (#{jobSource.jobName}, #{jobSource.jobGroup})
+        </foreach>
+    </update>-->
 
     <update id="updateJobStatus" parameterType="neatlogic.framework.scheduler.dto.JobStatusVo">
         UPDATE schedule_job_status
@@ -517,6 +587,29 @@
                 #{serverGroup},
                 #{fcu},
                 NOW(3))
+    </insert>
+
+    <insert id="insertJobSourceList" parameterType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        INSERT INTO schedule_job_source
+        (`job_name`,
+         `job_group`,
+         `server_id`,
+         `server_group`,
+         `fcu`,
+         `fcd`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+             #{item.jobName},
+             #{item.jobGroup},
+             #{item.serverId},
+             #{item.serverGroup},
+             #{item.fcu},
+             NOW(3)
+        )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            `server_group` = VALUES(`server_group`)
     </insert>
 
     <insert id="insertJobStatus" parameterType="neatlogic.framework.scheduler.dto.JobStatusVo">

@@ -12,17 +12,36 @@
 
 package neatlogic.framework.scheduler.dto;
 
+import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
+import neatlogic.framework.restful.annotation.EntityField;
 
+/**
+ * 定时作业来源信息。
+ * 既承载schedule_job_source表的主键和服务器归属，也提供管理页需要的作业显示信息。
+ */
 public class ScheduleJobSourceVo extends BaseEditorVo {
     private static final long serialVersionUID = -5352259213757469975L;
 
+    @EntityField(name = "作业唯一标识", type = ApiParamType.STRING)
     private String jobName;
 
+    @EntityField(name = "作业组", type = ApiParamType.STRING)
     private String jobGroup;
 
+//    @EntityField(name = "作业名称", type = ApiParamType.STRING)
+//    private String name;
+//
+//    @EntityField(name = "作业处理器类路径", type = ApiParamType.STRING)
+//    private String handler;
+//
+//    @EntityField(name = "作业模块", type = ApiParamType.STRING)
+//    private String handlerName;
+
+    @EntityField(name = "服务器ID", type = ApiParamType.INTEGER)
     private Integer serverId;
 
+    @EntityField(name = "服务器组", type = ApiParamType.STRING)
     private String serverGroup;
 
     public String getJobName() {
@@ -40,6 +59,44 @@ public class ScheduleJobSourceVo extends BaseEditorVo {
     public void setJobGroup(String jobGroup) {
         this.jobGroup = jobGroup;
     }
+
+//    public String getName() {
+//        return name;
+//    }
+//
+//    public void setName(String name) {
+//        this.name = name;
+//    }
+//
+//    public String getHandler() {
+//        return handler;
+//    }
+//
+//    public void setHandler(String handler) {
+//        this.handler = handler;
+//    }
+
+    /**
+     * 优先返回注册的作业处理器名称；内部作业处理器不存在时回退到作业组，保证列表有可识别信息。
+     *
+     * @return 作业模块显示名称
+     */
+//    public String getHandlerName() {
+//        if (StringUtils.isNotBlank(handlerName)) {
+//            return handlerName;
+//        }
+//        if (StringUtils.isNotBlank(handler)) {
+//            JobClassVo jobClassVo = SchedulerManager.getJobClassByClassName(handler);
+//            if (jobClassVo != null && StringUtils.isNotBlank(jobClassVo.getName())) {
+//                handlerName = jobClassVo.getName();
+//            }
+//        }
+//        return StringUtils.defaultIfBlank(handlerName, jobGroup);
+//    }
+//
+//    public void setHandlerName(String handlerName) {
+//        this.handlerName = handlerName;
+//    }
 
     public Integer getServerId() {
         return serverId;

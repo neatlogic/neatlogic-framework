@@ -45,6 +45,8 @@ public interface SchedulerMapper {
 
     List<JobLockVo> getJobLockByServerId(Integer serverId);
 
+    List<JobLockVo> getAllJobLockList();
+
     String getJobLastExecAuditStartTime(@Param("jobUuid") String jobUuid, @Param("status") String status);
 
     List<JobDataVo> getJobData(JobDataVo jobDataVo);
@@ -55,6 +57,8 @@ public interface SchedulerMapper {
     List<JobLoadVo> getJobLoadListByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
     ScheduleJobSourceVo getJobSourceByJobNameAndJobGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
+
+    List<ScheduleJobSourceVo> getAllJobSourceList();
 
 //    JobLoadTimeVo getJobLoadTime(JobLoadTimeVo jobLoadTimeVo);
 
@@ -75,6 +79,8 @@ public interface SchedulerMapper {
     int insertJob(JobVo job);
 
     int insertJobSource(ScheduleJobSourceVo jobSource);
+
+    int insertJobSourceList(List<ScheduleJobSourceVo> jobSourceList);
 
     int insertJobStatus(JobStatusVo jobStatus);
 

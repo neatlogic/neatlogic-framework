@@ -357,6 +357,15 @@
         WHERE server_id = #{value}
     </select>
 
+    <select id="getAllJobLockList" resultType="neatlogic.framework.scheduler.dto.JobLockVo">
+        SELECT `job_name`    as jobName,
+               `job_group`   as jobGroup,
+               `job_handler` as jobHandler,
+               `lock`,
+               `server_id`   as serverId
+        FROM `schedule_job_lock`
+    </select>
+
     <!--<select id="getJobLoadTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadTimeVo" resultType="neatlogic.framework.scheduler.dto.JobLoadTimeVo">
         SELECT
             `job_name` AS jobName,
@@ -407,10 +416,25 @@
             `server_id` AS serverId,
             `server_group` AS serverGroup,
             `fcu`,
-            `fcd`
+            `fcd`,
+            `lcu`,
+            `lcd`
         FROM `schedule_job_source`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
+    </select>
+
+    <select id="getAllJobSourceList" resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        SELECT
+            `job_name` AS jobName,
+            `job_group` AS jobGroup,
+            `server_id` AS serverId,
+            `server_group` AS serverGroup,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        FROM `schedule_job_source`
     </select>
 
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
@@ -510,13 +534,46 @@
          `server_id`,
          `server_group`,
          `fcu`,
-         `fcd`)
+         `fcd`,
+         `lcu`,
+         `lcd`)
         VALUES (#{jobName},
                 #{jobGroup},
                 #{serverId},
                 #{serverGroup},
                 #{fcu},
+                NOW(3),
+                #{lcu},
                 NOW(3))
+    </insert>
+
+    <insert id="insertJobSourceList" parameterType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        INSERT INTO schedule_job_source
+        (`job_name`,
+         `job_group`,
+         `server_id`,
+         `server_group`,
+         `fcu`,
+         `fcd`,
+         `lcu`,
+         `lcd`)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+        (
+             #{item.jobName},
+             #{item.jobGroup},
+             #{item.serverId},
+             #{item.serverGroup},
+             #{item.fcu},
+             NOW(3),
+             #{item.lcu},
+             NOW(3)
+        )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            `server_group` = VALUES(`server_group`),
+            `lcu` = VALUES(`lcu`),
+            `lcd` = VALUES(`lcd`)
     </insert>
 
     <insert id="insertJobStatus" parameterType="neatlogic.framework.scheduler.dto.JobStatusVo">

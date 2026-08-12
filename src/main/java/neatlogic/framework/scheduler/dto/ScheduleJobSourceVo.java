@@ -14,12 +14,20 @@ package neatlogic.framework.scheduler.dto;
 
 import neatlogic.framework.common.dto.BaseEditorVo;
 
+/**
+ * 定时作业来源信息。
+ * 既承载schedule_job_source表的主键和服务器归属，也提供管理页需要的作业显示信息。
+ */
 public class ScheduleJobSourceVo extends BaseEditorVo {
     private static final long serialVersionUID = -5352259213757469975L;
 
     private String jobName;
 
     private String jobGroup;
+
+    private String handler;
+
+    private String handlerName;
 
     private Integer serverId;
 
@@ -39,6 +47,22 @@ public class ScheduleJobSourceVo extends BaseEditorVo {
 
     public void setJobGroup(String jobGroup) {
         this.jobGroup = jobGroup;
+    }
+
+    public String getHandler() {
+        return handler;
+    }
+
+    public void setHandler(String handler) {
+        this.handler = handler;
+    }
+
+    public String getHandlerName() {
+        return handlerName;
+    }
+
+    public void setHandlerName(String handlerName) {
+        this.handlerName = handlerName;
     }
 
     public Integer getServerId() {

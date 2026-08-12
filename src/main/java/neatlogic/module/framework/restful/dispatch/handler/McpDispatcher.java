@@ -245,11 +245,13 @@ public class McpDispatcher {
             return false;
         }
 
+        // PAT 查询到的实名用户不携带租户字段，需要使用 URL 租户补齐后再写入 UserContext。
+        userVo.setTenant(tenant);
         userVo.setAuthorization(authorization);
         AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
-        UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
-        request.setAttribute("userId", userVo.getUserId());
-        request.setAttribute("userName", userVo.getUserName());
+        UserContext userContext = UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
+        request.setAttribute("userId", userContext.getUserId());
+        request.setAttribute("userName", userContext.getUserName());
         return true;
     }
 

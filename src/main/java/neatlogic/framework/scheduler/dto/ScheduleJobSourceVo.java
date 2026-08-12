@@ -12,9 +12,7 @@
 
 package neatlogic.framework.scheduler.dto;
 
-import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
-import neatlogic.framework.restful.annotation.EntityField;
 
 /**
  * 定时作业来源信息。
@@ -23,22 +21,16 @@ import neatlogic.framework.restful.annotation.EntityField;
 public class ScheduleJobSourceVo extends BaseEditorVo {
     private static final long serialVersionUID = -5352259213757469975L;
 
-    @EntityField(name = "作业唯一标识", type = ApiParamType.STRING)
     private String jobName;
 
-    @EntityField(name = "作业组", type = ApiParamType.STRING)
     private String jobGroup;
 
-    @EntityField(name = "作业处理器类路径", type = ApiParamType.STRING)
     private String handler;
 
-    @EntityField(name = "作业模块", type = ApiParamType.STRING)
     private String handlerName;
 
-    @EntityField(name = "服务器ID", type = ApiParamType.INTEGER)
     private Integer serverId;
 
-    @EntityField(name = "服务器组", type = ApiParamType.STRING)
     private String serverGroup;
 
     public String getJobName() {

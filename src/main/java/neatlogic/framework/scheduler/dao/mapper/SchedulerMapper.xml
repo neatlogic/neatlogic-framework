@@ -72,14 +72,6 @@
         AND `job_group` = #{jobGroup}
     </select>
 
-    <!--<select id="getAllJobStatusList" resultType="neatlogic.framework.scheduler.dto.JobStatusVo">
-        &lt;!&ndash;这是一级缓存的干扰器，不要删除 ${timestamp}&ndash;&gt;
-        SELECT `job_name` as jobName,
-        `job_group` as jobGroup,
-        `handler`
-        FROM `schedule_job_status`
-    </select>-->
-
     <select id="getJobByHandler" parameterType="java.lang.String" resultMap="jobMap">
         SELECT a.`uuid`,
                a.`name`,
@@ -416,13 +408,6 @@
         WHERE `job_name` = #{jobName}
         AND `job_group` = #{jobGroup}
     </select>
-
-<!--    <select id="getAllJobLoadList" resultType="neatlogic.framework.scheduler.dto.JobLoadVo">-->
-<!--        SELECT DISTINCT-->
-<!--            `job_name` AS jobName,-->
-<!--            `job_group` AS jobGroup-->
-<!--        FROM `schedule_job_load`-->
-<!--    </select>-->
 
     <select id="getJobSourceByJobNameAndJobGroup" resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
         SELECT

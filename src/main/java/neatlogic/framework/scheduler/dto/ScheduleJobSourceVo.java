@@ -32,11 +32,11 @@ public class ScheduleJobSourceVo extends BaseEditorVo {
 //    @EntityField(name = "作业名称", type = ApiParamType.STRING)
 //    private String name;
 //
-//    @EntityField(name = "作业处理器类路径", type = ApiParamType.STRING)
-//    private String handler;
-//
-//    @EntityField(name = "作业模块", type = ApiParamType.STRING)
-//    private String handlerName;
+    @EntityField(name = "作业处理器类路径", type = ApiParamType.STRING)
+    private String handler;
+
+    @EntityField(name = "作业模块", type = ApiParamType.STRING)
+    private String handlerName;
 
     @EntityField(name = "服务器ID", type = ApiParamType.INTEGER)
     private Integer serverId;
@@ -68,20 +68,21 @@ public class ScheduleJobSourceVo extends BaseEditorVo {
 //        this.name = name;
 //    }
 //
-//    public String getHandler() {
-//        return handler;
-//    }
-//
-//    public void setHandler(String handler) {
-//        this.handler = handler;
-//    }
+    public String getHandler() {
+        return handler;
+    }
+
+    public void setHandler(String handler) {
+        this.handler = handler;
+    }
 
     /**
      * 优先返回注册的作业处理器名称；内部作业处理器不存在时回退到作业组，保证列表有可识别信息。
      *
      * @return 作业模块显示名称
      */
-//    public String getHandlerName() {
+    public String getHandlerName() {
+        return handlerName;
 //        if (StringUtils.isNotBlank(handlerName)) {
 //            return handlerName;
 //        }
@@ -92,11 +93,11 @@ public class ScheduleJobSourceVo extends BaseEditorVo {
 //            }
 //        }
 //        return StringUtils.defaultIfBlank(handlerName, jobGroup);
-//    }
-//
-//    public void setHandlerName(String handlerName) {
-//        this.handlerName = handlerName;
-//    }
+    }
+
+    public void setHandlerName(String handlerName) {
+        this.handlerName = handlerName;
+    }
 
     public Integer getServerId() {
         return serverId;

@@ -27,6 +27,8 @@ public interface SchedulerMapper {
 
     JobStatusVo getJobStatusByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup, @Param("timestamp") Long timestamp);
 
+//    List<JobStatusVo> getAllJobStatusList();
+
     List<JobVo> getJobByHandler(String handler);
 
     int searchJobCount(JobVo jobVo);
@@ -45,6 +47,8 @@ public interface SchedulerMapper {
 
     List<JobLockVo> getJobLockByServerId(Integer serverId);
 
+    List<JobLockVo> getAllJobLockList();
+
     String getJobLastExecAuditStartTime(@Param("jobUuid") String jobUuid, @Param("status") String status);
 
     List<JobDataVo> getJobData(JobDataVo jobDataVo);
@@ -54,13 +58,17 @@ public interface SchedulerMapper {
 
     List<JobLoadVo> getJobLoadListByJobNameGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
+//    List<JobLoadVo> getAllJobLoadList();
+
     ScheduleJobSourceVo getJobSourceByJobNameAndJobGroup(@Param("jobName") String jobName, @Param("jobGroup") String jobGroup);
 
     /** 查询作业来源总数，供管理页分页使用。 */
-    int searchJobSourceCount(ScheduleJobSourceSearchVo searchVo);
+//    int searchJobSourceCount(ScheduleJobSourceSearchVo searchVo);
 
     /** 查询作业来源列表，并补充作业名称和处理器信息。 */
-    List<ScheduleJobSourceVo> searchJobSource(ScheduleJobSourceSearchVo searchVo);
+//    List<ScheduleJobSourceVo> searchJobSource(ScheduleJobSourceSearchVo searchVo);
+
+    List<ScheduleJobSourceVo> getAllJobSourceList();
 
     /** 查询已有服务器组，供管理页编辑控件复用。 */
 //    List<String> getJobSourceServerGroupList();

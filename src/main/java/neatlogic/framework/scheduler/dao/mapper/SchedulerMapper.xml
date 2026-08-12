@@ -72,6 +72,14 @@
         AND `job_group` = #{jobGroup}
     </select>
 
+    <!--<select id="getAllJobStatusList" resultType="neatlogic.framework.scheduler.dto.JobStatusVo">
+        &lt;!&ndash;这是一级缓存的干扰器，不要删除 ${timestamp}&ndash;&gt;
+        SELECT `job_name` as jobName,
+        `job_group` as jobGroup,
+        `handler`
+        FROM `schedule_job_status`
+    </select>-->
+
     <select id="getJobByHandler" parameterType="java.lang.String" resultMap="jobMap">
         SELECT a.`uuid`,
                a.`name`,
@@ -357,6 +365,15 @@
         WHERE server_id = #{value}
     </select>
 
+    <select id="getAllJobLockList" resultType="neatlogic.framework.scheduler.dto.JobLockVo">
+        SELECT `job_name`    as jobName,
+               `job_group`   as jobGroup,
+               `job_handler` as jobHandler,
+               `lock`,
+               `server_id`   as serverId
+        FROM `schedule_job_lock`
+    </select>
+
     <!--<select id="getJobLoadTime" parameterType="neatlogic.framework.scheduler.dto.JobLoadTimeVo" resultType="neatlogic.framework.scheduler.dto.JobLoadTimeVo">
         SELECT
             `job_name` AS jobName,
@@ -400,6 +417,13 @@
         AND `job_group` = #{jobGroup}
     </select>
 
+<!--    <select id="getAllJobLoadList" resultType="neatlogic.framework.scheduler.dto.JobLoadVo">-->
+<!--        SELECT DISTINCT-->
+<!--            `job_name` AS jobName,-->
+<!--            `job_group` AS jobGroup-->
+<!--        FROM `schedule_job_load`-->
+<!--    </select>-->
+
     <select id="getJobSourceByJobNameAndJobGroup" resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
         SELECT
             `job_name` AS jobName,
@@ -432,7 +456,7 @@
     </sql>
 
     <!-- 关联配置表和运行态表，仅用于补充作业来源管理页的显示名称与作业模块。 -->
-    <sql id="searchJobSourceFrom">
+    <!--<sql id="searchJobSourceFrom">
         FROM `schedule_job_source` s
         LEFT JOIN `schedule_job` sj
             ON sj.`uuid` = s.`job_name`
@@ -462,6 +486,16 @@
         <include refid="searchJobSourceWhere"/>
         ORDER BY s.`fcd` DESC, s.`job_name`, s.`job_group`
         LIMIT #{startNum}, #{pageSize}
+    </select>-->
+
+    <select id="getAllJobSourceList" resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
+        SELECT s.`job_name` AS jobName,
+        s.`job_group` AS jobGroup,
+        s.`server_id` AS serverId,
+        s.`server_group` AS serverGroup,
+        s.`fcu`,
+        s.`fcd`
+        FROM `schedule_job_source` s
     </select>
 
     <!-- 返回全部非空服务器组；编辑控件仍允许录入新的服务器组。 -->

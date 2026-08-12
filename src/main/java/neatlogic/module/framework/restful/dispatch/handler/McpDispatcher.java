@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/mcp/api")
+@RequestMapping("/api/mcp")
 public class McpDispatcher {
     private static final String DEFAULT_PROTOCOL_VERSION = "2025-11-25";
     private static final Set<String> SUPPORT_PROTOCOL_VERSION_SET = new HashSet<>(Arrays.asList("2025-06-18", "2025-11-25"));

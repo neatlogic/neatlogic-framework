@@ -73,6 +73,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     public void destroy() {
     }
 
+    /**
+     * MCP 接口由 McpDispatcher 独立处理租户和认证，避免普通登录认证链提前拦截请求。
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String contextPath = StringUtils.defaultString(request.getContextPath());
+        return request.getRequestURI().startsWith(contextPath + "/api/mcp/");
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         Cookie[] cookies = request.getCookies();

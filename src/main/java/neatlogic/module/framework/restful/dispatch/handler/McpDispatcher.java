@@ -3,8 +3,12 @@ package neatlogic.module.framework.restful.dispatch.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.common.util.TenantUtil;
+import neatlogic.framework.dto.AuthenticationInfoVo;
+import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.type.ApiNotFoundException;
@@ -17,6 +21,10 @@ import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.mcp.McpToolMetadataBuilder;
+import neatlogic.framework.service.AuthenticationInfoService;
+import neatlogic.framework.util.TimeUtil;
+import neatlogic.module.framework.filter.handler.BearerTokenAuthHandler;
+import neatlogic.module.framework.filter.handler.DefaultLoginAuthHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.stereotype.Controller;
@@ -38,10 +46,21 @@ public class McpDispatcher {
     @Resource
     private ApiMapper apiMapper;
 
-    @PostMapping({"", "/{scope}"})
-    public void dispatch(@PathVariable(value = "scope", required = false) String scope, @RequestBody String body, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @Resource
+    private BearerTokenAuthHandler bearerTokenAuthHandler;
+
+    @Resource
+    private DefaultLoginAuthHandler defaultLoginAuthHandler;
+
+    @Resource
+    private AuthenticationInfoService authenticationInfoService;
+
+    @PostMapping({"/{tenant}", "/{tenant}/{scope}"})
+    public void dispatch(@PathVariable("tenant") String tenant, @PathVariable(value = "scope", required = false) String scope, @RequestBody String body, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
-            validContext(request);
+            if (!initContext(tenant, request, response)) {
+                return;
+            }
             Object payload = parseRequestBody(body);
             if (payload instanceof JSONObject) {
                 JSONObject resp = handleSingleRequest(normalizeScope(scope), (JSONObject) payload, request, response);
@@ -74,13 +93,13 @@ public class McpDispatcher {
         }
     }
 
-    @GetMapping({"", "/{scope}"})
-    public void get(@PathVariable(value = "scope", required = false) String scope, HttpServletResponse response) {
+    @GetMapping({"/{tenant}", "/{tenant}/{scope}"})
+    public void get(@PathVariable("tenant") String tenant, @PathVariable(value = "scope", required = false) String scope, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
-    @DeleteMapping({"", "/{scope}"})
-    public void delete(@PathVariable(value = "scope", required = false) String scope, HttpServletRequest request, HttpServletResponse response) {
+    @DeleteMapping({"/{tenant}", "/{tenant}/{scope}"})
+    public void delete(@PathVariable("tenant") String tenant, @PathVariable(value = "scope", required = false) String scope, HttpServletRequest request, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 
@@ -198,16 +217,42 @@ public class McpDispatcher {
         return result;
     }
 
-    private void validContext(HttpServletRequest request) throws PermissionDeniedException {
-        if (TenantContext.get() == null || StringUtils.isBlank(TenantContext.get().getTenantUuid())) {
-            throw new PermissionDeniedException();
+    /**
+     * 根据地址中的租户和请求认证信息初始化 MCP 调用上下文。
+     * 外部客户端使用标准 Bearer PAT，内部 Autoexec 回环保留 BUILDIN 签名认证。
+     */
+    private boolean initContext(String tenant, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        RequestContext.init(request, request.getRequestURI(), response);
+        if (StringUtils.isBlank(tenant) || !TenantUtil.hasTenant(tenant)) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return false;
         }
-        UserContext userContext = UserContext.get();
-        if (userContext == null || StringUtils.isBlank(userContext.getUserId())) {
-            throw new PermissionDeniedException();
+        TenantContext.init().switchTenant(tenant);
+
+        String authorization = request.getHeader("Authorization");
+        UserVo userVo = null;
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            userVo = bearerTokenAuthHandler.myAuth(request);
+        } else if (authorization != null && authorization.startsWith("Bearer_")) {
+            // BUILDIN 会同时携带签名中的租户和 Tenant 头，URL 租户必须与它们一致。
+            if (Objects.equals(tenant, request.getHeader("Tenant"))) {
+                userVo = defaultLoginAuthHandler.myAuth(request);
+            }
         }
+        if (userVo == null || StringUtils.isBlank(userVo.getUuid()) || StringUtils.isBlank(userVo.getUserId())) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setHeader("WWW-Authenticate", "Bearer realm=\"neatlogic-mcp\"");
+            return false;
+        }
+
+        // PAT 查询到的实名用户不携带租户字段，需要使用 URL 租户补齐后再写入 UserContext。
+        userVo.setTenant(tenant);
+        userVo.setAuthorization(authorization);
+        AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+        UserContext userContext = UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
         request.setAttribute("userId", userContext.getUserId());
         request.setAttribute("userName", userContext.getUserName());
+        return true;
     }
 
     private JSONArray listTools(String scope) throws CloneNotSupportedException {

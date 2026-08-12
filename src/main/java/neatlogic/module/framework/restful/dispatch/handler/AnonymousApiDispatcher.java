@@ -345,7 +345,7 @@ public class AnonymousApiDispatcher {
             }
             if (StringUtils.isNotBlank(jsonStr)) {
                 try {
-                    paramObj = JSONObject.parseObject(jsonStr);
+                    paramObj = JSON.parseObject(jsonStr);
                 } catch (Exception e) {
                     throw new ParamJSONIrregularException();
                 }
@@ -705,7 +705,7 @@ public class AnonymousApiDispatcher {
             }
             if (StringUtils.isNotBlank(jsonStr)) {
                 try {
-                    paramObj = JSONObject.parseObject(jsonStr);
+                    paramObj = JSON.parseObject(jsonStr);
                 } catch (Exception e) {
                     throw new ParamJSONIrregularException();
                 }

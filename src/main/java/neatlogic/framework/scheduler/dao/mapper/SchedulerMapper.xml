@@ -416,20 +416,25 @@
             `server_id` AS serverId,
             `server_group` AS serverGroup,
             `fcu`,
-            `fcd`
+            `fcd`,
+            `lcu`,
+            `lcd`
         FROM `schedule_job_source`
         WHERE `job_name` = #{jobName}
           AND `job_group` = #{jobGroup}
     </select>
 
     <select id="getAllJobSourceList" resultType="neatlogic.framework.scheduler.dto.ScheduleJobSourceVo">
-        SELECT s.`job_name` AS jobName,
-        s.`job_group` AS jobGroup,
-        s.`server_id` AS serverId,
-        s.`server_group` AS serverGroup,
-        s.`fcu`,
-        s.`fcd`
-        FROM `schedule_job_source` s
+        SELECT
+            `job_name` AS jobName,
+            `job_group` AS jobGroup,
+            `server_id` AS serverId,
+            `server_group` AS serverGroup,
+            `fcu`,
+            `fcd`,
+            `lcu`,
+            `lcd`
+        FROM `schedule_job_source`
     </select>
 
     <update id="resetJobLockByServerId" parameterType="java.lang.Integer">
@@ -529,12 +534,16 @@
          `server_id`,
          `server_group`,
          `fcu`,
-         `fcd`)
+         `fcd`,
+         `lcu`,
+         `lcd`)
         VALUES (#{jobName},
                 #{jobGroup},
                 #{serverId},
                 #{serverGroup},
                 #{fcu},
+                NOW(3),
+                #{lcu},
                 NOW(3))
     </insert>
 
@@ -545,7 +554,9 @@
          `server_id`,
          `server_group`,
          `fcu`,
-         `fcd`)
+         `fcd`,
+         `lcu`,
+         `lcd`)
         VALUES
         <foreach collection="list" item="item" separator=",">
         (
@@ -554,11 +565,15 @@
              #{item.serverId},
              #{item.serverGroup},
              #{item.fcu},
+             NOW(3),
+             #{item.lcu},
              NOW(3)
         )
         </foreach>
         ON DUPLICATE KEY UPDATE
-            `server_group` = VALUES(`server_group`)
+            `server_group` = VALUES(`server_group`),
+            `lcu` = VALUES(`lcu`),
+            `lcd` = VALUES(`lcd`)
     </insert>
 
     <insert id="insertJobStatus" parameterType="neatlogic.framework.scheduler.dto.JobStatusVo">

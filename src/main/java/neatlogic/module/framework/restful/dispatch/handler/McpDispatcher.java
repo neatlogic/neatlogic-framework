@@ -15,6 +15,7 @@ import neatlogic.framework.exception.type.ApiNotFoundException;
 import neatlogic.framework.exception.type.ComponentNotFoundException;
 import neatlogic.framework.exception.type.ParamNotExistsException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
+import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
@@ -230,8 +231,9 @@ public class McpDispatcher {
         TenantContext.init().switchTenant(tenant);
 
         String authorization = request.getHeader("Authorization");
+        boolean isPat = authorization != null && authorization.startsWith("Bearer ");
         UserVo userVo = null;
-        if (authorization != null && authorization.startsWith("Bearer ")) {
+        if (isPat) {
             userVo = bearerTokenAuthHandler.myAuth(request);
         } else if (authorization != null && authorization.startsWith("Bearer_")) {
             // BUILDIN 会同时携带签名中的租户和 Tenant 头，URL 租户必须与它们一致。
@@ -247,8 +249,13 @@ public class McpDispatcher {
 
         // PAT 查询到的实名用户不携带租户字段，需要使用 URL 租户补齐后再写入 UserContext。
         userVo.setTenant(tenant);
-        userVo.setAuthorization(authorization);
         AuthenticationInfoVo authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userVo.getUuid());
+        if (isPat) {
+            // PAT 仅用于 MCP 入口认证，内部 BUILDIN 调用改用当前用户的签名 JWT。
+            LoginAuthHandlerBase.buildJwt(userVo, authenticationInfoVo, bearerTokenAuthHandler.getType());
+        } else {
+            userVo.setAuthorization(authorization);
+        }
         UserContext userContext = UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
         request.setAttribute("userId", userContext.getUserId());
         request.setAttribute("userName", userContext.getUserName());

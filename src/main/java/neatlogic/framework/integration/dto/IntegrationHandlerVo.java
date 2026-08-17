@@ -19,6 +19,10 @@ public class IntegrationHandlerVo {
 	private List<PatternVo> outputPattern;
 	@EntityField(name = "是否拥有参数模板", type = ApiParamType.INTEGER)
 	private Integer hasPattern;
+	@EntityField(name = "是否拥有输入参数模板", type = ApiParamType.INTEGER)
+	private Integer hasInputPattern;
+	@EntityField(name = "是否拥有输出参数模板", type = ApiParamType.INTEGER)
+	private Integer hasOutputPattern;
 	@EntityField(name = "支持的请求方式", type = ApiParamType.JSONARRAY)
 	private String[] methodList;
 
@@ -80,6 +84,34 @@ public class IntegrationHandlerVo {
 
 	public void setHasPattern(Integer hasPattern) {
 		this.hasPattern = hasPattern;
+	}
+
+	public Integer getHasInputPattern() {
+		if (hasInputPattern == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				hasInputPattern = integrationHandler.hasInputPattern();
+			}
+		}
+		return hasInputPattern;
+	}
+
+	public void setHasInputPattern(Integer hasInputPattern) {
+		this.hasInputPattern = hasInputPattern;
+	}
+
+	public Integer getHasOutputPattern() {
+		if (hasOutputPattern == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				hasOutputPattern = integrationHandler.hasOutputPattern();
+			}
+		}
+		return hasOutputPattern;
+	}
+
+	public void setHasOutputPattern(Integer hasOutputPattern) {
+		this.hasOutputPattern = hasOutputPattern;
 	}
 
 	public String[] getMethodList() {

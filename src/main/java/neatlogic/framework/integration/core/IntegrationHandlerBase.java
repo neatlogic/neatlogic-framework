@@ -138,7 +138,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         if (paramObj != null && paramObj.getInteger("needValid") != null && paramObj.getInteger("needValid").equals(1)) {
             List<PatternVo> patternList;
             // 包含内置参数
-            if (this.hasPattern().equals(1)) {
+            if (Integer.valueOf(1).equals(this.hasInputPattern())) {
                 patternList = this.getInputPattern();
             } else {// 自定义参数
                 patternList = new ArrayList<>();

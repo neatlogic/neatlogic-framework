@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.regex.Pattern;
@@ -48,6 +49,35 @@ public class Md5Util {
                     hexString.append(0);
                 }
                 hexString.append(shaHex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return "00000000000000000000000000000000";
+    }
+
+    /**
+     * 使用UTF-8字符集生成MD5，适用于需要跨服务节点稳定比较的内容指纹。
+     *
+     * @param content 待计算内容
+     * @return 32位小写MD5
+     */
+    public static String encryptMD5Utf8(String content) {
+        if (content == null) {
+            content = "";
+        }
+        try {
+            MessageDigest mdInst = MessageDigest.getInstance("MD5");
+            mdInst.update(content.getBytes(StandardCharsets.UTF_8));
+            byte[] md = mdInst.digest();
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : md) {
+                String md5Hex = Integer.toHexString(b & 0xFF);
+                if (md5Hex.length() < 2) {
+                    hexString.append('0');
+                }
+                hexString.append(md5Hex);
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {

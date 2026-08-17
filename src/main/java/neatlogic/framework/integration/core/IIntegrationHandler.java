@@ -24,6 +24,22 @@ public interface IIntegrationHandler {
 
     Integer hasPattern();
 
+    /**
+     * 输入参数是否使用处理器固定规范。
+     * 默认兼容旧处理器的统一参数规范开关。
+     */
+    default Integer hasInputPattern() {
+        return hasPattern();
+    }
+
+    /**
+     * 输出参数是否使用处理器固定规范。
+     * 默认兼容旧处理器的统一参数规范开关。
+     */
+    default Integer hasOutputPattern() {
+        return hasPattern();
+    }
+
     List<PatternVo> getInputPattern();
 
     List<PatternVo> getOutputPattern();

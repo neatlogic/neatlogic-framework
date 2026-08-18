@@ -61,7 +61,8 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     @EntityField(name = "用户名", type = ApiParamType.STRING)
     private String username;
     @EntityField(name = "密码", type = ApiParamType.STRING)
-    private String password;
+    @JSONField(serialize = false)
+    private transient String password;
     @EntityField(name = "认证方式", type = ApiParamType.STRING)
     private List<String> authTypeList = new ArrayList<>(List.of(ApiAuthType.HMAC.getValue()));
     @EntityField(name = "认证方式明", type = ApiParamType.STRING)
@@ -115,7 +116,8 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     private String authType;
 
     //明文
-    private String passwordPlain;
+    @JSONField(serialize = false)
+    private transient String passwordPlain;
     //密文
     private String passwordCipher;
 

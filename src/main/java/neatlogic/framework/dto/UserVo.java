@@ -50,7 +50,8 @@ public class UserVo extends BaseEditorVo implements Serializable {
     private String tenant;
     @EntityField(name = "邮箱", type = ApiParamType.STRING)
     private String email;
-    private String password;
+    @JSONField(serialize = false)
+    private transient String password;
     private String roleUuid;
     @EntityField(name = "是否激活(1:激活;0:未激活)", type = ApiParamType.INTEGER)
     private Integer isActive;

@@ -12,6 +12,7 @@
 
 package neatlogic.framework.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.util.PassWordUtil;
@@ -27,7 +28,8 @@ public class DatasourceVo implements Serializable {
     private Integer port;
     private String url;
     private String username;
-    private String passwordPlain;
+    @JSONField(serialize = false)
+    private transient String passwordPlain;
     private String passwordCipher;
     private String driver = "com.mysql.cj.jdbc.Driver";
 

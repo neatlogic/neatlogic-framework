@@ -12,6 +12,7 @@
 
 package neatlogic.framework.datawarehouse.dto;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,7 +22,8 @@ public class ConnectionVo {
     private String url;
     private String username;
     private String databaseVersion;
-    private String passwordPlain;
+    @JSONField(serialize = false)
+    private transient String passwordPlain;
     private String passwordCipher;
 
     public String getUrl() {

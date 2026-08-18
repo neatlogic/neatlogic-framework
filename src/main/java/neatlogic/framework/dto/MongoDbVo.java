@@ -25,7 +25,8 @@ public class MongoDbVo {
     private String host;
     private String database;
     private String username;
-    private String passwordPlain;
+    @JSONField(serialize = false)
+    private transient String passwordPlain;
     private String passwordCipher;
     private String option;
 

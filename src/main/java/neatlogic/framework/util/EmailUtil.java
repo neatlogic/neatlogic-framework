@@ -7,6 +7,7 @@ import jakarta.mail.*;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
 import neatlogic.framework.common.constvalue.MimeType;
+import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.MailServerVo;
 import neatlogic.framework.dto.NotifyConfigVo;
@@ -95,10 +96,11 @@ public class EmailUtil {
 
         Session session;
         if (StringUtils.isNotBlank(mailServerVo.getUserName()) && StringUtils.isNotBlank(mailServerVo.getPassword())) {
+            String password = RC4Util.decrypt(mailServerVo.getPassword());
             session = Session.getInstance(props, new Authenticator() {
                 @Override
                 protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(mailServerVo.getUserName(), mailServerVo.getPassword());
+                    return new PasswordAuthentication(mailServerVo.getUserName(), password);
                 }
             });
         } else {

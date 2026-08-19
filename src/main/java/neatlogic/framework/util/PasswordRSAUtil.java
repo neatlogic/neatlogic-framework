@@ -40,7 +40,11 @@ public final class PasswordRSAUtil {
     /** 前后端约定的RSA密码密文前缀。 */
     public static final String ENCRYPTED_PREFIX = "{RSA}";
     public static final String ALGORITHM = "RSA-OAEP-256";
+    /** JCE使用的RSA-OAEP算法名称，加密和解密必须保持一致。 */
+    private static final String CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     private static final int KEY_SIZE = 2048;
+    /** 2048位RSA使用OAEP-SHA256时，单次允许加密的最大明文字节数。 */
+    private static final int MAX_PLAINTEXT_BYTE_LENGTH = 190;
     private static final String KEY_DIRECTORY = "cmdb-key";
     private static final String PRIVATE_KEY_FILE = "account-password-rsa-private.key";
     private static final KeyPair KEY_PAIR = loadOrGenerateKeyPair();
@@ -156,6 +160,31 @@ public final class PasswordRSAUtil {
     }
 
     /**
+     * 使用已加载的公钥加密明文密码，并增加用于标识RSA密文的前缀。
+     *
+     * @param plainPassword 待加密的明文密码
+     * @return 带{RSA}前缀的Base64密文
+     */
+    public static String encrypt(String plainPassword) {
+        if (plainPassword == null) {
+            throw new IllegalArgumentException("待加密密码不能为空");
+        }
+        byte[] plainData = plainPassword.getBytes(StandardCharsets.UTF_8);
+        if (plainData.length > MAX_PLAINTEXT_BYTE_LENGTH) {
+            throw new IllegalArgumentException("密码内容过长，无法进行RSA加密");
+        }
+        try {
+            // 使用与前端Web Crypto一致的OAEP-SHA256参数，保证前后端密文可以统一解密。
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            cipher.init(Cipher.ENCRYPT_MODE, KEY_PAIR.getPublic(), OAEP_PARAMETER_SPEC);
+            byte[] encryptedData = cipher.doFinal(plainData);
+            return ENCRYPTED_PREFIX + Base64.getEncoder().encodeToString(encryptedData);
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("密码RSA加密失败", e);
+        }
+    }
+
+    /**
      * 使用已加载的私钥解密前端提交的 Base64 密文。
      */
     public static String decrypt(String encryptedPassword) {
@@ -164,7 +193,7 @@ public final class PasswordRSAUtil {
             String ciphertext = isEncrypted(encryptedPassword)
                     ? encryptedPassword.substring(ENCRYPTED_PREFIX.length())
                     : encryptedPassword;
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWithSHA-256AndMGF1Padding");
+            Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate(), OAEP_PARAMETER_SPEC);
             byte[] decryptedData = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
             return new String(decryptedData, StandardCharsets.UTF_8);

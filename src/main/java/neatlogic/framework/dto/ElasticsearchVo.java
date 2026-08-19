@@ -14,6 +14,7 @@ package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
 
@@ -23,7 +24,8 @@ public class ElasticsearchVo {
     private String tenantUuid;
     private String host;
     private String username;
-    private String passwordPlain;
+    @JSONField(serialize = false)
+    private transient String passwordPlain;
     private String passwordCipher;
     private JSONObject config;
     private String configStr;

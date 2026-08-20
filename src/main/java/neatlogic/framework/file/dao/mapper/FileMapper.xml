@@ -166,6 +166,16 @@
         WHERE id = #{id}
     </update>
 
+    <update id="updateFileTypeByIdList">
+        UPDATE `file`
+        SET `type` = #{targetType}
+        WHERE LOWER(`type`) = LOWER(#{sourceType})
+          AND `id` IN
+        <foreach collection="idList" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
     <insert id="insertFile" parameterType="neatlogic.framework.file.dto.FileVo">
         INSERT INTO `file` (`id`,
                             `name`,

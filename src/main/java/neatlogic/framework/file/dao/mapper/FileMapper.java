@@ -37,6 +37,10 @@ public interface FileMapper {
 
     void updateFile(FileVo fileVo);
 
+    int updateFileTypeByIdList(@Param("idList") List<Long> idList,
+                               @Param("sourceType") String sourceType,
+                               @Param("targetType") String targetType);
+
     int insertFile(FileVo fileVo);
 
     void saveFileTypeConfig(FileTypeVo fileTypeVo);

@@ -14,11 +14,11 @@ package neatlogic.framework.exception.util;
 
 import neatlogic.framework.exception.core.ApiRuntimeException;
 
-public class PasswordDecryptException extends ApiRuntimeException {
+public class PasswordEncryptException extends ApiRuntimeException {
 
-    private static final long serialVersionUID = -4632626576072818774L;
+    private static final long serialVersionUID = -4632626576772818674L;
 
-    public PasswordDecryptException(Throwable cause) {
-        super("nfeu.passworddecryptexception.passworddecryptexception", cause);
+    public PasswordEncryptException(Throwable cause) {
+        super("密码RSA加密失败", cause);
     }
 }

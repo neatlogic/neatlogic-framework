@@ -40,7 +40,7 @@ public class GetPasswordPublicKeyApi extends PrivateApiComponentBase {
 
     @Override
     public String getName() {
-        return "获取密码RSA加密公钥";
+        return "nmfra.getpasswordpublickeyapi.getname";
     }
 
     @Override
@@ -50,9 +50,9 @@ public class GetPasswordPublicKeyApi extends PrivateApiComponentBase {
 
 
     @Output({
-            @Param(name = "publicKey", type = ApiParamType.STRING, desc = "RSA公钥"),
+            @Param(name = "publicKey", type = ApiParamType.STRING, desc = "common.rsapublickey"),
     })
-    @Description(desc = "获取密码RSA加密公钥")
+    @Description(desc = "nmfra.getpasswordpublickeyapi.getname")
     @Override
     public Object myDoService(JSONObject paramObj) {
         JSONObject resultObj = new JSONObject();

@@ -13,6 +13,9 @@
 package neatlogic.framework.util;
 
 import neatlogic.framework.exception.util.PasswordDecryptException;
+import neatlogic.framework.exception.util.PasswordEncryptException;
+import neatlogic.framework.exception.util.PasswordTooLongException;
+import neatlogic.framework.exception.util.RSAPrivateKeyInitializationFailedException;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.OAEPParameterSpec;
@@ -62,15 +65,15 @@ public final class PasswordRSAUtil {
      *
      * @return 2048 位 RSA 密钥对
      */
-    private static KeyPair generateKeyPair() {
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(KEY_SIZE);
-            return keyPairGenerator.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("当前运行环境不支持RSA算法", e);
-        }
-    }
+//    private static KeyPair generateKeyPair() {
+//        try {
+//            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+//            keyPairGenerator.initialize(KEY_SIZE);
+//            return keyPairGenerator.generateKeyPair();
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new IllegalStateException("当前运行环境不支持RSA算法", e);
+//        }
+//    }
 
     /**
      * 优先加载已持久化的私钥；首次运行时生成密钥对并原子写入data.home目录。
@@ -142,7 +145,7 @@ public final class PasswordRSAUtil {
             RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(rsaPrivateKey.getModulus(), rsaPrivateKey.getPublicExponent());
             return new KeyPair(keyFactory.generatePublic(publicKeySpec), privateKey);
         } catch (Exception e) {
-            throw new IllegalStateException("账号密码RSA密钥初始化失败", e);
+            throw new RSAPrivateKeyInitializationFailedException(e);
         }
     }
 
@@ -183,11 +186,11 @@ public final class PasswordRSAUtil {
      */
     public static String encrypt(String plainPassword) {
         if (plainPassword == null) {
-            throw new IllegalArgumentException("待加密密码不能为空");
+            return null;
         }
         byte[] plainData = plainPassword.getBytes(StandardCharsets.UTF_8);
         if (plainData.length > MAX_PLAINTEXT_BYTE_LENGTH) {
-            throw new IllegalArgumentException("密码内容过长，无法进行RSA加密");
+            throw new PasswordTooLongException();
         }
         try {
             // 使用与前端Web Crypto一致的OAEP-SHA256参数，保证前后端密文可以统一解密。
@@ -196,7 +199,7 @@ public final class PasswordRSAUtil {
             byte[] encryptedData = cipher.doFinal(plainData);
             return ENCRYPTED_PREFIX + Base64.getEncoder().encodeToString(encryptedData);
         } catch (GeneralSecurityException e) {
-            throw new IllegalStateException("密码RSA加密失败", e);
+            throw new PasswordEncryptException(e);
         }
     }
 

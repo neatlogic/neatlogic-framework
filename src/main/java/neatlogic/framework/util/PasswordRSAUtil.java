@@ -38,7 +38,7 @@ import java.util.UUID;
 public final class PasswordRSAUtil {
 
     /** 前后端约定的RSA密码密文前缀。 */
-    public static final String ENCRYPTED_PREFIX = "{RSA}";
+    public static final String ENCRYPTED_PREFIX = "RSA:";
     public static final String ALGORITHM = "RSA-OAEP-256";
     /** JCE使用的RSA-OAEP算法名称，加密和解密必须保持一致。 */
     private static final String CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
@@ -163,7 +163,7 @@ public final class PasswordRSAUtil {
      * 使用已加载的公钥加密明文密码，并增加用于标识RSA密文的前缀。
      *
      * @param plainPassword 待加密的明文密码
-     * @return 带{RSA}前缀的Base64密文
+     * @return 带RSA:前缀的Base64密文
      */
     public static String encrypt(String plainPassword) {
         if (plainPassword == null) {
@@ -189,7 +189,7 @@ public final class PasswordRSAUtil {
      */
     public static String decrypt(String encryptedPassword) {
         try {
-            // Base64解码前移除用于区分历史密码格式的{RSA}前缀。
+            // Base64解码前移除用于区分历史密码格式的RSA:前缀。
             String ciphertext = isEncrypted(encryptedPassword)
                     ? encryptedPassword.substring(ENCRYPTED_PREFIX.length())
                     : encryptedPassword;

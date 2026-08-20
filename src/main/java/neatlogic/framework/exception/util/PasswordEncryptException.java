@@ -19,6 +19,6 @@ public class PasswordEncryptException extends ApiRuntimeException {
     private static final long serialVersionUID = -4632626576772818674L;
 
     public PasswordEncryptException(Throwable cause) {
-        super("密码RSA加密失败", cause);
+        super("nfeu.passwordencryptexception.passwordencryptexception", cause);
     }
 }

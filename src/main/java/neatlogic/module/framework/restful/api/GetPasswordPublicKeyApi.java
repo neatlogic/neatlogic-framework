@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 @Service
 @AuthAction(action = NoAuth.class)
 @OperationType(type = OperationTypeEnum.SEARCH)
-public class PasswordPublicKeyGetApi extends PrivateApiComponentBase {
+public class GetPasswordPublicKeyApi extends PrivateApiComponentBase {
 
     @Override
     public String getToken() {
@@ -51,7 +51,6 @@ public class PasswordPublicKeyGetApi extends PrivateApiComponentBase {
 
     @Output({
             @Param(name = "publicKey", type = ApiParamType.STRING, desc = "RSA公钥"),
-//            @Param(name = "algorithm", type = ApiParamType.STRING, desc = "RSA加密算法")
     })
     @Description(desc = "获取密码RSA加密公钥")
     @Override
@@ -59,7 +58,6 @@ public class PasswordPublicKeyGetApi extends PrivateApiComponentBase {
         JSONObject resultObj = new JSONObject();
         // 公钥使用X.509 SPKI Base64格式，可直接供浏览器Web Crypto导入。
         resultObj.put("publicKey", PasswordRSAUtil.getPublicKey());
-//        resultObj.put("algorithm", PasswordRSAUtil.ALGORITHM);
         return resultObj;
     }
 }

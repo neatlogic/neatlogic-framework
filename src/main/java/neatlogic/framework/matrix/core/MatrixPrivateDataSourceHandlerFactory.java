@@ -150,7 +150,7 @@ public class MatrixPrivateDataSourceHandlerFactory extends ModuleInitializedList
             matrixVo.setUuid(uuid);
             matrixVo.setName(name);
             matrixVo.setLabel(matrixPrivateDataSourceHandler.getLabel());
-            matrixVo.setType(MatrixType.PRIVATE.getValue());
+            matrixVo.setType("private");// MatrixType.PRIVATE.getValue()
             list.add(matrixVo);
             nameList.add(name);
             map.put(uuid, matrixPrivateDataSourceHandler);

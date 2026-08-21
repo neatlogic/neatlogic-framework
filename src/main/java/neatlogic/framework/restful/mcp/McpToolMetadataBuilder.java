@@ -8,6 +8,7 @@ import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ClassUtils;
 
@@ -24,7 +25,7 @@ public class McpToolMetadataBuilder {
         JSONObject apiObj = new JSONObject();
         apiObj.put("name", getToolName(api));
         apiObj.put("title", api.getName());
-        apiObj.put("description", api.getDescription());
+        apiObj.put("description", $.t(api.getDescription()));
         apiObj.put("inputSchema", getInputSchema(api));
         JSONObject annotations = getToolAnnotations(api);
         if (!annotations.isEmpty()) {

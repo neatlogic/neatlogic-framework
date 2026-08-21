@@ -32,7 +32,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
 
     @Resource
@@ -50,7 +50,7 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
         List<ViewStatusInfo> resultList = new ArrayList<>();
         int rowNum = matrixMapper.getMatrixViewCount();
         if (rowNum > 0) {
-            ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler(MatrixType.VIEW.getValue());
+            ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler("view");// MatrixType.VIEW.getValue()
             BasePageVo searchVo = new BasePageVo();
             searchVo.setRowNum(rowNum);
             searchVo.setPageSize(100);
@@ -98,7 +98,7 @@ public class MatrixViewRebuildHandler implements IRebuildDataBaseView {
         List<ViewStatusInfo> resultList = Collections.synchronizedList(new ArrayList<>());
         int rowNum = matrixMapper.getMatrixViewCount();
         if (rowNum > 0) {
-            ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler(MatrixType.VIEW.getValue());
+            ViewDataSourceHandler viewDataSourceHandler = (ViewDataSourceHandler) MatrixDataSourceHandlerFactory.getHandler("view");// MatrixType.VIEW.getValue()
             BasePageVo searchVo = new BasePageVo();
             searchVo.setRowNum(rowNum);
             searchVo.setPageSize(100);

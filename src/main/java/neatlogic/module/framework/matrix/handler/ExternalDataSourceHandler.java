@@ -56,7 +56,7 @@ import java.util.*;
  * @author linbq
  * @since 2021/11/4 19:34
  **/
-@Component
+//@Component
 public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     private final static Logger logger = LoggerFactory.getLogger(ExternalDataSourceHandler.class);
@@ -66,7 +66,8 @@ public class ExternalDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     public String getHandler() {
-        return MatrixType.EXTERNAL.getValue();
+        return "external";
+//        return MatrixType.EXTERNAL.getValue();
     }
 
     @Override

@@ -39,7 +39,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
@@ -52,7 +52,8 @@ public class PrivateDataSourceHandler extends MatrixDataSourceHandlerBase {
     private RoleMapper roleMapper;
     @Override
     public String getHandler() {
-        return MatrixType.PRIVATE.getValue();
+        return "private";
+//        return MatrixType.PRIVATE.getValue();
     }
 
     @Override

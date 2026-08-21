@@ -23,9 +23,10 @@ import java.util.List;
 
 public enum MatrixType implements IMatrixType, IEnum {
     CUSTOM("custom", new I18n("自定义数据源"), "custom", 1),
-    EXTERNAL("external", new I18n("外部数据源"), "integrationUuid", 2),
-    PRIVATE("private", new I18n("私有数据源"), "private", 5),
-    VIEW("view", new I18n("数据库视图"), "fileId", 3);
+//    EXTERNAL("external", new I18n("外部数据源"), "integrationUuid", 2),
+//    PRIVATE("private", new I18n("私有数据源"), "private", 5),
+//    VIEW("view", new I18n("数据库视图"), "fileId", 3)
+    ;
 
     private String value;
     private I18n name;

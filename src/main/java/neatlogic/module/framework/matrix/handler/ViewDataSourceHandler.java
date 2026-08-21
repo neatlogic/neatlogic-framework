@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
  * @author linbq
  * @since 2021/11/4 19:34
  **/
-@Component
+//@Component
 public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Resource
@@ -75,7 +75,8 @@ public class ViewDataSourceHandler extends MatrixDataSourceHandlerBase {
 
     @Override
     public String getHandler() {
-        return MatrixType.VIEW.getValue();
+        return "view";
+//        return MatrixType.VIEW.getValue();
     }
 
     @Override

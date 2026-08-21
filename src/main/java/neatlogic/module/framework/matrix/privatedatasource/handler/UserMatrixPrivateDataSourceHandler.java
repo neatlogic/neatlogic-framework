@@ -21,7 +21,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class UserMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSourceHandler {
 
     private final List<MatrixAttributeVo> matrixAttributeList = new ArrayList<>();

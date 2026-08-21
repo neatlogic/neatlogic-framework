@@ -35,7 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Component
+//@Component
 public class MatrixIntegrationHandler extends IntegrationHandlerBase {
 
     @Override

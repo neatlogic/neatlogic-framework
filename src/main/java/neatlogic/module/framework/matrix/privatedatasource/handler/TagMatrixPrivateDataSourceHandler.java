@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.util.*;
 
-@Component
+//@Component
 public class TagMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSourceHandler {
 
     private final List<MatrixAttributeVo> matrixAttributeList = new ArrayList<>();

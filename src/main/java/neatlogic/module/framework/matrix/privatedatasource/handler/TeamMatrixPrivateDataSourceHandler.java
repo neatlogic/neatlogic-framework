@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class TeamMatrixPrivateDataSourceHandler implements IMatrixPrivateDataSourceHandler {
 
     private final List<MatrixAttributeVo> matrixAttributeList = new ArrayList<>();

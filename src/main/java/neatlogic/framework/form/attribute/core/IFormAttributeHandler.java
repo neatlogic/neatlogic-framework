@@ -245,4 +245,12 @@ public interface IFormAttributeHandler {
     default boolean checkWhetherTwoAttributeCanBeAssignedToEachOther(FormAttributeVo fromFormAttributeVo, FormAttributeVo toFormAttributeVo) {
         return Objects.equals(fromFormAttributeVo.getHandler(), toFormAttributeVo.getHandler());
     }
+
+    /**
+     * 保存属性数据后需要的自定义操作
+     *
+     */
+    default void beforeSaveData(AttributeDataVo attributeDataVo, FormAttributeVo fromAttributeVo, Long sourceId, String source) {
+
+    }
 }

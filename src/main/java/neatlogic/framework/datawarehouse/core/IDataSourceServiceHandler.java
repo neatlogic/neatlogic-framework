@@ -28,5 +28,7 @@ public interface IDataSourceServiceHandler {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void syncData(DataSourceVo dataSourceVo, DataSourceAuditVo reportDataSourceAuditVo);
 
-    JSONObject getDataSourceTypeGroup(String keyword);
+    default JSONObject getDataSourceTypeGroup(String keyword) {
+        return null;
+    }
 }

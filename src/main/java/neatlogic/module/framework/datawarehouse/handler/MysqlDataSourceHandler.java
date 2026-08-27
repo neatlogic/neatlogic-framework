@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.module.framework.datawarehouse.handler;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerBase;
 import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
@@ -220,5 +221,16 @@ public class MysqlDataSourceHandler extends DataSourceServiceHandlerBase {
         }*/
         //什么都没则返回默认连接
         return dataSource.getConnection();
+    }
+
+    @Override
+    public JSONObject getDataSourceTypeGroup(String keyword) {
+        JSONArray mysqlChildren = new JSONArray();
+        if (StringUtils.isBlank(keyword) || getHandler().toLowerCase().contains(keyword.toLowerCase())) {
+            mysqlChildren.fluentAdd(new JSONObject().fluentPut("value", getHandler()).fluentPut("text", getHandler()));
+        }
+        return new JSONObject()
+                .fluentPut("value", getHandler()).fluentPut("text", getHandler())
+                .fluentPut("children", mysqlChildren );
     }
 }

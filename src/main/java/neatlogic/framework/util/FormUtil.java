@@ -371,7 +371,13 @@ public class FormUtil {
      */
     public static List<FormAttributeVo> getAllFormAttributeList(JSONObject formConfig) {
         JSONArray tableList = formConfig.getJSONArray("tableList");
-        return getAllFormAttributeList(tableList, null);
+        List<FormAttributeVo> formAttributeList = getAllFormAttributeList(tableList, null);
+        JSONArray hideComponentList = formConfig.getJSONArray("hideComponentList");
+        if (CollectionUtils.isNotEmpty(hideComponentList)) {
+            List<FormAttributeVo> formHideAttributeList = getAllFormHideAttributeList(hideComponentList, null);
+            formAttributeList.addAll(formHideAttributeList);
+        }
+        return formAttributeList;
     }
 
     /**
@@ -467,6 +473,21 @@ public class FormUtil {
                 continue;
             }
             resultList.addAll(getFormAttributeList(componentObj, parent));
+        }
+        return resultList;
+    }
+
+    private static List<FormAttributeVo> getAllFormHideAttributeList(JSONArray hideComponentList, FormAttributeParentVo parent) {
+        List<FormAttributeVo> resultList = new ArrayList<>();
+        if (CollectionUtils.isEmpty(hideComponentList)) {
+            return resultList;
+        }
+        for (int i = 0; i < hideComponentList.size(); i++) {
+            JSONObject cellObj = hideComponentList.getJSONObject(i);
+            if (MapUtils.isEmpty(cellObj)) {
+                continue;
+            }
+            resultList.addAll(getFormAttributeList(cellObj, parent));
         }
         return resultList;
     }

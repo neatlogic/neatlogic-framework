@@ -17,6 +17,7 @@ import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.util.$;
 
 public class JobClassVo extends BasePageVo {
     public final static String PUBLIC = "public";
@@ -52,7 +53,7 @@ public class JobClassVo extends BasePageVo {
     }
 
     public String getName() {
-        return name;
+        return $.t(name);
     }
 
     public String getClassName() {

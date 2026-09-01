@@ -12,6 +12,7 @@
 
 package neatlogic.framework.datawarehouse.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.datawarehouse.dto.DataSourceAuditVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,4 +27,8 @@ public interface IDataSourceServiceHandler {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void syncData(DataSourceVo dataSourceVo, DataSourceAuditVo reportDataSourceAuditVo);
+
+    default JSONObject getDataSourceTypeGroup(String keyword) {
+        return null;
+    }
 }

@@ -20,6 +20,7 @@ import neatlogic.framework.restful.core.IApiComponent;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dao.mapper.ApiMapper;
 import neatlogic.framework.restful.dto.ApiVo;
+import neatlogic.framework.restful.enums.ApiAccessType;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.mcp.McpToolMetadataBuilder;
 import neatlogic.framework.service.AuthenticationInfoService;
@@ -56,12 +57,17 @@ public class McpDispatcher {
     @Resource
     private AuthenticationInfoService authenticationInfoService;
 
+    /**
+     * 处理单条或批量 MCP HTTP 请求，仅 tools/call 会进入具体 API 的审计链路。
+     */
     @PostMapping({"/{tenant}", "/{tenant}/{scope}"})
     public void dispatch(@PathVariable("tenant") String tenant, @PathVariable(value = "scope", required = false) String scope, @RequestBody String body, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             if (!initContext(tenant, request, response)) {
                 return;
             }
+            // 访问类型由服务端分派入口写入请求属性，避免客户端伪造并保持并发请求隔离。
+            request.setAttribute(ApiAccessType.REQUEST_ATTRIBUTE, ApiAccessType.MCP.getValue());
             Object payload = parseRequestBody(body);
             if (payload instanceof JSONObject) {
                 JSONObject resp = handleSingleRequest(normalizeScope(scope), (JSONObject) payload, request, response);
@@ -352,15 +358,23 @@ public class McpDispatcher {
                 .collect(Collectors.toMap(ApiVo::getToken, api -> api, (a, b) -> a, HashMap::new));
     }
 
+    /**
+     * 使用请求级 API 元数据副本执行 MCP 工具，避免租户配置和访问类型污染共享注册信息。
+     */
     private Object invokeApi(String token, JSONObject arguments) throws Exception {
         ApiVo dbApiVo = apiMapper.getApiByToken(token);
         if (dbApiVo == null || !Objects.equals(dbApiVo.getIsMcp(), 1) || !Objects.equals(dbApiVo.getIsActive(), 1)) {
             throw new PermissionDeniedException("api is not mcp service: " + token);
         }
-        ApiVo apiVo = PrivateApiComponentFactory.getApiByToken(token);
-        if (apiVo == null) {
+        ApiVo registeredApiVo = PrivateApiComponentFactory.getApiByToken(token);
+        if (registeredApiVo == null) {
             throw new ApiNotFoundException(token);
         }
+        // MCP 调用使用请求级副本合并租户配置，不能修改全局注册的 API 元数据。
+        ApiVo apiVo = registeredApiVo.clone();
+        apiVo.setNeedAudit(dbApiVo.getNeedAudit());
+        apiVo.setQps(dbApiVo.getQps());
+        apiVo.setIsActive(dbApiVo.getIsActive());
         if (!Objects.equals(ApiType.OBJECT.getValue(), apiVo.getType())) {
             throw new PermissionDeniedException("api type is not supported by mcp: " + token);
         }

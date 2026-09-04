@@ -19,6 +19,7 @@ import neatlogic.framework.crossover.ICrossoverService;
 import neatlogic.framework.file.core.IEvent;
 import neatlogic.framework.restful.dao.mapper.ApiAuditMapper;
 import neatlogic.framework.restful.dto.ApiAuditVo;
+import neatlogic.framework.restful.enums.ApiAccessType;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -33,11 +34,15 @@ public class ApiAuditAppendPostProcessor implements Consumer<IEvent>, ICrossover
     @Resource
     private ApiAuditMapper apiAuditMapper;
 
+    /**
+     * 根据已写入日志文件的事件快照生成数据库索引记录。
+     */
     @Override
     public void accept(IEvent event) {
         JSONObject data = event.getData();
         ApiAuditVo apiAuditVo = new ApiAuditVo();
         apiAuditVo.setToken(data.getString("token"));
+        apiAuditVo.setType(ApiAccessType.normalize(data.get("type")));
         apiAuditVo.setUserUuid(data.getString("userUuid"));
         apiAuditVo.setAuthtype(data.getString("authtype"));
         apiAuditVo.setIp(data.getString("ip"));

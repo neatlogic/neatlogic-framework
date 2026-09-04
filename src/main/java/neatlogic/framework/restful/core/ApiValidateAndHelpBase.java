@@ -41,6 +41,7 @@ import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.reflection.ReflectionManager;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.dto.ApiVo;
+import neatlogic.framework.restful.enums.ApiAccessType;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.XssUtil;
@@ -65,11 +66,15 @@ import java.util.Objects;
 public class ApiValidateAndHelpBase {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
 
+    /**
+     * 保存 JSON 参数类型 API 的审计事件快照。
+     */
     protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
         HttpServletRequest request = RequestContext.get().getRequest();
         String requestIp = IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
+        data.put("type", getApiAccessType(request));
 //        data.put("authtype", apiVo.getAuthtype());
         data.put("userUuid", UserContext.get().getUserUuid());
         data.put("ip", requestIp);
@@ -89,12 +94,16 @@ public class ApiValidateAndHelpBase {
         AppenderManager.execute(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor, AuditType.API_AUDIT));
     }
 
+    /**
+     * 保存字符串参数类型 API 的审计事件快照。
+     */
     protected void saveAudit(ApiVo apiVo, String param, Object result, String error, Long startTime, Long endTime) {
         UserContext userContext = UserContext.get();
         HttpServletRequest request = RequestContext.get().getRequest();
         String requestIp = IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
+        data.put("type", getApiAccessType(request));
 //        data.put("authtype", apiVo.getAuthtype());
         data.put("userUuid", userContext.getUserUuid());
         data.put("ip", requestIp);
@@ -112,6 +121,13 @@ public class ApiValidateAndHelpBase {
         ApiAuditAppendPostProcessor appendPostProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPostProcessor.class);
         ApiAuditAppendPreProcessor appendPreProcessor = CrossoverServiceFactory.getApi(ApiAuditAppendPreProcessor.class);
         AppenderManager.execute(new Event(apiVo.getToken(), startTime, data, appendPreProcessor, appendPostProcessor, AuditType.API_AUDIT));
+    }
+
+    /**
+     * 从服务端请求属性读取审计访问类型，普通 API 和缺少请求上下文的内部调用默认按 REST 记录。
+     */
+    private String getApiAccessType(HttpServletRequest request) {
+        return ApiAccessType.normalize(request == null ? null : request.getAttribute(ApiAccessType.REQUEST_ATTRIBUTE));
     }
 
 

@@ -39,6 +39,8 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
     @EntityField(name = "地址", type = ApiParamType.STRING)
     @ExcelField(name = "token")
     private String token;
+    @EntityField(name = "common.accesstype", type = ApiParamType.ENUM)
+    private String type;
     @EntityField(name = "用户ID", type = ApiParamType.STRING)
     private String userUuid;
     @EntityField(name = "认证方式", type = ApiParamType.STRING)
@@ -134,6 +136,14 @@ public class ApiAuditVo extends BasePageVo implements AuditVoHandler {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUserUuid() {

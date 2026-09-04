@@ -8,6 +8,9 @@
         FROM `api_audit` a
         LEFT JOIN `user` u ON u.`uuid` = a.`user_uuid`
         WHERE a.`token` = #{token}
+        <if test="type != null and type != ''">
+            AND a.`type` = #{type}
+        </if>
         AND a.`start_time` &gt;= #{startTime}
         AND a.`end_time` &lt;= #{endTime}
         <if test="userUuidList != null and userUuidList.size() > 0">
@@ -34,6 +37,7 @@
             resultType="neatlogic.framework.restful.dto.ApiAuditVo" useCache="false">
         SELECT a.`id`,
         a.`token`,
+        a.`type`,
         a.`user_uuid` AS userUuid,
         u.`user_name` AS userName,
         a.`authtype`,
@@ -89,6 +93,7 @@
             resultType="neatlogic.framework.restful.dto.ApiAuditVo" useCache="false">
         select api_audit.id as id,
         `api_audit`.`token` as token,
+        `api_audit`.`type` as type,
         `api_audit`.`user_uuid` as userUuid,
         `api_audit`.`authtype` as authtype,
         `api_audit`.`server_id` as serverId,
@@ -166,6 +171,7 @@
             resultType="neatlogic.framework.restful.dto.ApiAuditVo" useCache="false">
         select CONCAT(api_audit.id,'') as id,
         `api_audit`.`token` as token,
+        `api_audit`.`type` as type,
         -- `api_audit`.`user_uuid` as userUuid,
         `api_audit`.`authtype` as authtype,
         CONCAT(`api_audit`.`server_id`,'') as serverId,
@@ -233,6 +239,7 @@
     <insert id="insertApiAudit" parameterType="neatlogic.framework.restful.dto.ApiAuditVo">
         INSERT INTO `api_audit` (`id`,
                                  `token`,
+                                 `type`,
                                  `user_uuid`,
                                  `authtype`,
                                  `server_id`,
@@ -246,6 +253,7 @@
                                  `error_file_path`)
         VALUES (#{id},
                 #{token},
+                COALESCE(#{type}, 'rest'),
                 #{userUuid},
                 #{authtype},
                 #{serverId},

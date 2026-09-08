@@ -210,7 +210,7 @@ public final class PasswordRSAUtil {
             return null;
         }
         byte[] plainData = plainPassword.getBytes(StandardCharsets.UTF_8);
-        if (plainData.length > MAX_PLAINTEXT_BYTE_LENGTH) {
+        if (plainData.length > getMaxPlaintextByteLength()) {
             throw new PasswordTooLongException();
         }
         try {

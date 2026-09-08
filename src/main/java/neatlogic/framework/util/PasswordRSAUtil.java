@@ -175,6 +175,24 @@ public final class PasswordRSAUtil {
     }
 
     /**
+     * RSA密钥长度统一为8192位。
+     * @return
+     */
+    public static int getKeySize() {
+        PrivateKey privateKey = KEY_PAIR.getPrivate();
+        RSAPrivateCrtKey rsaPrivateKey = (RSAPrivateCrtKey) privateKey;
+        return rsaPrivateKey.getModulus().bitLength();
+    }
+
+    /**
+     * 8192位RSA使用OAEP-SHA256时，单次允许加密的最大明文字节数为8192/8-2*32-2=958。
+     * @return
+     */
+    public static int getMaxPlaintextByteLength() {
+        return getKeySize() / 8 - 2 * 32 - 2;
+    }
+
+    /**
      * 判断密码是否为前端生成的RSA密文。
      */
     public static boolean isEncrypted(String password) {

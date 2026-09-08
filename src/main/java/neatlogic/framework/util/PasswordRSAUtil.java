@@ -188,10 +188,9 @@ public final class PasswordRSAUtil {
         if (plainPassword == null) {
             return null;
         }
-        // 超过190位的密码，不加密
         byte[] plainData = plainPassword.getBytes(StandardCharsets.UTF_8);
         if (plainData.length > MAX_PLAINTEXT_BYTE_LENGTH) {
-            return plainPassword;
+            throw new PasswordTooLongException();
         }
         try {
             // 使用与前端Web Crypto一致的OAEP-SHA256参数，保证前后端密文可以统一解密。
@@ -208,12 +207,11 @@ public final class PasswordRSAUtil {
      * 使用已加载的私钥解密前端提交的 Base64 密文。
      */
     public static String decrypt(String encryptedPassword) {
-        if (!isEncrypted(encryptedPassword)) {
-            return encryptedPassword;
-        }
         try {
             // Base64解码前移除用于区分历史密码格式的RSA:前缀。
-            String ciphertext = encryptedPassword.substring(ENCRYPTED_PREFIX.length());
+            String ciphertext = isEncrypted(encryptedPassword)
+                    ? encryptedPassword.substring(ENCRYPTED_PREFIX.length())
+                    : encryptedPassword;
             Cipher cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate(), OAEP_PARAMETER_SPEC);
             byte[] decryptedData = cipher.doFinal(Base64.getDecoder().decode(ciphertext));

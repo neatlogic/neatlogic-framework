@@ -83,6 +83,46 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
 
     }
 
+    /** Index existing object JSON only; attachments are streamed by the existing import stages. */
+    private static Map<String, Map<String, ImportExportVo>> readImportObjects(MultipartFile file) throws IOException {
+        Map<String, Map<String, ImportExportVo>> result = new HashMap<>();
+        try (ZipInputStream input = new ZipInputStream(file.getInputStream());
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[1024];
+            ZipEntry entry;
+            while ((entry = input.getNextEntry()) != null) {
+                if (entry.isDirectory() || entry.getName().startsWith("attachment-folder/")
+                        || !entry.getName().endsWith(".json")) {
+                    continue;
+                }
+                output.reset();
+                int length;
+                while ((length = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, length);
+                }
+                ImportExportVo info = JSONObject.parseObject(new String(output.toByteArray(), StandardCharsets.UTF_8), ImportExportVo.class);
+                result.computeIfAbsent(info.getType(), key -> new HashMap<>())
+                        .put(String.valueOf(info.getPrimaryKey()), info);
+            }
+        }
+        return result;
+    }
+
+    /** Preserve old summaries when their payload is absent; complete VOs implement the same base contract. */
+    static List<ImportExportBaseInfoVo> completeDependencyInfo(List<ImportExportBaseInfoVo> summaries,
+            Map<String, Map<String, ImportExportVo>> objects) {
+        if (summaries == null) {
+            return null;
+        }
+        List<ImportExportBaseInfoVo> result = new ArrayList<>();
+        for (ImportExportBaseInfoVo summary : summaries) {
+            Map<String, ImportExportVo> typed = objects.get(summary.getType());
+            ImportExportVo complete = typed == null ? null : typed.get(String.valueOf(summary.getPrimaryKey()));
+            result.add(complete == null ? summary : complete);
+        }
+        return result;
+    }
+
     /**
      * 导入数据
      *
@@ -110,6 +150,8 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
             try (ZipInputStream zipIs = new ZipInputStream(multipartFile.getInputStream());
                  ByteArrayOutputStream out = new ByteArrayOutputStream()
             ) {
+                // Full dependency data is already in the package; keep business identity out of the framework schema.
+                Map<String, Map<String, ImportExportVo>> importObjects = readImportObjects(multipartFile);
                 ZipEntry zipEntry = null;
                 while ((zipEntry = zipIs.getNextEntry()) != null) {
                     if (zipEntry.isDirectory()) {
@@ -153,12 +195,13 @@ public class ImportExportHandlerFactory extends ModuleInitializedListenerBase {
                         boolean alreadyExists = false;
                         JSONObject resultObj = new JSONObject();
                         ImportExportBaseInfoVo mainImportExportBaseInfoVo = new ImportExportBaseInfoVo(mainImportExportVo.getType(), mainImportExportVo.getPrimaryKey(), mainImportExportVo.getName());
-                        if (importExportHandler.checkIsExists(mainImportExportBaseInfoVo)) {
+                        if (importExportHandler.checkIsExists(mainImportExportVo)) {
                             mainImportExportBaseInfoVo.setType(importExportHandler.getType().getText());
                             resultObj.put("alreadyExists", mainImportExportBaseInfoVo);
                             alreadyExists = true;
                         }
-                        List<ImportExportBaseInfoVo> dependencyBaseInfoList = mainImportExportVo.getDependencyBaseInfoList();
+                        List<ImportExportBaseInfoVo> dependencyBaseInfoList = completeDependencyInfo(
+                                mainImportExportVo.getDependencyBaseInfoList(), importObjects);
                         if (CollectionUtils.isNotEmpty(dependencyBaseInfoList) && StringUtils.isBlank(userSelection)) {
                             List<ImportDependencyTypeVo> importDependencyTypeList = importExportHandler.checkDependencyList(dependencyBaseInfoList);
                             if (CollectionUtils.isNotEmpty(importDependencyTypeList)) {

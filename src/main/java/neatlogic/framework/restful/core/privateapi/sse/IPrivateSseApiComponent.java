@@ -27,7 +27,7 @@ import org.springframework.util.ClassUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface IPrivateSseApiComponent {
+public interface IPrivateSseApiComponent extends neatlogic.framework.restful.core.IApiExampleProvider {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default String getClassName() {
@@ -62,11 +62,6 @@ public interface IPrivateSseApiComponent {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     JSONObject help();
-
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    default JSONObject example() {
-        return null;
-    }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     default ApiAnonymousAccessSupportEnum supportAnonymousAccess() {

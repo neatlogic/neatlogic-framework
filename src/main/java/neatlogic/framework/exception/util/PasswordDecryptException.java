@@ -21,4 +21,8 @@ public class PasswordDecryptException extends ApiRuntimeException {
     public PasswordDecryptException(Throwable cause) {
         super("nfeu.passworddecryptexception.passworddecryptexception", cause);
     }
+
+    public PasswordDecryptException() {
+        super("nfeu.passworddecryptexception.passworddecryptexception");
+    }
 }

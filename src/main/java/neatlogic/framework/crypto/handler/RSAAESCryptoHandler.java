@@ -78,16 +78,16 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
         if (separatorIndex <= ENCRYPTED_PREFIX.length()
                 || separatorIndex != encryptedPassword.lastIndexOf(HYBRID_SECTION_SEPARATOR)
                 || separatorIndex == encryptedPassword.length() - HYBRID_SECTION_SEPARATOR.length()) {
-            throw new PasswordDecryptException("账号密码混合密文格式不正确");
+            throw new PasswordDecryptException();
         }
         String encryptedAesKeyBase64 = encryptedPassword.substring(ENCRYPTED_PREFIX.length(), separatorIndex);
         String aesPayloadBase64 = encryptedPassword.substring(separatorIndex + HYBRID_SECTION_SEPARATOR.length());
 
         byte[] aesPayload = Base64.getDecoder().decode(aesPayloadBase64);
-        int minimumPayloadLength = GCM_IV_BYTE_LENGTH + GCM_TAG_BIT_LENGTH / Byte.SIZE;
-        if (aesPayload.length < minimumPayloadLength) {
-            throw new PasswordDecryptException("账号密码AES密文长度不正确");
-        }
+//        int minimumPayloadLength = GCM_IV_BYTE_LENGTH + GCM_TAG_BIT_LENGTH / Byte.SIZE;
+//        if (aesPayload.length < minimumPayloadLength) {
+//            throw new PasswordDecryptException("账号密码AES密文长度不正确");
+//        }
         byte[] iv = Arrays.copyOfRange(aesPayload, 0, GCM_IV_BYTE_LENGTH);
         byte[] encryptedPasswordAndTag = Arrays.copyOfRange(aesPayload, GCM_IV_BYTE_LENGTH, aesPayload.length);
         try {

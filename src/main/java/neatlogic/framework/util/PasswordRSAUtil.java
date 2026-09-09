@@ -32,7 +32,7 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 
 /**
- * 账号密码传输用AES-GCM与RSA-OAEP混合加密工具。
+ * 账号密码传输用RSA加密工具。
  */
 public final class PasswordRSAUtil {
 
@@ -48,8 +48,6 @@ public final class PasswordRSAUtil {
     private static final int AES_KEY_SIZE = 256;
     /** 密码正文和AES密钥分别采用的加密算法标识。 */
     public static final String ALGORITHM = "AES-256-GCM+RSA-OAEP-256";
-    /** JCE使用的RSA-OAEP算法名称，加密和解密必须保持一致。 */
-    private static final String RSA_CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     /** JCE使用的RSA-OAEP算法名称，加密和解密必须保持一致。 */
     private static final String CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
     /** RSA密钥长度统一为8192位。 */
@@ -238,7 +236,7 @@ public final class PasswordRSAUtil {
      * 使用RSA-OAEP-SHA256公钥包装固定32字节的AES密钥。
      */
     public static byte[] encryptAesKeyByRsa(SecretKey aesKey) throws GeneralSecurityException {
-        Cipher rsaCipher = Cipher.getInstance(RSA_CIPHER_TRANSFORMATION);
+        Cipher rsaCipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
         rsaCipher.init(Cipher.ENCRYPT_MODE, KEY_PAIR.getPublic(), OAEP_PARAMETER_SPEC);
         return rsaCipher.doFinal(aesKey.getEncoded());
     }
@@ -248,7 +246,7 @@ public final class PasswordRSAUtil {
      */
     public static SecretKey decryptAesKeyByRsa(String encryptedAesKeyBase64) throws GeneralSecurityException {
         byte[] encryptedAesKey = Base64.getDecoder().decode(encryptedAesKeyBase64);
-        Cipher rsaCipher = Cipher.getInstance(RSA_CIPHER_TRANSFORMATION);
+        Cipher rsaCipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
         rsaCipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate(), OAEP_PARAMETER_SPEC);
         byte[] aesKeyBytes = rsaCipher.doFinal(encryptedAesKey);
         if (aesKeyBytes.length != AES_KEY_SIZE / Byte.SIZE) {
@@ -260,11 +258,11 @@ public final class PasswordRSAUtil {
     /**
      * 使用RSA-OAEP-SHA256解密升级前直接由RSA加密的密码正文。
      */
-    private static String decryptLegacyPassword(byte[] encryptedPassword) throws GeneralSecurityException {
-        Cipher rsaCipher = Cipher.getInstance(RSA_CIPHER_TRANSFORMATION);
-        rsaCipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate(), OAEP_PARAMETER_SPEC);
-        return new String(rsaCipher.doFinal(encryptedPassword), StandardCharsets.UTF_8);
-    }
+//    private static String decryptLegacyPassword(byte[] encryptedPassword) throws GeneralSecurityException {
+//        Cipher rsaCipher = Cipher.getInstance(RSA_CIPHER_TRANSFORMATION);
+//        rsaCipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate(), OAEP_PARAMETER_SPEC);
+//        return new String(rsaCipher.doFinal(encryptedPassword), StandardCharsets.UTF_8);
+//    }
 
     /**
      * 使用已加载的公钥加密明文密码，并增加用于标识RSA密文的前缀。

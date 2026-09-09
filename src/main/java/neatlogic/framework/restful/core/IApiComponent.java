@@ -22,7 +22,7 @@ import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletResponse;
 
-public interface IApiComponent {
+public interface IApiComponent extends neatlogic.framework.restful.core.IApiExampleProvider {
 
     /**
      * 实现类全名
@@ -97,16 +97,6 @@ public interface IApiComponent {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     JSONObject help();
-
-    /**
-     * 获取参数范例
-     *
-     * @return 参数范例json
-     */
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    default JSONObject example() {
-        return null;
-    }
 
     /**
      * 校验入参特殊规则，如：去重

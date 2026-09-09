@@ -51,7 +51,7 @@ public abstract class SseApiComponentBase extends ApiComponentTemplateBase imple
 
     @Override
     public final JSONObject help() {
-        return getHelpWithExample(example(), JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+        return getApiComponentHelp(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
     }
 
     private Object executeService(ApiVo apiVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response,

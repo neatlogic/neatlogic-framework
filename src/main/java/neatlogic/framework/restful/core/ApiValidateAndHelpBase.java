@@ -41,6 +41,7 @@ import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.reflection.ReflectionManager;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.dto.ApiVo;
+import neatlogic.framework.restful.util.ApiExampleUtil;
 import neatlogic.framework.restful.enums.ApiAccessType;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.Md5Util;
@@ -54,6 +55,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
@@ -63,7 +65,7 @@ import java.util.List;
 import java.util.Objects;
 
 @NeatLogicApi
-public class ApiValidateAndHelpBase {
+public class ApiValidateAndHelpBase implements IApiExampleProvider {
     private static final Logger logger = LoggerFactory.getLogger(ApiValidateAndHelpBase.class);
 
     /**
@@ -509,12 +511,15 @@ public class ApiValidateAndHelpBase {
         }
     }
 
+    /** 从真实接口类提取声明，统一供 Object、Raw 和 SSE 帮助使用。 */
     protected final JSONObject getApiComponentHelp(Class<?>... arg) {
         JSONObject jsonObj = new JSONObject();
         JSONArray inputList = new JSONArray();
         JSONArray outputList = new JSONArray();
+        jsonObj.put("example", new JSONArray());
         try {
-            Method method = this.getClass().getDeclaredMethod("myDoService", arg);
+            Method method = ClassUtils.getUserClass(this).getMethod("myDoService", arg);
+            jsonObj.put("example", ApiExampleUtil.getExamples(method, example()));
             if (method.isAnnotationPresent(Input.class) || method.isAnnotationPresent(Output.class) || method.isAnnotationPresent(Description.class)) {
                 for (Annotation anno : method.getDeclaredAnnotations()) {
                     if (anno.annotationType().equals(Input.class)) {
@@ -592,26 +597,11 @@ public class ApiValidateAndHelpBase {
                     } else if (anno.annotationType().equals(Description.class)) {
                         Description description = (Description) anno;
                         jsonObj.put("description", $.t(description.desc()));
-                    } else if (anno.annotationType().equals(Example.class)) {
-                        Example example = (Example) anno;
-                        String content = example.example();
-                        if (StringUtils.isNotBlank(content)) {
-                            try {
-                                jsonObj.put("example", JSON.parseObject(content));
-                            } catch (Exception ex) {
-                                try {
-                                    jsonObj.put("example", JSON.parseArray(content));
-                                } catch (Exception ignored) {
-
-                                }
-                            }
-
-                        }
                     }
                 }
             }
         } catch (NoSuchMethodException | SecurityException e) {
-            logger.error(e.getMessage());
+            logger.error("Failed to read API help for {}", getClass().getName(), e);
         }
         if (!outputList.isEmpty()) {
             jsonObj.put("output", outputList);

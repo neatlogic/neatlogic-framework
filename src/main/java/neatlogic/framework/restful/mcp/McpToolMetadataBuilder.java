@@ -1,6 +1,8 @@
 package neatlogic.framework.restful.mcp;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.parser.Feature;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
@@ -20,18 +22,21 @@ public class McpToolMetadataBuilder {
     private McpToolMetadataBuilder() {
     }
 
+    /** 一次读取帮助信息，确保工具说明、Schema 和示例来自同一份声明。 */
     public static JSONObject buildTool(ApiVo api) {
+        JSONObject help = getHelp(api);
+        JSONArray examples = getExamples(help);
         // tools/list 和接口管理MCP说明共用同一份tool元数据，避免展示与真实调用不一致。
         JSONObject apiObj = new JSONObject();
         apiObj.put("name", getToolName(api));
         apiObj.put("title", api.getName());
-        apiObj.put("description", $.t(api.getDescription()));
-        apiObj.put("inputSchema", getInputSchema(api));
+        apiObj.put("description", buildDescription($.t(api.getDescription()), examples));
+        apiObj.put("inputSchema", getSchemaFromHelpList(help.getJSONArray("input"), false));
         JSONObject annotations = getToolAnnotations(api);
         if (!annotations.isEmpty()) {
             apiObj.put("annotations", annotations);
         }
-        JSONObject outputSchema = getOutputSchema(api);
+        JSONObject outputSchema = getOutputSchema(help);
         if (!outputSchema.isEmpty()) {
             apiObj.put("outputSchema", outputSchema);
         }
@@ -50,16 +55,26 @@ public class McpToolMetadataBuilder {
         return token == null ? null : token.replaceAll("[^A-Za-z0-9_.-]", ".");
     }
 
-    public static JSONObject getInputSchema(ApiVo api) {
+    /** 读取已翻译的接口帮助；组件不可用时返回空结构。 */
+    private static JSONObject getHelp(ApiVo api) {
         IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        JSONObject helpObj = comp == null ? null : comp.help();
-        return getSchemaFromHelpList(helpObj == null ? null : helpObj.getJSONArray("input"), false);
+        JSONObject help = comp == null ? null : comp.help();
+        return help == null ? new JSONObject() : help;
     }
 
+    /** 对外提供包含详细字段帮助的输入 Schema。 */
+    public static JSONObject getInputSchema(ApiVo api) {
+        return getSchemaFromHelpList(getHelp(api).getJSONArray("input"), false);
+    }
+
+    /** 对外提供接口已声明的输出 Schema。 */
     public static JSONObject getOutputSchema(ApiVo api) {
-        IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        JSONObject helpObj = comp == null ? null : comp.help();
-        JSONArray outputList = helpObj == null ? null : helpObj.getJSONArray("output");
+        return getOutputSchema(getHelp(api));
+    }
+
+    /** 未声明出参时不生成推断的输出约束。 */
+    private static JSONObject getOutputSchema(JSONObject help) {
+        JSONArray outputList = help.getJSONArray("output");
         if (outputList == null || outputList.isEmpty()) {
             return new JSONObject();
         }
@@ -84,24 +99,63 @@ public class McpToolMetadataBuilder {
         return annotations;
     }
 
+    /** 扩展元数据只保存接口标识；场景示例统一放在模型可读的 description 中。 */
     public static JSONObject getMeta(ApiVo api) {
         JSONObject meta = new JSONObject();
         meta.put(META_PREFIX + "module", api.getModuleGroup());
         meta.put(META_PREFIX + "token", api.getToken());
-        Object example = getExample(api);
-        if (example != null) {
-            meta.put(META_PREFIX + "example", example);
-        }
         return meta;
     }
 
-    public static Object getExample(ApiVo api) {
-        IApiComponent comp = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
-        if (comp == null) {
-            return null;
+    /** 帮助页面直接读取统一注解解析结果，不依赖 MCP 元数据或解析描述文本。 */
+    public static JSONArray getExamples(ApiVo api) {
+        return getExamples(getHelp(api));
+    }
+
+    /** 帮助协议中的 example 始终是场景列表，不兼容旧单对象结构。 */
+    private static JSONArray getExamples(JSONObject help) {
+        JSONArray examples = help.getJSONArray("example");
+        return examples == null ? new JSONArray() : examples;
+    }
+
+    /** 将完整场景写入标准 description，让忽略 _meta 的模型也能正确构造 arguments。 */
+    static String buildDescription(String description, JSONArray examples) {
+        StringBuilder text = new StringBuilder(StringUtils.defaultString(description));
+        if (examples != null && !examples.isEmpty()) {
+            text.append("\n\n").append($.t("nf.api.example.mcparguments"));
+            for (int i = 0; i < examples.size(); i++) {
+                JSONObject example = examples.getJSONObject(i);
+                text.append("\n\n### ").append(example.getString("title"));
+                if (StringUtils.isNotBlank(example.getString("description"))) {
+                    text.append("\n").append(example.getString("description"));
+                }
+                text.append("\n```json\n").append(JSONObject.toJSONString(example.get("example"), true)).append("\n```");
+            }
         }
-        JSONObject helpObj = comp.help();
-        return helpObj == null ? null : helpObj.get("example");
+        return text.toString();
+    }
+
+    /** 按同一顺序包装完整 tools/call 请求，不向 arguments 混入场景元信息。 */
+    public static JSONArray getCallToolExamples(String toolName, JSONArray examples) {
+        JSONArray result = new JSONArray();
+        for (int i = 0; i < examples.size(); i++) {
+            JSONObject example = examples.getJSONObject(i);
+            JSONObject params = new JSONObject(true);
+            params.put("name", toolName);
+            // 场景内容同时出现在帮助列表中，深拷贝避免响应序列化将 arguments 写成 $ref。
+            params.put("arguments", JSON.parse(JSON.toJSONString(example.get("example")), Feature.OrderedField));
+            JSONObject request = new JSONObject(true);
+            request.put("jsonrpc", "2.0");
+            request.put("id", i + 1);
+            request.put("method", "tools/call");
+            request.put("params", params);
+            JSONObject item = new JSONObject(true);
+            item.put("title", example.getString("title"));
+            item.put("description", example.getString("description"));
+            item.put("example", request);
+            result.add(item);
+        }
+        return result;
     }
 
     private static JSONObject getSchemaFromHelpList(JSONArray paramList, boolean allowNestedObject) {
@@ -174,15 +228,22 @@ public class McpToolMetadataBuilder {
         } else {
             schema.put("type", getJsonSchemaType(inputType));
         }
-        if (StringUtils.isNotBlank(input.getString("description"))) {
-            schema.put("description", input.getString("description"));
+        // 标签与详细帮助共同构成模型可读的字段说明，条件必填不提升为全局 required。
+        String description = StringUtils.defaultString(input.getString("description"));
+        String help = input.getString("help");
+        if (StringUtils.isNotBlank(help) && !Objects.equals(description, help)) {
+            description = StringUtils.isBlank(description) ? help : description + "\n" + help;
+        }
+        if (StringUtils.isNotBlank(description)) {
+            schema.put("description", description);
         }
         if (!loose && input.getInteger("maxLength") != null) {
             schema.put("maxLength", input.getInteger("maxLength"));
         }
         String rule = input.getString("rule");
         if (!loose && StringUtils.isNotBlank(rule)) {
-            if (Objects.equals(input.getString("type"), "enum")) {
+            // StringApiParam 的 rule 与枚举一样表示候选值，并非正则表达式。
+            if (Objects.equals(input.getString("type"), "enum") || Objects.equals(input.getString("type"), "string")) {
                 JSONArray enumList = new JSONArray();
                 for (String item : rule.split(",")) {
                     if (StringUtils.isNotBlank(item)) {

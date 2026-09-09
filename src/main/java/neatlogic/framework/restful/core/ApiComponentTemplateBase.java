@@ -129,14 +129,4 @@ public abstract class ApiComponentTemplateBase extends ApiValidateAndHelpBase {
         return null;
     }
 
-    /**
-     * 统一拼装帮助信息，并在支持 example 的接口类型上附带示例数据。
-     */
-    protected final JSONObject getHelpWithExample(JSONObject example, Class<?>... parameterTypes) {
-        JSONObject helpObj = getApiComponentHelp(parameterTypes);
-        if (MapUtils.isNotEmpty(example)) {
-            helpObj.put("example", example);
-        }
-        return helpObj;
-    }
 }

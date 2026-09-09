@@ -74,7 +74,7 @@ public abstract class RawApiComponentBase extends ApiComponentTemplateBase imple
 
     @Override
     public final JSONObject help() {
-        return getHelpWithExample(this.example(), String.class);
+        return getApiComponentHelp(String.class);
     }
 
     /**

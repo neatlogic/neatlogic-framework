@@ -115,7 +115,7 @@ public abstract class ApiComponentBase extends ApiComponentTemplateBase implemen
 
     @Override
     public final JSONObject help() {
-        return getHelpWithExample(this.example(), JSONObject.class);
+        return getApiComponentHelp(JSONObject.class);
     }
 
     /**

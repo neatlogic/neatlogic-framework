@@ -13,11 +13,13 @@ package neatlogic.framework.crypto.handler;
 import neatlogic.framework.crypto.core.ICryptoHandler;
 import neatlogic.framework.exception.util.PasswordDecryptException;
 import neatlogic.framework.exception.util.PasswordEncryptException;
-import neatlogic.framework.util.AESGCMUtil;
 import neatlogic.framework.util.PasswordRSAUtil;
 
+import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -31,6 +33,8 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
     private static final int GCM_TAG_BIT_LENGTH = 128;
     /** 当前混合协议使用点号分隔RSA密钥密文和AES密码载荷。 */
     private static final String HYBRID_SECTION_SEPARATOR = ".";
+    /** AES密码正文使用GCM模式，同时提供机密性和完整性校验。 */
+    private static final String AES_CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
     /** GCM推荐使用96位随机IV，IV会随AES密文一起传输。 */
     private static final int GCM_IV_BYTE_LENGTH = 12;
     /** 每次密码加密均生成独立的256位AES密钥。 */
@@ -53,7 +57,7 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
             // 混合加密编排层只负责生成本次使用的密钥和IV、调用算法方法并拼装协议。
             SecretKey aesKey = generateAesKey();
             byte[] iv = generateGcmIv();
-            byte[] encryptedPassword = AESGCMUtil.encryptPasswordByAes(plainPassword, aesKey, iv);
+            byte[] encryptedPassword = encryptPasswordByAes(plainPassword, aesKey, iv);
             byte[] aesPayload = assembleAesPayload(iv, encryptedPassword);
             byte[] encryptedAesKey = PasswordRSAUtil.encryptAesKeyByRsa(aesKey);
             return ENCRYPTED_PREFIX
@@ -89,7 +93,7 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
         try {
             // RSA只负责解包AES密钥，AES工具只负责解密密码正文并校验GCM认证标签。
             SecretKey aesKey = PasswordRSAUtil.decryptAesKeyByRsa(encryptedAesKeyBase64);
-            return AESGCMUtil.decryptPasswordByAes(encryptedPasswordAndTag, aesKey, iv);
+            return decryptPasswordByAes(encryptedPasswordAndTag, aesKey, iv);
         } catch (Exception e) {
             throw new PasswordDecryptException(e);
         }
@@ -123,5 +127,31 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(AES_KEY_SIZE, SECURE_RANDOM);
         return keyGenerator.generateKey();
+    }
+
+    /**
+     * 使用AES-GCM解密“密文 + 认证标签”格式的密码正文。
+     */
+    private static String decryptPasswordByAes(byte[] encryptedPasswordAndTag, SecretKey aesKey, byte[] iv) throws GeneralSecurityException {
+        Cipher aesCipher = Cipher.getInstance(AES_CIPHER_TRANSFORMATION);
+        aesCipher.init(
+                Cipher.DECRYPT_MODE,
+                aesKey,
+                new GCMParameterSpec(GCM_TAG_BIT_LENGTH, iv)
+        );
+        return new String(aesCipher.doFinal(encryptedPasswordAndTag), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 使用AES-GCM加密密码正文，返回“密文 + 认证标签”字节数据。
+     */
+    private static byte[] encryptPasswordByAes(String plainPassword, SecretKey aesKey, byte[] iv) throws GeneralSecurityException {
+        Cipher aesCipher = Cipher.getInstance(AES_CIPHER_TRANSFORMATION);
+        aesCipher.init(
+                Cipher.ENCRYPT_MODE,
+                aesKey,
+                new GCMParameterSpec(GCM_TAG_BIT_LENGTH, iv)
+        );
+        return aesCipher.doFinal(plainPassword.getBytes(StandardCharsets.UTF_8));
     }
 }

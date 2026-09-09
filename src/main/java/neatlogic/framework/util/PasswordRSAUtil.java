@@ -36,22 +36,21 @@ import java.util.Base64;
  */
 public final class PasswordRSAUtil {
 
-    /** 8192位PKCS#8私钥，与前端接口返回的公钥配套使用。 */
+    /** 2048位PKCS#8私钥，与前端接口返回的公钥配套使用。 */
     private static final String PRIVATE_KEY = "MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCgsqfWg+kWqAW21X2krv/7kJ/Fyua49bgRi3Y02KlcP5ZYTcNvqg8Xs4LgoWFtfhf2kKLTHhF5JN5h8DMnq5p8z6xwa9JRzDe7v0r9sOPKYWFWkD/LWPMr7zcHL4L1qveI2xjb2yxMWm7buF0Rk+yO0am1THt3wxiodV4BK/LWm5ZZaZzwbrVVQwVel52ghY8l2PHgB+qIlt2gNSdGtjKPcxP5iMUX3STaDGhXDqBBPH7P97y01LHOsRUmgAMFRjyJQUJiCL5RMEmO3MdgcIXHwkfyMYByxGd7lSLc5yQjG1hdT1Dr2BtXQ80+1IhIUxCG2EiznQewYtVr40rGAEtnAgMBAAECggEAQt9l4eqd7ow4aIf6U7RxmTXrjytrDTBQC5kONVquS9G4VoHx4P+TbUkKH0F5Ik/1V+mDoLhkDBZQJtCG8SzDysm/WD8+VETYMpyd7+mTOa6Bi7zWl2AqPa+8JhTa+jHN9dk7RI62JgYCGRRlQoHc0OgmJ+iufr2k/sFsv68SzMRkNuggCWjXYuXTq2i7bUyuKLp4sm/47Rw5dkH36HGsW4fhltA4+T6+qEyyETNPaEoT1lQ+2jqjMBHyWOjZNBmlW85gUeSB/XZPnOWqEvPDzBOmgErmZIntJPHbFCoReb02/Kdrt4IRNI9sMirgSTQsn2UD+tBXBO+Hs3Wvtk2oJQKBgQC8/rHda23xs0vWMXgbpyd82CGXpQ/1rqqUrhAyMsdlPkpXbq4aEz7C3IF3NTfb5VBagaukJDI2fX/iYY+rnB7DtX6uzfICQn41cCnNK8htrFSxpJlFL0t0p2NgJHxBe7k9mDYxBS9fTj9Hs9F3DBFd8IK/l7IEbpw0GS4+HLaYCwKBgQDZq7QS4NIRKjnrMMe3C+Qlv8OR7DntgpK+fdarmpu+ygQTT8fMSPO/KuHRR3xR7dSDokGXKgwLuvONOKgjNihMZAqgwUOeUNdX4E2GlCPdjdpdW+Q/kWXxgHqLk+gJmx9SCR2IbE9DQ6CWhKINElTDgsokwvwov+yEuyxhrCSHlQKBgBLdocemh60O5s0U1xZ7kxeFQ6UtlvBBZUm+LmO0ae8TTrx3ke2MakFtXYcWyuKqe2DtfMK/0jtaP7/LWVoaFYAXx/OPH09Wb97JuYJ/klxQTYwGED61v+R/KQ5Z1gV7Yjxhy1cNW3M6DlsL+ibWD42/Cm4xqFWE7RbORK1ylE+NAoGAFMPYjeR8pb6Nf+5LXx73SNKeaZFLhWjrbti6XeyF5xGGigEWYlqjRh1lJX3YUkiJ+XTFJRKRy5yuF07MW2+TMJZqnSNSvAuiP3PacXg4Y65gon9dquLIAt3q0t3tSN1Pg5fzBUyv0w7khvdoLi8Nfwk/F3qya4DDo3XnqfmuEnECgYEAlleqGGVaAVc9oZj+LaNTZy0pwfIJrZOOeamA36j1R4A/kqKjJYttxIOF99IGDr+dRWhB0ml4iQi1BT9armk+M2lu01KjF6R4aEj0FrWcn/Nx/9SIv6p6IyokvC1SuC40cRhNgz3l1BcVWc8AZQUi65m8Mdnqp7pRVBwO0VAhn0k=";
-    /** 8192位X.509 SPKI公钥，用于核对固定密钥对配置。 */
+    /** 2048位X.509 SPKI公钥，用于核对固定密钥对配置。 */
     private static final String PUBLIC_KEY = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoLKn1oPpFqgFttV9pK7/+5CfxcrmuPW4EYt2NNipXD+WWE3Db6oPF7OC4KFhbX4X9pCi0x4ReSTeYfAzJ6uafM+scGvSUcw3u79K/bDjymFhVpA/y1jzK+83By+C9ar3iNsY29ssTFpu27hdEZPsjtGptUx7d8MYqHVeASvy1puWWWmc8G61VUMFXpedoIWPJdjx4AfqiJbdoDUnRrYyj3MT+YjFF90k2gxoVw6gQTx+z/e8tNSxzrEVJoADBUY8iUFCYgi+UTBJjtzHYHCFx8JH8jGAcsRne5Ui3OckIxtYXU9Q69gbV0PNPtSISFMQhthIs50HsGLVa+NKxgBLZwIDAQAB";
     /** 前后端约定的RSA密码密文前缀。 */
     public static final String ENCRYPTED_PREFIX = "RSA:";
     /** 每次密码加密均生成独立的256位AES密钥。 */
     private static final int AES_KEY_SIZE = 256;
-    /** 密码正文和AES密钥分别采用的加密算法标识。 */
-    public static final String ALGORITHM = "AES-256-GCM+RSA-OAEP-256";
+    public static final String ALGORITHM = "RSA-OAEP-256";
     /** JCE使用的RSA-OAEP算法名称，加密和解密必须保持一致。 */
     private static final String CIPHER_TRANSFORMATION = "RSA/ECB/OAEPWithSHA-256AndMGF1Padding";
-    /** RSA密钥长度统一为8192位。 */
-    private static final int KEY_SIZE = 8192;
-    /** 8192位RSA使用OAEP-SHA256时，单次允许包装的最大明文字节数为1024-2*32-2=958。 */
-    private static final int MAX_PLAINTEXT_BYTE_LENGTH = 958;
+    /** RSA密钥长度统一为2048位。 */
+    private static final int KEY_SIZE = 2048;
+    /** 8192位RSA使用OAEP-SHA256时，单次允许包装的最大明文字节数为256-2*32-2=190。 */
+    private static final int MAX_PLAINTEXT_BYTE_LENGTH = 190;
 //    private static final String KEY_DIRECTORY = "rsa-key";
 //    private static final String PRIVATE_KEY_FILE = "password-rsa-private.key";
 //    private static final KeyPair KEY_PAIR = loadOrGenerateKeyPair();
@@ -69,7 +68,7 @@ public final class PasswordRSAUtil {
     /**
      * 生成账号密码传输使用的 RSA 公钥和私钥。
      *
-     * @return 8192 位 RSA 密钥对
+     * @return 2048 位 RSA 密钥对
      */
 //    private static KeyPair generateKeyPair() {
 //        try {
@@ -178,7 +177,7 @@ public final class PasswordRSAUtil {
     }
 
     /**
-     * RSA密钥长度统一为8192位。
+     * RSA密钥长度统一为2048位。
      * @return
      */
     public static int getKeySize() {
@@ -188,7 +187,7 @@ public final class PasswordRSAUtil {
     }
 
     /**
-     * 8192位RSA使用OAEP-SHA256时，单次允许包装的最大明文字节数为8192/8-2*32-2=958。
+     * 2048位RSA使用OAEP-SHA256时，单次允许包装的最大明文字节数为2048/8-2*32-2=958。
      * @return
      */
     public static int getMaxPlaintextByteLength() {
@@ -202,33 +201,6 @@ public final class PasswordRSAUtil {
     public static boolean isEncrypted(String password) {
         return password != null && password.startsWith(ENCRYPTED_PREFIX);
     }
-
-    /**
-     * 解析并解密AES:密码载荷.RSA:AES密钥密文格式的数据。
-     */
-//    private static String decryptHybridPassword(String encryptedPassword) throws GeneralSecurityException {
-//        int separatorIndex = encryptedPassword.indexOf(HYBRID_RSA_SECTION_PREFIX, ENCRYPTED_PREFIX.length());
-//        if (separatorIndex <= ENCRYPTED_PREFIX.length()
-//                || separatorIndex != encryptedPassword.lastIndexOf(HYBRID_RSA_SECTION_PREFIX)) {
-//            throw new GeneralSecurityException("账号密码混合密文格式不正确");
-//        }
-//        String aesPayloadBase64 = encryptedPassword.substring(ENCRYPTED_PREFIX.length(), separatorIndex);
-//        String encryptedAesKeyBase64 = encryptedPassword.substring(separatorIndex + HYBRID_RSA_SECTION_PREFIX.length());
-//        if (encryptedAesKeyBase64.isEmpty()) {
-//            throw new GeneralSecurityException("账号密码混合密文缺少AES密钥");
-//        }
-//
-//        byte[] aesPayload = Base64.getDecoder().decode(aesPayloadBase64);
-//        int minimumPayloadLength = GCM_IV_BYTE_LENGTH + GCM_TAG_BIT_LENGTH / Byte.SIZE;
-//        if (aesPayload.length < minimumPayloadLength) {
-//            throw new GeneralSecurityException("账号密码AES密文长度不正确");
-//        }
-//        byte[] iv = Arrays.copyOfRange(aesPayload, 0, GCM_IV_BYTE_LENGTH);
-//        byte[] encryptedPasswordAndTag = Arrays.copyOfRange(aesPayload, GCM_IV_BYTE_LENGTH, aesPayload.length);
-//        // 混合解密编排层只负责解析协议，再将AES密钥和密码正文交给对应算法方法处理。
-//        SecretKey aesKey = decryptAesKeyByRsa(Base64.getDecoder().decode(encryptedAesKeyBase64));
-//        return decryptPasswordByAes(encryptedPasswordAndTag, aesKey, iv);
-//    }
 
     /**
      * 使用RSA-OAEP-SHA256公钥包装固定32字节的AES密钥。
@@ -252,15 +224,6 @@ public final class PasswordRSAUtil {
         }
         return new SecretKeySpec(aesKeyBytes, "AES");
     }
-
-    /**
-     * 使用RSA-OAEP-SHA256解密升级前直接由RSA加密的密码正文。
-     */
-//    private static String decryptLegacyPassword(byte[] encryptedPassword) throws GeneralSecurityException {
-//        Cipher rsaCipher = Cipher.getInstance(RSA_CIPHER_TRANSFORMATION);
-//        rsaCipher.init(Cipher.DECRYPT_MODE, KEY_PAIR.getPrivate(), OAEP_PARAMETER_SPEC);
-//        return new String(rsaCipher.doFinal(encryptedPassword), StandardCharsets.UTF_8);
-//    }
 
     /**
      * 使用已加载的公钥加密明文密码，并增加用于标识RSA密文的前缀。

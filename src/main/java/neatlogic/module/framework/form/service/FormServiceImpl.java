@@ -739,26 +739,29 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         if (StringUtils.isBlank(handler)) {
             return;
         }
-        String componentPath = appendMatrixValidationName(path,
-                StringUtils.defaultIfBlank(component.getString("label"), component.getString("uuid")));
-        boolean tableSelector = Objects.equals(handler, FormHandler.FORMTABLESELECTOR.getHandler())
-                || Objects.equals(handler, "formdynamiclist");
-        boolean selection = tableSelector || Objects.equals(handler, FormHandler.FORMSELECT.getHandler())
+        String componentPath = appendMatrixValidationName(path, StringUtils.defaultIfBlank(component.getString("label"), component.getString("uuid")));
+        boolean selection = Objects.equals(handler, FormHandler.FORMSELECT.getHandler())
                 || Objects.equals(handler, FormHandler.FORMRADIO.getHandler())
                 || Objects.equals(handler, FormHandler.FORMCHECKBOX.getHandler());
-        if (selection && MapUtils.isNotEmpty(config)) {
-            String dataSource = config.getString("dataSource");
-            // 表格选择的部分版本未保存 dataSource；显式 static/integration 的残留矩阵引用不参与校验。
-            if (Objects.equals(dataSource, "matrix") || (tableSelector && StringUtils.isBlank(dataSource))) {
-                validateComponentMatrixReference(config.getString("matrixUuid"), componentPath, matrixMapper, validatedMatrixUuids);
+        if (selection) {
+            if (MapUtils.isNotEmpty(config)) {
+                String dataSource = config.getString("dataSource");
+                if (Objects.equals(dataSource, "matrix")) {
+                    validateComponentMatrixReference(config.getString("matrixUuid"), componentPath, validatedMatrixUuids);
+                }
             }
-        }
-        if (MapUtils.isNotEmpty(config) && (tableSelector
-                || Objects.equals(handler, FormHandler.FORMTABLEINPUTER.getHandler()) || Objects.equals(handler, "formtable"))) {
-            // 表格输入列、表格选择的额外列以及嵌套表格列均可继续引用矩阵。
-            validateMatrixComponentList(config.getJSONArray("dataConfig"), componentPath + "/config.dataConfig", false, validatedMatrixUuids);
-        }
-        if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
+        } else if (Objects.equals(handler, FormHandler.FORMTABLESELECTOR.getHandler())) {
+            if (MapUtils.isNotEmpty(config)) {
+                validateComponentMatrixReference(config.getString("matrixUuid"), componentPath, validatedMatrixUuids);
+                // 表格输入列、表格选择的额外列以及嵌套表格列均可继续引用矩阵。
+                validateMatrixComponentList(config.getJSONArray("dataConfig"), componentPath + "/config.dataConfig", false, validatedMatrixUuids);
+            }
+        } else if ((Objects.equals(handler, FormHandler.FORMTABLEINPUTER.getHandler()) || Objects.equals(handler, "formtable"))) {
+            // 表格输入列以及嵌套表格列均可继续引用矩阵。
+            if (MapUtils.isNotEmpty(config)) {
+                validateMatrixComponentList(config.getJSONArray("dataConfig"), componentPath + "/config.dataConfig", false, validatedMatrixUuids);
+            }
+        } else if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
             JSONObject formData = component.getJSONObject("formData");
             // 兼容旧子表单将 formData 放在 config 中的存储形式。
             if (MapUtils.isEmpty(formData) && MapUtils.isNotEmpty(config)) {
@@ -773,26 +776,25 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
     }
 
     /** 使用数据库实际类型选择校验器，禁止信任表单保存的 dataSourceType 或 matrixType。 */
-    private void validateComponentMatrixReference(String matrixUuid, String componentPath, MatrixMapper matrixMapper,
-                                                         Set<String> validatedMatrixUuids) {
-        if (StringUtils.isBlank(matrixUuid)) {
-            throw new FormMatrixDataSourceInvalidException(componentPath, "未配置", "未配置矩阵 UUID", null);
-        }
+    private void validateComponentMatrixReference(String matrixUuid, String componentPath, Set<String> validatedMatrixUuids) {
         if (validatedMatrixUuids.contains(matrixUuid)) {
             return;
         }
-        MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
-        if (matrixVo == null) {
-            throw new FormMatrixDataSourceInvalidException(componentPath, matrixUuid, "矩阵不存在或已删除", null);
-        }
-        String matrixName = appendMatrixValidationName(matrixUuid,
-                StringUtils.defaultIfBlank(matrixVo.getName(), matrixVo.getLabel()));
-        IMatrixDataSourceHandler handler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
-        if (handler == null) {
-            throw new FormMatrixDataSourceInvalidException(componentPath, matrixName,
-                    "矩阵数据源类型【" + matrixVo.getType() + "】的处理器不存在", null);
-        }
+        String matrixName = null;
         try {
+            if (StringUtils.isBlank(matrixUuid)) {
+                throw new MatrixNotFoundException(matrixUuid);
+            }
+            matrixName = matrixUuid;
+            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+            if (matrixVo == null) {
+                throw new MatrixNotFoundException(matrixUuid);
+            }
+            matrixName = appendMatrixValidationName(matrixUuid, StringUtils.defaultIfBlank(matrixVo.getName(), matrixVo.getLabel()));
+            IMatrixDataSourceHandler handler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType() + "a");
+            if (handler == null) {
+                throw new MatrixDataSourceHandlerNotFoundException(matrixVo.getType());
+            }
             handler.validateDataSource(matrixVo);
         } catch (ApiRuntimeException ex) {
             // 保留来源类型提供的具体错误，同时补充表单组件和矩阵位置供用户修复。

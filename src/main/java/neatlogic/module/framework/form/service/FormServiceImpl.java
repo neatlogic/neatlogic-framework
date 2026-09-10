@@ -15,11 +15,14 @@ package neatlogic.module.framework.form.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.common.dto.ValueTextVo;
+import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.form.constvalue.FormHandler;
 import neatlogic.framework.form.dao.mapper.FormMapper;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
 import neatlogic.framework.form.dto.FormVersionVo;
 import neatlogic.framework.form.exception.FormActiveVersionNotFoundExcepiton;
+import neatlogic.framework.form.exception.FormMatrixDataSourceInvalidException;
 import neatlogic.framework.form.service.IFormCrossoverService;
 import neatlogic.framework.matrix.constvalue.SearchExpression;
 import neatlogic.framework.matrix.core.IMatrixDataSourceHandler;
@@ -682,4 +685,125 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
         }
         return null;
     }
+
+    @Override
+    public void validateMatrixDataSource(JSONObject formConfig) {
+        validateFormMatrixDataSource(formConfig, "formConfig", new HashSet<>());
+    }
+
+    /** 遍历默认场景、隐藏组件和其他场景，同时兼容旧版 controllerList。 */
+    private void validateFormMatrixDataSource(JSONObject formConfig, String path, Set<String> validatedMatrixUuids) {
+        if (MapUtils.isEmpty(formConfig)) {
+            return;
+        }
+        String scenePath = appendMatrixValidationName(path, formConfig.getString("name"));
+        validateMatrixComponentList(formConfig.getJSONArray("tableList"), scenePath + "/tableList", true, validatedMatrixUuids);
+        validateMatrixComponentList(formConfig.getJSONArray("hideComponentList"), scenePath + "/hideComponentList", false, validatedMatrixUuids);
+        // 新版表单不使用遗留的 controllerList，避免其中的旧配置造成误报。
+        if (!Objects.equals("new", formConfig.getString("_type"))) {
+            validateMatrixComponentList(formConfig.getJSONArray("controllerList"), scenePath + "/controllerList", false, validatedMatrixUuids);
+        }
+        JSONArray sceneList = formConfig.getJSONArray("sceneList");
+        if (CollectionUtils.isNotEmpty(sceneList)) {
+            for (int i = 0; i < sceneList.size(); i++) {
+                validateFormMatrixDataSource(sceneList.getJSONObject(i), scenePath + "/sceneList[" + i + "]", validatedMatrixUuids);
+            }
+        }
+    }
+
+    /** 表单单元格包装 component，隐藏组件、表格列和容器子组件直接保存组件对象。 */
+    private void validateMatrixComponentList(JSONArray components, String path, boolean wrapped, Set<String> validatedMatrixUuids) {
+        if (CollectionUtils.isEmpty(components)) {
+            return;
+        }
+        for (int i = 0; i < components.size(); i++) {
+            JSONObject component = components.getJSONObject(i);
+            if (MapUtils.isEmpty(component)) {
+                continue;
+            }
+            if (wrapped) {
+                component = component.getJSONObject("component");
+            }
+            validateMatrixComponent(component, path + "[" + i + "]", validatedMatrixUuids);
+        }
+    }
+
+    /** 仅校验当前组件实际启用的矩阵来源，并沿现有容器结构递归。 */
+    private void validateMatrixComponent(JSONObject component, String path, Set<String> validatedMatrixUuids) {
+        if (MapUtils.isEmpty(component)) {
+            return;
+        }
+        String handler = component.getString("handler");
+        JSONObject config = component.getJSONObject("config");
+        // 场景中的继承占位对象可以仅有 UUID，实际配置已经在默认场景中校验。
+        if (StringUtils.isBlank(handler)) {
+            return;
+        }
+        String componentPath = appendMatrixValidationName(path,
+                StringUtils.defaultIfBlank(component.getString("label"), component.getString("uuid")));
+        boolean tableSelector = Objects.equals(handler, FormHandler.FORMTABLESELECTOR.getHandler())
+                || Objects.equals(handler, "formdynamiclist");
+        boolean selection = tableSelector || Objects.equals(handler, FormHandler.FORMSELECT.getHandler())
+                || Objects.equals(handler, FormHandler.FORMRADIO.getHandler())
+                || Objects.equals(handler, FormHandler.FORMCHECKBOX.getHandler());
+        if (selection && MapUtils.isNotEmpty(config)) {
+            String dataSource = config.getString("dataSource");
+            // 表格选择的部分版本未保存 dataSource；显式 static/integration 的残留矩阵引用不参与校验。
+            if (Objects.equals(dataSource, "matrix") || (tableSelector && StringUtils.isBlank(dataSource))) {
+                validateComponentMatrixReference(config.getString("matrixUuid"), componentPath, matrixMapper, validatedMatrixUuids);
+            }
+        }
+        if (MapUtils.isNotEmpty(config) && (tableSelector
+                || Objects.equals(handler, FormHandler.FORMTABLEINPUTER.getHandler()) || Objects.equals(handler, "formtable"))) {
+            // 表格输入列、表格选择的额外列以及嵌套表格列均可继续引用矩阵。
+            validateMatrixComponentList(config.getJSONArray("dataConfig"), componentPath + "/config.dataConfig", false, validatedMatrixUuids);
+        }
+        if (Objects.equals(handler, FormHandler.FORMSUBASSEMBLY.getHandler())) {
+            JSONObject formData = component.getJSONObject("formData");
+            // 兼容旧子表单将 formData 放在 config 中的存储形式。
+            if (MapUtils.isEmpty(formData) && MapUtils.isNotEmpty(config)) {
+                formData = config.getJSONObject("formData");
+            }
+            if (MapUtils.isNotEmpty(formData)) {
+                validateFormMatrixDataSource(formData.getJSONObject("formConfig"), componentPath + "/formData.formConfig", validatedMatrixUuids);
+            }
+        } else {
+            validateMatrixComponentList(component.getJSONArray("component"), componentPath + "/component", false, validatedMatrixUuids);
+        }
+    }
+
+    /** 使用数据库实际类型选择校验器，禁止信任表单保存的 dataSourceType 或 matrixType。 */
+    private void validateComponentMatrixReference(String matrixUuid, String componentPath, MatrixMapper matrixMapper,
+                                                         Set<String> validatedMatrixUuids) {
+        if (StringUtils.isBlank(matrixUuid)) {
+            throw new FormMatrixDataSourceInvalidException(componentPath, "未配置", "未配置矩阵 UUID", null);
+        }
+        if (validatedMatrixUuids.contains(matrixUuid)) {
+            return;
+        }
+        MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+        if (matrixVo == null) {
+            throw new FormMatrixDataSourceInvalidException(componentPath, matrixUuid, "矩阵不存在或已删除", null);
+        }
+        String matrixName = appendMatrixValidationName(matrixUuid,
+                StringUtils.defaultIfBlank(matrixVo.getName(), matrixVo.getLabel()));
+        IMatrixDataSourceHandler handler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());
+        if (handler == null) {
+            throw new FormMatrixDataSourceInvalidException(componentPath, matrixName,
+                    "矩阵数据源类型【" + matrixVo.getType() + "】的处理器不存在", null);
+        }
+        try {
+            handler.validateDataSource(matrixVo);
+        } catch (ApiRuntimeException ex) {
+            // 保留来源类型提供的具体错误，同时补充表单组件和矩阵位置供用户修复。
+            throw new FormMatrixDataSourceInvalidException(componentPath, matrixName, ex.getMessage(), ex);
+        }
+        validatedMatrixUuids.add(matrixUuid);
+    }
+
+    /** 保留稳定结构路径，并附上名称，便于定位重名或嵌套组件。 */
+    private static String appendMatrixValidationName(String path, String name) {
+        return StringUtils.isBlank(name) ? path : path + "(" + name + ")";
+    }
+
 }

@@ -58,6 +58,8 @@ public class GetPasswordPublicKeyApi extends PrivateApiComponentBase {
         JSONObject resultObj = new JSONObject();
         // 公钥使用X.509 SPKI Base64格式，可直接供浏览器Web Crypto导入。
         resultObj.put("publicKey", PasswordRSAUtil.getPublicKey());
+        resultObj.put("keySize", PasswordRSAUtil.getKeySize());
+        resultObj.put("maxPlaintextByteLength", PasswordRSAUtil.getMaxPlaintextByteLength());
         return resultObj;
     }
 }

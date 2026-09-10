@@ -1,5 +1,4 @@
 /*
- *
  * Copyright (C) 2025  TechSure Co., Ltd.  All Rights Reserved.
  * This file is part of the NeatLogic software.
  * Licensed under the NeatLogic Sustainable Use License (NSUL), Version 4.x – 2025.
@@ -7,22 +6,28 @@
  * See the LICENSE file distributed with this work for the full license text.
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *
  */
 
-package neatlogic.framework.exception.util;
+package neatlogic.framework.crypto.handler;
 
-import neatlogic.framework.exception.core.ApiRuntimeException;
+import neatlogic.framework.crypto.core.ICryptoHandler;
+import neatlogic.framework.util.PasswordRSAUtil;
 
-public class PasswordDecryptException extends ApiRuntimeException {
+import java.util.List;
 
-    private static final long serialVersionUID = -4632626576072818774L;
-
-    public PasswordDecryptException(Throwable cause) {
-        super("nfeu.passworddecryptexception.passworddecryptexception", cause);
+public class RSACryptoHandler implements ICryptoHandler {
+    @Override
+    public List<String> handlers() {
+        return List.of("RSA:");
     }
 
-    public PasswordDecryptException() {
-        super("nfeu.passworddecryptexception.passworddecryptexception");
+    @Override
+    public String encrypt(String plaintext) {
+        return PasswordRSAUtil.encrypt(plaintext);
+    }
+
+    @Override
+    public String decrypt(String ciphertext) {
+        return PasswordRSAUtil.decrypt(ciphertext);
     }
 }

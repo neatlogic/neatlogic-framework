@@ -50,6 +50,15 @@ public interface IMatrixDataSourceHandler {
     MatrixVo getMatrix(MatrixVo matrixVo);
 
     /**
+     * 校验矩阵引用的数据源定义是否仍然存在，不查询矩阵数据或执行外部集成。
+     * 自定义矩阵和私有矩阵没有外部来源，默认无需额外校验。
+     *
+     * @param matrixVo 数据库中实际保存的矩阵定义
+     */
+    default void validateDataSource(MatrixVo matrixVo) {
+    }
+
+    /**
      * 删除矩阵信息
      *
      * @param uuid

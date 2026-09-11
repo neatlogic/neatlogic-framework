@@ -786,9 +786,12 @@ public class FormServiceImpl implements FormService, IFormCrossoverService {
                 throw new MatrixNotFoundException(matrixUuid);
             }
             matrixName = matrixUuid;
-            MatrixVo matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+            MatrixVo matrixVo = MatrixPrivateDataSourceHandlerFactory.getMatrixVo(matrixUuid);
             if (matrixVo == null) {
-                throw new MatrixNotFoundException(matrixUuid);
+                matrixVo = matrixMapper.getMatrixByUuid(matrixUuid);
+                if (matrixVo == null) {
+                    throw new MatrixNotFoundException(matrixUuid);
+                }
             }
             matrixName = appendMatrixValidationName(matrixUuid, StringUtils.defaultIfBlank(matrixVo.getName(), matrixVo.getLabel()));
             IMatrixDataSourceHandler handler = MatrixDataSourceHandlerFactory.getHandler(matrixVo.getType());

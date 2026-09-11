@@ -569,6 +569,7 @@ public class HttpRequestUtil {
     private String result;
     private String error;
     private String errorMsg; // 异常的简略信息
+    private String errorResponseBody; // 下游 HTTP 错误响应原文
     private int responseCode;
     //用于将请求的response的header 设置到当前上下文response中
     private List<String> responseHeaderList;
@@ -723,7 +724,8 @@ public class HttpRequestUtil {
                         StringWriter writer = new StringWriter();
                         InputStreamReader reader = new InputStreamReader(input, this.charset);
                         IOUtils.copy(reader, writer);
-                        throw new ApiRuntimeException(writer.toString());
+                        this.errorResponseBody = writer.toString();
+                        throw new ApiRuntimeException(this.errorResponseBody);
                     }
                 }
             } catch (ApiRuntimeException e) {
@@ -770,6 +772,10 @@ public class HttpRequestUtil {
 
     public String getErrorMsg() {
         return errorMsg;
+    }
+
+    public String getErrorResponseBody() {
+        return errorResponseBody;
     }
 
     public HttpRequestUtil setResponseHeaders(List<String> responseHeaderList) {

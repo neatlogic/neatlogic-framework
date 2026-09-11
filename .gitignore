@@ -10,3 +10,4 @@ logs/
 .flattened-pom.xml
 .DS_Store
 .idea
+scripts/globallock

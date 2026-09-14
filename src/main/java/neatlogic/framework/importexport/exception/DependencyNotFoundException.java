@@ -10,10 +10,12 @@ public class DependencyNotFoundException extends ApiRuntimeException {
     private List<String> messageList;
 
     public DependencyNotFoundException(List<String> messageList) {
+        super(String.join(",", messageList));
         this.messageList = messageList;
     }
 
     public DependencyNotFoundException(String message) {
+        super(message);
         this.messageList = new ArrayList<>();
         this.messageList.add(message);
     }

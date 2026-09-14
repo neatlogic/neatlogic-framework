@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.crossover.ICrossoverService;
 import neatlogic.framework.form.dto.AttributeDataVo;
 import neatlogic.framework.form.dto.FormAttributeVo;
+import neatlogic.framework.matrix.dao.mapper.MatrixMapper;
 
 import java.util.List;
 
@@ -52,4 +53,6 @@ public interface IFormCrossoverService extends ICrossoverService {
      * @return
      */
     Object getSelectStandardValueBySimpleValue(Object simpleValue, JSONObject configObj);
+
+    void validateMatrixDataSource(JSONObject formConfig);
 }

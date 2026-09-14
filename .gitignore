@@ -11,4 +11,3 @@ logs/
 .DS_Store
 .idea
 scripts/globallock
-src/test

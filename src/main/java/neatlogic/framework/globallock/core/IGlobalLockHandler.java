@@ -28,6 +28,22 @@ public interface IGlobalLockHandler {
      */
     String getHandler();
 
+    /** 在获锁事务内、取得资源行锁前校验申请条件。 */
+    default void validateAcquisition(GlobalLockVo lock) {
+    }
+
+
+    /** 校验相同锁 ID 的业务身份；默认不附加业务约束。 */
+    default void validateIdentity(GlobalLockVo existing, GlobalLockVo request) { }
+
+    /** 判断业务归属；旧数据解析规则由业务处理器提供。 */
+    default boolean ownsLock(GlobalLockVo lock, String ownerId) {
+        return ownerId != null && ownerId.equals(lock.getOwnerId());
+    }
+
+    /** 提供进度展示的业务标识，框架不解释业务字段。 */
+    default JSONObject getLockIdentity(GlobalLockVo lock) { return new JSONObject(); }
+
     /**
      * 获取handler name
      *

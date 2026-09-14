@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 
+<!--
+  ~ Copyright (C) 2026  深圳极向量科技有限公司 All Rights Reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU Affero General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU Affero General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Affero General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.globallock.dao.mapper.GlobalLockMapper">
     <select id="getGlobalLockByUuid" parameterType="java.lang.String"
@@ -9,7 +26,7 @@
                `uuid`,
                `key`,
                `handler`,
-               owner_id AS ownerId, `handler_param` as handlerParamStr, `notify_error` as notifyError, `unlock_error` as unlockError,
+               `handler_param` as handlerParamStr,
                `is_lock`       as isLock,
                `description`,
                `fcd`
@@ -22,7 +39,7 @@
                `uuid`,
                `key`,
                `handler`,
-               owner_id AS ownerId, `handler_param` as handlerParamStr, `notify_error` as notifyError, `unlock_error` as unlockError,
+               `handler_param` as handlerParamStr,
                `is_lock`       as isLock,
                `description`,
                `fcd`
@@ -35,7 +52,7 @@
                `uuid`,
                `key`,
                `handler`,
-               owner_id AS ownerId, `handler_param` as handlerParamStr, `notify_error` as notifyError, `unlock_error` as unlockError,
+               `handler_param` as handlerParamStr,
                `is_lock`       as isLock,
                `description`,
                `fcd`
@@ -50,7 +67,7 @@
         `uuid`,
         `key`,
         `handler`,
-        owner_id AS ownerId, `handler_param` as handlerParamStr, `notify_error` as notifyError, `unlock_error` as unlockError,
+        `handler_param` as handlerParamStr,
         `is_lock` as isLock,
         `description`,
         `fcd`
@@ -85,7 +102,7 @@
         `uuid`,
         `key`,
         `handler`,
-        owner_id AS ownerId, `handler_param` as handlerParamStr, `notify_error` as notifyError, `unlock_error` as unlockError,
+        `handler_param` as handlerParamStr,
         `is_lock` as isLock,
         `description`,
         `fcd`
@@ -159,19 +176,13 @@
 
     <update id="updateToLockById">
         UPDATE `global_lock`
-        set `is_lock` = 1, notify_error = NULL, notify_revision = notify_revision + 1
+        set `is_lock` = 1
         where `id` = #{value}
     </update>
 
-    <sql id="insertLockSql">
-        INSERT ignore INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `owner_id`, `is_lock`, `description`, `fcd`)
-        VALUES (#{id}, #{uuid}, #{key}, #{handler}, #{handlerParamStr}, #{ownerId}, #{isLock}, #{description}, now())
-    </sql>
     <insert id="insertLock" parameterType="neatlogic.framework.dto.globallock.GlobalLockVo">
-        <include refid="insertLockSql"/>
-    </insert>
-    <insert id="insertLockIfAbsent" parameterType="neatlogic.framework.dto.globallock.GlobalLockVo">
-        <include refid="insertLockSql"/>
+        INSERT ignore INTO `global_lock` (`id`, `uuid`, `key`, `handler`, `handler_param`, `is_lock`, `description`, `fcd`)
+        VALUES (#{id}, #{uuid}, #{key}, #{handler}, #{handlerParamStr}, #{isLock}, #{description}, now())
     </insert>
 
     <insert id="insertLockPk" parameterType="java.lang.String">
@@ -203,41 +214,4 @@
         </foreach>
     </delete>
 
-
-    <select id="getLockCandidates" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
-        SELECT id, uuid, `key`, handler, owner_id AS ownerId, handler_param AS handlerParamStr, is_lock AS isLock,
-               description, fcd, notify_error AS notifyError, unlock_error AS unlockError
-        FROM global_lock
-        <where><if test="handler != null">handler = #{handler}</if></where>
-        ORDER BY id
-    </select>
-    <select id="getOwnerLockCandidates" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
-        SELECT id, uuid, `key`, handler, owner_id AS ownerId, handler_param AS handlerParamStr,
-               is_lock AS isLock, description, fcd, notify_error AS notifyError, unlock_error AS unlockError
-        FROM global_lock
-        WHERE handler IN
-        <foreach collection="handlers" item="handler" open="(" close=")" separator=",">#{handler}</foreach>
-        AND (owner_id = #{ownerId} OR owner_id IS NULL)
-        ORDER BY id
-    </select>
-    <select id="getWaitingLocks" resultType="neatlogic.framework.dto.globallock.GlobalLockVo">
-        SELECT id, uuid, `key`, handler, owner_id AS ownerId, handler_param AS handlerParamStr, is_lock AS isLock, description, fcd
-        FROM global_lock WHERE uuid = #{value} AND is_lock = 0 ORDER BY id
-    </select>
-    <update id="updateLockError">
-        UPDATE global_lock
-        <choose>
-            <when test="notify">
-                SET notify_error = #{error}, notify_revision = #{revision}
-                WHERE id = #{id} AND notify_revision = #{revision}
-            </when>
-            <otherwise>
-                SET unlock_error = #{error}, unlock_revision = #{revision}
-                WHERE id = #{id} AND unlock_revision &lt;= #{revision}
-            </otherwise>
-        </choose>
-    </update>
-    <update id="incrementNotifyRevision">UPDATE global_lock SET notify_revision=notify_revision+1 WHERE id=#{value} AND is_lock=0</update>
-    <select id="getNotifyRevision" resultType="java.lang.Long">SELECT notify_revision FROM global_lock WHERE id=#{value}</select>
 </mapper>
-

@@ -26,6 +26,22 @@ import java.util.Date;
 import java.util.List;
 
 public class GlobalLockVo extends BasePageVo {
+    @EntityField(name = "globallock.ownerid", type = ApiParamType.STRING)
+    private String ownerId;
+
+    public String getOwnerId() { return ownerId; }
+    public void setOwnerId(String ownerId) { this.ownerId = ownerId; }
+
+    @EntityField(name = "globallock.notifyerror", type = ApiParamType.STRING)
+    private String notifyError;
+    @EntityField(name = "globallock.unlockerror", type = ApiParamType.STRING)
+    private String unlockError;
+
+    public String getNotifyError() { return notifyError; }
+    public void setNotifyError(String value) { notifyError = value; }
+    public String getUnlockError() { return unlockError; }
+    public void setUnlockError(String value) { unlockError = value; }
+
     private static final long serialVersionUID = 6246879548347033138L;
     @EntityField(name = "锁id", type = ApiParamType.LONG)
     private Long id;

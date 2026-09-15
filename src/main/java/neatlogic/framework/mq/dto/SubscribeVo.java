@@ -20,6 +20,7 @@ import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.mq.core.*;
 import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.SnowflakeUtil;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
@@ -141,11 +142,12 @@ public class SubscribeVo extends BasePageVo {
         this.tenantUuid = tenantUuid;
     }
 
+    /** 系统主题名称按当前请求语言读取，不缓存翻译结果。 */
     public String getTopicLabel() {
-        if (StringUtils.isBlank(topicLabel) && StringUtils.isNotBlank(topicName)) {
+        if (StringUtils.isNotBlank(topicName)) {
             TopicVo topicVo = TopicFactory.getTopicByName(topicName);
             if (topicVo != null) {
-                topicLabel = topicVo.getLabel();
+                return topicVo.getLabel();
             }
         }
         return topicLabel;
@@ -209,8 +211,9 @@ public class SubscribeVo extends BasePageVo {
         this.isDurable = isDurable;
     }
 
+    /** 系统订阅说明支持国际化词条，自定义订阅保留用户文案。 */
     public String getDescription() {
-        return description;
+        return SubscribeHandlerFactory.hasSystemSubscribe(name) && description != null ? $.t(description) : description;
     }
 
     public void setDescription(String description) {

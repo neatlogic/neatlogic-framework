@@ -15,8 +15,9 @@ package neatlogic.framework.fulltextindex.enums;
 import neatlogic.framework.fulltextindex.core.IFullTextIndexType;
 import neatlogic.framework.util.$;
 
+/** 全文索引类型名称按当前请求语言翻译。 */
 public enum FrameworkFullTextIndexType implements IFullTextIndexType {
-    INTEGRATION_AUDIT("integration_audit", "集成审计"),
+    INTEGRATION_AUDIT("integration_audit", "fulltextindex.type.integrationaudit"),
     ;
 
     private final String type;

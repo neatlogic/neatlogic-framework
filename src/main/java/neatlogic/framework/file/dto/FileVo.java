@@ -100,7 +100,8 @@ public class FileVo extends BaseEditorVo {
     }
 
     DecimalFormat decimalFormat = new DecimalFormat("0.##");
-    String[] units = new String[]{"字节", "KB", "MB", "GB"};
+    // 文件大小统一使用标准单位符号，避免混入中文单位。
+    String[] units = new String[]{"B", "KB", "MB", "GB"};
 
     public String getSizeText() {
         if (StringUtils.isBlank(sizeText)) {

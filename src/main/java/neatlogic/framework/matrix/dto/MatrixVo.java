@@ -1,6 +1,8 @@
 package neatlogic.framework.matrix.dto;
 
 import neatlogic.framework.matrix.core.MatrixTypeFactory;
+import neatlogic.framework.matrix.core.MatrixPrivateDataSourceHandlerFactory;
+import neatlogic.framework.matrix.core.IMatrixPrivateDataSourceHandler;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 
@@ -59,7 +61,14 @@ public class MatrixVo extends BaseEditorVo {
         this.uuid = uuid;
     }
 
+    /** 内置矩阵按当前请求语言获取名称，自定义矩阵保留用户配置的名称。 */
     public String getName() {
+        if ("private".equals(type) && StringUtils.isNotBlank(uuid)) {
+            IMatrixPrivateDataSourceHandler handler = MatrixPrivateDataSourceHandlerFactory.getHandler(uuid);
+            if (handler != null) {
+                return handler.getName();
+            }
+        }
         return name;
     }
 

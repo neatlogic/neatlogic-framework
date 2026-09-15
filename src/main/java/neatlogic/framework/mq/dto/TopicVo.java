@@ -86,7 +86,14 @@ public class TopicVo implements Serializable {
         this.label = label;
     }
 
+    /** 系统主题说明按当前请求语言获取，避免使用启动时缓存的文案。 */
     public String getDescription() {
+        if (StringUtils.isNotBlank(name)) {
+            ITopic topic = TopicFactory.getTopic(name);
+            if (topic != null) {
+                return topic.getDescription();
+            }
+        }
         return description;
     }
 

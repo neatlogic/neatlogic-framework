@@ -12,6 +12,7 @@
 
 package neatlogic.module.framework.file.plugin;
 
+import neatlogic.framework.util.$;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.file.core.FileTypeHandlerBase;
@@ -31,9 +32,10 @@ public class ImageHandler extends FileTypeHandlerBase {
         return "IMAGE";
     }
 
+    /** 按当前请求语言返回附件类型名称。 */
     @Override
     public String getDisplayName() {
-        return "图片文件";
+        return $.t("file.type.image");
     }
 
     @Override

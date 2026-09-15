@@ -14,11 +14,12 @@ package neatlogic.framework.datawarehouse.enums;
 
 import neatlogic.framework.util.$;
 
+/** 定义数据仓库同步状态，展示名称按当前请求语言翻译。 */
 public enum Status {
-    DOING("doing", "同步数据中"),
-    DONE("done", "同步完成"),
-    ABORTED("aborted", "同步已中止"),
-    FAILED("failed", "同步失败");
+    DOING("doing", "datawarehouse.status.doing"),
+    DONE("done", "datawarehouse.status.done"),
+    ABORTED("aborted", "datawarehouse.status.aborted"),
+    FAILED("failed", "datawarehouse.status.failed");
 
     private final String value;
     private final String text;

@@ -621,6 +621,7 @@ public class ReloadableJsonBundleMessageSource extends AbstractResourceBasedMess
             return this.properties.getProperty(code);
         }
 
+        /** 获取按语言缓存的格式对象，仅对已找到的翻译模板兼容显示用单引号。 */
         @Nullable
         public MessageFormat getMessageFormat(String code, Locale locale) {
             if (this.properties == null) {
@@ -643,7 +644,7 @@ public class ReloadableJsonBundleMessageSource extends AbstractResourceBasedMess
             }
             MessageFormat result;
             if (msg != null) {
-                result = createMessageFormat(msg, locale);
+                result = createMessageFormat(I18nMessagePattern.normalize(msg), locale);
             }else{
                 result = createMessageFormat(code, locale);
             }

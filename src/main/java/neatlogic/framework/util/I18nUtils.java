@@ -13,6 +13,7 @@
 package neatlogic.framework.util;
 
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
+import neatlogic.framework.i18n.I18nMessagePattern;
 import neatlogic.framework.i18n.JsonResourceBundleControl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -119,7 +120,8 @@ public class I18nUtils {
         ResourceBundle bundle = ResourceBundle.getBundle("i18n/language", new JsonResourceBundleControl());
         String value;
         try {
-            value = bundle.getString(key);
+            // 只处理成功读取的模板，缺失 key 和传入参数保持原有语义。
+            value = I18nMessagePattern.normalize(bundle.getString(key));
             if (args != null) {
                 args = Arrays.stream(args).map(arg -> arg == null ? StringUtils.EMPTY : arg.toString()).toArray(); //解决Long类型参数被格式化问题
             }

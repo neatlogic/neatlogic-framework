@@ -873,21 +873,28 @@ public class TimeUtil {
     /**
      * @param milliseconds 毫秒数
      * @return String
-     * @description : 将毫秒转换换为最大单位显示文案
+     * @description : 将毫秒按最大单位向下取整，并返回当前请求语言的耗时文案
      * @since 2020年9月14日
      */
     public static String millisecondsTransferMaxTimeUnit(long milliseconds) {
         if (milliseconds >= 24 * 60 * 60 * 1000) {
-            return (milliseconds / (24 * 60 * 60 * 1000)) + " 天";
+            return formatDurationUnit(milliseconds / (24 * 60 * 60 * 1000), "day");
         } else if (milliseconds >= (60 * 60 * 1000)) {
-            return (milliseconds / (60 * 60 * 1000)) + " 小时";
+            return formatDurationUnit(milliseconds / (60 * 60 * 1000), "hour");
         } else if (milliseconds >= 60 * 1000) {
-            return (milliseconds / (60 * 1000)) + " 分钟";
+            return formatDurationUnit(milliseconds / (60 * 1000), "minute");
         } else if (milliseconds >= 1000) {
-            return (milliseconds / 1000) + " 秒";
+            return formatDurationUnit(milliseconds / 1000, "second");
         } else {
-            return milliseconds + " 毫秒";
+            return formatDurationUnit(milliseconds, "millisecond");
         }
+    }
+
+    /**
+     * 按当前请求语言显示耗时数值和单位，英文区分单复数，数值保持原有整数精度。
+     */
+    private static String formatDurationUnit(long value, String unit) {
+        return $.t("time.duration." + unit + (value == 1 ? "" : "s"), value);
     }
 
     /**

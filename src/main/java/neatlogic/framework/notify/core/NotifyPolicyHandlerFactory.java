@@ -36,6 +36,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
 
     private static final Map<String, INotifyPolicyHandler> notifyPolicyHandlerMap = new HashMap<>();
 
+    // 分类展示需要读取非公开处理器的文案，不改变公开处理器的调用注册范围。
+    private static final Map<String, INotifyPolicyHandler> treeHandlerMap = new HashMap<>();
+
     private static final List<NotifyTreeVo> moduleTreeVoList = new ArrayList<>();
 
     private static final Map<String, NotifyTreeVo> moduleTreeVoMap = new HashMap<>();
@@ -77,6 +80,7 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
         return handler2ModuleGroupIdMap.get(handler);
     }
 
+    /** 返回当前请求语言的分类树副本，避免沿用启动阶段缓存的展示文案。 */
     public static List<NotifyTreeVo> getModuleTreeVoList() {
         if (CollectionUtils.isNotEmpty(moduleTreeVoList)) {
             List<NotifyTreeVo> moduleTreeListTmp = JSON.parseArray(JSON.toJSONString(moduleTreeVoList), NotifyTreeVo.class);
@@ -84,10 +88,19 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
                 notifyTreeVo.setName($.t(notifyTreeVo.getName()));
                 if (CollectionUtils.isNotEmpty(notifyTreeVo.getChildren())) {
                     for (NotifyTreeVo childNotifyTreeVo : notifyTreeVo.getChildren()) {
-                        childNotifyTreeVo.setName($.t(childNotifyTreeVo.getName()));
+                        INotifyPolicyHandler handler = treeHandlerMap.get(childNotifyTreeVo.getUuid());
+                        childNotifyTreeVo.setName(handler != null ? $.t(handler.getName()) : $.t(childNotifyTreeVo.getName()));
+                        Map<String, String> triggerNames = new HashMap<>();
+                        // 触发器名称可能在构造时已经翻译，必须从处理器重新读取当前语言。
+                        if (handler != null && CollectionUtils.isNotEmpty(handler.getNotifyTriggerList())) {
+                            for (NotifyTriggerVo trigger : handler.getNotifyTriggerList()) {
+                                triggerNames.put(trigger.getTrigger(), trigger.getTriggerName());
+                            }
+                        }
                         if (CollectionUtils.isNotEmpty(childNotifyTreeVo.getChildren())) {
                             for (NotifyTreeVo secondChildNotifyTreeVo : childNotifyTreeVo.getChildren()) {
-                                secondChildNotifyTreeVo.setName($.t(secondChildNotifyTreeVo.getName()));
+                                secondChildNotifyTreeVo.setName($.t(triggerNames.getOrDefault(
+                                        secondChildNotifyTreeVo.getUuid(), secondChildNotifyTreeVo.getName())));
                             }
                         }
                     }
@@ -195,6 +208,7 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
 //                }
             }
 
+            treeHandlerMap.put(notifyPolicyHandler.getClassName(), notifyPolicyHandler);
             NotifyTreeVo treeVo = new NotifyTreeVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName());
             List<NotifyTreeVo> children = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(notifyPolicyHandler.getNotifyTriggerList())) {
@@ -205,7 +219,7 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
             treeVo.setChildren(children);
             NotifyTreeVo parentTreeVo = moduleTreeVoMap.get(moduleVo.getGroup());
             if (parentTreeVo == null) {
-                parentTreeVo = new NotifyTreeVo(moduleVo.getGroup(), moduleVo.getGroupName());
+                parentTreeVo = new NotifyTreeVo(moduleVo.getGroup(), moduleVo.getGroupNameWithoutTranslate());
                 moduleTreeVoMap.put(moduleVo.getGroup(), parentTreeVo);
                 moduleTreeVoList.add(parentTreeVo);
             }

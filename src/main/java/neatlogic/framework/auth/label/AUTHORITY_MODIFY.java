@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class AUTHORITY_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "权限管理权限";
+		return "auth.authority_modify.name";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "对权限进行添加、修改和删除";
+		return "auth.authority_modify.description";
 	}
 
 	@Override

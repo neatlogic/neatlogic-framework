@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class ADMIN extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "系统核心基础权限";
+        return "auth.admin.name";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "对某些系统功能进行管理，例如重建左右编码等";
+        return "auth.admin.description";
     }
 
     @Override

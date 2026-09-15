@@ -2,16 +2,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class VIP_VIEW extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "VIP查看权限";
+		return "auth.vip_view.name";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "拥有此权限才能查看vip用户头像的VIP标识";
+		return "auth.vip_view.description";
 	}
 
 	@Override

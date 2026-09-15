@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class NOTIFY_JOB_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "通知定时任务管理权限";
+		return "auth.notify_job_modify.name";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "对通知策略中的定时任务进行添加、修改和删除";
+		return "auth.notify_job_modify.description";
 	}
 
 	@Override

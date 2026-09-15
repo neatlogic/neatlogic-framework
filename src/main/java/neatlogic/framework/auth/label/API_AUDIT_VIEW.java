@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class API_AUDIT_VIEW extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "查看操作审计权限";
+		return "auth.api_audit_view.name";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "查看操作审计权限";
+		return "auth.api_audit_view.description";
 	}
 
 	@Override

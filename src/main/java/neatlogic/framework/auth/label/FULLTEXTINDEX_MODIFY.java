@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class FULLTEXTINDEX_MODIFY extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "重建搜索中心索引权限";
+        return "auth.fulltextindex_modify.name";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "对全局检索索引进行重建";
+        return "auth.fulltextindex_modify.description";
     }
 
     @Override

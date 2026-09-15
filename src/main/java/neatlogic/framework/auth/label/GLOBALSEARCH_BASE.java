@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class GLOBALSEARCH_BASE extends AuthBase {
 
     @Override
     public String getAuthDisplayName() {
-        return "搜索中心基础权限";
+        return "auth.globalsearch_base.name";
     }
 
     @Override
     public String getAuthIntroduction() {
-        return "拥有此权限才能使用搜索中心基础权限功能";
+        return "auth.globalsearch_base.description";
     }
 
     @Override

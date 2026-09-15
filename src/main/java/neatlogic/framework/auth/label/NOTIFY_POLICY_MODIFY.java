@@ -14,16 +14,17 @@ package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
 
+/** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
 public class NOTIFY_POLICY_MODIFY extends AuthBase {
 
 	@Override
 	public String getAuthDisplayName() {
-		return "通知策略管理权限";
+		return "auth.notify_policy_modify.name";
 	}
 
 	@Override
 	public String getAuthIntroduction() {
-		return "对通知策略进行添加、修改和删除";
+		return "auth.notify_policy_modify.description";
 	}
 
 	@Override

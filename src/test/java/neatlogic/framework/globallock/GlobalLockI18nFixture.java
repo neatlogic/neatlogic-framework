@@ -42,11 +42,7 @@ final class GlobalLockI18nFixture implements AutoCloseable {
         StaticMessageSource messages = new StaticMessageSource();
         for (String language : new String[]{"zh", "en"}) {
             JSONObject json = JSONObject.parseObject(new String(Files.readAllBytes(Paths.get("../neatlogic-resources/localconfig/i18n/language_" + language + ".json")), StandardCharsets.UTF_8));
-            for (String key : json.keySet()) {
-                if (key.startsWith("globallock.")) {
-                    messages.addMessage(key, new Locale(language), json.getString(key));
-                }
-            }
+            registerGlobalLockMessages(messages, json, "", new Locale(language));
             // 公共参数异常使用嵌套语言包，按实际路径注册，不能按平铺 key 查找。
             JSONObject rules = json.getJSONObject("nfet").getJSONObject("paramirregularexception").getJSONObject("paramirregularexception");
             for (String key : rules.keySet()) {
@@ -56,6 +52,19 @@ final class GlobalLockI18nFixture implements AutoCloseable {
         context.getBeanFactory().registerSingleton("messageSourceAccessor", new MessageSourceAccessor(messages));
         new SpringContextUtil().setApplicationContext(context);
         Locale.setDefault(Locale.CHINESE);
+    }
+
+    /** 递归展开嵌套语言包，同时兼容历史平铺格式，只注册全局锁测试需要的文案。 */
+    private void registerGlobalLockMessages(StaticMessageSource messages, JSONObject json, String prefix, Locale locale) {
+        for (String key : json.keySet()) {
+            Object value = json.get(key);
+            String messageKey = prefix.isEmpty() ? key : prefix + "." + key;
+            if (value instanceof JSONObject) {
+                registerGlobalLockMessages(messages, (JSONObject) value, messageKey, locale);
+            } else if (messageKey.startsWith("globallock.") && value instanceof String) {
+                messages.addMessage(messageKey, locale, (String) value);
+            }
+        }
     }
 
     /** 恢复全局上下文和默认语言，避免影响其他测试。 */

@@ -30,6 +30,15 @@ import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 权限校验入口，支持校验当前用户或显式指定用户，权限标识取 AuthBase 类型的简单类名。
+ * 参数无效时返回 false；目标权限包含 NoAuth 时直接通过。
+ * 系统用户在 API 执行链外保持直接放行，API 内仅在当前接口通过 AuthUser 匹配该系统用户时豁免，否则继续校验权限。
+ * 维护用户命中任一维护权限时直接通过，否则继续校验权限。
+ * 目标用户与当前上下文用户一致时，信任并复用 UserContext 中的超级管理员状态和鉴权信息；
+ * 校验其他用户时，实时确认目标用户存在、已启用且未删除，再使用目标用户自身的超级管理员状态和鉴权信息。
+ * 直接权限未命中时继续递归检查权限包含关系，任一目标权限命中即通过。
+ */
 @RootComponent
 public class AuthActionChecker {
 

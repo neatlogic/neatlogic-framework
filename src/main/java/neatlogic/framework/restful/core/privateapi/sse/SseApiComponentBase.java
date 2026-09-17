@@ -56,9 +56,11 @@ public abstract class SseApiComponentBase extends ApiComponentTemplateBase imple
 
     private Object executeService(ApiVo apiVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response,
                                   Object component, Class<?> targetClass) throws Exception {
-        validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-        validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-        return invokeComponentMethod(component, "myDoService",
-                new Class[]{JSONObject.class, HttpServletRequest.class, HttpServletResponse.class}, paramObj, request, response);
+        return invokeWithApiAuthContext(targetClass, () -> {
+            validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+            validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+            return invokeComponentMethod(component, "myDoService",
+                    new Class[]{JSONObject.class, HttpServletRequest.class, HttpServletResponse.class}, paramObj, request, response);
+        });
     }
 }

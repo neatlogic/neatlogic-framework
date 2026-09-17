@@ -74,13 +74,15 @@ public abstract class BinaryStreamApiComponentBase extends ApiComponentTemplateB
      */
     private Object executeService(ApiVo apiVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response,
                                   Object component, Class<?> targetClass) throws Exception {
-        validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-        validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-        CacheControlVo cacheControlVo = getCacheControl(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-        if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
-            response.setHeader("Cache-Control", "max-age=" + cacheControlVo.getMaxAge());
-        }
-        return invokeComponentMethod(component, "myDoService",
-                new Class[]{JSONObject.class, HttpServletRequest.class, HttpServletResponse.class}, paramObj, request, response);
+        return invokeWithApiAuthContext(targetClass, () -> {
+            validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+            validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+            CacheControlVo cacheControlVo = getCacheControl(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+            if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                response.setHeader("Cache-Control", "max-age=" + cacheControlVo.getMaxAge());
+            }
+            return invokeComponentMethod(component, "myDoService",
+                    new Class[]{JSONObject.class, HttpServletRequest.class, HttpServletResponse.class}, paramObj, request, response);
+        });
     }
 }

@@ -70,8 +70,10 @@ public abstract class JsonStreamApiComponentBase extends ApiComponentTemplateBas
      * 执行 JSON 流接口的实际服务逻辑。
      */
     private Object executeService(ApiVo apiVo, JSONObject paramObj, JSONReader jsonReader, Object component, Class<?> targetClass) throws Exception {
-        validApi(targetClass, paramObj, apiVo, JSONObject.class, JSONReader.class);
-        validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, JSONReader.class);
-        return invokeComponentMethod(component, "myDoService", new Class[]{JSONObject.class, JSONReader.class}, paramObj, jsonReader);
+        return invokeWithApiAuthContext(targetClass, () -> {
+            validApi(targetClass, paramObj, apiVo, JSONObject.class, JSONReader.class);
+            validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, JSONReader.class);
+            return invokeComponentMethod(component, "myDoService", new Class[]{JSONObject.class, JSONReader.class}, paramObj, jsonReader);
+        });
     }
 }

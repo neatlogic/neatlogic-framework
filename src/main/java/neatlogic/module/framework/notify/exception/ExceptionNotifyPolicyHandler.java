@@ -13,6 +13,7 @@
 package neatlogic.module.framework.notify.exception;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.label.NOTIFY_POLICY_MODIFY;
 import neatlogic.framework.dto.ConditionParamVo;
 import neatlogic.framework.notify.core.NotifyPolicyHandlerBase;
@@ -37,8 +38,8 @@ public class ExceptionNotifyPolicyHandler extends NotifyPolicyHandlerBase {
      * 绑定权限，每种handler对应不同的权限
      */
     @Override
-    public String getAuthName() {
-        return NOTIFY_POLICY_MODIFY.class.getSimpleName();
+    public Class<? extends AuthBase> getAuthClass() {
+        return NOTIFY_POLICY_MODIFY.class;
     }
 
 //    @Override

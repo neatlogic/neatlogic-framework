@@ -22,11 +22,11 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.core.AuthAction;
 import neatlogic.framework.auth.core.AuthActionChecker;
+import neatlogic.framework.auth.core.ApiAuthContext;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
-import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
@@ -262,9 +262,8 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
         boolean isAuth = false;
         for (AuthAction action : actions) {
             if (StringUtils.isNotBlank(action.action().getSimpleName())) {
-                String actionName = action.action().getSimpleName();
                 // 判断用户角色是否拥有接口权限
-                if (AuthActionChecker.check(actionName)) {
+                if (AuthActionChecker.check(action.action())) {
                     isAuth = true;
                     break;
                 }
@@ -298,15 +297,7 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
         if (apiClass != null) {
             if (!Objects.equals(TenantContext.get().getTenantUuid(), "master")) {
                 //判断是否系统用户豁免接口
-                if (SystemUserFactory.getUserVoByUser(UserContext.get().getUserUuid()) != null) {
-                    AuthUser[] authUsers = apiClass.getAnnotationsByType(AuthUser.class);
-                    for (AuthUser authUser : authUsers) {
-                        if (Objects.equals(authUser.value().getUserId(), UserContext.get().getUserUuid())) {
-                            isAuth = true;
-                            break;
-                        }
-                    }
-                }
+                isAuth = ApiAuthContext.isCurrentSystemUserExempt();
                 if (!isAuth) {
                     //AuthAction action = apiClass.getAnnotation(AuthAction.class);
                     AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);

@@ -82,21 +82,23 @@ public abstract class RawApiComponentBase extends ApiComponentTemplateBase imple
      */
     private Object executeService(ApiVo apiVo, String param, HttpServletResponse response, Object component, Class<?> targetClass,
                                   boolean useDeclaredCacheControlType) throws Exception {
-        validAuth(targetClass);
-        validIsReSubmitForRaw(targetClass, apiVo.getToken(), param, String.class);
-        Object result = invokeComponentMethod(component, "myDoService", new Class[]{String.class}, param);
-        if (Config.ENABLE_INTERFACE_VERIFY()) {
-            validOutput(targetClass, result, JSONObject.class);
-        }
-        if (response != null) {
-            CacheControlVo cacheControlVo = getCacheControl(String.class);
-            if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
-                String headerValue = useDeclaredCacheControlType
-                        ? cacheControlVo.getCacheControlType().getValue() + cacheControlVo.getMaxAge()
-                        : "max-age=" + cacheControlVo.getMaxAge();
-                response.setHeader("Cache-Control", headerValue);
+        return invokeWithApiAuthContext(targetClass, () -> {
+            validAuth(targetClass);
+            validIsReSubmitForRaw(targetClass, apiVo.getToken(), param, String.class);
+            Object result = invokeComponentMethod(component, "myDoService", new Class[]{String.class}, param);
+            if (Config.ENABLE_INTERFACE_VERIFY()) {
+                validOutput(targetClass, result, JSONObject.class);
             }
-        }
-        return result;
+            if (response != null) {
+                CacheControlVo cacheControlVo = getCacheControl(String.class);
+                if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                    String headerValue = useDeclaredCacheControlType
+                            ? cacheControlVo.getCacheControlType().getValue() + cacheControlVo.getMaxAge()
+                            : "max-age=" + cacheControlVo.getMaxAge();
+                    response.setHeader("Cache-Control", headerValue);
+                }
+            }
+            return result;
+        });
     }
 }

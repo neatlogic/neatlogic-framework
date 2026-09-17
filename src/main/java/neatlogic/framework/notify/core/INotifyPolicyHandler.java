@@ -13,6 +13,7 @@
 package neatlogic.framework.notify.core;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.config.Config;
@@ -47,9 +48,11 @@ public interface INotifyPolicyHandler {
     }
 
     /**
-     * 绑定权限，每种handler对应不同的权限
+     * 获取当前处理器绑定的权限类型。
+     *
+     * @return 权限类型，没有绑定权限时返回 null
      */
-    String getAuthName();
+    Class<? extends AuthBase> getAuthClass();
 
 //    INotifyPolicyHandlerGroup getGroup();
 

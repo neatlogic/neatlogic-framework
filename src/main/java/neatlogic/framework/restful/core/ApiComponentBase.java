@@ -123,31 +123,33 @@ public abstract class ApiComponentBase extends ApiComponentTemplateBase implemen
      */
     private Object executeService(ApiVo apiVo, JSONObject paramObj, HttpServletResponse response, Object component, Class<?> targetClass,
                                   boolean useDeclaredCacheControlType) throws Exception {
-        validApi(targetClass, paramObj, apiVo, JSONObject.class);
-        Object result = null;
-        boolean canRun = false;
-        if (apiVo.getIsActive().equals(0)) {
-            result = invokeComponentMethod(component, "myDoTest", new Class[]{JSONObject.class}, paramObj);
-            canRun = (result == null);
-        } else {
-            canRun = true;
-        }
-        if (canRun) {
-            validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class);
-            result = invokeComponentMethod(component, "myDoService", new Class[]{JSONObject.class}, paramObj);
-            if (Config.ENABLE_INTERFACE_VERIFY()) {
-                validOutput(targetClass, result, JSONObject.class);
+        return invokeWithApiAuthContext(targetClass, () -> {
+            validApi(targetClass, paramObj, apiVo, JSONObject.class);
+            Object result = null;
+            boolean canRun = false;
+            if (apiVo.getIsActive().equals(0)) {
+                result = invokeComponentMethod(component, "myDoTest", new Class[]{JSONObject.class}, paramObj);
+                canRun = (result == null);
+            } else {
+                canRun = true;
             }
-            if (response != null) {
-                CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
-                if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
-                    String headerValue = useDeclaredCacheControlType
-                            ? cacheControlVo.getCacheControlType().getValue() + "=" + cacheControlVo.getMaxAge()
-                            : "max-age=" + cacheControlVo.getMaxAge();
-                    response.setHeader("Cache-Control", headerValue);
+            if (canRun) {
+                validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class);
+                result = invokeComponentMethod(component, "myDoService", new Class[]{JSONObject.class}, paramObj);
+                if (Config.ENABLE_INTERFACE_VERIFY()) {
+                    validOutput(targetClass, result, JSONObject.class);
+                }
+                if (response != null) {
+                    CacheControlVo cacheControlVo = getCacheControl(JSONObject.class);
+                    if (cacheControlVo != null && cacheControlVo.getCacheControlType() != null) {
+                        String headerValue = useDeclaredCacheControlType
+                                ? cacheControlVo.getCacheControlType().getValue() + "=" + cacheControlVo.getMaxAge()
+                                : "max-age=" + cacheControlVo.getMaxAge();
+                        response.setHeader("Cache-Control", headerValue);
+                    }
                 }
             }
-        }
-        return result;
+            return result;
+        });
     }
 }

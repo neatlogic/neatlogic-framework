@@ -64,11 +64,28 @@ public class SystemUserFactory {
         }
     }
 
+    /**
+     * 根据用户 UUID 或用户 ID 构造系统用户信息。
+     *
+     * @param user 用户 UUID 或用户 ID
+     * @return 系统用户信息，不存在时返回 null
+     */
     public static UserVo getUserVoByUser(String user) {
+        ISystemUser systemUser = getSystemUserByUser(user);
+        return systemUser == null ? null : systemUser.getUserVo();
+    }
+
+    /**
+     * 根据用户 UUID 或用户 ID 获取系统用户定义，不构造包含 JWT 的 UserVo。
+     *
+     * @param user 用户 UUID 或用户 ID
+     * @return 系统用户定义，不存在时返回 null
+     */
+    public static ISystemUser getSystemUserByUser(String user) {
         for (Map.Entry<String, ISystemUser> userEntry : systemUserMap.entrySet()) {
             ISystemUser systemUser = userEntry.getValue();
             if (systemUser.getUserUuid().equals(user) || systemUser.getUserId().equals(user)) {
-                return systemUser.getUserVo();
+                return systemUser;
             }
         }
         return null;

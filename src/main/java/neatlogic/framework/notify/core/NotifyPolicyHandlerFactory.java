@@ -192,7 +192,7 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
                 notifyPolicyHandlerMap.put(className, notifyPolicyHandler);
                 handler2ModuleGroupIdMap.put(className, moduleGroup);
                 handler2ModuleIdMap.put(className, moduleVo.getId());
-//                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthName(), moduleVo.getId(), moduleVo.getGroup(), notifyPolicyHandler.isAllowMultiPolicy()));
+//                notifyPolicyHandlerList.add(new NotifyPolicyHandlerVo(notifyPolicyHandler.getClassName(), notifyPolicyHandler.getName(), notifyPolicyHandler.getAuthClass().getSimpleName(), moduleVo.getId(), moduleVo.getGroup(), notifyPolicyHandler.isAllowMultiPolicy()));
 
 //                INotifyPolicyHandlerGroup notifyPolicyHandlerGroup = notifyPolicyHandler.getGroup();
 //                if (notifyPolicyHandlerGroup == null) {

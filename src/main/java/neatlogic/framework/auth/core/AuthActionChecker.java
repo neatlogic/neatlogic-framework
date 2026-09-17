@@ -21,9 +21,10 @@ import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
-import neatlogic.framework.restful.core.ApiValidateAndHelpBase;
+import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.service.AuthenticationInfoService;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -46,108 +47,104 @@ public class AuthActionChecker {
         authenticationInfoService = _authenticationInfoService;
     }
 
+    /**
+     * 校验当前用户是否拥有任一目标权限。
+     *
+     * @param actionClass 目标权限类型
+     * @return 是否拥有任一目标权限
+     */
     @SafeVarargs
     public static Boolean check(Class<? extends AuthBase>... actionClass) {
-        if (actionClass == null || actionClass.length == 0) {
+        UserContext userContext = UserContext.get();
+        if (userContext == null || StringUtils.isBlank(userContext.getUserUuid())) {
             return false;
         }
-        UserContext userContext = UserContext.get();
+        return check(userContext.getUserUuid(), actionClass);
+    }
+
+    /**
+     * 校验指定用户是否拥有任一目标权限。
+     *
+     * @param userUuid    待校验用户 UUID
+     * @param actionClass 目标权限类型
+     * @return 是否有权限 有：true 否：false
+     */
+    @SafeVarargs
+    public static Boolean check(String userUuid, Class<? extends AuthBase>... actionClass) {
+        if (StringUtils.isBlank(userUuid)) {
+            return false;
+        }
+        List<String> actionList = getActionList(actionClass);
+        if (CollectionUtils.isEmpty(actionList)) {
+            return false;
+        }
+        return check(userUuid, actionList);
+    }
+
+    /**
+     * 将权限类型转换为权限名称；存在空权限类型时拒绝本次校验。
+     *
+     * @param actionClass 目标权限类型
+     * @return 权限名称列表，参数无效时返回空列表
+     */
+    private static List<String> getActionList(Class<? extends AuthBase>[] actionClass) {
+        if (actionClass == null || actionClass.length == 0) {
+            return Collections.emptyList();
+        }
         List<String> actionList = new ArrayList<>();
         for (Class<? extends AuthBase> action : actionClass) {
+            if (action == null) {
+                return Collections.emptyList();
+            }
             actionList.add(action.getSimpleName());
         }
-        if (userContext != null) {
-            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null && !isApiBaseCaller()) {
-                return true;
-            }
-            return checkByUserUuid(userContext.getUserUuid(), actionList);
-        } else {
-            return false;
-        }
-    }
-
-    public static Boolean check(String... action) {
-        if (action == null || action.length == 0) {
-            return false;
-        }
-        UserContext userContext = UserContext.get();
-        List<String> actionList = new ArrayList<>(Arrays.asList(action));
-        if (userContext != null) {
-            if ( SystemUserFactory.getUserVoByUser(userContext.getUserUuid()) != null) {
-                return true;
-            }
-            return checkByUserUuid(userContext.getUserUuid(), actionList);
-        } else {
-            return false;
-        }
+        return actionList;
     }
 
     /**
-     * 如果是访问接口（ApiValidateAndHelpBase调的方法），系统用户无需鉴权
-     */
-    private static boolean isApiBaseCaller() {
-        StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-        for (StackTraceElement e : stack) {
-            if (!e.getClassName().equals(AuthActionChecker.class.getName()) && Objects.equals(ApiValidateAndHelpBase.class.getName(),e.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 穿透校验该用户是拥有在满足的权限
+     * 校验指定用户是否拥有任一目标权限。
      *
-     * @param userUuid 当前登录人
-     * @param action   目标权限
-     * @return 是否有权限 有：true 否：false
+     * @param userUuid   待校验用户 UUID
+     * @param actionList 目标权限列表
+     * @return 是否拥有任一目标权限
      */
-    public static Boolean checkByUserUuid(String userUuid, String... action) {
-        if (action == null || action.length == 0) {
-            return false;
-        }
-        if ( SystemUserFactory.getUserVoByUser(userUuid) != null) {
-            return true;
-        }
-        List<String> actionList = Arrays.asList(action);
-        return checkByUserUuid(userUuid, actionList);
-    }
-
-    /**
-     * 穿透校验该用户是拥有在满足的权限
-     * 1、递归获取该用户所有权限
-     * 2、比对用户所有权限中是否包含需要检验的权限
-     *
-     * @param userUuid   当前登录人
-     * @param actionList 目标权限
-     * @return 是否有权限 有：true 否：false
-     */
-    public static Boolean checkByUserUuid(String userUuid, List<String> actionList) {
-        //维护模式下且是维护用户 || ,指定权限无需鉴权
-        if (Config.ENABLE_MAINTENANCE() && userUuid.equals(Config.MAINTENANCE()) && MaintenanceMode.maintenanceAuthSet.containsAll(actionList)) {
-            return true;
-        }
-        //超级管理员无需鉴权
-        if (UserContext.get() != null && UserContext.get().getIsSuperAdmin()) {
-            return true;
-        }
-        if (CollectionUtils.isEmpty(actionList)) {
+    private static Boolean check(String userUuid, List<String> actionList) {
+        if (StringUtils.isBlank(userUuid) || CollectionUtils.isEmpty(actionList)) {
             return false;
         }
         if (actionList.contains(NoAuth.class.getSimpleName())) {
             return true;
         }
-        //判断从数据库查询的用户权限是否满足
+        boolean isSystemUser = SystemUserFactory.getSystemUserByUser(userUuid) != null;
+        if (isSystemUser && ApiAuthContext.shouldBypassSystemUserAuth(userUuid)) {
+            return true;
+        }
+        boolean isMaintenanceUser = Config.ENABLE_MAINTENANCE() && Objects.equals(userUuid, Config.MAINTENANCE());
+        if (isMaintenanceUser && !Collections.disjoint(MaintenanceMode.maintenanceAuthSet, actionList)) {
+            return true;
+        }
         AuthenticationInfoVo authenticationInfoVo;
-        if (UserContext.get() != null) {
-            authenticationInfoVo = UserContext.get().getAuthenticationInfoVo();
+        UserContext userContext = UserContext.get();
+        boolean isCurrentUser = userContext != null && Objects.equals(userContext.getUserUuid(), userUuid);
+        if (isCurrentUser) {
+            if (Boolean.TRUE.equals(userContext.getIsSuperAdmin())) {
+                return true;
+            }
+            authenticationInfoVo = userContext.getAuthenticationInfoVo();
         } else {
+            UserVo userVo = userMapper.getUserBaseInfoByUuidWithoutCache(userUuid);
+            if (userVo == null || !Objects.equals(userVo.getIsActive(), 1) || Objects.equals(userVo.getIsDelete(), 1)) {
+                return false;
+            }
+            if (Boolean.TRUE.equals(userVo.getIsSuperAdmin())) {
+                return true;
+            }
             authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(userUuid);
         }
+
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo);
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
-        List<String> contains = userAuthList.stream().filter(actionList::contains).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(contains)) {
+        if (userAuthList.stream().anyMatch(actionList::contains)) {
             return true;
         }
         //以上不满足，则遍历递归所有权限寻找
@@ -207,7 +204,7 @@ public class AuthActionChecker {
      * @param authBase     权限对象
      * @param userAuthList 用户对应权限
      */
-    public static void getUserAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
+    private static void getUserAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
         if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
@@ -217,25 +214,6 @@ public class AuthActionChecker {
                         userAuthList.add(new UserAuthVo(auth));
                         getUserAuthListByAuth(auth, userAuthList);
                     }
-                }
-            }
-        }
-    }
-
-    /**
-     * 递归穿透获取权限
-     *
-     * @param authBase 权限对象
-     * @param authList 权限
-     */
-    public static void getAuthListByAuth(AuthBase authBase, List<String> authList) {
-        if (authBase != null) {
-            List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
-            for (Class<? extends AuthBase> authClass : authClassList) {
-                if (authList.stream().noneMatch(o -> Objects.equals(o, authClass.getSimpleName()))) {//防止回环
-                    AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
-                    authList.add(auth.getAuthName());
-                    getAuthListByAuth(auth, authList);
                 }
             }
         }

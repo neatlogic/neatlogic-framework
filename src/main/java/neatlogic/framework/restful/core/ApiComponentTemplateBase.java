@@ -13,6 +13,7 @@
 package neatlogic.framework.restful.core;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.auth.core.ApiAuthContext;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.restful.dto.ApiVo;
 import org.apache.commons.collections4.MapUtils;
@@ -45,6 +46,17 @@ public abstract class ApiComponentTemplateBase extends ApiValidateAndHelpBase {
     }
 
     /**
+     * API 鉴权作用域内的执行逻辑。
+     */
+    @FunctionalInterface
+    protected interface ApiAuthInvocation {
+        /**
+         * 执行当前 API 作用域中的业务逻辑。
+         */
+        Object execute() throws Exception;
+    }
+
+    /**
      * 默认不需要审计，由具体组件按需覆盖。
      */
     public int needAudit() {
@@ -66,6 +78,18 @@ public abstract class ApiComponentTemplateBase extends ApiValidateAndHelpBase {
                 throw new ApiRuntimeException(ex.getCause().getMessage(), ex.getCause());
             }
             throw ex;
+        }
+    }
+
+    /**
+     * 在当前同步 API 执行链内应用系统用户鉴权规则，并在完成或异常时恢复外层状态。
+     */
+    protected final Object invokeWithApiAuthContext(Class<?> apiClass, ApiAuthInvocation invocation) throws Exception {
+        ApiAuthContext.enter(apiClass);
+        try {
+            return invocation.execute();
+        } finally {
+            ApiAuthContext.exit();
         }
     }
 

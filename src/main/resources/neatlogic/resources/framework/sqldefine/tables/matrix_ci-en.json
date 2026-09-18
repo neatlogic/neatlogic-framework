@@ -1,0 +1,35 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_ci",
+  "label": "CMDB Model Matrix",
+  "description": "The CMDB model matrix can be used for related queries in framework-related scenarios and report queries.",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "Matrix UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "ci_id",
+      "type": "bigint",
+      "description": "CI model ID."
+    },
+    {
+      "name": "config",
+      "type": "longtext",
+      "description": "Configuration information."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "Primary key index covering the matrix_uuid field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

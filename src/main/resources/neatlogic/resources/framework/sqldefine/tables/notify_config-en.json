@@ -1,0 +1,50 @@
+{
+  "moduleId": "framework",
+  "name": "notify_config",
+  "label": "Notification Configuration Table",
+  "description": "The notification configuration table is used for filtering enabled states in various reporting scenarios related to framework components.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Primary key ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(250)",
+      "description": "Name."
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint(1)",
+      "description": "Indicates whether it is active."
+    },
+    {
+      "name": "is_default",
+      "type": "tinyint(1)",
+      "description": "Is this the default configuration."
+    },
+    {
+      "name": "type",
+      "type": "varchar(100)",
+      "description": "Notification type."
+    },
+    {
+      "name": "config",
+      "type": "text",
+      "description": "Configuration."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_external",
+  "label": "Matrix External DataSource Configuration Information Table",
+  "description": "Matrix external data source configuration information table is used for querying, filtering, and reporting of related framework data.",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "Matrix UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "integration_uuid",
+      "type": "char(32)",
+      "description": "Plugin type."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "Primary key index covering the matrix_uuid field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

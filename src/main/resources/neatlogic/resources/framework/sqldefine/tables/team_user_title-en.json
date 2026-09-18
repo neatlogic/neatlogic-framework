@@ -1,0 +1,63 @@
+{
+  "moduleId": "framework",
+  "name": "team_user_title",
+  "label": "Group Leadership Relationship Table",
+  "description": "Grouped leadership position relationships table used for Framework-Related association queries and report queries.",
+  "fields": [
+    {
+      "name": "team_uuid",
+      "type": "char(32)",
+      "description": "The UUID of the group, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "title_id",
+      "type": "bigint",
+      "description": "Title ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "title_sort",
+      "type": "int",
+      "description": "Sort by title."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "team_uuid",
+        "user_uuid",
+        "title_id"
+      ],
+      "description": "Primary key index covering the team_uuid, user_uuid, title_id fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "title_id"
+      ],
+      "description": "Standard index covering the title_id field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_teamiuud_titlesort",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "team_uuid",
+        "title_sort"
+      ],
+      "description": "Standard index covering the team_uuid, title_sort fields, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

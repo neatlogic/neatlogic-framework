@@ -1,0 +1,76 @@
+{
+  "moduleId": "framework",
+  "name": "user_session",
+  "label": "UserSession Table",
+  "description": "The user session table is used for querying, filtering, and reporting on framework-related data.",
+  "fields": [
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "token_hash",
+      "type": "char(32)",
+      "description": "Token hash value, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "token_create_time",
+      "type": "bigint",
+      "description": "Token creation time."
+    },
+    {
+      "name": "visit_time",
+      "type": "timestamp(3)",
+      "description": "Access time. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "auth_info_hash",
+      "type": "char(32)",
+      "description": "User role group information hash. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "user_uuid",
+        "token_hash"
+      ],
+      "description": "Primary key index covering the user_uuid, token_hash fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_authinfohash",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "auth_info_hash"
+      ],
+      "description": "Standard index covering the auth_info_hash field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_useruuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid"
+      ],
+      "description": "Standard index covering the user_uuid field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_vistitime",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "visit_time"
+      ],
+      "description": "Standard index covering the visit_time field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

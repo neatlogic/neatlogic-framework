@@ -1,0 +1,56 @@
+{
+  "moduleId": "framework",
+  "name": "user_role",
+  "label": "Role Member Relationship Table",
+  "description": "The role membership relationship table is used for querying, filtering, and reporting on related data for framework purposes.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Auto-incremented ID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "role_uuid",
+      "type": "char(32)",
+      "description": "Get the UUID of the role, used as the primary key or unique identifier for records in this table."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "user_uuid",
+        "role_uuid"
+      ],
+      "description": "Primary key index covering the user_uuid, role_uuid fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "Standard index covering the ID field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_role_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "role_uuid"
+      ],
+      "description": "Standard index covering the role_uuid field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

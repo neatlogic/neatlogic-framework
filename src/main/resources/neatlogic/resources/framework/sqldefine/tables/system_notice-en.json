@@ -1,0 +1,95 @@
+{
+  "moduleId": "framework",
+  "name": "system_notice",
+  "label": "System Announcements Table",
+  "description": "The system announcement table is used for reporting scenarios related to framework status tracking and time dimension statistics.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "title",
+      "type": "varchar(50)",
+      "description": "Title."
+    },
+    {
+      "name": "content",
+      "type": "mediumtext",
+      "description": "Content."
+    },
+    {
+      "name": "start_time",
+      "type": "timestamp(3)",
+      "description": "Effective time."
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp(3)",
+      "description": "Failure time."
+    },
+    {
+      "name": "status",
+      "type": "enum('not_issued','issued','stopped')",
+      "description": "not_issued: not issued; issued: issued; stopped: stopped."
+    },
+    {
+      "name": "pop_up",
+      "type": "enum('longshow','close')",
+      "description": "Longshow: persistent pop-up; close: non-persistent pop-up."
+    },
+    {
+      "name": "ignore_read",
+      "type": "tinyint(1)",
+      "description": "The \"ignore_read\" field is set to 1 for yes; 0 for no; -1 for not set."
+    },
+    {
+      "name": "issue_time",
+      "type": "timestamp(3)",
+      "description": "Last time the configuration was deployed. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "Creation time."
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "Creator."
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "Update the timestamp."
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "Updated by."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_issue_time",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "issue_time"
+      ],
+      "description": "Standard index covering the issue_time field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

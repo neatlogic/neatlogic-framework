@@ -1,0 +1,96 @@
+{
+  "moduleId": "framework",
+  "name": "user_export_file",
+  "label": "User Import File Information Table",
+  "description": "The user-imported file information table is used for framework-related status tracking and reporting scenarios.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(255)",
+      "description": "File name."
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "\"User\" with \"user_uuid\" reference. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "type",
+      "type": "varchar(200)",
+      "description": "Function type."
+    },
+    {
+      "name": "content_type",
+      "type": "varchar(200)",
+      "description": "Mime type."
+    },
+    {
+      "name": "config",
+      "type": "text",
+      "description": "Information."
+    },
+    {
+      "name": "is_read",
+      "type": "tinyint(1)",
+      "description": "Has_read."
+    },
+    {
+      "name": "status",
+      "type": "varchar(50)",
+      "description": "Status."
+    },
+    {
+      "name": "start_time",
+      "type": "timestamp(3)",
+      "description": "Start time."
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp(3)",
+      "description": "End time."
+    },
+    {
+      "name": "path",
+      "type": "varchar(255)",
+      "description": "Path."
+    },
+    {
+      "name": "size",
+      "type": "bigint",
+      "description": "File size."
+    },
+    {
+      "name": "error",
+      "type": "mediumtext",
+      "description": "Error message."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_user_uuid_start_time",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid",
+        "start_time"
+      ],
+      "description": "Standard index covering the user_uuid, start_time fields, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

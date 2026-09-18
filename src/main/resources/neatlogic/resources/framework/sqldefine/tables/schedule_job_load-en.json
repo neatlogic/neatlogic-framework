@@ -1,0 +1,42 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_load",
+  "label": "schedule_job_load Table",
+  "description": "The schedule_job_load table, belonging to the framework module, is used for related queries and report queries related to the framework.",
+  "fields": [
+    {
+      "name": "job_name",
+      "type": "varchar(100)",
+      "description": "The UUID of the schedule_job table, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "job_group",
+      "type": "varchar(100)",
+      "description": "Job group, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "server_id",
+      "type": "int",
+      "description": "Service ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "server_start_time",
+      "type": "timestamp(3)",
+      "description": "Service start time."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "job_name",
+        "job_group",
+        "server_id"
+      ],
+      "description": "Primary key index covering the job_name, job_group, server_id fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

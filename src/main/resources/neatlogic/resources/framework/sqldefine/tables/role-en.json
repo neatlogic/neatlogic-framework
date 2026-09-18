@@ -1,0 +1,65 @@
+{
+  "moduleId": "framework",
+  "name": "role",
+  "label": "Role Table",
+  "description": "The role table is used for querying, filtering, and reporting on data related to the framework.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "AUTO_INCREMENT ID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "Role name."
+    },
+    {
+      "name": "description",
+      "type": "varchar(500)",
+      "description": "Role description."
+    },
+    {
+      "name": "rule",
+      "type": "text",
+      "description": "Enforce rules."
+    },
+    {
+      "name": "is_delete",
+      "type": "tinyint(1)",
+      "description": "Is it deleted."
+    },
+    {
+      "name": "env",
+      "type": "varchar(50)",
+      "description": "The env field in the role table."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "Primary key index covering the UUID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "Standard index covering the ID field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

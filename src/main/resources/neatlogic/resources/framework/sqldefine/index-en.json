@@ -1,0 +1,225 @@
+{
+  "moduleId": "framework",
+  "tables": [
+    {
+      "name": "matrix",
+      "label": "Matrix Information Table",
+      "description": "The matrix information table is used for time dimension statistical queries related to the framework."
+    },
+    {
+      "name": "matrix_attribute",
+      "label": "Custom Attribute Matrix",
+      "description": "The custom attribute table is designed for querying, filtering, and reporting on framework-related data."
+    },
+    {
+      "name": "matrix_ci",
+      "label": "CMDB Model Matrix",
+      "description": "The CMDB model matrix can be used for related queries in framework-related scenarios and report queries."
+    },
+    {
+      "name": "matrix_cmdb_custom_view",
+      "label": "CMDB Custom View Matrix Configuration Table",
+      "description": "The custom view matrix configuration table for CMDB is designed for use in association queries related to framework and reporting scenarios."
+    },
+    {
+      "name": "matrix_external",
+      "label": "Matrix External DataSource Configuration Information Table",
+      "description": "Matrix external data source configuration information table is used for querying, filtering, and reporting of related framework data."
+    },
+    {
+      "name": "matrix_view",
+      "label": "Matrix Dashboard",
+      "description": "Matrix view is suitable for querying related associations in framework-related scenarios and report queries."
+    },
+    {
+      "name": "notify_config",
+      "label": "Notification Configuration Table",
+      "description": "The notification configuration table is used for filtering enabled states in various reporting scenarios related to framework components."
+    },
+    {
+      "name": "notify_job",
+      "label": "Schedule Notification Task Table",
+      "description": "Notify the scheduled task table for use in reporting scenarios related to enabling state filtering for framework-related items and time dimension statistics."
+    },
+    {
+      "name": "notify_job_receiver",
+      "label": "Notification Task Receiver Table",
+      "description": "The notification task receiver table is used for related queries in framework-related scenarios and report queries."
+    },
+    {
+      "name": "notify_policy",
+      "label": "Notification Policy Information Table",
+      "description": "Notification strategy information table for use in reporting scenarios related to time dimension statistics for framework purposes."
+    },
+    {
+      "name": "region",
+      "label": "Region Table",
+      "description": "The region table is used for filtering enabled states related to the framework and for querying related data in report scenarios."
+    },
+    {
+      "name": "region_team",
+      "label": "region_team Table",
+      "description": "The region_team table, which belongs to the framework module, is used for time dimension statistical queries and association queries related to framework operations."
+    },
+    {
+      "name": "role",
+      "label": "Role Table",
+      "description": "The role table is used for querying, filtering, and reporting on data related to the framework."
+    },
+    {
+      "name": "role_authority",
+      "label": "Role Authorization Table",
+      "description": "The role authorization table is used for querying, filtering, and reporting on framework-related data."
+    },
+    {
+      "name": "schedule_job",
+      "label": "Scheduled Job Information Table",
+      "description": "The periodic job information table is used for filtering the enablement status related to the framework and for statistical queries based on time dimensions."
+    },
+    {
+      "name": "schedule_job_audit",
+      "label": "Scheduled Job Log Table",
+      "description": "The scheduled job log table is used for tracking the state of related frameworks and for querying related associations in report scenarios."
+    },
+    {
+      "name": "schedule_job_audit_detail",
+      "label": "Job Log Details Table",
+      "description": "Job log details table for scheduled jobs, used for querying, filtering, and reporting on Framework-Related data."
+    },
+    {
+      "name": "schedule_job_data",
+      "label": "Scheduled Job Process Data",
+      "description": "The scheduled job process data can be used for querying, filtering, and reporting on related framework data."
+    },
+    {
+      "name": "schedule_job_load",
+      "label": "schedule_job_load Table",
+      "description": "The schedule_job_load table, belonging to the framework module, is used for related queries and report queries related to the framework."
+    },
+    {
+      "name": "schedule_job_load_time",
+      "label": "Scheduled Job Locks Table",
+      "description": "Scheduled job locks table for querying, filtering, and reporting on framework-related data."
+    },
+    {
+      "name": "schedule_job_lock",
+      "label": "Scheduled Job Locks Table",
+      "description": "Scheduled job locks table is used for related queries in framework-related scenarios."
+    },
+    {
+      "name": "schedule_job_prop",
+      "label": "Scheduled Job Parameters Table",
+      "description": "Scheduled job parameters table used for querying, filtering, and reporting on related framework data."
+    },
+    {
+      "name": "schedule_job_status",
+      "label": "Scheduled Job Status Table",
+      "description": "The scheduled job status table is used for statistical reporting scenarios related to time dimensions in the framework."
+    },
+    {
+      "name": "system_notice",
+      "label": "System Announcements Table",
+      "description": "The system announcement table is used for reporting scenarios related to framework status tracking and time dimension statistics."
+    },
+    {
+      "name": "system_notice_recipient",
+      "label": "System Announcement Notification Object Table",
+      "description": "The system announcement notification object table is used for related query scenarios involving framework associations and report queries."
+    },
+    {
+      "name": "system_notice_user",
+      "label": "System Announcement for Users to Receive",
+      "description": "The system announcement user interface is designed for reporting scenarios related to framework associations and other query purposes."
+    },
+    {
+      "name": "system_role",
+      "label": "System Corresponding Information",
+      "description": "Important system information related to the framework for association queries and report queries."
+    },
+    {
+      "name": "team",
+      "label": "Group Information Table",
+      "description": "Group information table used for time dimensional statistical reports for frameworks."
+    },
+    {
+      "name": "team_role",
+      "label": "Group-Role Relationship Table",
+      "description": "Group and role relationships table used for querying, filtering, and reporting on Framework-Related data."
+    },
+    {
+      "name": "team_user_title",
+      "label": "Group Leadership Relationship Table",
+      "description": "Grouped leadership position relationships table used for Framework-Related association queries and report queries."
+    },
+    {
+      "name": "user",
+      "label": "User Information Table",
+      "description": "The user information table is used for filtering enabled states related to the framework, time dimension statistics, and association queries for report scenarios."
+    },
+    {
+      "name": "user_agent",
+      "label": "User Authorization Proxy Table",
+      "description": "User authorization proxy table this table is used for querying, filtering, and reporting on related framework data."
+    },
+    {
+      "name": "user_authority",
+      "label": "User Authorization Table",
+      "description": "The user authorization table is used for querying, filtering, and reporting on related framework data."
+    },
+    {
+      "name": "user_data",
+      "label": "User Data",
+      "description": "User data can be used for querying, filtering, and reporting on framework-related data."
+    },
+    {
+      "name": "user_export_file",
+      "label": "User Import File Information Table",
+      "description": "The user-imported file information table is used for framework-related status tracking and reporting scenarios."
+    },
+    {
+      "name": "user_password",
+      "label": "User Password Table",
+      "description": "The user password table is used for filtering enabled states related to the framework, time dimension statistics, and association queries."
+    },
+    {
+      "name": "user_profile",
+      "label": "User-specific Configuration",
+      "description": "User-specific configuration is used for related queries in framework integration scenarios and report queries."
+    },
+    {
+      "name": "user_role",
+      "label": "Role Member Relationship Table",
+      "description": "The role membership relationship table is used for querying, filtering, and reporting on related data for framework purposes."
+    },
+    {
+      "name": "user_session",
+      "label": "UserSession Table",
+      "description": "The user session table is used for querying, filtering, and reporting on framework-related data."
+    },
+    {
+      "name": "user_session_content",
+      "label": "User Sessions",
+      "description": "User sessions are used to query, filter, and present data related to framework components."
+    },
+    {
+      "name": "user_team",
+      "label": "Group Member Relationship Table",
+      "description": "Group membership table for querying, filtering, and reporting related framework data."
+    },
+    {
+      "name": "user_title",
+      "label": "User Position Table",
+      "description": "User table is used for querying, filtering, and reporting on related framework data."
+    },
+    {
+      "name": "worktime",
+      "label": "Service Window",
+      "description": "The service window is used for enabling state filtering for related framework operations and time dimension statistics for report queries."
+    },
+    {
+      "name": "worktime_range",
+      "label": "Service Window Time Range Table",
+      "description": "Service window time range table is used for querying, filtering, and reporting on related framework data."
+    }
+  ]
+}

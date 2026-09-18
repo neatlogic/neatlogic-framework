@@ -1,0 +1,36 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_data",
+  "label": "Scheduled Job Process Data",
+  "description": "The scheduled job process data can be used for querying, filtering, and reporting on related framework data.",
+  "fields": [
+    {
+      "name": "job_uuid",
+      "type": "char(32)",
+      "description": "Work order unique identifier, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "data_name",
+      "type": "varchar(100)",
+      "description": "Attribute name, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "data_value",
+      "type": "varchar(500)",
+      "description": "Attribute values."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "job_uuid",
+        "data_name"
+      ],
+      "description": "Primary key index covering the job_uuid, data_name fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "moduleId": "framework",
+  "name": "user_authority",
+  "label": "User Authorization Table",
+  "description": "The user authorization table is used for querying, filtering, and reporting on related framework data.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Auto-incremented ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User ID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "auth_group",
+      "type": "varchar(50)",
+      "description": "Permission group."
+    },
+    {
+      "name": "auth",
+      "type": "varchar(100)",
+      "description": "Permissions. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "Standard index covering the ID field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_auth",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "auth"
+      ],
+      "description": "Standard index covering the auth field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_user_auth",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "user_uuid",
+        "auth_group",
+        "auth"
+      ],
+      "description": "Unique index covering the user_uuid, auth_group, auth fields, suitable for exact-match retrieval, uniqueness checks, and duplicate detection."
+    }
+  ]
+}

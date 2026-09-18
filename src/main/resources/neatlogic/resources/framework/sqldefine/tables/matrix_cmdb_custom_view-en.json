@@ -1,0 +1,35 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_cmdb_custom_view",
+  "label": "CMDB Custom View Matrix Configuration Table",
+  "description": "The custom view matrix configuration table for CMDB is designed for use in association queries related to framework and reporting scenarios.",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "Matrix UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "custom_view_id",
+      "type": "bigint",
+      "description": "Custom view ID."
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "Configuration information."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "Primary key index covering the matrix_uuid field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

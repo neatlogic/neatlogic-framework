@@ -1,0 +1,30 @@
+{
+  "moduleId": "framework",
+  "name": "user_session_content",
+  "label": "User Sessions",
+  "description": "User sessions are used to query, filter, and present data related to framework components.",
+  "fields": [
+    {
+      "name": "hash",
+      "type": "varchar(255)",
+      "description": "The information hash, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "content",
+      "type": "text",
+      "description": "Information."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "hash"
+      ],
+      "description": "Primary key index covering the hash field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

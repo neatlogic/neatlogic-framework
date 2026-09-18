@@ -1,0 +1,71 @@
+{
+  "moduleId": "framework",
+  "name": "user_team",
+  "label": "Group Member Relationship Table",
+  "description": "Group membership table for querying, filtering, and reporting related framework data.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Auto-incremented ID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "team_uuid",
+      "type": "char(32)",
+      "description": "Retrieve the UUID of the flow_team, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "Retrieve the UUID of the flow_user, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "title",
+      "type": "varchar(50)",
+      "description": "Title, such as team leader or deputy team leader."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "team_uuid",
+        "user_uuid"
+      ],
+      "description": "Primary key index covering the team_uuid, user_uuid fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "Standard index covering the ID field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_flow_team_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "team_uuid"
+      ],
+      "description": "Standard index covering the team_uuid field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_flow_user_team",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid"
+      ],
+      "description": "Standard index covering the user_uuid field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

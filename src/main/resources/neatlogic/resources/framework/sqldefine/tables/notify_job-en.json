@@ -1,0 +1,75 @@
+{
+  "moduleId": "framework",
+  "name": "notify_job",
+  "label": "Schedule Notification Task Table",
+  "description": "Notify the scheduled task table for use in reporting scenarios related to enabling state filtering for framework-related items and time dimension statistics.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "Task name."
+    },
+    {
+      "name": "cron",
+      "type": "varchar(50)",
+      "description": "Cron."
+    },
+    {
+      "name": "handler",
+      "type": "varchar(255)",
+      "description": "Plugin."
+    },
+    {
+      "name": "notify_handler",
+      "type": "varchar(255)",
+      "description": "Notification plugin."
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "Configuration information."
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint",
+      "description": "1: Enable; 0: disable."
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "Creation time."
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "Creator."
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "Update the timestamp."
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "Updated by."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

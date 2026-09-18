@@ -1,0 +1,41 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_load_time",
+  "label": "Scheduled Job Locks Table",
+  "description": "Scheduled job locks table for querying, filtering, and reporting on framework-related data.",
+  "fields": [
+    {
+      "name": "job_name",
+      "type": "varchar(100)",
+      "description": "The UUID of the schedule_job table, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "job_group",
+      "type": "varchar(200)",
+      "description": "Job group, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "cron",
+      "type": "varchar(255)",
+      "description": "Cron expression."
+    },
+    {
+      "name": "load_time",
+      "type": "timestamp(3)",
+      "description": "Load time."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "job_name",
+        "job_group"
+      ],
+      "description": "Primary key index covering the job_name, job_group fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

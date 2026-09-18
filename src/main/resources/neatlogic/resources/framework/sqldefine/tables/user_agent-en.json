@@ -1,0 +1,57 @@
+{
+  "moduleId": "framework",
+  "name": "user_agent",
+  "label": "User Authorization Proxy Table",
+  "description": "User authorization proxy table this table is used for querying, filtering, and reporting on related framework data.",
+  "fields": [
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "agent_uuid",
+      "type": "char(32)",
+      "description": "Agent_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "func",
+      "type": "varchar(255)",
+      "description": "Function, used as the primary key or unique identifier for records in this table."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "user_uuid",
+        "agent_uuid",
+        "func"
+      ],
+      "description": "Primary key index covering the user_uuid, agent_uuid, func fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_agent_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "agent_uuid"
+      ],
+      "description": "Standard index covering the agent_uuid field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_user_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid"
+      ],
+      "description": "Standard index covering the user_uuid field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "moduleId": "framework",
+  "name": "team",
+  "label": "Group Information Table",
+  "description": "Group information table used for time dimensional statistical reports for frameworks.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "Global unique identifier, cross-environment import use, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "Name."
+    },
+    {
+      "name": "phone",
+      "type": "varchar(20)",
+      "description": "Phone."
+    },
+    {
+      "name": "email",
+      "type": "varchar(255)",
+      "description": "Email address."
+    },
+    {
+      "name": "description",
+      "type": "mediumtext",
+      "description": "Domain group report."
+    },
+    {
+      "name": "parent_uuid",
+      "type": "char(32)",
+      "description": "Parent_node_id. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "lft",
+      "type": "int",
+      "description": "Left encoding. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "rht",
+      "type": "int",
+      "description": "Right encoding. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "level",
+      "type": "varchar(50)",
+      "description": "Level, such as company, department."
+    },
+    {
+      "name": "is_delete",
+      "type": "tinyint(1)",
+      "description": "Is it deleted."
+    },
+    {
+      "name": "upward_uuid_path",
+      "type": "text",
+      "description": "Upward UUID path."
+    },
+    {
+      "name": "upward_name_path",
+      "type": "text",
+      "description": "Upward name path."
+    },
+    {
+      "name": "source",
+      "type": "varchar(30)",
+      "description": "Data source."
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "Creation time."
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "Creator."
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "Last updated time."
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "Updated by."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "Primary key index covering the UUID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "Standard index covering the ID field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_lft_rht",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "lft",
+        "rht"
+      ],
+      "description": "Standard index covering the lft, rht fields, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_parent_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "parent_uuid"
+      ],
+      "description": "Standard index covering the parent_uuid field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_rht_lft",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "rht",
+        "lft"
+      ],
+      "description": "Standard index covering the rht, lft fields, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

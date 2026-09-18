@@ -1,0 +1,55 @@
+{
+  "moduleId": "framework",
+  "name": "system_role",
+  "label": "System Corresponding Information",
+  "description": "Important system information related to the framework for association queries and report queries.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Database ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "system_id",
+      "type": "varchar(255)",
+      "description": "System ID in CMDB."
+    },
+    {
+      "name": "cn_sysname",
+      "type": "varchar(255)",
+      "description": "Simplified chinese abbreviation."
+    },
+    {
+      "name": "en_sysname",
+      "type": "varchar(255)",
+      "description": "English abbreviation."
+    },
+    {
+      "name": "role_name",
+      "type": "varchar(255)",
+      "description": "Corresponding to the name of the on-duty A position in the operations."
+    },
+    {
+      "name": "role_number",
+      "type": "varchar(255)",
+      "description": "Assign the corresponding work order to the A role."
+    },
+    {
+      "name": "is_check",
+      "type": "varchar(100)",
+      "description": "Is the check passed, 1 for yes, 0 for no."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "moduleId": "framework",
+  "name": "worktime_range",
+  "label": "Service Window Time Range Table",
+  "description": "Service window time range table is used for querying, filtering, and reporting on related framework data.",
+  "fields": [
+    {
+      "name": "worktime_uuid",
+      "type": "varchar(50)",
+      "description": "The UUID in the worktime table, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "year",
+      "type": "int",
+      "description": "Year."
+    },
+    {
+      "name": "date",
+      "type": "varchar(10)",
+      "description": "Date."
+    },
+    {
+      "name": "start_time",
+      "type": "bigint",
+      "description": "Start timestamp, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "end_time",
+      "type": "bigint",
+      "description": "End timestamp. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "worktime_uuid",
+        "start_time"
+      ],
+      "description": "Primary key index covering the worktime_uuid, start_time fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_endtime",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "end_time"
+      ],
+      "description": "Standard index covering the end_time field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_starttime",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "start_time"
+      ],
+      "description": "Standard index covering the start_time field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job",
+  "label": "Scheduled Job Information Table",
+  "description": "The periodic job information table is used for filtering the enablement status related to the framework and for statistical queries based on time dimensions.",
+  "fields": [
+    {
+      "name": "uuid",
+      "type": "varchar(50)",
+      "description": "Global unique identifier, cross-environment import use, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(100)",
+      "description": "Name."
+    },
+    {
+      "name": "handler",
+      "type": "varchar(200)",
+      "description": "Processor."
+    },
+    {
+      "name": "begin_time",
+      "type": "timestamp(3)",
+      "description": "Start time."
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp(3)",
+      "description": "End time."
+    },
+    {
+      "name": "cron",
+      "type": "varchar(100)",
+      "description": "Corn expression."
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint(1)",
+      "description": "0: Disabled, 1: enabled."
+    },
+    {
+      "name": "need_audit",
+      "type": "tinyint(1)",
+      "description": "0: Not saved, 1: saved."
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "Creation time."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "Primary key index covering the UUID field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

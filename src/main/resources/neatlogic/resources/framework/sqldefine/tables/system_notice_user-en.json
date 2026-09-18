@@ -1,0 +1,67 @@
+{
+  "moduleId": "framework",
+  "name": "system_notice_user",
+  "label": "System Announcement for Users to Receive",
+  "description": "The system announcement user interface is designed for reporting scenarios related to framework associations and other query purposes.",
+  "fields": [
+    {
+      "name": "system_notice_id",
+      "type": "bigint",
+      "description": "System announcement ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "is_read",
+      "type": "tinyint(1)",
+      "description": "Read: 1; not read: 0."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "system_notice_id",
+        "user_uuid"
+      ],
+      "description": "Primary key index covering the system_notice_id, user_uuid fields, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_notice_id_and_user_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "system_notice_id",
+        "user_uuid"
+      ],
+      "description": "Standard index covering the system_notice_id, user_uuid fields, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_system_notice_id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "system_notice_id"
+      ],
+      "description": "Standard index covering the system_notice_id field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_user_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "user_uuid"
+      ],
+      "description": "Standard index covering the user_uuid field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

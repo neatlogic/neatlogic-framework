@@ -17,8 +17,10 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.matrix.constvalue.MatrixAttributeType;
 import neatlogic.framework.matrix.dto.MatrixAttributeVo;
 import neatlogic.framework.matrix.dto.MatrixDataVo;
+import neatlogic.framework.util.$;
 import neatlogic.framework.util.UuidUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -82,5 +84,24 @@ public interface IMatrixPrivateDataSourceHandler {
             index ++ ;
         }
 
+    }
+
+    /**
+     * 根据当前请求语言构造私有矩阵属性，避免单例处理器在启动阶段固定语言。
+     * 名称包含点号时按 i18n key 解析，UUID、ID 等原生术语保持原值。
+     *
+     * @param attributeArray 属性定义
+     * @return 本地化后的全新属性列表
+     */
+    default List<MatrixAttributeVo> getLocalizedAttributeList(JSONArray attributeArray) {
+        List<MatrixAttributeVo> localizedAttributeList = new ArrayList<>();
+        setAttribute(localizedAttributeList, attributeArray);
+        for (MatrixAttributeVo attributeVo : localizedAttributeList) {
+            String name = attributeVo.getName();
+            if (name.contains(".")) {
+                attributeVo.setName($.t(name));
+            }
+        }
+        return localizedAttributeList;
     }
 }

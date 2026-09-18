@@ -1,0 +1,76 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_attribute",
+  "label": "Custom Attribute Matrix",
+  "description": "The custom attribute table is designed for querying, filtering, and reporting on framework-related data.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Auto-incremented ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "The attribute UUID."
+    },
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "Matrix UUID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "type",
+      "type": "varchar(50)",
+      "description": "Attribute type."
+    },
+    {
+      "name": "is_required",
+      "type": "tinyint(1)",
+      "description": "Is the attribute mandatory?"
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "Attribute name."
+    },
+    {
+      "name": "unique_identifier",
+      "type": "varchar(50)",
+      "description": "Unique identifier."
+    },
+    {
+      "name": "sort",
+      "type": "int",
+      "description": "Sort."
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "Attribute configuration."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "matrix_attribute_key",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "matrix_uuid",
+        "uuid"
+      ],
+      "description": "Unique index covering the matrix_uuid, UUID fields, suitable for exact-match retrieval, uniqueness checks, and duplicate detection."
+    }
+  ]
+}

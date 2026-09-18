@@ -1,0 +1,36 @@
+{
+  "moduleId": "framework",
+  "name": "user_data",
+  "label": "User Data",
+  "description": "User data can be used for querying, filtering, and reporting on framework-related data.",
+  "fields": [
+    {
+      "name": "user_uuid",
+      "type": "varchar(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "data",
+      "type": "longtext",
+      "description": "Data."
+    },
+    {
+      "name": "type",
+      "type": "varchar(20)",
+      "description": "Function type, used as the primary key or unique identifier for records in this table."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "user_uuid",
+        "type"
+      ],
+      "description": "Primary key index covering the user_uuid, type fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

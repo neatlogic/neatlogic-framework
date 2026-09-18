@@ -1,0 +1,43 @@
+{
+  "moduleId": "framework",
+  "name": "notify_job_receiver",
+  "label": "Notification Task Receiver Table",
+  "description": "The notification task receiver table is used for related queries in framework-related scenarios and report queries.",
+  "fields": [
+    {
+      "name": "notify_job_id",
+      "type": "bigint",
+      "description": "Notify task ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "receiver",
+      "type": "varchar(100)",
+      "description": "Receiver, group, role UUID or email, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "type",
+      "type": "enum('common','user','team','role','processUserType','email')",
+      "description": "The receiver type should distinguish whether it's an email, user, group, or role's UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "receive_type",
+      "type": "enum('to','cc')",
+      "description": "Receiver type, to: recipient; cc: CC, used as the primary key or unique identifier for records in this table."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "notify_job_id",
+        "receiver",
+        "type",
+        "receive_type"
+      ],
+      "description": "Primary key index covering the notify_job_id, receiver, type, receive_type fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

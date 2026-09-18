@@ -1,0 +1,36 @@
+{
+  "moduleId": "framework",
+  "name": "team_role",
+  "label": "Group-Role Relationship Table",
+  "description": "Group and role relationships table used for querying, filtering, and reporting on Framework-Related data.",
+  "fields": [
+    {
+      "name": "team_uuid",
+      "type": "char(32)",
+      "description": "Retrieve the UUID of the team, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "role_uuid",
+      "type": "char(32)",
+      "description": "Get the UUID of the role, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "checked_children",
+      "type": "tinyint",
+      "description": "Does the drill-down option allow for selecting child nodes?"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "team_uuid",
+        "role_uuid"
+      ],
+      "description": "Primary key index covering the team_uuid, role_uuid fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

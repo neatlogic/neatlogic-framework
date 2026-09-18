@@ -1,0 +1,41 @@
+{
+  "moduleId": "framework",
+  "name": "region_team",
+  "label": "region_team Table",
+  "description": "The region_team table, which belongs to the framework module, is used for time dimension statistical queries and association queries related to framework operations.",
+  "fields": [
+    {
+      "name": "region_id",
+      "type": "bigint",
+      "description": "Region_id, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "team_uuid",
+      "type": "char(32)",
+      "description": "Group UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "checked_children",
+      "type": "tinyint(1)",
+      "description": "Does the workflow include subgroups?"
+    },
+    {
+      "name": "update_time",
+      "type": "bigint",
+      "description": "Update identifier."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "region_id",
+        "team_uuid"
+      ],
+      "description": "Primary key index covering the region_id, team_uuid fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "moduleId": "framework",
+  "name": "system_notice_recipient",
+  "label": "System Announcement Notification Object Table",
+  "description": "The system announcement notification object table is used for related query scenarios involving framework associations and report queries.",
+  "fields": [
+    {
+      "name": "system_notice_id",
+      "type": "bigint",
+      "description": "System announcement ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "The unique identifier of the notification object, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "type",
+      "type": "enum('common','user','team','role')",
+      "description": "Common, user, team, role, used as the primary key or unique identifier for records in this table."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "system_notice_id",
+        "uuid",
+        "type"
+      ],
+      "description": "Primary key index covering the system_notice_id, UUID, type fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

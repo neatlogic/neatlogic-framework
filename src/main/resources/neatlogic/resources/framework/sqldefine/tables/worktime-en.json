@@ -1,0 +1,55 @@
+{
+  "moduleId": "framework",
+  "name": "worktime",
+  "label": "Service Window",
+  "description": "The service window is used for enabling state filtering for related framework operations and time dimension statistics for report queries.",
+  "fields": [
+    {
+      "name": "uuid",
+      "type": "varchar(50)",
+      "description": "ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(50)",
+      "description": "Name."
+    },
+    {
+      "name": "is_active",
+      "type": "int",
+      "description": "IsActivated: 1 for activated, 0 for deactivated."
+    },
+    {
+      "name": "lcu",
+      "type": "varchar(50)",
+      "description": "Last modified by."
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "Last modified time."
+    },
+    {
+      "name": "config",
+      "type": "longtext",
+      "description": "Define the work hours for each week."
+    },
+    {
+      "name": "is_delete",
+      "type": "tinyint(1)",
+      "description": "Is it deleted."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "Primary key index covering the UUID field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

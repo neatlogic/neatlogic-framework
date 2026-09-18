@@ -1,0 +1,36 @@
+{
+  "moduleId": "framework",
+  "name": "user_profile",
+  "label": "User-specific Configuration",
+  "description": "User-specific configuration is used for related queries in framework integration scenarios and report queries.",
+  "fields": [
+    {
+      "name": "user_uuid",
+      "type": "char(32)",
+      "description": "User_uuid, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "module_id",
+      "type": "varchar(50)",
+      "description": "Module ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "Personalized JSON."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "user_uuid",
+        "module_id"
+      ],
+      "description": "Primary key index covering the user_uuid, module_id fields, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

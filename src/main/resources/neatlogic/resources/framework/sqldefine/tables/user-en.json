@@ -1,0 +1,150 @@
+{
+  "moduleId": "framework",
+  "name": "user",
+  "label": "User Information Table",
+  "description": "The user information table is used for filtering enabled states related to the framework, time dimension statistics, and association queries for report scenarios.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "uuid",
+      "type": "char(32)",
+      "description": "Global unique identifier, cross-environment import use, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "user_id",
+      "type": "varchar(100)",
+      "description": "User ID. This value must be unique in the database and is suitable for exact-match queries and duplicate detection."
+    },
+    {
+      "name": "user_name",
+      "type": "varchar(50)",
+      "description": "Username."
+    },
+    {
+      "name": "email",
+      "type": "varchar(60)",
+      "description": "Email. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "phone",
+      "type": "char(11)",
+      "description": "Phone."
+    },
+    {
+      "name": "pinyin",
+      "type": "varchar(50)",
+      "description": "Pinyin."
+    },
+    {
+      "name": "is_active",
+      "type": "tinyint(1)",
+      "description": "IsActivated (1: activated, 0: deactivated)."
+    },
+    {
+      "name": "user_info",
+      "type": "mediumtext",
+      "description": "Additional attributes."
+    },
+    {
+      "name": "vip_level",
+      "type": "tinyint",
+      "description": "VIP level (0, 1, 2, 3, 4, 5)."
+    },
+    {
+      "name": "is_delete",
+      "type": "tinyint(1)",
+      "description": "Is it deleted."
+    },
+    {
+      "name": "token",
+      "type": "varchar(32)",
+      "description": "Randomly generated token for HMAC authentication. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "is_super_admin",
+      "type": "tinyint(1)",
+      "description": "Is super administrator?"
+    },
+    {
+      "name": "source",
+      "type": "varchar(50)",
+      "description": "SOURCE."
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "Creation time."
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "Creator."
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "Update the timestamp."
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "Updated by."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "uuid"
+      ],
+      "description": "Primary key index covering the UUID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "email",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "email"
+      ],
+      "description": "Standard index covering the email field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "id",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "id"
+      ],
+      "description": "Standard index covering the ID field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "token",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "token"
+      ],
+      "description": "Standard index covering the token field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "user_id_idx",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "user_id"
+      ],
+      "description": "Unique index covering the user_id field, suitable for exact-match retrieval, uniqueness checks, and duplicate detection."
+    }
+  ]
+}

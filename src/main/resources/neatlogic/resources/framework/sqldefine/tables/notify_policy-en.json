@@ -1,0 +1,65 @@
+{
+  "moduleId": "framework",
+  "name": "notify_policy",
+  "label": "Notification Policy Information Table",
+  "description": "Notification strategy information table for use in reporting scenarios related to time dimension statistics for framework purposes.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Primary key, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(100)",
+      "description": "Name."
+    },
+    {
+      "name": "handler",
+      "type": "varchar(100)",
+      "description": "Different strategy processors."
+    },
+    {
+      "name": "is_default",
+      "type": "tinyint(1)",
+      "description": "Is this a default notification policy?"
+    },
+    {
+      "name": "config",
+      "type": "mediumtext",
+      "description": "JSON format configuration information."
+    },
+    {
+      "name": "fcd",
+      "type": "timestamp(3)",
+      "description": "Creation time."
+    },
+    {
+      "name": "fcu",
+      "type": "char(32)",
+      "description": "Creator."
+    },
+    {
+      "name": "lcd",
+      "type": "timestamp(3)",
+      "description": "Update the timestamp."
+    },
+    {
+      "name": "lcu",
+      "type": "char(32)",
+      "description": "Updated by."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "moduleId": "framework",
+  "name": "matrix_view",
+  "label": "Matrix Dashboard",
+  "description": "Matrix view is suitable for querying related associations in framework-related scenarios and report queries.",
+  "fields": [
+    {
+      "name": "matrix_uuid",
+      "type": "char(32)",
+      "description": "Matrix UUID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "file_id",
+      "type": "bigint",
+      "description": "Configuration file."
+    },
+    {
+      "name": "config",
+      "type": "longtext",
+      "description": "Config."
+    },
+    {
+      "name": "file_name",
+      "type": "varchar(100)",
+      "description": "Upload the configuration file name."
+    },
+    {
+      "name": "xml",
+      "type": "longtext",
+      "description": "Upload configuration file content."
+    },
+    {
+      "name": "error",
+      "type": "text",
+      "description": "Error message."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "matrix_uuid"
+      ],
+      "description": "Primary key index covering the matrix_uuid field, suitable for uniquely identifying records and queries that join the primary table."
+    }
+  ]
+}

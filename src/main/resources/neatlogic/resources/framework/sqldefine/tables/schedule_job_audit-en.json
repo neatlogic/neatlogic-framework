@@ -1,0 +1,85 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_audit",
+  "label": "Scheduled Job Log Table",
+  "description": "The scheduled job log table is used for tracking the state of related frameworks and for querying related associations in report scenarios.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "job_uuid",
+      "type": "varchar(100)",
+      "description": "Retrieve the UUID of the schedule_job. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "start_time",
+      "type": "timestamp(3)",
+      "description": "Start time."
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp(3)",
+      "description": "End time. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "content_hash",
+      "type": "char(32)",
+      "description": "Content hash."
+    },
+    {
+      "name": "status",
+      "type": "enum('running','succeed','failed')",
+      "description": "Success: success; error: error; processing: processing."
+    },
+    {
+      "name": "server_id",
+      "type": "int",
+      "description": "Server ID."
+    },
+    {
+      "name": "cron",
+      "type": "varchar(255)",
+      "description": "Cron expression."
+    },
+    {
+      "name": "next_fire_time",
+      "type": "timestamp(3)",
+      "description": "Next activation time."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_end_time",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "end_time"
+      ],
+      "description": "Standard index covering the end_time field, suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "idx_job_uuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "job_uuid"
+      ],
+      "description": "Standard index covering the job_uuid field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

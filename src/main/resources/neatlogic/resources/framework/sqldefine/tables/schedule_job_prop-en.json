@@ -1,0 +1,50 @@
+{
+  "moduleId": "framework",
+  "name": "schedule_job_prop",
+  "label": "Scheduled Job Parameters Table",
+  "description": "Scheduled job parameters table used for querying, filtering, and reporting on related framework data.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "ID, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "job_uuid",
+      "type": "char(50)",
+      "description": "Retrieve the UUID of the schedule_job. A standard index is defined on this field, making it suitable for filtering, join, and sort queries."
+    },
+    {
+      "name": "prop_name",
+      "type": "varchar(100)",
+      "description": "Attribute name."
+    },
+    {
+      "name": "prop_value",
+      "type": "mediumtext",
+      "description": "Attribute values."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "idx_jobuuid",
+      "type": "BTREE",
+      "unique": false,
+      "primary": false,
+      "columns": [
+        "job_uuid"
+      ],
+      "description": "Standard index covering the job_uuid field, suitable for filtering, join, and sort queries."
+    }
+  ]
+}

@@ -346,10 +346,18 @@ def build_table_json(table, module_id):
 
 
 def prepare_output_dir(path, force):
+    """准备中文定义输出目录，并在强制生成时保留英文镜像文件。"""
     if path.exists():
         if not force:
             raise SystemExit(f"Refusing to overwrite existing directory without --force: {path}")
-        shutil.rmtree(path)
+        # 中文定义重新生成时保留已审核的英文镜像，结构差异由英文资源校验脚本报告。
+        for child in path.iterdir():
+            if child.is_file() and child.name.endswith("-en.json"):
+                continue
+            if child.is_dir():
+                shutil.rmtree(child)
+            else:
+                child.unlink()
     path.mkdir(parents=True, exist_ok=True)
 
 

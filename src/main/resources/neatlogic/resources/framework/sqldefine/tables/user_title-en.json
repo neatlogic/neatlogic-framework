@@ -1,0 +1,40 @@
+{
+  "moduleId": "framework",
+  "name": "user_title",
+  "label": "User Position Table",
+  "description": "User table is used for querying, filtering, and reporting on related framework data.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "bigint",
+      "description": "Unique identifier, used as the primary key or unique identifier for records in this table."
+    },
+    {
+      "name": "name",
+      "type": "varchar(20)",
+      "description": "Title, automatically deleted upon not being referenced. This value must be unique in the database and is suitable for exact-match queries and duplicate detection."
+    }
+  ],
+  "indexes": [
+    {
+      "name": "PRIMARY",
+      "type": "BTREE",
+      "unique": true,
+      "primary": true,
+      "columns": [
+        "id"
+      ],
+      "description": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    {
+      "name": "unique_name",
+      "type": "BTREE",
+      "unique": true,
+      "primary": false,
+      "columns": [
+        "name"
+      ],
+      "description": "Unique index covering the name field, suitable for exact-match retrieval, uniqueness checks, and duplicate detection."
+    }
+  ]
+}

@@ -13,6 +13,7 @@
 package neatlogic.framework.listener;
 
 import neatlogic.framework.asynchronization.threadlocal.*;
+import neatlogic.framework.auth.core.ApiAuthContext;
 import neatlogic.framework.cache.threadlocal.CacheContext;
 
 import javax.servlet.ServletRequestEvent;
@@ -44,6 +45,8 @@ public class ThreadlocalClearListener implements ServletRequestListener {
             MongodbSessionContext.get().release();
         }
         CacheContext.release();
+
+        ApiAuthContext.release();
     }
 
     @Override

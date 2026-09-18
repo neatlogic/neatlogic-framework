@@ -12,6 +12,7 @@ import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.listener.ThreadlocalClearListener;
 import neatlogic.framework.restful.annotation.AuthUser;
 import neatlogic.framework.restful.core.ApiComponentTemplateBase;
 import neatlogic.framework.service.AuthenticationInfoService;
@@ -121,8 +122,7 @@ public class ApiAuthContextTest {
      */
     @After
     public void cleanupContext() {
-        ApiAuthContext.exit();
-        ApiAuthContext.exit();
+        ApiAuthContext.release();
         if (UserContext.get() != null) {
             UserContext.get().release();
         }
@@ -192,6 +192,25 @@ public class ApiAuthContextTest {
         ApiAuthContext.exit();
 
         Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
+    }
+
+    /**
+     * 请求结束清理应一次移除全部嵌套 API 鉴权状态，并允许重复清理。
+     */
+    @Test
+    public void shouldReleaseAllApiAuthStatesAtRequestEnd() {
+        initUser(SystemUser.SYSTEM.getUserUuid());
+        ApiAuthContext.enter(SystemUserApi.class);
+        ApiAuthContext.enter(SystemUserApi.class);
+        Assert.assertTrue(ApiAuthContext.isCurrentSystemUserExempt());
+
+        new ThreadlocalClearListener().requestDestroyed(null);
+        Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
+        Assert.assertTrue(ApiAuthContext.shouldBypassSystemUserAuth(SystemUser.SYSTEM.getUserUuid()));
+
+        ApiAuthContext.release();
+        ApiAuthContext.release();
+        Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
     }
 
     /**

@@ -77,6 +77,14 @@ public final class ApiAuthContext {
     }
 
     /**
+     * 清除当前线程的全部 API 鉴权状态。
+     * 用于请求结束时兜底清理，正常的嵌套 API 返回仍应调用 exit() 恢复外层状态。
+     */
+    public static void release() {
+        AUTH_STATE_STACK.remove();
+    }
+
+    /**
      * 判断指定系统用户在当前 API 作用域中是否允许跳过权限校验。
      * 非 API 场景保持系统用户原有放行行为，普通用户的接口作用域不改变显式用户校验语义。
      *

@@ -22,10 +22,7 @@ import neatlogic.framework.util.I18n;
 import java.util.List;
 
 public enum MatrixType implements IMatrixType, IEnum {
-    CUSTOM("custom", new I18n("自定义数据源"), "custom", 1),
-//    EXTERNAL("external", new I18n("外部数据源"), "integrationUuid", 2),
-//    PRIVATE("private", new I18n("私有数据源"), "private", 5),
-//    VIEW("view", new I18n("数据库视图"), "fileId", 3)
+    CUSTOM("custom", new I18n("framework.matrixtype.customdatasource"), "custom", 1),
     ;
 
     private String value;

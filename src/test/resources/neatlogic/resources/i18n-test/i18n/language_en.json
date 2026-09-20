@@ -1,0 +1,29 @@
+{
+  "apostrophe": "Can't find {0}",
+  "complex": "'{0}' {1,number,integer}",
+  "escaped": "Model ''{0}'' does not exist",
+  "fallback": "English Fallback",
+  "field": {
+    "help": "Select os or services; one category per call."
+  },
+  "plain": "Can't find anything",
+  "quoted": "Model '{0}' does not exist",
+  "scene": {
+    "help": "Replace the hostname with a registered node.",
+    "os": "OS Health",
+    "services": "Service Health"
+  },
+  "screenshot": "The value of the unique rule attribute '{2}' ({3}) of model '{0} ({1})' is empty",
+  "test": {
+    "module": {
+      "group": {
+        "description": "Test Group",
+        "name": "AI"
+      },
+      "name": "Test Module"
+    },
+    "notify": {
+      "module": "IT Service"
+    }
+  }
+}

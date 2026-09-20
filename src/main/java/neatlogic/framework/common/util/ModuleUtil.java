@@ -48,10 +48,10 @@ public class ModuleUtil {
             // master模块不允许用户添加
             if (!moduleVo.getId().equals("master")) {
                 if (!groupSet.contains(moduleVo.getGroup())) {
-                    if (StringUtils.isNotBlank(moduleVo.getGroup()) && StringUtils.isNotBlank(moduleVo.getGroupName())) {
+                    if (StringUtils.isNotBlank(moduleVo.getGroup()) && StringUtils.isNotBlank(moduleVo.getGroupNameWithoutTranslate())) {
                         ModuleGroupVo moduleGroup = new ModuleGroupVo();
                         moduleGroup.setGroup(moduleVo.getGroup());
-                        moduleGroup.setGroupName(moduleVo.getGroupName());
+                        moduleGroup.setGroupName(moduleVo.getGroupNameWithoutTranslate());
                         moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
                         moduleGroup.setGroupSort(moduleVo.getGroupSort());
                         moduleGroupList.add(moduleGroup);
@@ -102,7 +102,7 @@ public class ModuleUtil {
                 if (moduleGroup == null) {
                     moduleGroup = new ModuleGroupVo();
                     moduleGroup.setGroup(moduleVo.getGroup());
-                    moduleGroup.setGroupName(moduleVo.getGroupName());
+                    moduleGroup.setGroupName(moduleVo.getGroupNameWithoutTranslate());
                     moduleGroup.setGroupDescription(moduleVo.getGroupDescription());
                     moduleGroup.setGroupSort(moduleVo.getGroupSort());
 
@@ -129,7 +129,7 @@ public class ModuleUtil {
             } else {
                 moduleGroupVo = new ModuleGroupVo();
                 moduleGroupVo.setGroup(moduleVo.getGroup());
-                moduleGroupVo.setGroupName(moduleVo.getGroupName());
+                moduleGroupVo.setGroupName(moduleVo.getGroupNameWithoutTranslate());
                 moduleGroupVo.setGroupDescription(moduleVo.getGroupDescription());
                 moduleGroupVo.setGroupSort(moduleVo.getGroupSort());
                 List<ModuleVo> moduleList = new ArrayList<ModuleVo>();

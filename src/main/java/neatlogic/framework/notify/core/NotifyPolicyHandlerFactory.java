@@ -19,6 +19,7 @@ import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.i18n.I18nRuntime;
 import neatlogic.framework.notify.dto.NotifyTreeVo;
 import neatlogic.framework.notify.dto.NotifyTriggerVo;
 import neatlogic.framework.util.$;
@@ -89,7 +90,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
                 if (CollectionUtils.isNotEmpty(notifyTreeVo.getChildren())) {
                     for (NotifyTreeVo childNotifyTreeVo : notifyTreeVo.getChildren()) {
                         INotifyPolicyHandler handler = treeHandlerMap.get(childNotifyTreeVo.getUuid());
-                        childNotifyTreeVo.setName(handler != null ? $.t(handler.getName()) : $.t(childNotifyTreeVo.getName()));
+                        childNotifyTreeVo.setName(handler != null
+                                ? I18nRuntime.getTranslator().translateIfPresent(handler.getName())
+                                : childNotifyTreeVo.getName());
                         Map<String, String> triggerNames = new HashMap<>();
                         // 触发器名称可能在构造时已经翻译，必须从处理器重新读取当前语言。
                         if (handler != null && CollectionUtils.isNotEmpty(handler.getNotifyTriggerList())) {
@@ -99,8 +102,9 @@ public class NotifyPolicyHandlerFactory extends ModuleInitializedListenerBase {
                         }
                         if (CollectionUtils.isNotEmpty(childNotifyTreeVo.getChildren())) {
                             for (NotifyTreeVo secondChildNotifyTreeVo : childNotifyTreeVo.getChildren()) {
-                                secondChildNotifyTreeVo.setName($.t(triggerNames.getOrDefault(
-                                        secondChildNotifyTreeVo.getUuid(), secondChildNotifyTreeVo.getName())));
+                                secondChildNotifyTreeVo.setName(I18nRuntime.getTranslator().translateIfPresent(
+                                        triggerNames.getOrDefault(secondChildNotifyTreeVo.getUuid(),
+                                                secondChildNotifyTreeVo.getName())));
                             }
                         }
                     }

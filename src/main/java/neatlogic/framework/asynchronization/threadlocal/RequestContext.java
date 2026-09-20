@@ -16,6 +16,7 @@ import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.dto.healthcheck.RequestSqlAuditVo;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
+import neatlogic.framework.i18n.I18nLocaleResolver;
 import neatlogic.framework.restful.constvalue.RejectSource;
 import neatlogic.framework.util.SnowflakeUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -171,12 +172,11 @@ public class RequestContext implements Serializable {
         RequestContext context = new RequestContext(request, url);
         context.setResponse(response);
         instance.set(context);
+        context.setLocale(I18nLocaleResolver.DEFAULT_LOCALE);
         if (request.getCookies() != null && request.getCookies().length > 0) {
             Optional<Cookie> languageCookie = Arrays.stream(request.getCookies()).filter(o -> Objects.equals(o.getName(), "neatlogic_language")).findFirst();
             if (languageCookie.isPresent()) {
-                context.setLocale(new Locale(languageCookie.get().getValue()));
-            } else {
-                context.setLocale(Locale.getDefault());
+                context.setLocale(I18nLocaleResolver.parse(languageCookie.get().getValue()));
             }
         }
         String tempUrl = url;

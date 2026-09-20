@@ -1,0 +1,12 @@
+{
+  "invalid": [
+    "Value {1st}",
+    "{0}-{2}",
+    "Value {0"
+  ],
+  "valid": [
+    "Value {0}",
+    "'{0}' {1,number,integer}",
+    "{\"key\":\"value\"}"
+  ]
+}

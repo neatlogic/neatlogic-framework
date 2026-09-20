@@ -42,7 +42,7 @@ public class AuthVo {
     public AuthVo(AuthBase tmpAuth) {
         this.name = tmpAuth.getAuthName();
         this.displayName = tmpAuth.getAuthDisplayName();
-        this.description = tmpAuth.getAuthName();
+        this.description = tmpAuth.getAuthIntroduction();
         this.authGroupName = tmpAuth.getAuthGroup();
         this.sort = tmpAuth.getSort();
     }

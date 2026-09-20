@@ -2,6 +2,7 @@ package neatlogic.framework.restful.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.exception.type.ApiExampleInvalidException;
 import neatlogic.framework.restful.annotation.Example;
@@ -14,51 +15,28 @@ import neatlogic.framework.restful.core.privateapi.sse.SseApiComponentBase;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.dto.ApiExampleVo;
 import neatlogic.framework.restful.mcp.McpToolMetadataBuilder;
-import neatlogic.framework.util.SpringContextUtil;
 import org.junit.*;
 import org.springframework.aop.framework.ProxyFactory;
-import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.context.support.StaticApplicationContext;
-import org.springframework.context.support.StaticMessageSource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Field;
 import java.util.Locale;
 
 /** 验证场景声明到 API 帮助及模型工具定义的完整契约，不执行真实业务。 */
 public class ApiExampleTest {
-    private static Field contextField;
-    private static Object originalContext;
-    private static Locale originalLocale;
+    private static RequestContext requestContext;
 
     /** 安装隔离的语言环境，避免测试依赖真实租户或数据库。 */
     @BeforeClass
-    public static void installMessages() throws Exception {
-        originalLocale = Locale.getDefault();
-        Locale.setDefault(Locale.ENGLISH);
-        StaticApplicationContext context = new StaticApplicationContext();
-        StaticMessageSource messages = new StaticMessageSource();
-        for (Locale locale : new Locale[]{Locale.ENGLISH, Locale.CHINESE}) {
-            messages.addMessage("scene.os", locale, locale.equals(Locale.ENGLISH) ? "OS Health" : "操作系统健康状态");
-            messages.addMessage("scene.services", locale, "Service Health");
-            messages.addMessage("scene.help", locale, "Replace the hostname with a registered node.");
-            messages.addMessage("field.help", locale, "Select os or services; one category per call.");
-            messages.addMessage("nf.api.example.mcparguments", locale, "Each example is params.arguments for tools/call.");
-            messages.addMessage("nf.api.example.invalid", locale, "Invalid example {1} for {0}");
-        }
-        context.getBeanFactory().registerSingleton("messageSourceAccessor", new MessageSourceAccessor(messages));
-        contextField = SpringContextUtil.class.getDeclaredField("ctx");
-        contextField.setAccessible(true);
-        originalContext = contextField.get(null);
-        contextField.set(null, context);
+    public static void installMessages() {
+        requestContext = RequestContext.init((RequestContext) null);
+        requestContext.setLocale(Locale.ENGLISH);
     }
 
     /** 恢复全局状态，避免污染同一 JVM 的其他测试。 */
     @AfterClass
-    public static void restoreMessages() throws Exception {
-        contextField.set(null, originalContext);
-        Locale.setDefault(originalLocale);
+    public static void restoreMessages() {
+        requestContext.release();
     }
 
     /** 重复注解按声明顺序返回，只有展示信息随语言变化。 */
@@ -69,12 +47,12 @@ public class ApiExampleTest {
         Assert.assertEquals("OS Health", english.getJSONObject(0).getString("title"));
         Assert.assertEquals("services", english.getJSONObject(1).getJSONObject("example").getString("type"));
         try {
-            Locale.setDefault(Locale.CHINESE);
+            requestContext.setLocale(Locale.CHINESE);
             JSONArray chinese = new ObjectApi().help().getJSONArray("example");
             Assert.assertEquals("操作系统健康状态", chinese.getJSONObject(0).getString("title"));
             Assert.assertEquals(english.getJSONObject(0).get("example"), chinese.getJSONObject(0).get("example"));
         } finally {
-            Locale.setDefault(Locale.ENGLISH);
+            requestContext.setLocale(Locale.ENGLISH);
         }
     }
 

@@ -244,6 +244,37 @@
         <includeCallerData>true</includeCallerData>
     </appender>
 
+    <!-- 缺失翻译输出由 JVM 参数 -DenableI18nExceptionLog=true 开启 -->
+    <appender name="i18nExceptionAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${log4j.home}/i18nException.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <FileNamePattern>${log4j.home}/i18nException.log.%i</FileNamePattern>
+            <MinIndex>1</MinIndex>
+            <MaxIndex>5</MaxIndex>
+        </rollingPolicy>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>100MB</MaxFileSize>
+        </triggeringPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>[%-5level]%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{36}[%line] [%tenant] %requestUrl- %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <!-- 异步输出国际化异常，避免资源查找影响请求线程 -->
+    <appender name="i18nExceptionAsyncAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>256</queueSize>
+        <neverBlock>true</neverBlock>
+        <appender-ref ref="i18nExceptionAppender"/>
+        <includeCallerData>false</includeCallerData>
+    </appender>
+
     <appender name="sqlTimeoutAuditAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <File>${log4j.home}/sqlTimeout.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
@@ -298,6 +329,10 @@
     </logger>
     <logger name="exceptionAudit" level="ERROR" additivity="false">
         <appender-ref ref="exceptionAuditAsyncAppender"/>
+    </logger>
+    <!-- 国际化异常单独落盘，不向 root 传播，避免写入 error.log -->
+    <logger name="i18nException" level="ERROR" additivity="false">
+        <appender-ref ref="i18nExceptionAsyncAppender"/>
     </logger>
     <!-- mysql事务超时日志 -->
     <logger name="sqlTimeoutAudit" level="ERROR" additivity="false">

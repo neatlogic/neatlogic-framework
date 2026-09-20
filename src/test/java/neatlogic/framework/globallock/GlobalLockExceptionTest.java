@@ -29,12 +29,12 @@ import static org.junit.Assert.*;
 public class GlobalLockExceptionTest {
     /** 包装数据库异常必须保留原 cause，不能把错误码或根因藏在空消息后。 */
     @Test public void releaseFailureRetainsCauseAndContextInBothLanguages() throws Exception {
-        try (GlobalLockI18nFixture ignored = new GlobalLockI18nFixture()) {
+        try (GlobalLockI18nFixture fixture = new GlobalLockI18nFixture()) {
             GlobalLockVo lock = new GlobalLockVo(123L, "generic", "config/resource", "{}");
             SQLException sql = new SQLException("Lock wait timeout", "HY000", 1205);
             RuntimeException cause = new RuntimeException("wrapper", sql);
             for (Locale locale : new Locale[]{Locale.CHINESE, Locale.ENGLISH}) {
-                Locale.setDefault(locale);
+                fixture.setLocale(locale);
                 GlobalLockReleaseException failure = new GlobalLockReleaseException(123L, lock, "operation-1", "unlock", cause);
                 assertSame(cause, failure.getCause());
                 for (String value : new String[]{"lockId=123", "config/resource", "operation-1", "unlock", "SQLState=HY000", "errorCode=1205", "Lock wait timeout"}) {

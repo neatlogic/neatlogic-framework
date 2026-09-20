@@ -1,0 +1,1298 @@
+{
+  "auth": {
+    "admin": {
+      "description": "对某些系统功能进行管理，例如重建左右编码等",
+      "name": "系统核心基础权限"
+    },
+    "api_audit_view": {
+      "description": "查看操作审计权限",
+      "name": "查看操作审计权限"
+    },
+    "authority_modify": {
+      "description": "对权限进行添加、修改和删除",
+      "name": "权限管理权限"
+    },
+    "data_warehouse_base": {
+      "description": "对数据仓库数据源进行访问",
+      "name": "数据仓库默认权限"
+    },
+    "data_warehouse_modify": {
+      "description": "对数据仓库添加、修改和删除",
+      "name": "数据仓库管理权限"
+    },
+    "documentonline_config_modify": {
+      "description": "对模块和菜单绑定的在线帮助文档进行添加、移除等修改操作",
+      "name": "在线帮助文档配置管理权限"
+    },
+    "file_modify": {
+      "description": "对所有附件进行管理",
+      "name": "附件管理权限"
+    },
+    "form_modify": {
+      "description": "对表单进行添加、修改和删除",
+      "name": "表单管理权限"
+    },
+    "fulltextindex_modify": {
+      "description": "对全局检索索引进行重建",
+      "name": "重建搜索中心索引权限"
+    },
+    "globalsearch_base": {
+      "description": "拥有此权限才能使用搜索中心基础权限功能",
+      "name": "搜索中心基础权限"
+    },
+    "integration_modify": {
+      "description": "对集成进行添加、修改和删除",
+      "name": "集成管理权限"
+    },
+    "interface_modify": {
+      "description": "对接口进行添加、修改和删除",
+      "name": "接口管理权限"
+    },
+    "license_modify": {
+      "description": "查看和更新许可",
+      "name": "许可管理权限"
+    },
+    "module_modify": {
+      "description": "查看模块版本信息，导入导出模块初始化数据文件",
+      "name": "系统模块管理权限"
+    },
+    "mq_modify": {
+      "description": "对消息队列主题和订阅进行添加、修改和删除",
+      "name": "消息队列管理权限"
+    },
+    "noauth": {
+      "description": "无权限",
+      "name": "无权限"
+    },
+    "notify_job_modify": {
+      "description": "对通知策略中的定时任务进行添加、修改和删除",
+      "name": "通知定时任务管理权限"
+    },
+    "notify_policy_modify": {
+      "description": "对通知策略进行添加、修改和删除",
+      "name": "通知策略管理权限"
+    },
+    "region_modify": {
+      "description": "对地域进行添加、修改和删除",
+      "name": "地域管理权限"
+    },
+    "role_modify": {
+      "description": "对角色进行添加、修改和删除",
+      "name": "角色管理权限"
+    },
+    "runner_modify": {
+      "description": "对自动化执行器进行添加、修改和删除",
+      "name": "自动化执行器管理权限"
+    },
+    "schedule_job_modify": {
+      "description": "对定时作业进行添加、修改和删除",
+      "name": "定时作业管理权限"
+    },
+    "system_notice_modify": {
+      "description": "对系统公告进行添加、修改和删除",
+      "name": "系统公告管理权限"
+    },
+    "team_modify": {
+      "description": "对分组进行添加、修改和删除",
+      "name": "分组管理权限"
+    },
+    "theme_modify": {
+      "description": "对主题色的设置",
+      "name": "主题设置权限"
+    },
+    "user_modify": {
+      "description": "对用户进行添加、修改和删除",
+      "name": "用户管理权限"
+    },
+    "vip_view": {
+      "description": "拥有此权限才能查看vip用户头像的VIP标识",
+      "name": "VIP查看权限"
+    },
+    "worktime_modify": {
+      "description": "对服务窗口添加、修改和删除",
+      "name": "服务窗口管理权限"
+    }
+  },
+  "common": {
+    "aborted": "已中止",
+    "accesstype": "访问类型",
+    "account": "账号",
+    "action": "动作",
+    "actiontime": "操作时间",
+    "actiontype": "操作类型",
+    "actionuser": "操作人",
+    "active": "激活",
+    "activeversionid": "激活版本ID",
+    "alertattr": "告警属性",
+    "alertdetail": "告警详情",
+    "alertlevel": "告警级别",
+    "alertlink": "告警外部链接",
+    "alertlist": "告警列表",
+    "alerttime": "告警时间",
+    "alertvalue": "告警值",
+    "all": "所有",
+    "alluser": "所有人",
+    "anchorpoint": "锚点",
+    "anonymous": "匿名认证",
+    "attachment": "附件",
+    "attributelist": "属性列表",
+    "attrname": "属性名",
+    "auth": "授权",
+    "authidlist": "授权id列表",
+    "authlist": "授权列表",
+    "authoritylist": "授权对象",
+    "authtype": "授权类型",
+    "authuuid": "授权对象uuid",
+    "avatar": "头像",
+    "basicauth": "Basic认证",
+    "bearerauth": "Bearer Token",
+    "belongtodepartment": "所属部门",
+    "between": "介于",
+    "boolean": "布尔型",
+    "branch": "分支",
+    "bug": "缺陷",
+    "buildinauth": "内部验证",
+    "cacheandvalid": "缓存但重新验证",
+    "canceled": "已取消",
+    "catalog": "目录",
+    "catalogid": "目录id",
+    "catalogname": "目录名称",
+    "check": "审核",
+    "checkbox": "复选框",
+    "children": "子集合",
+    "childrencount": "子集合个数",
+    "classname": "全类名",
+    "cnname": "中文名称",
+    "collectcount": "收藏量",
+    "collector": "收藏人",
+    "color": "颜色",
+    "comment": "评论",
+    "commentcount": "评论数量",
+    "commitcheck": "提交审核",
+    "common": "公共",
+    "compare": "对比",
+    "condition": "条件配置",
+    "config": "配置",
+    "configfilepath": "配置文件路径",
+    "configfilepathlist": "配置文件路径列表",
+    "configlist": "配置列表",
+    "content": "内容",
+    "copy": "复制",
+    "count": "数量",
+    "create": "创建",
+    "createdate": "创建日期",
+    "createrobject": "创建者对象",
+    "createtime": "创建时间",
+    "createuser": "创建人",
+    "createusername": "创建人名字",
+    "creator": "创建用户",
+    "currentpage": "当前页",
+    "customattribute": "自定义属性",
+    "data": "数据",
+    "datacenter": "数据中心",
+    "datasource": "数据库数据源",
+    "datatype": "数据类型",
+    "date": "日期",
+    "datetime": "日期时间",
+    "defaultexpression": "默认表达式",
+    "defaultpriorityuuid": "默认优先级uuid",
+    "defaultvalue": "默认值列表",
+    "defaultvaluelist": "用于回显的参数列表",
+    "delaytime": "延迟时间",
+    "delegateauthoritylist": "代报权限列表",
+    "deletable": "是否可删除",
+    "delete": "删除",
+    "dependency": "依赖",
+    "description": "描述",
+    "displaymode": "显示模式",
+    "displaytype": "显示类型",
+    "doing": "进行中",
+    "done": "已完成",
+    "double": "双精度浮点数",
+    "draft": "草稿",
+    "dropdownlist": "下拉选择",
+    "dslexpression": "dsl表达式",
+    "duration": "持续时间",
+    "edit": "编辑",
+    "editable": "是否可编辑",
+    "editauthoritylist": "编辑权限列表",
+    "editdate": "修改日期",
+    "editmode": "编辑模式",
+    "editor": "修改者",
+    "editorlist": "修改人列表",
+    "editorname": "修改者名字",
+    "editorobject": "修改者对象",
+    "edittime": "修改时间",
+    "email": "邮箱",
+    "emailnotify": "邮件通知",
+    "embed": "内置",
+    "enabledebugmode": "是否启用debug模式",
+    "encoding": "编码",
+    "enddate": "结束日期",
+    "endtime": "结束时间",
+    "enum": "枚举",
+    "equal": "等于",
+    "errorinfo": "错误信息",
+    "errormsg": "异常信息",
+    "event": "事件",
+    "example": "范例",
+    "exclude": "不包括",
+    "excludeid": "排除id",
+    "excludelist": "用于过滤回显参数",
+    "execrtoolauthoritystatus": "直接执行权限状态",
+    "execrtoolauthorityuuidlist": "直接执行权限对象UUID列表",
+    "executable": "是否可执行",
+    "executeauthoritylist": "执行权限列表",
+    "expired": "过期",
+    "expireddays": "超时天数",
+    "export": "导出",
+    "expressionlist": "表达式列表",
+    "failed": "失败",
+    "failedcount": "错误次数",
+    "failedload": "执行失败",
+    "favorcount": "点赞量",
+    "featurename": "功能名称",
+    "featurepath": "功能路径",
+    "file": "文件",
+    "fileid": "文件ID",
+    "fileidlist": "附件ID列表",
+    "filelist": "附件列表",
+    "filename": "文件名",
+    "fileparamname": "附件参数名称",
+    "filepath": "文件路径",
+    "filepathlist": "附件路径列表",
+    "filepathprefix": "附件路径前缀",
+    "filesize": "文件大小",
+    "filetype": "附件类型",
+    "filter": "过滤条件",
+    "focususerlist": "关注人列表",
+    "focususeruuidlist": "关注人uuid列表",
+    "form": "表单",
+    "greaterthan": "大于",
+    "greaterthanorequal": "大于等于",
+    "group": "分组",
+    "groupid": "组id",
+    "grouplist": "限制接口返回类型",
+    "handler": "处理器标识",
+    "hang": "已挂起",
+    "hasmore": "是否有更多内容尚未读取",
+    "hasparent": "是否拥有父级",
+    "help": "帮助",
+    "hmac": "Hmac认证",
+    "homeurl": "应用服务器地址",
+    "hostname": "主机名",
+    "icon": "图标",
+    "id": "ID",
+    "importtargettype": "导入目标类型",
+    "include": "包括",
+    "includelist": "用于需要回显参数",
+    "index": "下标",
+    "inittime": "初始化时间",
+    "inittype": "前端初始化类型，取值范围[user,team,role]",
+    "inputfrom": "更新方式",
+    "inputfromname": "变更方式名称",
+    "int": "整形",
+    "ip": "ip",
+    "iplist": "IP列表",
+    "isactive": "是否激活",
+    "isactived": "已激活",
+    "isactivepriority": "是否启用优先级",
+    "isauthenticate": "是否需要鉴权",
+    "isautofill": "是否自动填充",
+    "iscancheck": "是否能审核",
+    "iscandelete": "是否能删除",
+    "iscanmodify": "是否能修改",
+    "iscanview": "是否能查看",
+    "isdefault": "是否默认",
+    "isdelegateauthority": "是否有代报权限",
+    "isdeleted": "是否已删除",
+    "isdisplaypriority": "是否显示优先级",
+    "isend": "是否完结",
+    "isexpired": "是否过期",
+    "isfavoried": "是否收藏",
+    "isfile": "是否是文件",
+    "isfocus": "是否已关注",
+    "ishidden": "是否隐藏",
+    "islimit": "是否限制个数",
+    "ismultiple": "是否多选",
+    "ismycreated": "是否我创建",
+    "isneedpage": "是否需要分页",
+    "isnotnull": "不为空",
+    "isnull": "为空",
+    "isoverride": "是否覆盖",
+    "isregister": "是否注册",
+    "isrequired": "是否必填",
+    "isreviewable": "是否能审批",
+    "isshow": "是否显示",
+    "isunique": "是否唯一",
+    "iteration": "迭代",
+    "jobuuid": "定时作业UUID",
+    "jsonarray": "json数组",
+    "jsonobject": "json对象",
+    "key": "键",
+    "keyword": "关键字",
+    "lastfinishtime": "最后一次完成时间",
+    "lastfiretime": "最后一次激活时间",
+    "layout": "布局",
+    "lessthan": "小于",
+    "lessthanorequal": "小于等于",
+    "level": "层次",
+    "lft": "左编码",
+    "like": "包含",
+    "loadcommercialmodulefail": "加载商业版模块 {0} 失败, 请核对许可权限信息，联系厂商更换",
+    "locktime": "锁定时间",
+    "logger": {
+      "level": "日志级别"
+    },
+    "logincenter": "当前登录人所在中心",
+    "logindepartment": "当前登录人所在部",
+    "loginteam": "当前登录人所在组",
+    "loginuser": "当前登录人",
+    "loglist": "日志列表",
+    "long": "长整数",
+    "mailaddress": "邮箱地址",
+    "maintenanceman": "维护者",
+    "match": "匹配",
+    "matrix": "矩阵",
+    "memo": "备注",
+    "menu": "菜单",
+    "messagenotify": "消息通知",
+    "mobile": "手机端",
+    "module": {
+      "group": "模块分组",
+      "groupname": "模块分组名称",
+      "name": "模块名称"
+    },
+    "modulegroup": "模块组",
+    "moduleid": "模块ID",
+    "modulespolicy": "模块规则",
+    "multiselect": "多选下拉",
+    "mustinput": "必填",
+    "name": "名称",
+    "needpage": "是否分页",
+    "needscore": "是否需要评分",
+    "networkarea": "网络区域",
+    "newvalue": "新值",
+    "nextfiretime": "下一次激活时间",
+    "no": "否",
+    "noauth": "无需认证",
+    "nocache": "没有缓存",
+    "nodeinfo": "节点信息",
+    "nostatus": "无状态",
+    "notifytype": "通知类型",
+    "notlike": "不包含",
+    "notstart": "未开始",
+    "notsynced": "未同步",
+    "number": "数字",
+    "object": "任意对象",
+    "oldvalue": "旧值",
+    "owner": "所有者",
+    "ownereditable": "是否可编辑维护人",
+    "owneruuid": "维护人",
+    "packagename": "包名",
+    "pagecount": "总页数",
+    "pageinfo": "分页数据",
+    "pagesize": "每页大小",
+    "parentid": "父ID",
+    "parentuuid": "父级uuid",
+    "pass": "通过",
+    "password": "密码",
+    "path": "路径",
+    "pc": "电脑端",
+    "phase": "阶段",
+    "phone": "电话号码",
+    "planstarttime": "计划时间",
+    "policy": "策略",
+    "prefix": "前缀",
+    "primarykey": "主键",
+    "priority": "优先级",
+    "prioritycolor": "优先级颜色",
+    "priorityname": "优先级名称",
+    "priorityuuid": "优先级uuid",
+    "privatecache": "私有缓存",
+    "progress": "进度",
+    "project": "项目",
+    "publiccache": "公共缓存",
+    "radio": "单选",
+    "rangelist": "限制接口option范围",
+    "rated": "已评分",
+    "readonly": "只读",
+    "recall": "撤回",
+    "referencecount": "引用数量",
+    "regex": "正则表达式",
+    "region": "地域",
+    "reject": "驳回",
+    "release": "发布",
+    "relname": "关系名称",
+    "reltype": "关系类型",
+    "reportauthoritylist": "上报权限列表",
+    "request": "需求",
+    "retreat": "\"撤回\"",
+    "reviewable": "是否可审核",
+    "reviewer": "审核人",
+    "reviewerlist": "审批人列表",
+    "rht": "右编码",
+    "role": "角色",
+    "roleauthlist": "角色权限列表",
+    "roleuuid": "角色uuid",
+    "roleuuidlist": "角色uuid列表",
+    "rownum": "数据条目",
+    "rsapublickey": "RSA公钥",
+    "rule": "规则",
+    "runnergroup": "执行器组",
+    "runnergrouptag": "执行器组标签",
+    "saveasdraft": "存为草稿",
+    "savemode": "保存模式",
+    "sceneuuid": "场景uuid",
+    "schedule": "定时任务",
+    "schedulejobclassinfo": "定时作业组件信息",
+    "schedulejobinfo": "定时作业信息",
+    "scopeofuse": "使用范围",
+    "scoreinfo": "评分信息",
+    "select": "下拉框",
+    "servergroup": "服务器组",
+    "serviceid": "服务ID",
+    "servicename": "服务名",
+    "singleselect": "单选下拉",
+    "sla": "时效",
+    "sort": "排序",
+    "source": "来源",
+    "sourcelist": "来源列表",
+    "sourcename": "来源中文名",
+    "specifyversionid": "指定版本ID",
+    "sql": "sql语句",
+    "startdate": "开始日期",
+    "startloadcommercialmodule": "成功加载商业版模块 {0}",
+    "startloadconfig": "开始从 {0} 加载配置...",
+    "startloadmodule": "开始初始化模块...",
+    "startloadschedulejob": "开始加载模块 {0} 的定时作业...",
+    "startloadstartupjob": "租户 {1} 的启动作业 {0} 已执行完毕",
+    "startloadstartupjobforall": "全局启动作业 {0} 已执行完毕",
+    "starttime": "开始时间",
+    "startupjob": "启动作业",
+    "startuser": "开始用户",
+    "status": "状态",
+    "statuscolor": "状态颜色",
+    "statusdescription": "状态描述",
+    "statusid": "状态ID",
+    "statusinfo": "状态信息",
+    "statuslist": "状态列表",
+    "statusname": "状态名称",
+    "statusuniquename": "状态唯一标识",
+    "steplist": "步骤列表",
+    "string": "字符串",
+    "succeed": "已成功",
+    "successload": "执行完毕",
+    "superadmin": "超级管理员",
+    "switch": "开关",
+    "tablelist": "表格列表",
+    "tag": "标签",
+    "tagid": "标签id",
+    "tagidlist": "标签ID列表",
+    "taglist": "标签列表",
+    "tagsdir": "标签目录",
+    "targetid": "目标id",
+    "task": "任务",
+    "tbodylist": "展示的值",
+    "team": "组",
+    "teamlist": "分组列表",
+    "teamusertitlelist": "分组领导集合",
+    "teamuuid": "用户组uuid",
+    "teamuuidlist": "用户组uuid列表",
+    "tel": "手机号",
+    "templateid": "模板id",
+    "templatename": "模板名称",
+    "tenantname": "租户名称",
+    "tenantuuid": "租户uuid",
+    "test": "测试",
+    "testcase": "测试用例",
+    "testenv": "测试环境",
+    "testplan": "测试计划",
+    "text": "文本",
+    "textarea": "文本域",
+    "textbox": "文本框",
+    "theadlist": "展示的字段",
+    "time": "时间",
+    "timecost": "耗时",
+    "timeoutpoint": "超时时间点",
+    "timerange": "时间范围",
+    "timeunit": "时间单位",
+    "title": "标题",
+    "toomanyoption": "选项过多，其余选项不予展示",
+    "trigger": "触发点",
+    "triggertime": "触发时间",
+    "triggertype": "触发类型",
+    "type": "类型",
+    "typeid": "类型ID",
+    "typename": "类型名称",
+    "typeuuid": "分类uuid",
+    "uncommited": "未提交",
+    "unequal": "不等于",
+    "unique": "唯一",
+    "uniquename": "唯一标识",
+    "unreadcount": "未读数量",
+    "upwardnamelist": "上层名称列表",
+    "url": "请求路径",
+    "user": "用户",
+    "userenname": "用户英文名",
+    "userid": "用户ID",
+    "useridlist": "用户id列表",
+    "userinfolist": "用户信息列表",
+    "userlist": "用户列表",
+    "username": "用户名",
+    "userselect": "用户选择器",
+    "userselectionimportoption": "用户选择导入的依赖数据",
+    "usertype": "用户类型",
+    "useruuid": "用户UUID",
+    "useruuidlist": "用户uuid列表",
+    "uuid": "uuid",
+    "validate": "校验",
+    "validcode": "注册验证码",
+    "validtype": "验证方式",
+    "value": "值",
+    "vendor": "厂商",
+    "versioncount": "版本数量",
+    "versionid": "版本ID",
+    "versionlist": "版本列表",
+    "versionname": "版本名称",
+    "versionnum": "版本号",
+    "versionuuid": "版本uuid",
+    "view": "查看",
+    "viewable": "是否可查看",
+    "viewauthoritylist": "查看权限列表",
+    "viewcount": "浏览量",
+    "vipuser": "vip用户",
+    "waiting": "排队中",
+    "wechatnotify": "微信通知",
+    "widgetlist": "组件列表",
+    "worker": "处理人",
+    "worktimename": "服务时间窗口名称",
+    "worktimeuuid": "服务时间窗口uuid",
+    "year": "年份",
+    "yes": "是"
+  },
+  "config": {
+    "receiveconfiginfo": "重新加载了 nacos 配置"
+  },
+  "datawarehouse": {
+    "status": {
+      "aborted": "同步已中止",
+      "doing": "同步数据中",
+      "done": "同步完成",
+      "failed": "同步失败"
+    }
+  },
+  "file": {
+    "type": {
+      "image": "图片文件"
+    }
+  },
+  "framework": {
+    "matrixtype": {
+      "customdatasource": "自定义数据源"
+    }
+  },
+  "fulltextindex": {
+    "type": {
+      "integrationaudit": "集成审计"
+    }
+  },
+  "globallock": {
+    "error": {
+      "enqueuemissing": "入队后未找到锁记录；lockId={0}，key={1}，uuid={2}，handler={3}。无法确认入队结果，拒绝返回获锁成功。",
+      "identitymismatch": "锁身份冲突，拒绝复用或修改记录；lockId={0}，冲突字段={1}，原值={2}，请求值={3}；原 key={4}，请求 key={5}，原 handler={6}，请求 handler={7}。",
+      "operationmismatch": "操作记录与请求不匹配，拒绝执行；operationId={0}，绑定 lockId={1}、action={2}，请求 lockId={3}、action={4}。",
+      "operationunavailable": "操作记录不存在、已过期或当前用户无权访问，拒绝执行；operationId={0}，请求 lockId={1}、action={2}。请重新准备操作。",
+      "ownerrequired": "批量释放资源锁要求非空处理器列表及业务归属标识；实际 handlers={0}，ownerId={1}。",
+      "prepareinvalid": "准备交互式锁操作要求 lockId 非空且 action 为 unlock 或 cancel；实际 lockId={0}，action={1}。",
+      "releasefailed": "资源锁操作失败；action={0}，lockId={1}，key={2}，uuid={3}，handler={4}，operationId={5}；原因：{6}。",
+      "transactionrequired": "批量释放资源锁必须加入调用方的活动事务，当前无活动事务；handlers={0}，ownerId={1}。请在业务状态更新事务内调用。"
+    },
+    "notifyerror": "通知异常",
+    "ownerid": "业务归属标识",
+    "status": {
+      "notification": {
+        "empty": "无可通知的等待锁",
+        "failed": "通知失败",
+        "success": "通知成功"
+      },
+      "operation": {
+        "done": "操作结束",
+        "failed": "操作失败",
+        "prepared": "已准备",
+        "running": "执行中"
+      },
+      "release": {
+        "failed": "释放失败",
+        "pending": "等待释放",
+        "released": "已释放",
+        "releasing": "释放中"
+      },
+      "waiter": {
+        "failed": "通知失败",
+        "notifying": "通知中",
+        "notnotified": "未通知",
+        "pending": "等待通知",
+        "skipped": "已跳过",
+        "success": "通知成功"
+      }
+    },
+    "unlockerror": "解锁异常"
+  },
+  "nf": {
+    "api": {
+      "example": {
+        "invalid": "接口 {0} 的场景 {1} 请求示例不是有效的 JSON 对象或数组。",
+        "mcparguments": "以下各场景的 JSON 是 tools/call 的 params.arguments。先根据适用条件选择场景，再替换示例值；不要把标题、说明或整个示例列表放入 arguments。"
+      }
+    }
+  },
+  "nfai": {
+    "maintenancemode": {
+      "getmaintenanceuser": "厂商维护人员"
+    }
+  },
+  "nfal": {
+    "extra_menu_modify": {
+      "getauthdisplayname": "附加菜单管理权限",
+      "getauthintroduction": "对附加菜单进行配置"
+    },
+    "home_page_modify": {
+      "getauthdisplayname": "默认首页管理权限",
+      "getauthintroduction": "对默认首页进行添加、修改、删除"
+    },
+    "matrix_modify": {
+      "getauthdisplayname": "矩阵管理权限",
+      "getauthintroduction": "对矩阵进行添加、修改和删除"
+    },
+    "notify_config_modify": {
+      "getauthdisplayname": "通知配置管理权限",
+      "getauthintroduction": "对通知配置进行修改"
+    },
+    "user_export_file_modify": {
+      "getauthdisplayname": "导出文件管理权限",
+      "getauthintroduction": "对所有用户的导出文件有查看、下载、删除权限"
+    }
+  },
+  "nfb": {
+    "moduleinitializer": {
+      "checkchangelog": {
+        "invalid": "版本日志:{0} ,changelog下文件夹名需按{1}格式命名"
+      },
+      "getactivetenantlist": {
+        "neatlogicdb": "neatlogic库连接不上,请核对{0}的db.driverClassName、db.url、db.username、db.password配置无误后重启"
+      },
+      "initdmlsql": {
+        "tenant": "开始初始化数据库数据..."
+      }
+    },
+    "neatlogicdispatcherservlet": {
+      "init": {
+        "error": " 模块加载异常"
+      }
+    }
+  },
+  "nfc": {
+    "frameworktenantconfig": {
+      "apiqps": "每秒向服务器发送的请求数量峰值（不分接口）",
+      "disabledmodulegrouplist": "禁用的模块组列表，页面将不显示被禁用的模块（多个模块请以英文逗号隔开）",
+      "isdebug": "是否调试模式，默认0，不调试。如果调试则移动端认证失败页面展示认证相关信息",
+      "loginlockedfailedcount": "登录失败次数限制(次)。超过次数则锁定用户，无法登录，等自动解锁",
+      "loginlockedtime": "登录锁定时长(分钟)。锁定用户后，超过这个时间后才允许登录",
+      "loginneedlock": "登录是否需要检查是否锁定用户，默认为0，不需要检查",
+      "matrixcolumndatasearchforbatchinputparamsearchparamlistsize": "单次调用批量下拉矩阵属性数据查询接口时，入参searchParamList大小",
+      "matrixcolumndatasearchforbatchrequestconcurrency": "同时调用批量下拉矩阵属性数据查询接口的并发数",
+      "minimumchromebrowserversion": "chrome浏览器最低版本，低于该设置版本会跳转至浏览器版本不兼容页面，默认95",
+      "minimumfirefoxbrowserversion": "firefox浏览器最低版本，低于该设置版本会跳转至浏览器版本不兼容页面，默认0",
+      "mobilefiledownloadenabled": "是否允许移动端下载附件",
+      "passwordexpiredays": "用户密码有效期(天)，超过有效期则强制跳转改密码页面",
+      "passwordneedexpiredcheck": "是否需要检验用户密码有效期，默认为0，不需要检查",
+      "tenantdefaultlanguage": "租户默认语言，支持 zh/en。语言优先级：Cookie > 租户默认语言 > 浏览器首选语言 > 中文"
+    }
+  },
+  "nfcc": {
+    "config": {
+      "loadnacosproperties": {
+        "jwtsecret": "✖请在配置文件中定义jwt.secret参数"
+      }
+    },
+    "inputfrom": {
+      "api": "接口调用",
+      "autocollect": "自动采集",
+      "excel": "excel导入",
+      "itsm": "流程修改",
+      "mobile": "移动端",
+      "page": "页面操作",
+      "pc": "PC端",
+      "relative": "级联更新",
+      "unknown": "未知"
+    },
+    "userprofile": {
+      "rolecreatesuccess": "角色创建成功",
+      "teamcreatesuccess": "分组创建成功",
+      "usercreatesuccess": "用户创建成功"
+    },
+    "userprofileoperate": {
+      "backrolelist": "返回角色列表",
+      "backteamlist": "返回分组列表",
+      "backuserlist": "返回用户列表",
+      "editrole": "编辑角色",
+      "editteam": "编辑分组",
+      "edituser": "编辑用户",
+      "keeponcreate": "继续创建"
+    }
+  },
+  "nfccs": {
+    "systemuser": {
+      "anonymous": "匿名用户",
+      "autoexec": "自动化用户",
+      "system": "系统"
+    },
+    "systemuserfactory": {
+      "repeatexception": "存在相同的虚拟系统用户，请联系管理员"
+    }
+  },
+  "nfd": {
+    "licensevo": {
+      "entityfield": {
+        "name": {
+          "dburl": "数据库URL",
+          "enddate": "服务终止日期",
+          "expirationdate": "过期日期",
+          "graceperiod": "宽限天数",
+          "isend": "是否终止服务",
+          "isvalid": "是否合法",
+          "modules": "模块列表",
+          "purchaser": "客户名称"
+        }
+      }
+    },
+    "rolevo": {
+      "entityfield": {
+        "name": {
+          "ruleprefix": "规则前缀"
+        }
+      }
+    },
+    "tenantauditvo": {
+      "error": "异常内容",
+      "errorhash": "异常内容hash",
+      "result": "日志内容",
+      "resulthash": "日志内容hash",
+      "sqltype": "版本序号",
+      "timecost": "耗时（毫秒）"
+    },
+    "tenantvo": {
+      "authmongodb": "认证 mongodb",
+      "expiredate": "有效期限",
+      "islocaldb": "是否本地数据库",
+      "modulegrouplist": "激活模块分组",
+      "modulelist": "激活模块",
+      "mongodb": "新 mongodb",
+      "superadmin": "超级管理员 租户创建时使用",
+      "visittime": "访问时间"
+    }
+  },
+  "nfdd": {
+    "datasourcedatavo": {
+      "entityfield": {
+        "name": {
+          "conditionlist": "条件列表",
+          "datasourceid": "数据源id",
+          "expiremin": "有效时间，单位分钟",
+          "inserttime": "添加日期"
+        }
+      },
+      "inserttime": "insertTime"
+    },
+    "datasourcevo": {
+      "entityfield": {
+        "name": {
+          "connectionid": "数据连接id",
+          "cron": "定时策略",
+          "databaseid": "数据库Id",
+          "datacount": "数据量",
+          "dbtype": "数据库类型",
+          "expireunit": "有效时间单位",
+          "fieldlist": "字段列表",
+          "fileid": "配置文件id",
+          "mode": "同步模式",
+          "moduleid": "所属模块",
+          "modulename": "所属模块名称",
+          "paramlist": "参数列表",
+          "querytimeout": "查询超时时间，单位：秒",
+          "xml": "xml配置"
+        }
+      }
+    }
+  },
+  "nfde": {
+    "databaseconnectionfailedexception": {
+      "configisempty": "数据库连接配置config为空",
+      "fileidlistisempty": "{0}数据库连接配置config中fileIdList为空"
+    },
+    "databasenamerepeatexception": {
+      "databasenamerepeatexception": "数据库名称：{0} 已存在"
+    },
+    "databasenotfoundexception": {
+      "databasenotfoundexception": "数据库：{0} 不存在"
+    },
+    "documentonlinejarnameillegalexception": {
+      "documentonlinejarnameillegalexception": "在线文档Jar名称：{0}不合法"
+    },
+    "documentonlinenotfoundexception": {
+      "documentonlinenotfoundexception": "在线帮助文档：“{0}”不存在"
+    }
+  },
+  "nfdt": {
+    "status": {
+      "building": "构建中",
+      "built": "已完成",
+      "error": "异常"
+    }
+  },
+  "nfe": {
+    "loadbalanceexception": {
+      "loadbalanceexception": "后端节点漂移，权限服务器ID“{0}”，当前服务器ID“{1}”,请联系管理员！"
+    },
+    "systempropertynotfoundexception": {
+      "systempropertynotfoundexception": "系统属性“{0}”不存在"
+    }
+  },
+  "nfea": {
+    "authencryptexception": {
+      "authencryptexception": "前端加密方式异常，请在后端服务配置文件配置login.auth.password.encrypt={0}后，重启后端服务后，刷新前端页面重新登录"
+    },
+    "authnotfoundexception": {
+      "authnotfoundexception": {
+        "apiauthname": "”{0}“接口权限“{1}”不存在",
+        "authname": "权限“{0}”不存在"
+      }
+    },
+    "notsupportbasicauthexception": {
+      "notsupportbasicauthexception": "该接口不支持 basic 认证"
+    }
+  },
+  "nfec": {
+    "apifieldvalidexception": {
+      "apifieldvalidexception": "入参数校验异常"
+    },
+    "apiratelimiterexception": {
+      "apiratelimiterexception": "系统繁忙，请稍后重试"
+    },
+    "changelogversioninvalidexception": {
+      "changelogversioninvalidexception": {
+        "a": "模块: {0} 版本:{1} 文件内容格式不合法"
+      }
+    },
+    "changelogversionnotfoundexception": {
+      "changelogversionnotfoundexception": {
+        "a": "模块: {0} 版本:{1} 不存在"
+      }
+    }
+  },
+  "nfed": {
+    "tenantmongoclientnotfoundexception": {
+      "tenantmongoclientnotfoundexception": "获取mongoClient失败，请核对neatlogic库mongodb表中{0}租户的认证数据，重启服务再重试"
+    }
+  },
+  "nfee": {
+    "extramenuexistchildrenexception": {
+      "extramenuexistchildrenexception": "当前目录：{0}存在子节点，无法删除"
+    },
+    "extramenunamerepeatexception": {
+      "extramenunamerepeatexception": "菜单名称“{0}”已存在"
+    },
+    "extramenunotallowedaddexception": {
+      "extramenunotallowedaddexception": "菜单节点不允许新增子节点"
+    },
+    "extramenunotfoundexception": {
+      "extramenunotfoundexception": "菜单配置：{0}不存在"
+    },
+    "extramenuparamexception": {
+      "extramenuparamexception": "参数：{0}不能为空"
+    },
+    "extramenurootexception": {
+      "extramenurootexception": "只允许存在一个根节点"
+    },
+    "extramenurootnotallowedexception": {
+      "extramenurootnotallowedexception": "根节点不允许删除"
+    }
+  },
+  "nfef": {
+    "filenamenotnullexception": {
+      "filenamenotnullexception": "上传文件名不能为空"
+    },
+    "filenotfoundexception": {
+      "filenotfoundexception": "附件“{0}”不存在",
+      "getmessage": {
+        "directory": "“{0}”是一个目录",
+        "nonexistent": "文件或目录“{0}”不存在"
+      }
+    },
+    "uploadfilefailedexception": {
+      "uploadfilefailedexception": {
+        "a": "上传文件失败，错误：{0}",
+        "b": "上传到{0}文件失败，错误：{1}"
+      }
+    }
+  },
+  "nfeh": {
+    "homepagenamerepeatexception": {
+      "homepagenamerepeatexception": "首页配置：“{0}” 已存在"
+    },
+    "homepagenotfoundexception": {
+      "homepagenotfoundexception": "首页配置：“{0}”不存在"
+    }
+  },
+  "nfel": {
+    "policyrepeatexception": {
+      "policyrepeatexception": "存在重复license规则{0}"
+    }
+  },
+  "nfem": {
+    "modulegroupnotfoundexception": {
+      "modulegroupnotfoundexception": "模块组“{0}”不存在"
+    },
+    "subscribehandlerisembedexception": {
+      "subscribehandlerisembedexception": "系统订阅处理器：{0}不允许用于自定义订阅"
+    },
+    "subscribeissystemexception": {
+      "subscribeissystemexception": "系统订阅：{0}不允许修改或删除"
+    }
+  },
+  "nfer": {
+    "rolenamerepeatexception": {
+      "rolenamerepeatexception": "角色：“{0}”已存在"
+    },
+    "runnerconnectrefusedexception": {
+      "runnerconnectrefusedexceptiona": "Runner 链接失败： {0}",
+      "runnerconnectrefusedexceptionmsg": "执行器（runner)：“{0}” 连接失败,请检查执行器服务正常后重试。异常信息:{1}"
+    },
+    "runnergroupnotfoundexception": {
+      "runnergroupnotfoundexception": "执行器组不存在，请先配置执行器组",
+      "runnergroupnotfoundexceptionname": "执行器组: {0} 不存在"
+    },
+    "runnergrouprunnerlistemptyexception": {
+      "runnergrouprunnerlistemptyexception": "执行器组: {0} ({1}) 不存在执行器"
+    },
+    "runnergrouprunnernotfoundexception": {
+      "runnergrouprunnernotfoundexceptionid": "执行器组“{0}”不存在或未配置runner",
+      "runnergrouprunnernotfoundexceptionname": "runnerGroup: {0}未配置runner"
+    },
+    "runnernotfoundbytagentidexception": {
+      "runnernotfoundbytagentidexception": "未找到tagent:“{0}({1})”对应的runner,请查看logs/tagentRegisterAndNetty.log,心跳异常"
+    },
+    "runnernotfoundbytagentrunneridexception": {
+      "runnernotfoundbytagentrunneridexception": "未找到tagent:“{0}({1})”对应的runner“{2}”,请查看logs/tagentRegisterAndNetty.log,心跳异常"
+    },
+    "runnernotfoundexception": {
+      "runnernotfoundexception": {
+        "all": "执行器(runenr)不存在,请前往“执行器管理”确认是否配置了执行器(runner)",
+        "ipport": "{0}:{1}没有找到匹配的runner,请确认执行器管理是否存在该runner",
+        "not": "runner“{0}”不存在"
+      }
+    },
+    "runnernotmatchexception": {
+      "runnernotmatchexception": {
+        "ipresourceid": "ip: {0}({1})找不到匹配的runner，请核对runner组配置",
+        "noparam": "找不到匹配的runner，请核对runner组配置 或者 没有配置runner map"
+      }
+    },
+    "runnerurlisnullexception": {
+      "runnerurlisnullexception": "ID为：{0}的runner的url是空的"
+    }
+  },
+  "nfes": {
+    "dmlsqlexecuteexception": {
+      "dmlsqlexecuteexception": "租户:{0} 模块:{1} dmlSql:{2} 执行失败"
+    },
+    "schedulepublicauthexception": {
+      "schedulepublicauthexception": "没有权限测试该定时作业"
+    }
+  },
+  "nfet": {
+    "licenseinvalidexception": {
+      "licenseinvalidexception": "当前许可缺少访问模块 {0} 的授权，尝试访问会被拒绝。请检查许可信息，确认是否应具备该访问权限。如果确实缺少，请联系厂商更换，或者避免访问该模块下的任何功能。",
+      "licenseinvalidexceptiona": "许可非法"
+    },
+    "paramirregularexception": {
+      "paramirregularexception": {
+        "common": "参数“{0}”不符合格式要求",
+        "rule": "参数“{0}”不符合格式要求，{1}"
+      }
+    },
+    "paramjsonirregularexception": {
+      "paramjsonirregularexception": "参数不是合法的JSON格式"
+    },
+    "paramsizetoolargeexception": {
+      "paramsizetoolargeexception": "参数：“{0}”允许最大长度是{1}，当前长度：{2}"
+    },
+    "paramsizetoosmallexception": {
+      "paramsizetoosmallexception": "参数：“{0}”允许最小长度是{1}，当前长度：{2}"
+    },
+    "paramtransferexception": {
+      "paramtransferexception": "输入参数转换异常：{0}"
+    },
+    "paramvaluetooshortexception": {
+      "paramvaluetooshortexception": "参数：“{0}”允许最小长度是{1}个字符"
+    },
+    "teamnamerepeatexception": {
+      "teamnamerepeatexception": "分组：“{0}”已存在"
+    },
+    "tenantconfignotfoundexception": {
+      "tenantconfignotfoundexception": "配置信息：“{0}”不存在"
+    },
+    "tenantinvalidexception": {
+      "tenantinvalidexception": "租户{0}认证非法"
+    },
+    "updateteamfoundmultiexception": {
+      "updateteamfoundmultiexception": "存在多个分组“{0}”, 请用 uuid 更新"
+    }
+  },
+  "nfeu": {
+    "ipsubnetmaskexception": {
+      "ipsubnetmaskexception": "ip:{0} 匹配执行器组时异常，请检查执行器组网段/子网掩码配置后，重试！异常网段/子网掩码:{1}"
+    },
+    "loginlockedexception": {
+      "loginlockedexception": "登录失败已超过“{0}”次，账号已锁定，请于“{1}”后重试"
+    },
+    "passworddecryptexception": {
+      "passworddecryptexception": "密码解密失败"
+    },
+    "passwordencryptexception": {
+      "passwordencryptexception": "密码加密失败"
+    },
+    "passwordtoolongexception": {
+      "passwordtoolongexception": "密码内容过长，无法进行RSA加密"
+    },
+    "rsaprivatekeyinitializationfailedexception": {
+      "rsaprivatekeyinitializationfailedexception": "RSA私钥初始化失败"
+    },
+    "userpasswordexpiredexception": {
+      "userpasswordexpiredexception": "用户密码已过期，请修改密码"
+    }
+  },
+  "nfew": {
+    "wechatauthenticationinformationnotfoundexception": {
+      "wechatauthenticationinformationnotfoundexception": "企业微信认证信息找不到"
+    }
+  },
+  "nff": {
+    "jsonwebtokenvalidfilter": {
+      "dofilterinternal": {
+        "authfailed": "认证失败(‘{0}’)，请重新登录",
+        "authfailederrorlog": "认证失败",
+        "authfailedlog": "=======登录错误：通过 {0} 认证失败，请重新登录",
+        "authtypeinvalid": "找不到认证方式 ‘{0}’",
+        "lacktenant": "租户 ‘{0}’ 不存在或已被禁用",
+        "unexpired": "会话已超时或已被终止，请重新登录"
+      }
+    }
+  },
+  "nffd": {
+    "formattributevo": {
+      "entityfield": {
+        "name": "供前端渲染时判断，如果为false则前端页面需使用默认config,true则使用表单管理编辑保存的config"
+      }
+    }
+  },
+  "nffe": {
+    "formattributenotfoundexception": {
+      "formattributenotfoundexception_a": "表单属性：{0}不存在",
+      "formattributenotfoundexception_b": "表单{0}中找不到{1}属性"
+    },
+    "formextendattributeconfigillegalexception": {
+      "formextendattributeconfigillegalexception_a": "表单扩展数据中，{0} 类型属性 {1} 的配置中缺少 {2} 字段",
+      "formextendattributeconfigillegalexception_b": "表单扩展数据中，{0} 类型属性 {1} 的配置中 {2} 字段值为 {3} 不合法"
+    },
+    "formnotfoundexception": {
+      "formnotfoundexception": "表单“{0}”不存在"
+    },
+    "formversionnotfoundexception": {
+      "formversionnotfoundexception": "表单版本“{0}”不存在"
+    },
+    "formversionscenenotfoundexception": {
+      "formversionscenenotfoundexception": "在表单：{0}的版本：{1}中，场景：{2}不存在"
+    },
+    "status": {
+      "doing": "重建中",
+      "done": "重建完毕"
+    }
+  },
+  "nfhc": {
+    "heartbeatmanager": {
+      "myinit": {
+        "startupfailureprompt": "启动失败，服务器ID:{0}已经被服务器({1})使用，请修改类路径下config/serverid.conf文件中数值"
+      }
+    }
+  },
+  "nfie": {
+    "exportnoauthexception": {
+      "exportnoauthexception": "没有导出权限"
+    },
+    "importexporthandlernotfoundexception": {
+      "importexporthandlernotfoundexception": "导入导出处理器：{0}找不到"
+    },
+    "importexporttypeinconsistencyexception": {
+      "importexporttypeinconsistencyexception": "导入文件异常，请导入{0}"
+    },
+    "importnoauthexception": {
+      "importnoauthexception": "没有导入权限"
+    }
+  },
+  "nfme": {
+    "matrixviewsqlirregularexception": {
+      "matrixviewsqlirregularexception": "sql 非法{0}",
+      "matrixviewsqlirregularexception_a": "配置文件不是合法的XML文件"
+    }
+  },
+  "nfne": {
+    "emailsendexception": {
+      "emailsendexception": "邮件发送失败，异常：{0}",
+      "emailsendexception_a": "邮件发送失败，异常：{0}，所有收件人：{1}"
+    }
+  },
+  "nfpw": {
+    "frameworkportalwidget": {
+      "text": {
+        "quickentry": "快捷入口",
+        "welcomeoverview": "欢迎概况"
+      }
+    }
+  },
+  "nfs": {
+    "scriptrunnermanager": {
+      "runscriptoncewithjdbc": {
+        "failed": " 执行失败，请检查核对最新的数据库表schema",
+        "tenantnotconnect": "无法连接租户库 neatlogic_{0}，请到 neatlogic 库中的 datasource 表确认 {0} 租户的username、password、host、port字段是否正确。"
+      }
+    }
+  },
+  "nfuc": {
+    "frameworkuserexportfiletype": {
+      "matrixdata": "矩阵数据"
+    }
+  },
+  "nfue": {
+    "userexportfiledeletedeniedexception": {
+      "userexportfiledeletedeniedexception": "您没有权限删除{0}文件"
+    },
+    "userexportfiledownloaddeniedexception": {
+      "userexportfiledownloaddeniedexception": "您没有权限下载{0}文件"
+    },
+    "userexportfilenotfoundexception": {
+      "userexportfilenotfoundexception": "用户导出文件“{0}”不存在"
+    },
+    "userexportfiletypenotfoundexception": {
+      "userexportfiletypenotfoundexception": "用户导出文件类型“{0}”不存在"
+    }
+  },
+  "nfwe": {
+    "worktimerangenotfoundexception": {
+      "worktimerangenotfoundexception_a": "服务时间:“{0}”没有设置排班时间或日历",
+      "worktimerangenotfoundexception_b": "服务时间:“{0}”的“{1}”年份没有设置排班日历",
+      "worktimerangenotfoundexception_c": "服务时间:“{0}”的“{1}”年份排班截止时间为“{2}”，需要追加排班日历"
+    }
+  },
+  "nmffh": {
+    "ldapauthhandler": {
+      "mylogin": {
+        "failed": "[Ldap认证失败]user dn:",
+        "faileda": "[Ldap认证失败]",
+        "succeed": "[Ldap认证成功]user dn:"
+      }
+    }
+  },
+  "nmfra": {
+    "getpasswordpublickeyapi": {
+      "getname": "获取密码RSA加密公钥"
+    }
+  },
+  "nmfs": {
+    "checkupdatedatabaseviewhandler": {
+      "getname": "检查资源中心视图"
+    },
+    "documentonlineinitializeindexhandler": {
+      "executeforalltenant": {
+        "error": "有两个文件路径相同，路径为：{0}，请将其中一个文件重命名文件或移动到不同路径中",
+        "system_out_println": "在线文档索引库位置为{0}",
+        "warn_a": "{0}文件中第{1}个元素中的filePath字段没有设置值",
+        "warn_b": "{0}文件中第{1}个元素中的moduleGroup字段没有设置值",
+        "warn_c": "已经失效的关系配置："
+      },
+      "getname": "初始化在线帮助文档索引"
+    }
+  },
+  "nmfsl": {
+    "licensepolicyvalidjob": {
+      "isend": "%s(%s)模块许可于%s已过期,%s已停止使用，请联系厂商更换",
+      "isendgraceperiod": "且超过了宽限天数(%d天),",
+      "isexpired": "%s(%s)模块许可于%s已过期,%s请联系厂商更换",
+      "isexpiredgraceperiod": "现宽限%d天,即将停止使用,",
+      "iswillexpired": "%s(%s)模块许可即将于%s过期，请联系厂商更换"
+    }
+  },
+  "nmft": {
+    "createdatawarehousetableinithandler": {
+      "getname": "创建数据仓库动态表"
+    }
+  },
+  "nmtc": {
+    "regiontype": {
+      "owner": "上报人"
+    }
+  },
+  "term": {
+    "event": {
+      "eventtypeid": "保存的事件类型ID",
+      "eventtypelist": "关联的事件类型",
+      "name": "事件模块"
+    },
+    "framework": {
+      "agentid": "企业应用ID",
+      "conditionmodel": "条件模型",
+      "corpid": "企业ID",
+      "corpsecret": "应用的凭证密钥",
+      "domain": "域名",
+      "exceptionnotify": "通知异常",
+      "formuuid": "表单uuid",
+      "formversionuuid": "表单版本uuid",
+      "groupname": "系统配置",
+      "integration": "集成配置",
+      "integrationuuid": "集成UUID",
+      "matrixattr": "矩阵属性",
+      "matrixtype": "矩阵类型",
+      "name": "基础框架",
+      "pinyin": "拼音",
+      "policyid": "通知策略ID",
+      "serverid": "服务器ID",
+      "smpthost": "smtp主机",
+      "smptport": "smtp端口",
+      "smptsslenable": "是否使用SSL",
+      "team": {
+        "fullpath": "分组全路径",
+        "parentpathlist": "父级路径列表"
+      },
+      "user": {
+        "viplevel": "VIP级别"
+      },
+      "userotherinfo": "用户其他信息",
+      "viplevel": "用户等级"
+    }
+  },
+  "time": {
+    "duration": {
+      "day": "{0} 天",
+      "days": "{0} 天",
+      "hour": "{0} 小时",
+      "hours": "{0} 小时",
+      "millisecond": "{0} 毫秒",
+      "milliseconds": "{0} 毫秒",
+      "minute": "{0} 分钟",
+      "minutes": "{0} 分钟",
+      "second": "{0} 秒",
+      "seconds": "{0} 秒"
+    }
+  }
+}

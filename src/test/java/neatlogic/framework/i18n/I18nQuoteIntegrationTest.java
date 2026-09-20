@@ -4,9 +4,17 @@ import neatlogic.framework.util.I18nUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.NoSuchMessageException;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.Assert.*;
 
@@ -14,25 +22,22 @@ import static org.junit.Assert.*;
 public class I18nQuoteIntegrationTest {
     private static final Locale TEST_LOCALE = new Locale("en", "XQ");
     private Locale previousLocale;
-    private InspectableMessageSource source;
+    private ModuleJsonMessageSource source;
 
-    /** 使用专用地区资源，避免覆盖运行环境中的中英文语言包。 */
+    /** 使用专用模块资源，避免测试文案与生产 key 冲突。 */
     @Before
     public void setUp() {
         previousLocale = Locale.getDefault();
-        source = new InspectableMessageSource();
-        source.setBasename("classpath:i18n/language");
-        source.setDefaultEncoding("UTF-8");
-        source.setFallbackToSystemLocale(false);
+        source = new ModuleJsonMessageSource();
     }
 
-    /** 静态入口会设置默认语言，测试结束后必须恢复。 */
+    /** 恢复测试前的默认语言，避免其他测试修改造成相互影响。 */
     @After
     public void tearDown() {
         Locale.setDefault(previousLocale);
     }
 
-    /** 两个入口应输出相同文案，缓存对象可复用且参数不残留。 */
+    /** 两个入口应输出相同文案，且连续调用时参数不得残留。 */
     @Test
     public void formatsBothEntrypointsAndReusesCache() {
         String[] keys = {"quoted", "escaped", "apostrophe"};
@@ -41,9 +46,7 @@ public class I18nQuoteIntegrationTest {
             assertEquals(expected[i], source.getMessage(keys[i], new Object[]{"Server"}, TEST_LOCALE));
             assertEquals(expected[i], I18nUtils.getStaticMessage(TEST_LOCALE, keys[i], "Server"));
         }
-        MessageFormat cached = source.formatFor("quoted");
         assertEquals("Model 'Switch' does not exist", source.getMessage("quoted", new Object[]{"Switch"}, TEST_LOCALE));
-        assertSame(cached, source.formatFor("quoted"));
         String argument = "O'Brien {0} $1 \\path";
         String output = "Model '" + argument + "' does not exist";
         assertEquals(output, source.getMessage("quoted", new Object[]{argument}, TEST_LOCALE));
@@ -65,14 +68,16 @@ public class I18nQuoteIntegrationTest {
         source.getMessage("quoted", new Object[]{"Server"}, TEST_LOCALE);
         assertEquals("Model '{0}' does not exist", source.getMessage("quoted", null, TEST_LOCALE));
         assertEquals("Can't find anything", source.getMessage("plain", new Object[0], TEST_LOCALE));
-        // 静态入口原本始终使用 MessageFormat，此处确认无占位符文案仍沿用原生结果。
-        assertEquals(MessageFormat.format("Can't find anything", new Object[0]),
-                I18nUtils.getStaticMessage(TEST_LOCALE, "plain"));
+        assertEquals("Can't find anything", I18nUtils.getStaticMessage(TEST_LOCALE, "plain"));
         assertEquals("missing", I18nUtils.getStaticMessage(TEST_LOCALE, "missing", "Server"));
-        // 当前消息源会把缺失 key 编译成模板，而不是采用默认文案，保持该行为。
-        assertEquals("missing", source.getMessage("missing", new Object[]{"Server"}, "fallback", TEST_LOCALE));
-        assertEquals("missing {0}", source.getMessage("missing '{0}'", new Object[]{"Server"}, TEST_LOCALE));
-        assertEquals("missing {0}", I18nUtils.getStaticMessage(TEST_LOCALE, "missing '{0}'", "Server"));
+        assertEquals("fallback", source.getMessage("missing", new Object[]{"Server"}, "fallback", TEST_LOCALE));
+        try {
+            source.getMessage("missing '{0}'", new Object[]{"Server"}, TEST_LOCALE);
+            fail("Spring 消息源缺少 key 时应保持标准 NoSuchMessageException 语义");
+        } catch (NoSuchMessageException ignored) {
+            // 业务入口 I18nUtils 负责将缺失 key 原样返回，底层消息源保持 Spring 标准行为。
+        }
+        assertEquals("missing '{0}'", I18nUtils.getStaticMessage(TEST_LOCALE, "missing '{0}'", "Server"));
     }
 
     /** 高级格式继续采用原生语义，不将被引用的占位符转换为参数。 */
@@ -81,13 +86,44 @@ public class I18nQuoteIntegrationTest {
         Object[] args = {"Server", 1234};
         String expected = new MessageFormat("'{0}' {1,number,integer}", TEST_LOCALE).format(args);
         assertEquals(expected, source.getMessage("complex", args, TEST_LOCALE));
+        assertEquals(expected, I18nUtils.getStaticMessage(TEST_LOCALE, "complex", args));
     }
 
-    /** 仅为断言缓存身份暴露受保护入口，不改变生产解析行为。 */
-    private static class InspectableMessageSource extends ReloadableJsonBundleMessageSource {
-        /** 返回指定翻译的实际缓存格式对象。 */
-        MessageFormat formatFor(String key) {
-            return resolveCode(key, TEST_LOCALE);
+    /** Spring 消息参数中的嵌套消息应先解析，且不得修改调用方数组。 */
+    @Test
+    public void resolvesNestedMessageArgumentsWithoutMutatingCallerArray() {
+        DefaultMessageSourceResolvable nested = new DefaultMessageSourceResolvable(new String[]{"plain"});
+        Object[] arguments = {nested};
+        assertEquals("Model 'Can't find anything' does not exist",
+                source.getMessage("quoted", arguments, TEST_LOCALE));
+        assertSame(nested, arguments[0]);
+    }
+
+    /** 不支持的语言整体回退中文，且静态入口不得修改 JVM 默认 Locale。 */
+    @Test
+    public void fallsBackToChineseWithoutChangingDefaultLocale() {
+        Locale defaultLocale = Locale.getDefault();
+        assertEquals("中文回退", I18nUtils.getStaticMessage(Locale.FRENCH, "fallback"));
+        assertEquals(defaultLocale, Locale.getDefault());
+    }
+
+    /** 并发格式化必须隔离参数，不能共享 MessageFormat 的可变状态。 */
+    @Test
+    public void formatsConcurrentlyWithoutArgumentLeakage() throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(8);
+        try {
+            List<Callable<String>> tasks = new ArrayList<>();
+            for (int index = 0; index < 200; index++) {
+                String argument = "Server-" + index;
+                tasks.add(() -> source.getMessage("quoted", new Object[]{argument}, TEST_LOCALE));
+            }
+            List<Future<String>> futures = executor.invokeAll(tasks);
+            for (int index = 0; index < futures.size(); index++) {
+                assertEquals("Model 'Server-" + index + "' does not exist", futures.get(index).get());
+            }
+        } finally {
+            executor.shutdownNow();
         }
     }
+
 }

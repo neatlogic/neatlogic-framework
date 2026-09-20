@@ -1,8 +1,0 @@
-{
-  "apostrophe": "Can't find {0}",
-  "complex": "'{0}' {1,number,integer}",
-  "escaped": "Model ''{0}'' does not exist",
-  "plain": "Can't find anything",
-  "quoted": "Model '{0}' does not exist",
-  "screenshot": "The value of the unique rule attribute '{2}' ({3}) of model '{0} ({1})' is empty"
-}

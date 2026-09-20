@@ -13,7 +13,6 @@
 package neatlogic.framework.common.constvalue;
 
 import neatlogic.framework.dto.ExpressionVo;
-import neatlogic.framework.util.$;
 import neatlogic.framework.util.I18n;
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,7 +53,7 @@ public enum Expression implements IEnum {
     }
 
     public String getExpressionName() {
-        return $.t(expressionName.toString());
+        return expressionName.toString();
     }
 
     public String getExpressionEs() {

@@ -59,6 +59,24 @@ public class I18nMessagePatternTest {
                         .format(new Object[]{"IP", 1234}));
     }
 
+    /** 同一参数混用显式格式和普通占位符时必须保留原始类型。 */
+    @Test
+    public void preservesArgumentTypeWhenAnyExplicitFormatExists() {
+        I18nMessageTemplate explicitFirst = new I18nMessageTemplate("{0,number,integer} / {0}", "en");
+        I18nMessageTemplate explicitLast = new I18nMessageTemplate("{0} / {0,number,integer}", "en");
+        assertEquals("1,234 / 1,234", explicitFirst.format(1234));
+        assertEquals("1,234 / 1,234", explicitLast.format(1234));
+        assertEquals("1234 / 1234", new I18nMessageTemplate("{0} / {0}", "en").format(1234L));
+    }
+
+    /** 模板参数与展示用 JSON 并存时，转义的大括号应按原文输出。 */
+    @Test
+    public void formatsLiteralJsonAlongsideArgument() {
+        I18nMessageTemplate template = new I18nMessageTemplate(
+                "Parameter {0}: '{\"dataList\":[{\"text\":\"Yes\"}]}'", "en");
+        assertEquals("Parameter source: {\"dataList\":[{\"text\":\"Yes\"}]}", template.format("source"));
+    }
+
     /** 通过真实 MessageFormat 验证预处理后的最终展示文案。 */
     private String format(String pattern, Object... args) {
         return MessageFormat.format(I18nMessagePattern.normalize(pattern), args);

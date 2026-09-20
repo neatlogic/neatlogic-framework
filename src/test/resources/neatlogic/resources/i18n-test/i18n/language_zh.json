@@ -1,0 +1,29 @@
+{
+  "apostrophe": "Can't find {0}",
+  "complex": "'{0}' {1,number,integer}",
+  "escaped": "Model ''{0}'' does not exist",
+  "fallback": "中文回退",
+  "field": {
+    "help": "每次调用选择一种分类。"
+  },
+  "plain": "Can't find anything",
+  "quoted": "Model '{0}' does not exist",
+  "scene": {
+    "help": "请将主机名替换为已注册节点。",
+    "os": "操作系统健康状态",
+    "services": "服务健康状态"
+  },
+  "screenshot": "The value of the unique rule attribute '{2}' ({3}) of model '{0} ({1})' is empty",
+  "test": {
+    "module": {
+      "group": {
+        "description": "测试分组",
+        "name": "AI"
+      },
+      "name": "测试模块"
+    },
+    "notify": {
+      "module": "IT服务"
+    }
+  }
+}

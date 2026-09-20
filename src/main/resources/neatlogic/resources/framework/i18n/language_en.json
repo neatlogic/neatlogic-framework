@@ -1,0 +1,1298 @@
+{
+  "auth": {
+    "admin": {
+      "description": "Manage selected system features, such as rebuilding nested set indices.",
+      "name": "Core System Administration Permission"
+    },
+    "api_audit_view": {
+      "description": "View operation audits.",
+      "name": "Operation Audit View Permission"
+    },
+    "authority_modify": {
+      "description": "Add, modify, and delete permissions.",
+      "name": "Permission Management Permission"
+    },
+    "data_warehouse_base": {
+      "description": "Access data warehouse data sources.",
+      "name": "Data Warehouse Default Permission"
+    },
+    "data_warehouse_modify": {
+      "description": "Add, modify, and delete data warehouses.",
+      "name": "Data Warehouse Management Permission"
+    },
+    "documentonline_config_modify": {
+      "description": "Add, remove, and otherwise modify online help documentation associated with modules and menus.",
+      "name": "Online Help Documentation Configuration Permission"
+    },
+    "file_modify": {
+      "description": "Manage all attachments.",
+      "name": "Attachment Management Permission"
+    },
+    "form_modify": {
+      "description": "Add, modify, and delete forms.",
+      "name": "Form Management Permission"
+    },
+    "fulltextindex_modify": {
+      "description": "Rebuild the global search index.",
+      "name": "Search Center Index Rebuild Permission"
+    },
+    "globalsearch_base": {
+      "description": "Use basic search center features.",
+      "name": "Search Center Access Permission"
+    },
+    "integration_modify": {
+      "description": "Add, modify, and delete integrations.",
+      "name": "Integration Management Permission"
+    },
+    "interface_modify": {
+      "description": "Add, modify, and delete APIs.",
+      "name": "API Management Permission"
+    },
+    "license_modify": {
+      "description": "View and update licenses.",
+      "name": "License Management Permission"
+    },
+    "module_modify": {
+      "description": "View module version information and import and export module initialization data files.",
+      "name": "System Module Management Permission"
+    },
+    "mq_modify": {
+      "description": "Add, modify, and delete message queue topics and subscriptions.",
+      "name": "Message Queue Management Permission"
+    },
+    "noauth": {
+      "description": "No permission.",
+      "name": "No Permission"
+    },
+    "notify_job_modify": {
+      "description": "Add, modify, and delete scheduled tasks in notification policies.",
+      "name": "Scheduled Notification Task Management Permission"
+    },
+    "notify_policy_modify": {
+      "description": "Add, modify, and delete notification policies.",
+      "name": "Notification Policy Management Permission"
+    },
+    "region_modify": {
+      "description": "Add, modify, and delete regions.",
+      "name": "Region Management Permission"
+    },
+    "role_modify": {
+      "description": "Add, modify, and delete roles.",
+      "name": "Role Management Permission"
+    },
+    "runner_modify": {
+      "description": "Add, modify, and delete Runners.",
+      "name": "Runner Management Permission"
+    },
+    "schedule_job_modify": {
+      "description": "Add, modify, and delete scheduled jobs.",
+      "name": "Scheduled Job Management Permission"
+    },
+    "system_notice_modify": {
+      "description": "Add, modify, and delete system announcements.",
+      "name": "System Announcement Management Permission"
+    },
+    "team_modify": {
+      "description": "Add, modify, and delete user groups.",
+      "name": "User Group Management Permission"
+    },
+    "theme_modify": {
+      "description": "Configure theme colors.",
+      "name": "Theme Configuration Permission"
+    },
+    "user_modify": {
+      "description": "Add, modify, and delete users.",
+      "name": "User Management Permission"
+    },
+    "vip_view": {
+      "description": "View the VIP indicator on VIP user avatars.",
+      "name": "VIP Indicator View Permission"
+    },
+    "worktime_modify": {
+      "description": "Add, modify, and delete service windows.",
+      "name": "Service Window Management Permission"
+    }
+  },
+  "common": {
+    "aborted": "Aborted",
+    "accesstype": "Access Type",
+    "account": "Account",
+    "action": "Action",
+    "actiontime": "Operation time",
+    "actiontype": "Operation Type",
+    "actionuser": "Operator",
+    "active": "activation",
+    "activeversionid": "Activation version ID",
+    "alertattr": "Alarm Properties",
+    "alertdetail": "Alarm details",
+    "alertlevel": "Alarm level",
+    "alertlink": "Alarm External Link",
+    "alertlist": "Alarm List",
+    "alerttime": "Alarm time",
+    "alertvalue": "Alarm value",
+    "all": "All",
+    "alluser": "Everyone",
+    "anchorpoint": "Anchor point",
+    "anonymous": "anonymous authentication ",
+    "attachment": "Attachment",
+    "attributelist": "Attribute List",
+    "attrname": "Attribute Name",
+    "auth": "authorization",
+    "authidlist": "Authorization ID List",
+    "authlist": "Authorization List",
+    "authoritylist": "Authorized object",
+    "authtype": "Authorization Type",
+    "authuuid": "Authorized object uuid",
+    "avatar": "Avatar",
+    "basicauth": "Basic authentication",
+    "bearerauth": "Bearer Token",
+    "belongtodepartment": "Department",
+    "between": "Between",
+    "boolean": "Boolean type",
+    "branch": "Branch",
+    "bug": "Defect",
+    "buildinauth": "Internal verification",
+    "cacheandvalid": "Cache but revalidate",
+    "canceled": "Canceled",
+    "catalog": "catalogue",
+    "catalogid": "Directory ID",
+    "catalogname": "Directory Name",
+    "check": "Auditing",
+    "checkbox": "Checkbox",
+    "children": "Subset",
+    "childrencount": "Number of Subsets",
+    "classname": "Full class name",
+    "cnname": "Chinese name",
+    "collectcount": "Collection volume",
+    "collector": "Collector",
+    "color": "Colour",
+    "comment": "Comment",
+    "commentcount": "Number of comments",
+    "commitcheck": "Submit for review",
+    "common": "Public",
+    "compare": "Comparison",
+    "condition": "Condition configuration",
+    "config": "Configuration",
+    "configfilepath": "Configuration file path",
+    "configfilepathlist": "Configuration file path list",
+    "configlist": "Configuration List",
+    "content": "Content",
+    "copy": "Copy",
+    "count": "Quantity",
+    "create": "establish",
+    "createdate": "Created On",
+    "createrobject": "Creator Object",
+    "createtime": "Creation Time",
+    "createuser": "Creator",
+    "createusername": "Creator Name",
+    "creator": "Creating Users",
+    "currentpage": "Current Page",
+    "customattribute": "Custom Properties",
+    "data": "data",
+    "datacenter": "Data Center",
+    "datasource": "Database Data Source",
+    "datatype": "data type",
+    "date": "Date",
+    "datetime": "Date/Time",
+    "defaultexpression": "Default expression",
+    "defaultpriorityuuid": "Default Priority UUID",
+    "defaultvalue": "Default Value List",
+    "defaultvaluelist": "List of parameters for echo",
+    "delaytime": "Delay Time",
+    "delegateauthoritylist": "List of Authorization for Proxy Reporting",
+    "deletable": "Can I delete it",
+    "delete": "Delete",
+    "dependency": "Dependency",
+    "description": "Description",
+    "displaymode": "display mode",
+    "displaytype": "Display Type",
+    "doing": "In Progress",
+    "done": "Completed",
+    "double": "Double-precision floating-point format",
+    "draft": "Draft",
+    "dropdownlist": "Dropdown selection",
+    "dslexpression": "DSL expression",
+    "duration": "duration",
+    "edit": "Edit",
+    "editable": "Editable",
+    "editauthoritylist": "Edit Permission List",
+    "editdate": "Modification Date",
+    "editmode": "Editing mode",
+    "editor": "Modified By",
+    "editorlist": "Modified by List",
+    "editorname": "Modifier Name",
+    "editorobject": "Modifier Object",
+    "edittime": "Modification time",
+    "email": "Email",
+    "emailnotify": "Email notification",
+    "embed": "built-in",
+    "enabledebugmode": "Do You Want to Enable Debug Mode",
+    "encoding": "coding",
+    "enddate": "End date",
+    "endtime": "End Time",
+    "enum": "enumeration",
+    "equal": "Equal To",
+    "errorinfo": "error message",
+    "errormsg": "Abnormal Information",
+    "event": "Event",
+    "example": "example",
+    "exclude": "Excludes",
+    "excludeid": "Exclude ID",
+    "excludelist": "Used to filter echo parameters",
+    "execrtoolauthoritystatus": "Direct execution permission status",
+    "execrtoolauthorityuuidlist": "Direct execution permission object UUID list",
+    "executable": "Executable or not",
+    "executeauthoritylist": "Execution permission list",
+    "expired": "overdue",
+    "expireddays": "Number of timeout days",
+    "export": "Export",
+    "expressionlist": "Expression List",
+    "failed": "Failed",
+    "failedcount": "Number of errors",
+    "failedload": "is failed",
+    "favorcount": "Likes",
+    "featurename": "Function Name",
+    "featurepath": "functional path",
+    "file": "File",
+    "fileid": "File ID",
+    "fileidlist": "Attachment ID List",
+    "filelist": "Attachment List",
+    "filename": "file name",
+    "fileparamname": "Attachment parameter name",
+    "filepath": "File Path",
+    "filepathlist": "Attachment Path List",
+    "filepathprefix": "Attachment Path Prefix",
+    "filesize": "file size",
+    "filetype": "Attachment Type",
+    "filter": "Filter conditions",
+    "focususerlist": "List of Followers",
+    "focususeruuidlist": "List of Followers' Uuids",
+    "form": "Form",
+    "greaterthan": "Greater Than",
+    "greaterthanorequal": "Greater Than or Equal To",
+    "group": "Group",
+    "groupid": "Group",
+    "grouplist": "Restrict interface return types",
+    "handler": "Processor identification",
+    "hang": "Suspended",
+    "hasmore": "More Data Available",
+    "hasparent": "Do you have a parent",
+    "help": "help",
+    "hmac": "HMAC Authentication",
+    "homeurl": "Application server address",
+    "hostname": "Hostname",
+    "icon": "Icon",
+    "id": "ID",
+    "importtargettype": "Import Target Type",
+    "include": "Includes",
+    "includelist": "Used to require echo parameters",
+    "index": "subscript",
+    "inittime": "Initialization time",
+    "inittype": "Front end initialization type, value range [user, team, role]",
+    "inputfrom": "Update method",
+    "inputfromname": "Change method name",
+    "int": "int",
+    "ip": "IP",
+    "iplist": "IP List",
+    "isactive": "Active",
+    "isactived": "Activated",
+    "isactivepriority": "Enable Priority",
+    "isauthenticate": "Do You Need Authentication",
+    "isautofill": "Auto Fill",
+    "iscancheck": "Can we review it",
+    "iscandelete": "Can I delete it",
+    "iscanmodify": "Can I modify it",
+    "iscanview": "Can I view it",
+    "isdefault": "Default",
+    "isdelegateauthority": "Do you have authorization for proxy reporting",
+    "isdeleted": "Has IT Been Deleted",
+    "isdisplaypriority": "Display Priority",
+    "isend": "Completed or not",
+    "isexpired": "Expired",
+    "isfavoried": "Favorite or Not",
+    "isfile": "Is it a file",
+    "isfocus": "Have You Followed",
+    "ishidden": "Whether to hide",
+    "islimit": "Whether to limit the number of items",
+    "ismultiple": "Do you want to select multiple options",
+    "ismycreated": "Do I create",
+    "isneedpage": "Pagination Required",
+    "isnotnull": "Is Not Empty",
+    "isnull": "Is Empty",
+    "isoverride": "Overwrite or not",
+    "isregister": "Register or not",
+    "isrequired": "Is it mandatory",
+    "isreviewable": "Can approval be granted",
+    "isshow": "Display or Not",
+    "isunique": "Is it unique",
+    "iteration": "Iteration",
+    "jobuuid": "Timed homework UUID",
+    "jsonarray": "JSON array",
+    "jsonobject": "JSON Object",
+    "key": "Key",
+    "keyword": "Keyword",
+    "lastfinishtime": "Last completion time",
+    "lastfiretime": "Last activation time",
+    "layout": "layout",
+    "lessthan": "Less Than",
+    "lessthanorequal": "Less Than or Equal To",
+    "level": "arrangement",
+    "lft": "Left Code",
+    "like": "Contains",
+    "loadcommercialmodulefail": "Failed to load commercial module {0}. Verify the license and contact the vendor for a replacement.",
+    "locktime": "Lock time",
+    "logger": {
+      "level": "log level"
+    },
+    "logincenter": "The center where the current logged in person is located",
+    "logindepartment": "The department where the current logged in person is located",
+    "loginteam": "The current logged in person belongs to the same group",
+    "loginuser": "Currently logged-in user",
+    "loglist": "Log List",
+    "long": "long integer",
+    "mailaddress": "Email address",
+    "maintenanceman": "Maintainer",
+    "match": "Matches",
+    "matrix": "matrix",
+    "memo": "Remarks",
+    "menu": "menu",
+    "messagenotify": "Message notification",
+    "mobile": "Mobile terminal",
+    "module": {
+      "group": "Module grouping",
+      "groupname": "Module Group Name",
+      "name": "Module Name"
+    },
+    "modulegroup": "Module group",
+    "moduleid": "Module ID",
+    "modulespolicy": "Module Policies",
+    "multiselect": "Multi-Select",
+    "mustinput": "Required",
+    "name": "Name",
+    "needpage": "Pagination Required",
+    "needscore": "Do You Need to Score",
+    "networkarea": "Network Area",
+    "newvalue": "New value",
+    "nextfiretime": "Next activation time",
+    "no": "No",
+    "noauth": "No certification required",
+    "nocache": "No cache",
+    "nodeinfo": "Node Information",
+    "nostatus": "Stateless",
+    "notifytype": "Notification Type",
+    "notlike": "Does Not Contain",
+    "notstart": "Not Started Yet",
+    "notsynced": "Not synced",
+    "number": "Number",
+    "object": "Any object",
+    "oldvalue": "Old value",
+    "owner": "Owner",
+    "ownereditable": "Can the maintainer be edited",
+    "owneruuid": "Maintainer",
+    "packagename": "Package Name",
+    "pagecount": "Page Count",
+    "pageinfo": "Paging data",
+    "pagesize": "Page Size",
+    "parentid": "Parent ID",
+    "parentuuid": "Parent UUID",
+    "pass": "adopt",
+    "password": "Password",
+    "path": "path",
+    "pc": "Computer side",
+    "phase": "Phase",
+    "phone": "Phone Number",
+    "planstarttime": "Planned Time",
+    "policy": "strategy",
+    "prefix": "prefix",
+    "primarykey": "Primary key",
+    "priority": "Priority",
+    "prioritycolor": "Priority Color",
+    "priorityname": "Priority Name",
+    "priorityuuid": "Priority UUID",
+    "privatecache": "Private cache",
+    "progress": "schedule",
+    "project": "Project",
+    "publiccache": "Public cache",
+    "radio": "Radio Button",
+    "rangelist": "Limit the scope of interface options",
+    "rated": "Rated",
+    "readonly": "read-only",
+    "recall": "Withdraw",
+    "referencecount": "Reference Count",
+    "regex": "Regular Expression",
+    "region": "Region",
+    "reject": "Reject",
+    "release": "release",
+    "relname": "Relationship Name",
+    "reltype": "Relationship Type",
+    "reportauthoritylist": "Report Permission List",
+    "request": "Requirement",
+    "retreat": "Withdrawal",
+    "reviewable": "Is it auditable",
+    "reviewer": "Reviewed by",
+    "reviewerlist": "List of approvers",
+    "rht": "Right Code",
+    "role": "Role",
+    "roleauthlist": "Role permission list",
+    "roleuuid": "Role uuid",
+    "roleuuidlist": "Role uuid List",
+    "rownum": "Data Entry",
+    "rsapublickey": "RSA Public Key",
+    "rule": "rule",
+    "runnergroup": "Runner Group",
+    "runnergrouptag": "Runner Group Tag",
+    "saveasdraft": "Save As Draft",
+    "savemode": "Save Mode",
+    "sceneuuid": "Scenario uuid",
+    "schedule": "Scheduled Tasks",
+    "schedulejobclassinfo": "Timed Job Component Information",
+    "schedulejobinfo": "Scheduled job information",
+    "scopeofuse": "Scope of Use",
+    "scoreinfo": "Rating Information",
+    "select": "Dropdown Box",
+    "servergroup": "Server group",
+    "serviceid": "Service ID",
+    "servicename": "service name",
+    "singleselect": "Single-Select",
+    "sla": "SLA",
+    "sort": "Sort",
+    "source": "Source",
+    "sourcelist": "Source List",
+    "sourcename": "Source Chinese Name",
+    "specifyversionid": "Specify version ID",
+    "sql": "SQL statement",
+    "startdate": "Start date",
+    "startloadcommercialmodule": "Commercial module {0} loaded successfully.",
+    "startloadconfig": "Start to load config from {0}...",
+    "startloadmodule": "Start to initialize module...",
+    "startloadschedulejob": "Start to load schedule job of {0}...",
+    "startloadstartupjob": "The startup job {0} for tenant {1} has been completed.",
+    "startloadstartupjobforall": "The global startup job {0} has been completed.",
+    "starttime": "Start Time",
+    "startupjob": "Startup Job",
+    "startuser": "Start User",
+    "status": "Status",
+    "statuscolor": "Status Color",
+    "statusdescription": "Status Description",
+    "statusid": "Status ID",
+    "statusinfo": "Status Information",
+    "statuslist": "Status List",
+    "statusname": "Status Name",
+    "statusuniquename": "State Unique Identification",
+    "steplist": "Step List",
+    "string": "character string",
+    "succeed": "Successfully completed",
+    "successload": "is loaded",
+    "superadmin": "Super administrator",
+    "switch": "Switch",
+    "tablelist": "Table List",
+    "tag": "Tag",
+    "tagid": "Tag ID",
+    "tagidlist": "Tag ID List",
+    "taglist": "Label List",
+    "tagsdir": "Tag Directory",
+    "targetid": "Target ID",
+    "task": "Task",
+    "tbodylist": "Data List",
+    "team": "Group",
+    "teamlist": "Group List",
+    "teamusertitlelist": "Group Leader Collection",
+    "teamuuid": "User group uuid",
+    "teamuuidlist": "User group uuid list",
+    "tel": "Mobile phone number",
+    "templateid": "Template ID",
+    "templatename": "Template Name",
+    "tenantname": "Tenant Name",
+    "tenantuuid": "Tenant uuid",
+    "test": "Test",
+    "testcase": "Test Case",
+    "testenv": "testing environment",
+    "testplan": "Test Plan",
+    "text": "Text",
+    "textarea": "Text Area",
+    "textbox": "Text Box",
+    "theadlist": "Thead List",
+    "time": "Time",
+    "timecost": "Elapsed Time",
+    "timeoutpoint": "Time Out Point",
+    "timerange": "Time Range",
+    "timeunit": "Time Unit",
+    "title": "Title",
+    "toomanyoption": "Too many options, other options will not be displayed",
+    "trigger": "Trigger point",
+    "triggertime": "Trigger Time",
+    "triggertype": "Trigger Type",
+    "type": "Type",
+    "typeid": "Type ID",
+    "typename": "Type Name",
+    "typeuuid": "Type UUID",
+    "uncommited": "Not Submitted",
+    "unequal": "Not Equal To",
+    "unique": "only",
+    "uniquename": "Unique Identifier",
+    "unreadcount": "Unread count",
+    "upwardnamelist": "Upper level name list",
+    "url": "Request Path",
+    "user": "User",
+    "userenname": "User English Name",
+    "userid": "User ID",
+    "useridlist": "User ID List",
+    "userinfolist": "User Information List",
+    "userlist": "User List",
+    "username": "Username",
+    "userselect": "User selector",
+    "userselectionimportoption": "Import Selected Dependency Data",
+    "usertype": "customer type",
+    "useruuid": "User UUID",
+    "useruuidlist": "User uuid list",
+    "uuid": "UUID",
+    "validate": "Verify",
+    "validcode": "Registration verification code",
+    "validtype": "Verification method",
+    "value": "Value",
+    "vendor": "Manufacturer",
+    "versioncount": "Number of versions",
+    "versionid": "Version ID",
+    "versionlist": "List of versions",
+    "versionname": "Version Name",
+    "versionnum": "Version Number",
+    "versionuuid": "Version uuid",
+    "view": "View",
+    "viewable": "Can I view it",
+    "viewauthoritylist": "View Permission List",
+    "viewcount": "View volume",
+    "vipuser": "VIP users",
+    "waiting": "In line",
+    "wechatnotify": "WeChat notification",
+    "widgetlist": "Component List",
+    "worker": "Assignee",
+    "worktimename": "Working Time Window Name",
+    "worktimeuuid": "Working Time Window UUID",
+    "year": "particular year",
+    "yes": "Yes"
+  },
+  "config": {
+    "receiveconfiginfo": "Reloaded nacos configuration"
+  },
+  "datawarehouse": {
+    "status": {
+      "aborted": "Sync Aborted",
+      "doing": "Syncing",
+      "done": "Sync Completed",
+      "failed": "Sync Failed"
+    }
+  },
+  "file": {
+    "type": {
+      "image": "Image File"
+    }
+  },
+  "framework": {
+    "matrixtype": {
+      "customdatasource": "Custom Data Source"
+    }
+  },
+  "fulltextindex": {
+    "type": {
+      "integrationaudit": "Integration Audit"
+    }
+  },
+  "globallock": {
+    "error": {
+      "enqueuemissing": "Lock record not found after enqueue; lockId={0}, key={1}, uuid={2}, handler={3}. Enqueue could not be confirmed; acquisition cannot be reported as successful.",
+      "identitymismatch": "Lock identity mismatch; reuse or modification rejected. lockId={0}, field={1}, stored value={2}, requested value={3}; stored key={4}, requested key={5}, stored handler={6}, requested handler={7}.",
+      "operationmismatch": "Operation binding mismatch; execution rejected. operationId={0}, bound lockId={1}, bound action={2}, requested lockId={3}, requested action={4}.",
+      "operationunavailable": "Operation record is missing, expired, or inaccessible to the current user; execution rejected. operationId={0}, requested lockId={1}, action={2}. Prepare a new operation.",
+      "ownerrequired": "Bulk lock release requires a nonempty handler list and an owner ID; actual handlers={0}, ownerId={1}.",
+      "prepareinvalid": "Preparing an interactive lock operation requires a lockId and action unlock or cancel; actual lockId={0}, action={1}.",
+      "releasefailed": "Resource lock operation failed; action={0}, lockId={1}, key={2}, uuid={3}, handler={4}, operationId={5}; cause: {6}.",
+      "transactionrequired": "Bulk lock release must join an active caller transaction, but none is active; handlers={0}, ownerId={1}. Call it within the business status update transaction."
+    },
+    "notifyerror": "Notification Error",
+    "ownerid": "Owner ID",
+    "status": {
+      "notification": {
+        "empty": "No Waiters to Notify",
+        "failed": "Notification Failed",
+        "success": "Notification Succeeded"
+      },
+      "operation": {
+        "done": "Finished",
+        "failed": "Operation Failed",
+        "prepared": "Prepared",
+        "running": "Running"
+      },
+      "release": {
+        "failed": "Release Failed",
+        "pending": "Pending Release",
+        "released": "Released",
+        "releasing": "Releasing"
+      },
+      "waiter": {
+        "failed": "Notification Failed",
+        "notifying": "Notifying",
+        "notnotified": "Not Notified",
+        "pending": "Pending Notification",
+        "skipped": "Skipped",
+        "success": "Notification Succeeded"
+      }
+    },
+    "unlockerror": "Release Error"
+  },
+  "nf": {
+    "api": {
+      "example": {
+        "invalid": "The request example for scenario {1} in API {0} is not a valid JSON object or array.",
+        "mcparguments": "The JSON in each scenario below is params.arguments for tools/call. Select a scenario based on its prerequisites and replace the example values. Do not include titles, descriptions, or the entire example list in arguments."
+      }
+    }
+  },
+  "nfai": {
+    "maintenancemode": {
+      "getmaintenanceuser": "\"Manufacturer maintenance personnel\""
+    }
+  },
+  "nfal": {
+    "extra_menu_modify": {
+      "getauthdisplayname": "Additional Menu Management Permission",
+      "getauthintroduction": "Configure additional menus."
+    },
+    "home_page_modify": {
+      "getauthdisplayname": "Default Home Page Management Permission",
+      "getauthintroduction": "Add, modify, and delete default home pages."
+    },
+    "matrix_modify": {
+      "getauthdisplayname": "Matrix Management Permissions",
+      "getauthintroduction": "Adding, modifying, and deleting matrices"
+    },
+    "notify_config_modify": {
+      "getauthdisplayname": "Notification Configuration Management Permission",
+      "getauthintroduction": "Modify notification configurations."
+    },
+    "user_export_file_modify": {
+      "getauthdisplayname": "Export File Management Permission",
+      "getauthintroduction": "View, download, and delete exported files belonging to any user."
+    }
+  },
+  "nfb": {
+    "moduleinitializer": {
+      "checkchangelog": {
+        "invalid": "Version log: {0}, folder name under changelog needs to be named in {1} format"
+      },
+      "getactivetenantlist": {
+        "neatlogicdb": "Unable to connect to the nextlogic library. Check if the database account and password configuration for {0} are correct and restart"
+      },
+      "initdmlsql": {
+        "tenant": "Start to Initialize Database..."
+      }
+    },
+    "neatlogicdispatcherservlet": {
+      "init": {
+        "error": " Module loading exception"
+      }
+    }
+  },
+  "nfc": {
+    "frameworktenantconfig": {
+      "apiqps": "Peak number of requests sent to the server per second (regardless of interface)",
+      "disabledmodulegrouplist": "List of disabled module groups, page does not display disabled modules",
+      "isdebug": "Whether to debug mode, default 0, do not debug. If debugging, the mobile authentication failure page will display authentication related information",
+      "loginlockedfailedcount": "Login failure limit (times). If the number of times exceeds, the user will be locked and unable to log in, waiting for automatic unlocking",
+      "loginlockedtime": "Login lock duration (minutes). After locking the user, login is only allowed after exceeding this time limit",
+      "loginneedlock": "Is it necessary to check if the user is locked when logging in? The default value is 0, and there is no need to check",
+      "matrixcolumndatasearchforbatchinputparamsearchparamlistsize": "When calling the batch dropdown matrix attribute data query interface in a single call, input the size of the searchParamList parameter",
+      "matrixcolumndatasearchforbatchrequestconcurrency": "The concurrent number of calling batch dropdown matrix attribute data query interface simultaneously",
+      "minimumchromebrowserversion": "The minimum version of Chrome browser. If the setting is lower than this version, it will redirect to a page that is incompatible with the browser version. The default is 95",
+      "minimumfirefoxbrowserversion": "Firefox browser minimum version, below this setting version will redirect to browser version incompatible page, default 0",
+      "mobilefiledownloadenabled": "Do you allow mobile devices to download attachments",
+      "passwordexpiredays": "User password validity period (days), if it exceeds the validity period, it will be forcibly redirected to the password change page",
+      "passwordneedexpiredcheck": "Do you need to verify the validity period of the user password? It defaults to 0 and does not need to be checked",
+      "tenantdefaultlanguage": "Tenant default language. Supported values: zh/en. Language priority: Cookie > tenant default language > browser preferred language > Chinese"
+    }
+  },
+  "nfcc": {
+    "config": {
+      "loadnacosproperties": {
+        "jwtsecret": "✖nacos Or please define the JWT key as jwt.secret in the config.properties"
+      }
+    },
+    "inputfrom": {
+      "api": "Interface call",
+      "autocollect": "Automatic collection",
+      "excel": "Excel import",
+      "itsm": "Process modification",
+      "mobile": "mobile terminal",
+      "page": "Page Operations",
+      "pc": "PC end",
+      "relative": "update cascade ",
+      "unknown": "unknown"
+    },
+    "userprofile": {
+      "rolecreatesuccess": "Role created successfully",
+      "teamcreatesuccess": "Group created successfully",
+      "usercreatesuccess": "User created successfully"
+    },
+    "userprofileoperate": {
+      "backrolelist": "Return to Role List",
+      "backteamlist": "Return to group list",
+      "backuserlist": "Return to user list",
+      "editrole": "Edit Role",
+      "editteam": "Edit Group",
+      "edituser": "Edit User",
+      "keeponcreate": "Continue creating"
+    }
+  },
+  "nfccs": {
+    "systemuser": {
+      "anonymous": "Anonymous user",
+      "autoexec": "Automated users",
+      "system": "system"
+    },
+    "systemuserfactory": {
+      "repeatexception": "There are identical virtual system users, please contact the administrator"
+    }
+  },
+  "nfd": {
+    "licensevo": {
+      "entityfield": {
+        "name": {
+          "dburl": "Database URL",
+          "enddate": "Service Termination Date",
+          "expirationdate": "Expiration date",
+          "graceperiod": "Grace days",
+          "isend": "Service Terminated",
+          "isvalid": "Is IT legal",
+          "modules": "Module List",
+          "purchaser": "Customer Name"
+        }
+      }
+    },
+    "rolevo": {
+      "entityfield": {
+        "name": {
+          "ruleprefix": "Rule prefix"
+        }
+      }
+    },
+    "tenantauditvo": {
+      "error": "Exception Details",
+      "errorhash": "Exception Content Hash",
+      "result": "Log Content",
+      "resulthash": "Log Content Hash",
+      "sqltype": "Version Number",
+      "timecost": "Time Cost (Milliseconds)"
+    },
+    "tenantvo": {
+      "authmongodb": "Authentication MongoDB",
+      "expiredate": "Expiration Date",
+      "islocaldb": "Local Database",
+      "modulegrouplist": "Active Module Group List",
+      "modulelist": "Active Module List",
+      "mongodb": "New MongoDB",
+      "superadmin": "Super Administrator Used When Creating a Tenant",
+      "visittime": "Access Time"
+    }
+  },
+  "nfdd": {
+    "datasourcedatavo": {
+      "entityfield": {
+        "name": {
+          "conditionlist": "Condition List",
+          "datasourceid": "Data source ID",
+          "expiremin": "Effective time in minutes",
+          "inserttime": "Add Date"
+        }
+      },
+      "inserttime": "InsertTime"
+    },
+    "datasourcevo": {
+      "entityfield": {
+        "name": {
+          "connectionid": "Data connection ID",
+          "cron": "Timing strategy",
+          "databaseid": "Database ID",
+          "datacount": "Data volume",
+          "dbtype": "Database type",
+          "expireunit": "Effective time unit",
+          "fieldlist": "Field List",
+          "fileid": "Profile ID",
+          "mode": "Synchronous mode",
+          "moduleid": "Module",
+          "modulename": "Module Name",
+          "paramlist": "parameter list",
+          "querytimeout": "Query timeout, in seconds",
+          "xml": "XML configuration"
+        }
+      }
+    }
+  },
+  "nfde": {
+    "databaseconnectionfailedexception": {
+      "configisempty": "The database connection configuration config is empty",
+      "fileidlistisempty": "The fileIdList in the {0} database connection configuration config is empty"
+    },
+    "databasenamerepeatexception": {
+      "databasenamerepeatexception": "Database name: {0} already exists"
+    },
+    "databasenotfoundexception": {
+      "databasenotfoundexception": "Database: {0} does not exist"
+    },
+    "documentonlinejarnameillegalexception": {
+      "documentonlinejarnameillegalexception": "Online document Jar name: {0} is illegal"
+    },
+    "documentonlinenotfoundexception": {
+      "documentonlinenotfoundexception": "Online help document: {0} does not exist"
+    }
+  },
+  "nfdt": {
+    "status": {
+      "building": "Building",
+      "built": "Completed",
+      "error": "Error"
+    }
+  },
+  "nfe": {
+    "loadbalanceexception": {
+      "loadbalanceexception": "Backend node drift, permission server ID '{0}', current server ID '{1}', please contact the administrator!"
+    },
+    "systempropertynotfoundexception": {
+      "systempropertynotfoundexception": "The system property '{0}' does not exist"
+    }
+  },
+  "nfea": {
+    "authencryptexception": {
+      "authencryptexception": "The front-end encryption method is abnormal. Please configure login. auth. password. encryption={0} in the back-end service configuration file, restart the back-end service, refresh the front-end page, and log in again"
+    },
+    "authnotfoundexception": {
+      "authnotfoundexception": {
+        "apiauthname": "”{0} \"Interface permission\" {1} \"does not exist",
+        "authname": "Permission '{0}' does not exist"
+      }
+    },
+    "notsupportbasicauthexception": {
+      "notsupportbasicauthexception": "This interface does not support basic authentication"
+    }
+  },
+  "nfec": {
+    "apifieldvalidexception": {
+      "apifieldvalidexception": "Abnormal input parameter verification"
+    },
+    "apiratelimiterexception": {
+      "apiratelimiterexception": "The system is busy, please try again later"
+    },
+    "changelogversioninvalidexception": {
+      "changelogversioninvalidexception": {
+        "a": "Module: {0} Version: {1} File content format is illegal"
+      }
+    },
+    "changelogversionnotfoundexception": {
+      "changelogversionnotfoundexception": {
+        "a": "Module: {0} Version: {1} does not exist"
+      }
+    }
+  },
+  "nfed": {
+    "tenantmongoclientnotfoundexception": {
+      "tenantmongoclientnotfoundexception": "Tenant: {0} failed to obtain MongoDB Client. Please verify the MongoDB table authentication data of the tenant corresponding to the nearlogic library, restart the service, and try again"
+    }
+  },
+  "nfee": {
+    "extramenuexistchildrenexception": {
+      "extramenuexistchildrenexception": "Current directory: {0} has child nodes, cannot be deleted"
+    },
+    "extramenunamerepeatexception": {
+      "extramenunamerepeatexception": "Name: {0} duplicate"
+    },
+    "extramenunotallowedaddexception": {
+      "extramenunotallowedaddexception": "Menu nodes do not allow adding child nodes"
+    },
+    "extramenunotfoundexception": {
+      "extramenunotfoundexception": "Menu configuration: {0} does not exist"
+    },
+    "extramenuparamexception": {
+      "extramenuparamexception": "Parameter: {0} cannot be empty"
+    },
+    "extramenurootexception": {
+      "extramenurootexception": "Only one root node is allowed to exist"
+    },
+    "extramenurootnotallowedexception": {
+      "extramenurootnotallowedexception": "Root node not allowed to be deleted"
+    }
+  },
+  "nfef": {
+    "filenamenotnullexception": {
+      "filenamenotnullexception": "Upload file name cannot be empty"
+    },
+    "filenotfoundexception": {
+      "filenotfoundexception": "Attachment '{0}' does not exist",
+      "getmessage": {
+        "directory": "'{0}' is a directory",
+        "nonexistent": "The file or directory '{0}' does not exist"
+      }
+    },
+    "uploadfilefailedexception": {
+      "uploadfilefailedexception": {
+        "a": "Upload file failed, error: {0}",
+        "b": "Upload to file {0} failed, error: {1}"
+      }
+    }
+  },
+  "nfeh": {
+    "homepagenamerepeatexception": {
+      "homepagenamerepeatexception": "Homepage configuration: '{0}' already exists"
+    },
+    "homepagenotfoundexception": {
+      "homepagenotfoundexception": "Homepage configuration: '{0}' does not exist"
+    }
+  },
+  "nfel": {
+    "policyrepeatexception": {
+      "policyrepeatexception": "There is a duplicate license rule {0}"
+    }
+  },
+  "nfem": {
+    "modulegroupnotfoundexception": {
+      "modulegroupnotfoundexception": "Module group '{0}' does not exist"
+    },
+    "subscribehandlerisembedexception": {
+      "subscribehandlerisembedexception": "System subscription processor: {0} is not allowed for custom subscriptions"
+    },
+    "subscribeissystemexception": {
+      "subscribeissystemexception": "System subscription: {0} does not allow modification or deletion"
+    }
+  },
+  "nfer": {
+    "rolenamerepeatexception": {
+      "rolenamerepeatexception": "Role: '{0}' already exists"
+    },
+    "runnerconnectrefusedexception": {
+      "runnerconnectrefusedexceptiona": "Runner link failed: {0}",
+      "runnerconnectrefusedexceptionmsg": "Runner: '{0}' connection failed, please check if the runner service is functioning properly and try again. Exception message: {1}"
+    },
+    "runnergroupnotfoundexception": {
+      "runnergroupnotfoundexception": "The actuator group does not exist. Please configure the actuator group first",
+      "runnergroupnotfoundexceptionname": "Executor group: {0} does not exist"
+    },
+    "runnergrouprunnerlistemptyexception": {
+      "runnergrouprunnerlistemptyexception": "Executor group: {0} ({1}) does not have an executor"
+    },
+    "runnergrouprunnernotfoundexception": {
+      "runnergrouprunnernotfoundexceptionid": "The actuator group '{0}' does not exist or the runner is not configured",
+      "runnergrouprunnernotfoundexceptionname": "RunnerGroup: {0} Runner not configured"
+    },
+    "runnernotfoundbytagentidexception": {
+      "runnernotfoundbytagentidexception": "Cannot find the corresponding runner for tag: '{0} ({1})', please check logs/taggerAndNetty.log for abnormal heartbeat"
+    },
+    "runnernotfoundbytagentrunneridexception": {
+      "runnernotfoundbytagentrunneridexception": "Unable to find the corresponding runner '{2}' for tag '{0} ({1})'. Please check logs/taggentReginalAndNetty.log for abnormal heartbeat"
+    },
+    "runnernotfoundexception": {
+      "runnernotfoundexception": {
+        "all": "The runenr does not exist. Please go to the 'Runenr Management' to confirm if the runenr has been configured",
+        "ipport": "{0}: {1} No matching runner found, please confirm if the runner exists in the executor management",
+        "not": "Runner '{0}' does not exist"
+      }
+    },
+    "runnernotmatchexception": {
+      "runnernotmatchexception": {
+        "ipresourceid": "IP: {0}({1}) Unable to find a matching runner, please verify the runner group configuration",
+        "noparam": "Unable to find a matching runner. Please verify the runner group configuration or if there is no runner map configured"
+      }
+    },
+    "runnerurlisnullexception": {
+      "runnerurlisnullexception": "The URL of the runner with ID {0} is empty"
+    }
+  },
+  "nfes": {
+    "dmlsqlexecuteexception": {
+      "dmlsqlexecuteexception": "Tenant:{0} Module:{1} dmlSql:{2} execution failed"
+    },
+    "schedulepublicauthexception": {
+      "schedulepublicauthexception": "No permission to test this scheduled job"
+    }
+  },
+  "nfet": {
+    "licenseinvalidexception": {
+      "licenseinvalidexception": "The current license lacks authorization to access module {0}, and attempts to access will be denied. Please check the license information to confirm if you should have the access permission. If it is indeed missing, please contact the manufacturer for replacement or avoid accessing any functions under this module.",
+      "licenseinvalidexceptiona": "Illegal license"
+    },
+    "paramirregularexception": {
+      "paramirregularexception": {
+        "common": "The parameter  {0}  does not meet the format requirements",
+        "rule": "The parameter  {0}  does not meet the format requirements, {1}"
+      }
+    },
+    "paramjsonirregularexception": {
+      "paramjsonirregularexception": "The parameter is not in a valid JSON format"
+    },
+    "paramsizetoolargeexception": {
+      "paramsizetoolargeexception": "Parameter: \"{0}\" allows a maximum length of {1}, current length: {2}"
+    },
+    "paramsizetoosmallexception": {
+      "paramsizetoosmallexception": "Parameter: \"{0}\" allows a minimum length of {1}, current length: {2}"
+    },
+    "paramtransferexception": {
+      "paramtransferexception": "Input parameter conversion exception: {0}"
+    },
+    "paramvaluetooshortexception": {
+      "paramvaluetooshortexception": "Parameter: \"{0}\" allows a minimum length of {1} characters"
+    },
+    "teamnamerepeatexception": {
+      "teamnamerepeatexception": "Grouping: \"{0}\" already exists"
+    },
+    "tenantconfignotfoundexception": {
+      "tenantconfignotfoundexception": "Configuration information: {0} does not exist"
+    },
+    "tenantinvalidexception": {
+      "tenantinvalidexception": "Tenant {0} is illegal"
+    },
+    "updateteamfoundmultiexception": {
+      "updateteamfoundmultiexception": "There are multiple groups' {0} ', please update with uuid"
+    }
+  },
+  "nfeu": {
+    "ipsubnetmaskexception": {
+      "ipsubnetmaskexception": "IP: {0} encountered an exception when matching the actuator group. Please check the network segment/subnet mask configuration of the actuator group and try again! Abnormal network segment/subnet mask: {1}"
+    },
+    "loginlockedexception": {
+      "loginlockedexception": "Login failed more than the limit ('{0}' times), account locked, please try again after '{1}'"
+    },
+    "passworddecryptexception": {
+      "passworddecryptexception": "Password decryption failed"
+    },
+    "passwordencryptexception": {
+      "passwordencryptexception": "Password encryption failed"
+    },
+    "passwordtoolongexception": {
+      "passwordtoolongexception": "The password content is too long to perform RSA encryption"
+    },
+    "rsaprivatekeyinitializationfailedexception": {
+      "rsaprivatekeyinitializationfailedexception": "RSA private key initialization failed"
+    },
+    "userpasswordexpiredexception": {
+      "userpasswordexpiredexception": "The user password has expired, please change the password"
+    }
+  },
+  "nfew": {
+    "wechatauthenticationinformationnotfoundexception": {
+      "wechatauthenticationinformationnotfoundexception": "Enterprise WeChat authentication information not found"
+    }
+  },
+  "nff": {
+    "jsonwebtokenvalidfilter": {
+      "dofilterinternal": {
+        "authfailed": "Authentication failed ( {0} ), please login again",
+        "authfailederrorlog": "Authentication failed",
+        "authfailedlog": "=======Login error: Failed to authenticate through  {0} , please login again",
+        "authtypeinvalid": "Unable to find authType:  {0} ",
+        "lacktenant": "Tenant  {0}  does not exist or has been disabled",
+        "unexpired": "The session has timed out or been terminated. Please login again"
+      }
+    }
+  },
+  "nffd": {
+    "formattributevo": {
+      "entityfield": {
+        "name": "For frontend rendering, if false, the frontend page needs to use the default config. If true, use the form management to edit and save the config"
+      }
+    }
+  },
+  "nffe": {
+    "formattributenotfoundexception": {
+      "formattributenotfoundexception_a": "Form property: {0} does not exist",
+      "formattributenotfoundexception_b": "{1} attribute not found in form {0}"
+    },
+    "formextendattributeconfigillegalexception": {
+      "formextendattributeconfigillegalexception_a": "In the form extension data, the configuration of the {0} type attribute {1} is missing the {2} field",
+      "formextendattributeconfigillegalexception_b": "In the form extension data, the configuration of the {0} type attribute {1} has an invalid {2} field value of {3}"
+    },
+    "formnotfoundexception": {
+      "formnotfoundexception": "Form '{0}' does not exist"
+    },
+    "formversionnotfoundexception": {
+      "formversionnotfoundexception": "Form version '{0}' does not exist"
+    },
+    "formversionscenenotfoundexception": {
+      "formversionscenenotfoundexception": "In version: {1} of form: {0}, scenario: {2} does not exist"
+    },
+    "status": {
+      "doing": "Rebuilding",
+      "done": "Rebuild Completed"
+    }
+  },
+  "nfhc": {
+    "heartbeatmanager": {
+      "myinit": {
+        "startupfailureprompt": "Startup failed, server ID: {0} is already in use by server ({1}), please modify the values in the config/serviceid.exe file under the class path"
+      }
+    }
+  },
+  "nfie": {
+    "exportnoauthexception": {
+      "exportnoauthexception": "No export permission"
+    },
+    "importexporthandlernotfoundexception": {
+      "importexporthandlernotfoundexception": "Import export processor: {0} cannot be found"
+    },
+    "importexporttypeinconsistencyexception": {
+      "importexporttypeinconsistencyexception": "Import file exception, please import {0}"
+    },
+    "importnoauthexception": {
+      "importnoauthexception": "No import permission"
+    }
+  },
+  "nfme": {
+    "matrixviewsqlirregularexception": {
+      "matrixviewsqlirregularexception": "SQL illegal {0}",
+      "matrixviewsqlirregularexception_a": "The configuration file is not a valid XML file"
+    }
+  },
+  "nfne": {
+    "emailsendexception": {
+      "emailsendexception": "Email sending failed, Exception:{0}",
+      "emailsendexception_a": "Email sending failed, exception: {0}, all recipients: {1}"
+    }
+  },
+  "nfpw": {
+    "frameworkportalwidget": {
+      "text": {
+        "quickentry": "Quick Access",
+        "welcomeoverview": "Welcome Overview"
+      }
+    }
+  },
+  "nfs": {
+    "scriptrunnermanager": {
+      "runscriptoncewithjdbc": {
+        "failed": "Execution failed, please check and verify the latest database table schema",
+        "tenantnotconnect": "Unable to connect to tenant library netlogic_ {0}, please go to the datasource table in the nearlogic library to confirm if the username, password, host, and port fields of the {0} tenant are correct."
+      }
+    }
+  },
+  "nfuc": {
+    "frameworkuserexportfiletype": {
+      "matrixdata": "Matrix data"
+    }
+  },
+  "nfue": {
+    "userexportfiledeletedeniedexception": {
+      "userexportfiledeletedeniedexception": "You do not have permission to delete the {0} file"
+    },
+    "userexportfiledownloaddeniedexception": {
+      "userexportfiledownloaddeniedexception": "You do not have permission to download the {0} file"
+    },
+    "userexportfilenotfoundexception": {
+      "userexportfilenotfoundexception": "The user exported file '{0}' does not exist"
+    },
+    "userexportfiletypenotfoundexception": {
+      "userexportfiletypenotfoundexception": "The user exported file type '{0}' does not exist"
+    }
+  },
+  "nfwe": {
+    "worktimerangenotfoundexception": {
+      "worktimerangenotfoundexception_a": "Service time: '{0}' has no scheduled time or calendar set",
+      "worktimerangenotfoundexception_b": "Service time: The '{1}' year of '{0}' does not have a scheduling calendar set",
+      "worktimerangenotfoundexception_c": "Service time: The deadline for scheduling in the \"{1}\" year of \"{0}\" is \"{2}\", and a scheduling calendar needs to be added"
+    }
+  },
+  "nmffh": {
+    "ldapauthhandler": {
+      "mylogin": {
+        "failed": "[Ldap authentication failed] user dn:",
+        "faileda": "[Ldap authentication failed]",
+        "succeed": "[Ldap authentication successful] user dn:"
+      }
+    }
+  },
+  "nmfra": {
+    "getpasswordpublickeyapi": {
+      "getname": "Obtain password RSA encryption public key"
+    }
+  },
+  "nmfs": {
+    "checkupdatedatabaseviewhandler": {
+      "getname": "Check the resource center view"
+    },
+    "documentonlineinitializeindexhandler": {
+      "executeforalltenant": {
+        "error": "There are two files with the same path: {0}. Please rename one of the files or move it to a different path",
+        "system_out_println": "The location of the online document index library is {0}",
+        "warn_a": "The filePath field in element {1} of the {0} file has no value set",
+        "warn_b": "The moduleGroup field in element {1} of the {0} file has no value set",
+        "warn_c": "Invalid relationship configurations:"
+      },
+      "getname": "Initialize online help document index"
+    }
+  },
+  "nmfsl": {
+    "licensepolicyvalidjob": {
+      "isend": "%The license for the s (% s) module on% s has expired and% s has been discontinued. Please contact the manufacturer for replacement",
+      "isendgraceperiod": "And it has exceeded the grace period (% d days),",
+      "isexpired": "%The license for the s (% s) module has expired on% s. Please contact the manufacturer for replacement",
+      "isexpiredgraceperiod": "We have a grace period of% d days and will soon stop using it,",
+      "iswillexpired": "%The license for the s (% s) module is about to expire on% s. Please contact the manufacturer to replace it"
+    }
+  },
+  "nmft": {
+    "createdatawarehousetableinithandler": {
+      "getname": "Create a data warehouse dynamic table"
+    }
+  },
+  "nmtc": {
+    "regiontype": {
+      "owner": "Requester"
+    }
+  },
+  "term": {
+    "event": {
+      "eventtypeid": "Saved Event Type ID",
+      "eventtypelist": "Associated event types",
+      "name": "Event"
+    },
+    "framework": {
+      "agentid": "Enterprise Application ID",
+      "conditionmodel": "Conditional model",
+      "corpid": "Enterprise ID",
+      "corpsecret": "Applied credential key",
+      "domain": "domain name",
+      "exceptionnotify": "Notification exception",
+      "formuuid": "Form UUID",
+      "formversionuuid": "Form version uuid",
+      "groupname": "Framework",
+      "integration": "integrated configuration",
+      "integrationuuid": "Integrated UUID",
+      "matrixattr": "Matrix Properties",
+      "matrixtype": "Matrix type",
+      "name": "Framework",
+      "pinyin": "Pinyin",
+      "policyid": "Notification Policy ID",
+      "serverid": "Server ID",
+      "smpthost": "SMTP host",
+      "smptport": "SMTP port",
+      "smptsslenable": "Whether to use SSL",
+      "team": {
+        "fullpath": "Grouping full path",
+        "parentpathlist": "Parent Path List"
+      },
+      "user": {
+        "viplevel": "VIP level"
+      },
+      "userotherinfo": "Other user information",
+      "viplevel": "User level"
+    }
+  },
+  "time": {
+    "duration": {
+      "day": "{0} Day",
+      "days": "{0} Days",
+      "hour": "{0} Hour",
+      "hours": "{0} Hours",
+      "millisecond": "{0} Millisecond",
+      "milliseconds": "{0} Milliseconds",
+      "minute": "{0} Minute",
+      "minutes": "{0} Minutes",
+      "second": "{0} Second",
+      "seconds": "{0} Seconds"
+    }
+  }
+}

@@ -14,20 +14,21 @@ package neatlogic.framework.i18n;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.MessageSource;
 import org.springframework.context.support.MessageSourceAccessor;
 
-@DependsOn("springContextUtil")
 @Configuration
 public class I18nManager {
 
+    /** 暴露统一翻译服务，供新代码优先通过依赖注入使用。 */
     @Bean
-    public MessageSourceAccessor messageSourceAccessor() {
-        //ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
-        ReloadableJsonBundleMessageSource source = new ReloadableJsonBundleMessageSource();
-        source.setBasename("classpath:i18n/language");
-        source.setCacheSeconds(1000);
-        source.setDefaultEncoding("utf-8");
-        return new MessageSourceAccessor(source);
+    public I18nTranslator i18nTranslator() {
+        return I18nRuntime.getTranslator();
+    }
+
+    /** 使用 Spring 唯一消息源创建统一访问器。 */
+    @Bean
+    public MessageSourceAccessor messageSourceAccessor(MessageSource messageSource) {
+        return new MessageSourceAccessor(messageSource);
     }
 }

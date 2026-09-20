@@ -10,7 +10,7 @@ import java.io.InputStream;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-/** 使用共享 fixture 验证 Java 与工作区脚本的模板规则保持一致。 */
+/** 使用共享 fixture 验证语言资源模板规则。 */
 public class ModuleI18nValidationFixtureTest {
 
     /** fixture 中的正反例必须分别通过和拒绝。 */

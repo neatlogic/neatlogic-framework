@@ -114,6 +114,13 @@
     }
   },
   "common": {
+    "uncategorized": "Uncategorized",
+    "inspectstatus": {
+      "critical": "Critical",
+      "fatal": "Fatal",
+      "normal": "Normal",
+      "warn": "Warning"
+    },
     "aborted": "Aborted",
     "accesstype": "Access Type",
     "account": "Account",

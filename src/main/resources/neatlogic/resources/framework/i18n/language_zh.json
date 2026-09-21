@@ -114,6 +114,13 @@
     }
   },
   "common": {
+    "uncategorized": "未分类",
+    "inspectstatus": {
+      "critical": "严重",
+      "fatal": "致命",
+      "normal": "正常",
+      "warn": "告警"
+    },
     "aborted": "已中止",
     "accesstype": "访问类型",
     "account": "账号",

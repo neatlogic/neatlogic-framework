@@ -1,5 +1,7 @@
 package neatlogic.framework.i18n;
 
+import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.util.I18nUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -22,12 +24,17 @@ import static org.junit.Assert.*;
 public class I18nQuoteIntegrationTest {
     private static final Locale TEST_LOCALE = new Locale("en", "XQ");
     private Locale previousLocale;
+    private UserContext previousUserContext;
     private ModuleJsonMessageSource source;
 
     /** 使用专用模块资源，避免测试文案与生产 key 冲突。 */
     @Before
     public void setUp() {
         previousLocale = Locale.getDefault();
+        previousUserContext = UserContext.get() == null ? null : UserContext.get().copy();
+        if (UserContext.get() != null) {
+            UserContext.get().release();
+        }
         source = new ModuleJsonMessageSource();
     }
 
@@ -35,6 +42,12 @@ public class I18nQuoteIntegrationTest {
     @After
     public void tearDown() {
         Locale.setDefault(previousLocale);
+        if (UserContext.get() != null) {
+            UserContext.get().release();
+        }
+        if (previousUserContext != null) {
+            UserContext.init(previousUserContext);
+        }
     }
 
     /** 两个入口应输出相同文案，且连续调用时参数不得残留。 */
@@ -62,7 +75,38 @@ public class I18nQuoteIntegrationTest {
         assertEquals(expected, I18nUtils.getStaticMessage(TEST_LOCALE, "screenshot", args));
     }
 
-    /** Spring 无参数路径仍返回原文，缓存预处理不能污染资源内容。 */
+    /** 存量异常直接使用中文模板时也必须替换权限名称。 */
+    @Test
+    public void formatsLegacyPermissionDeniedMessage() {
+        UserContext userContext = UserContext.init((UserContext) null);
+        userContext.setUserName("管理员");
+        userContext.setUserId("admin");
+        PermissionDeniedException exception = new PermissionDeniedException(List.of("基线巡检查看权限"));
+        assertEquals("当前用户“管理员(admin)”缺少“基线巡检查看权限”权限，请联系管理员", exception.getMessage());
+        assertEquals("当前用户“管理员(admin)”没有权限执行该操作，请联系管理员",
+                new PermissionDeniedException().getMessage());
+    }
+
+    /** 当前用户信息不完整时使用可用字段，不存在时不展示用户身份。 */
+    @Test
+    public void formatsIncompleteAndMissingUsers() {
+        UserContext userContext = UserContext.init((UserContext) null);
+        userContext.setUserName("管理员");
+        assertEquals("当前用户“管理员”没有权限执行该操作，请联系管理员",
+                new PermissionDeniedException().getMessage());
+
+        userContext.setUserName(null);
+        userContext.setUserId("admin");
+        assertEquals("当前用户“admin”没有权限执行该操作，请联系管理员",
+                new PermissionDeniedException().getMessage());
+
+        userContext.release();
+        assertEquals("当前用户缺少“基线巡检查看权限”权限，请联系管理员",
+                new PermissionDeniedException(List.of("基线巡检查看权限")).getMessage());
+        assertEquals("没有权限执行该操作，请联系管理员", new PermissionDeniedException().getMessage());
+    }
+
+    /** Spring 无参数路径仍返回原文，缺失 key 按存量消息模板兼容格式化。 */
     @Test
     public void preservesRawMessagesAndMissingKeys() {
         source.getMessage("quoted", new Object[]{"Server"}, TEST_LOCALE);
@@ -70,14 +114,18 @@ public class I18nQuoteIntegrationTest {
         assertEquals("Can't find anything", source.getMessage("plain", new Object[0], TEST_LOCALE));
         assertEquals("Can't find anything", I18nUtils.getStaticMessage(TEST_LOCALE, "plain"));
         assertEquals("missing", I18nUtils.getStaticMessage(TEST_LOCALE, "missing", "Server"));
+        assertEquals("missing {0}", I18nUtils.getStaticMessage(TEST_LOCALE, "missing {0}"));
         assertEquals("fallback", source.getMessage("missing", new Object[]{"Server"}, "fallback", TEST_LOCALE));
         try {
             source.getMessage("missing '{0}'", new Object[]{"Server"}, TEST_LOCALE);
             fail("Spring 消息源缺少 key 时应保持标准 NoSuchMessageException 语义");
         } catch (NoSuchMessageException ignored) {
-            // 业务入口 I18nUtils 负责将缺失 key 原样返回，底层消息源保持 Spring 标准行为。
+            // 业务入口 I18nUtils 负责格式化存量文案，底层消息源保持 Spring 标准行为。
         }
-        assertEquals("missing '{0}'", I18nUtils.getStaticMessage(TEST_LOCALE, "missing '{0}'", "Server"));
+        assertEquals("missing 'Server'", I18nUtils.getStaticMessage(TEST_LOCALE, "missing '{0}'", "Server"));
+        assertEquals("当前用户缺少“基线巡检查看权限”权限，请联系管理员",
+                I18nUtils.getStaticMessage(TEST_LOCALE, "当前用户缺少“{0}”权限，请联系{1}",
+                        "基线巡检查看权限", "管理员"));
     }
 
     /** 高级格式继续采用原生语义，不将被引用的占位符转换为参数。 */

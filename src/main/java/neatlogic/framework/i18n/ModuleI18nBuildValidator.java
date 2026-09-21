@@ -37,12 +37,18 @@ public final class ModuleI18nBuildValidator {
      * @param args 第一个参数为工作区目录
      */
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            throw new ModuleInitRuntimeException("构建期语言资源校验需要一个工作区目录参数");
+        try {
+            if (args.length != 1) {
+                throw new ModuleInitRuntimeException("构建期语言资源校验需要一个工作区目录参数");
+            }
+            ValidationSummary summary = validateWorkspace(Path.of(args[0]));
+            System.out.printf("模块语言资源 Java 校验通过，moduleCount: %d, languageFileCount: %d, keyCount: %d%n",
+                    summary.moduleCount(), summary.languageFileCount(), summary.keyCount());
+        } catch (Exception ex) {
+            // Maven 日志配置可能隐藏 logger 输出，标准输出中保留完整校验异常链便于定位。
+            ex.printStackTrace(System.out);
+            throw ex;
         }
-        ValidationSummary summary = validateWorkspace(Path.of(args[0]));
-        System.out.printf("模块语言资源 Java 校验通过，moduleCount: %d, languageFileCount: %d, keyCount: %d%n",
-                summary.moduleCount(), summary.languageFileCount(), summary.keyCount());
     }
 
     /** 校验工作区资源布局，并使用运行时加载器检查语言资源内容。 */

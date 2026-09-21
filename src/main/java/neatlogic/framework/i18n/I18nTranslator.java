@@ -21,17 +21,17 @@ public class I18nTranslator {
         this.missingReporter = missingReporter;
     }
 
-    /** 使用当前请求语言翻译，缺失时返回原始 key。 */
+    /** 使用当前请求语言翻译，缺失时将原始 key 作为兼容模板格式化。 */
     public String translate(String key, Object... args) {
         return translate(currentLocale(), key, args);
     }
 
-    /** 使用指定语言翻译，缺失时返回原始 key。 */
+    /** 使用指定语言翻译，缺失时将原始 key 作为兼容模板格式化。 */
     public String translate(Locale locale, String key, Object... args) {
         I18nMessageTemplate template = findTemplate(locale, key);
         if (template == null) {
             reportMissing(locale, key);
-            return key;
+            return formatMissingKey(locale, key, args);
         }
         return template.format(args);
     }
@@ -63,6 +63,15 @@ public class I18nTranslator {
     /** 返回目录，供诊断和兼容适配使用。 */
     public ModuleI18nCatalog getCatalog() {
         return catalog;
+    }
+
+    /** 缺失 key 不进入缓存，仅在存在参数时按消息模板格式化存量文案。 */
+    private String formatMissingKey(Locale locale, String key, Object... args) {
+        if (args == null || args.length == 0) {
+            return key;
+        }
+        String language = I18nLocaleResolver.resolveLanguage(locale);
+        return new I18nMessageTemplate(key, language).format(args);
     }
 
     /** 查找或创建不可变模板缓存。 */

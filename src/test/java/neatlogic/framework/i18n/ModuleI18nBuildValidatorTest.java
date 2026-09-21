@@ -5,6 +5,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -82,6 +84,34 @@ public class ModuleI18nBuildValidatorTest {
         writeBundle(workspace, "neatlogic-sample", "sample", "en", "{\"other\":\"Sample\"}");
 
         assertValidationFails(workspace, "模块中英文 key 不一致");
+    }
+
+    /** 构建入口必须向标准输出打印包含资源上下文的完整异常链。 */
+    @Test
+    public void printsDuplicateFieldFailureToStandardOutputAndRethrows() throws Exception {
+        Path workspace = temporaryFolder.newFolder("duplicate-field").toPath();
+        writeBuildRootPom(workspace, "neatlogic-sample");
+        writeBundle(workspace, "neatlogic-sample", "sample", "zh",
+                "{\"nfae\":\"示例一\",\"nfae\":\"示例二\"}");
+        writeBundle(workspace, "neatlogic-sample", "sample", "en", "{\"nfae\":\"Sample\"}");
+        PrintStream originalOutput = System.out;
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try {
+            System.setOut(new PrintStream(output, true, StandardCharsets.UTF_8));
+            ModuleI18nBuildValidator.main(new String[]{workspace.toString()});
+            fail("重复 JSON 字段未导致构建校验失败");
+        } catch (ModuleInitRuntimeException ex) {
+            assertTrue(ex.getMessage(), ex.getMessage().contains("读取模块语言资源失败"));
+        } finally {
+            System.setOut(originalOutput);
+        }
+
+        String consoleOutput = output.toString(StandardCharsets.UTF_8);
+        assertTrue(consoleOutput, consoleOutput.contains("读取模块语言资源失败"));
+        assertTrue(consoleOutput, consoleOutput.contains("Duplicate field 'nfae'"));
+        assertTrue(consoleOutput, consoleOutput.contains("owner: sample"));
+        assertTrue(consoleOutput, consoleOutput.contains("language: zh"));
+        assertTrue(consoleOutput, consoleOutput.contains("language_zh.json"));
     }
 
     /** 写入只包含目标模块的聚合 POM。 */

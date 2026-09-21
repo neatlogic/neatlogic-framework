@@ -1,6 +1,8 @@
 package neatlogic.framework.i18n;
 
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
  * 在构建阶段使用运行时加载器校验工作区内的模块语言资源。
  */
 public final class ModuleI18nBuildValidator {
+    private static final Logger logger = LoggerFactory.getLogger(ModuleI18nBuildValidator.class);
     private static final Set<String> IGNORED_DIRECTORIES = Set.of(
             ".git", ".idea", "node_modules", "target", "dist", "build", "__pycache__");
     private static final Pattern MODULE_PATTERN = Pattern.compile("<module>\\s*([^<]+?)\\s*</module>");
@@ -149,7 +152,7 @@ public final class ModuleI18nBuildValidator {
             }
         }
         if (!missingModuleDirectories.isEmpty()) {
-            throw new ModuleInitRuntimeException("模块同时缺少中英文语言资源: " + missingModuleDirectories);
+            logger.warn("模块同时缺少中英文语言资源: {}", missingModuleDirectories);
         }
     }
 

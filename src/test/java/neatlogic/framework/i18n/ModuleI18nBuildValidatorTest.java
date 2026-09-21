@@ -44,9 +44,9 @@ public class ModuleI18nBuildValidatorTest {
         assertValidationFails(workspace, "owner 与 artifact 目录不一致");
     }
 
-    /** Reactor 模块声明 servlet 上下文后必须提供语言资源。 */
+    /** Reactor 模块同时缺少中英文资源时仅警告，不阻断其他模块校验。 */
     @Test
-    public void rejectsModuleWithoutLanguageResources() throws Exception {
+    public void warnsAndContinuesForModuleWithoutLanguageResources() throws Exception {
         Path workspace = temporaryFolder.newFolder("missing-bundle").toPath();
         writeBuildRootPom(workspace, "neatlogic-sample", "neatlogic-missing");
         writeBundle(workspace, "neatlogic-sample", "sample", "zh", "{\"sample\":\"示例\"}");
@@ -56,7 +56,11 @@ public class ModuleI18nBuildValidatorTest {
         Files.createDirectories(descriptor.getParent());
         Files.writeString(descriptor, "<beans/>", StandardCharsets.UTF_8);
 
-        assertValidationFails(workspace, "模块同时缺少中英文语言资源");
+        ModuleI18nBuildValidator.ValidationSummary summary = ModuleI18nBuildValidator.validateWorkspace(workspace);
+
+        assertEquals(1, summary.moduleCount());
+        assertEquals(2, summary.languageFileCount());
+        assertEquals(1, summary.keyCount());
     }
 
     /** 单语言资源必须由运行时加载器拒绝。 */

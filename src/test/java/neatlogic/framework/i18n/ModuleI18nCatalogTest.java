@@ -36,6 +36,19 @@ public class ModuleI18nCatalogTest {
         }
     }
 
+    /** 语言资源 key 未按字母升序排列时仅警告，仍应加载全部翻译。 */
+    @Test
+    public void loadsUnsortedKeys() throws Exception {
+        Path root = temporaryFolder.newFolder("unsorted-keys").toPath();
+        writeBundle(root, "sample", "zh", "{\"sample\":{\"z\":\"后项\",\"a\":\"前项\"}}");
+        writeBundle(root, "sample", "en", "{\"sample\":{\"z\":\"Last\",\"a\":\"First\"}}");
+        try (URLClassLoader classLoader = new URLClassLoader(new URL[]{root.toUri().toURL()}, null)) {
+            ModuleI18nCatalog catalog = new ModuleI18nCatalog(classLoader);
+            assertEquals("后项", catalog.findMessage("zh", "sample.z"));
+            assertEquals("First", catalog.findMessage("en", "sample.a"));
+        }
+    }
+
     /** 两个模块声明相同完整 key 时必须阻断启动。 */
     @Test(expected = ModuleInitRuntimeException.class)
     public void rejectsDuplicateKeysAcrossModules() throws Exception {

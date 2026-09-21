@@ -2,6 +2,8 @@ package neatlogic.framework.i18n;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import neatlogic.framework.exception.module.ModuleInitRuntimeException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -9,9 +11,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 校验模块语言资源的结构、排序、模板和多语言镜像关系。
+ * 校验模块语言资源的结构、模板和多语言镜像关系，并诊断 key 排序。
  */
 final class ModuleI18nValidator {
+    private static final Logger logger = LoggerFactory.getLogger(ModuleI18nValidator.class);
 
     /** 将嵌套 JSON 展开为点号 key，并执行单文件校验。 */
     Map<String, String> flatten(JsonNode root, String origin, String language, String owner) {
@@ -56,7 +59,7 @@ final class ModuleI18nValidator {
         }
     }
 
-    /** 递归展开 JSON，并检查逐层排序、叶子类型和消息模板。 */
+    /** 递归展开 JSON，并诊断逐层排序、检查叶子类型和消息模板。 */
     private void flattenNode(JsonNode node, String prefix, Map<String, String> result,
                              String origin, String language, String owner) {
         String previousName = null;
@@ -68,8 +71,8 @@ final class ModuleI18nValidator {
                         + ", node: " + (prefix.isEmpty() ? "<root>" : prefix) + ", field: " + field.getKey());
             }
             if (previousName != null && previousName.compareTo(field.getKey()) > 0) {
-                throw new ModuleInitRuntimeException("模块语言资源 key 未按字母升序排列，resource: " + origin
-                        + ", previous: " + previousName + ", current: " + field.getKey());
+                logger.warn("模块语言资源 key 未按字母升序排列，resource: {}, node: {}, previous: {}, current: {}",
+                        origin, prefix.isEmpty() ? "<root>" : prefix, previousName, field.getKey());
             }
             previousName = field.getKey();
             String key = prefix.isEmpty() ? field.getKey() : prefix + '.' + field.getKey();

@@ -862,6 +862,14 @@
     "loadbalanceexception": {
       "loadbalanceexception": "Backend node drift, permission server ID '{0}', current server ID '{1}', please contact the administrator!"
     },
+    "paramnotexistsexception": {
+      "allblank": "Parameters “{0}” cannot all be empty.",
+      "groupseparator": ", ",
+      "indexedfieldrequired": "Field “{1}” of parameter {0} cannot be empty.",
+      "namedindexedfieldrequired": "Field “{2}” of parameter {0} (“{1}”) cannot be empty.",
+      "required": "Parameter “{0}” cannot be empty.",
+      "selectonegroup": "Complete one of the following parameter groups: {0}."
+    },
     "systempropertynotfoundexception": {
       "systempropertynotfoundexception": "The system property '{0}' does not exist"
     }

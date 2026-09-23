@@ -26,6 +26,7 @@ import neatlogic.framework.integration.core.IntegrationHandlerBase;
 import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import neatlogic.framework.integration.dto.PatternVo;
+import neatlogic.framework.util.$;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -44,7 +45,7 @@ import java.util.stream.Collectors;
 public class FormIntegrationHandler extends IntegrationHandlerBase {
     @Override
     public String getName() {
-        return "表单外部数据源查询";
+        return $.t("integration.formintegrationhandler.getname");
     }
 
     @Override

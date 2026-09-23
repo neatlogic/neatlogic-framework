@@ -9,20 +9,18 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum ParamType implements IEnum {
-    STRING("string", "字符串", Arrays.asList(Expression.EQUAL, Expression.UNEQUAL, Expression.LIKE, Expression.NOTLIKE, Expression.ISNULL, Expression.ISNOTNULL), Expression.LIKE),
-    NUMBER("number", "数字", Arrays.asList(Expression.EQUAL, Expression.UNEQUAL, Expression.LESSTHAN, Expression.LESSTHANOREQUAL,
+    STRING("string", Arrays.asList(Expression.EQUAL, Expression.UNEQUAL, Expression.LIKE, Expression.NOTLIKE, Expression.ISNULL, Expression.ISNOTNULL), Expression.LIKE),
+    NUMBER("number", Arrays.asList(Expression.EQUAL, Expression.UNEQUAL, Expression.LESSTHAN, Expression.LESSTHANOREQUAL,
             Expression.GREATERTHAN, Expression.GREATERTHANOREQUAL, Expression.BETWEEN, Expression.ISNULL, Expression.ISNOTNULL), Expression.EQUAL),
-    ENUM("enum", "枚举", Arrays.asList(Expression.EQUAL, Expression.UNEQUAL), Expression.EQUAL),
-    ARRAY("array", "数组", Arrays.asList(Expression.INCLUDE, Expression.EXCLUDE, Expression.ISNULL, Expression.ISNOTNULL), Expression.INCLUDE),
-    DATE("date", "日期", Arrays.asList(Expression.BETWEEN, Expression.ISNULL, Expression.ISNOTNULL), Expression.BETWEEN);
+    ENUM("enum", Arrays.asList(Expression.EQUAL, Expression.UNEQUAL), Expression.EQUAL),
+    ARRAY("array", Arrays.asList(Expression.INCLUDE, Expression.EXCLUDE, Expression.ISNULL, Expression.ISNOTNULL), Expression.INCLUDE),
+    DATE("date", Arrays.asList(Expression.BETWEEN, Expression.ISNULL, Expression.ISNOTNULL), Expression.BETWEEN);
     private final String name;
-    private final String text;
     private final List<Expression> expressionList;
     private final Expression defaultExpression;
 
-    ParamType(String _name, String _text, List<Expression> _expressionList, Expression _defaultExpression) {
+    ParamType(String _name, List<Expression> _expressionList, Expression _defaultExpression) {
         this.name = _name;
-        this.text = _text;
         this.expressionList = _expressionList;
         this.defaultExpression = _defaultExpression;
     }
@@ -31,8 +29,9 @@ public enum ParamType implements IEnum {
         return name;
     }
 
+    /** 获取当前语言对应的参数类型名称。 */
     public String getText() {
-        return $.t(text);
+        return $.t("integration.paramtype." + name);
     }
 
     public List<Expression> getExpressionList() {

@@ -20,6 +20,7 @@ import neatlogic.framework.integration.core.IntegrationHandlerBase;
 import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import neatlogic.framework.integration.dto.PatternVo;
+import neatlogic.framework.util.$;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -27,7 +28,7 @@ import java.util.List;
 @Component
 public class CustomIntegrationHandler extends IntegrationHandlerBase {
 	public String getName() {
-		return "自定义";
+		return $.t("integration.customintegrationhandler.getname");
 	}
 
 	public Object myGetData() {

@@ -26,7 +26,7 @@ import java.util.Map;
 public class IntegrationHandlerFactory extends ModuleInitializedListenerBase {
 
     private static final Map<String, IIntegrationHandler> componentMap = new HashMap<>();
-    private static final List<IntegrationHandlerVo> handlerList = new ArrayList<>();
+    private static final List<IIntegrationHandler> handlerList = new ArrayList<>();
 
     public static IIntegrationHandler getHandler(String handler) {
         return componentMap.get(handler);
@@ -37,7 +37,12 @@ public class IntegrationHandlerFactory extends ModuleInitializedListenerBase {
     }
 
     public static List<IntegrationHandlerVo> getHandlerList() {
-        return handlerList;
+        // 处理器名称可能通过 $.t() 按请求语言解析，不能在模块初始化时缓存展示文本。
+        List<IntegrationHandlerVo> result = new ArrayList<>();
+        for (IIntegrationHandler handler : handlerList) {
+            result.add(new IntegrationHandlerVo(handler.getName(), handler.getHandler()));
+        }
+        return result;
     }
 
 
@@ -48,7 +53,7 @@ public class IntegrationHandlerFactory extends ModuleInitializedListenerBase {
             IIntegrationHandler component = entry.getValue();
             if (component.getHandler() != null) {
                 componentMap.put(component.getHandler(), component);
-                handlerList.add(new IntegrationHandlerVo(component.getName(), component.getHandler()));
+                handlerList.add(component);
             }
         }
     }

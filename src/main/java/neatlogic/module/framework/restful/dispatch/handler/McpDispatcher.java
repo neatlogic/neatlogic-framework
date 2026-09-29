@@ -121,8 +121,12 @@ public class McpDispatcher {
         }
     }
 
+    /**
+     * 单条通知或客户端响应仅返回 202；带 id 的请求才生成 JSON-RPC 响应。
+     */
     private JSONObject handleSingleRequest(String scope, JSONObject req, HttpServletRequest request, HttpServletResponse response) {
-        if (isNotificationOrResponse(req) && !isRequest(req)) {
+        // 通知也包含 method，不能以缺少 method 判断，否则初始化通知会返回空的 200 并中断客户端握手。
+        if (isNotificationOrResponse(req)) {
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
             return null;
         }

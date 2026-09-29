@@ -29,15 +29,19 @@ import java.util.*;
 public class SubscribeHandlerFactory extends ModuleInitializedListenerBase implements BeanFactoryPostProcessor {
     private static final Map<String, ISubscribeHandler> componentMap = new HashMap<>();
     private static final Map<String, SubscribeVo> systemSubscribeMap = new LinkedHashMap<>();
+    private static final List<ISubscribeHandler> subscribeHandlerList = new ArrayList<>();
+    private static final Map<String, Boolean> embedSubscribeHandlerMap = new HashMap<>();
 
     public static ISubscribeHandler getHandler(String handlerId) {
         return componentMap.get(handlerId);
     }
 
-    private static final List<SubscribeHandlerVo> subscribeHandlerVoList = new ArrayList<>();
-
     public static List<SubscribeHandlerVo> getSubscribeHandlerList() {
-        return subscribeHandlerVoList;
+        List<SubscribeHandlerVo> result = new ArrayList<>();
+        for (ISubscribeHandler component : subscribeHandlerList) {
+            result.add(new SubscribeHandlerVo(component.getName(), component.getLabel(), component.getClassName(), embedSubscribeHandlerMap.get(component.getClassName())));
+        }
+        return result;
     }
 
     public static List<SubscribeVo> getSystemSubscribeList() {
@@ -52,7 +56,7 @@ public class SubscribeHandlerFactory extends ModuleInitializedListenerBase imple
         if (StringUtils.isBlank(className)) {
             return false;
         }
-        return subscribeHandlerVoList.stream().anyMatch(o -> className.equals(o.getClassName()) && Boolean.TRUE.equals(o.getIsEmbed()));
+        return Boolean.TRUE.equals(embedSubscribeHandlerMap.get(className));
     }
 
     @Override
@@ -64,6 +68,7 @@ public class SubscribeHandlerFactory extends ModuleInitializedListenerBase imple
                 throw new RuntimeException("Duplicate subscribe handler: " + component.getClassName());
             }
             componentMap.put(component.getClassName(), component);
+            subscribeHandlerList.add(component);
             boolean isEmbed = false;
             List<SubscribeVo> systemSubscribeList = component.getSystemSubscribeList();
             if (CollectionUtils.isNotEmpty(systemSubscribeList)) {
@@ -75,7 +80,7 @@ public class SubscribeHandlerFactory extends ModuleInitializedListenerBase imple
                     isEmbed = true;
                 }
             }
-            subscribeHandlerVoList.add(new SubscribeHandlerVo(component.getName(), component.getLabel(), component.getClassName(), isEmbed));
+            embedSubscribeHandlerMap.put(component.getClassName(), isEmbed);
         }
     }
 

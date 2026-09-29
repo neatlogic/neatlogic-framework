@@ -10,7 +10,12 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 public class MatrixNotFoundException extends ApiRuntimeException {
     private static final long serialVersionUID = -4508274752209783532L;
 
+    /**
+     * 报告指定矩阵不存在，矩阵名称或标识作为原始参数保留。
+     *
+     * @param matrixName 矩阵名称或标识
+     */
     public MatrixNotFoundException(String matrixName) {
-        super("矩阵{0}不存在", matrixName);
+        super("nfme.matrixnotfoundexception.matrixnotfoundexception", matrixName);
     }
 }

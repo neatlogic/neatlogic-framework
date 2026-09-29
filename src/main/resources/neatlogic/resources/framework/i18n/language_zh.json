@@ -153,6 +153,8 @@
     "avatar": "头像",
     "basicauth": "Basic认证",
     "bearerauth": "Bearer Token",
+    "connected": "已连接",
+    "disconnected": "未连接",
     "belongtodepartment": "所属部门",
     "between": "介于",
     "boolean": "布尔型",
@@ -1157,6 +1159,9 @@
     }
   },
   "nfme": {
+    "matrixnotfoundexception": {
+      "matrixnotfoundexception": "矩阵{0}不存在"
+    },
     "matrixviewsqlirregularexception": {
       "matrixviewsqlirregularexception": "sql 非法{0}",
       "matrixviewsqlirregularexception_a": "配置文件不是合法的XML文件"
@@ -1181,6 +1186,65 @@
       "runscriptoncewithjdbc": {
         "failed": " 执行失败，请检查核对最新的数据库表schema",
         "tenantnotconnect": "无法连接租户库 neatlogic_{0}，请到 neatlogic 库中的 datasource 表确认 {0} 租户的username、password、host、port字段是否正确。"
+      }
+    }
+  },
+  "nfsn": {
+    "systemnoticeexpiredtimelessthanactivetimeexception": {
+      "message": "公告失效时间不能早于生效时间"
+    },
+    "systemnoticehasbeenissuedexception": {
+      "message": "系统公告：'{0}'已下发，不可操作，请刷新系统公告管理页后查看公告状态"
+    },
+    "systemnoticenotfoundexception": {
+      "message": "系统公告：{0}不存在"
+    },
+    "systemnoticerecipientvo": {
+      "entityfield": {
+        "name": {
+          "systemnoticeid": "公告 ID",
+          "type": "类型",
+          "uuid": "通知对象 UUID"
+        }
+      }
+    },
+    "systemnoticerepeatexception": {
+      "message": "系统公告：'{0}'已存在"
+    },
+    "systemnoticeuservo": {
+      "entityfield": {
+        "name": {
+          "isread": "是否已读（1：已读；0：未读）",
+          "systemnoticeid": "公告 ID",
+          "useruuid": "用户 UUID"
+        }
+      }
+    },
+    "systemnoticevo": {
+      "entityfield": {
+        "name": {
+          "content": "内容",
+          "direction": "供前端查询使用（before：查找 issueTime 之前的公告；after：查找 issueTime 之后的公告）",
+          "endtime": "失效时间",
+          "id": "公告 ID",
+          "ignoreread": "是否忽略已读",
+          "imglist": "公告内容中包含的所有图片，供前端展示使用",
+          "isread": "是否已读（1：已读；0：未读）",
+          "issuetime": "下发时间",
+          "popup": "弹框方式",
+          "recipientlist": "通知对象 UUID 列表",
+          "recipientobjlist": "通知对象列表，供前端组件使用",
+          "recipientvolist": "通知对象列表",
+          "starttime": "生效时间",
+          "status": "状态（not_issued：未下发；issued：已下发；stopped：已停用）",
+          "statusvo": "状态（包含名称与颜色值）",
+          "title": "标题"
+        }
+      },
+      "status": {
+        "issued": "已下发",
+        "notissued": "未下发",
+        "stopped": "已停用"
       }
     }
   },

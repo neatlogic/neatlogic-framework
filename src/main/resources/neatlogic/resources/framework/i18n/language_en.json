@@ -153,6 +153,8 @@
     "avatar": "Avatar",
     "basicauth": "Basic authentication",
     "bearerauth": "Bearer Token",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
     "belongtodepartment": "Department",
     "between": "Between",
     "boolean": "Boolean type",
@@ -1157,6 +1159,9 @@
     }
   },
   "nfme": {
+    "matrixnotfoundexception": {
+      "matrixnotfoundexception": "Matrix {0} does not exist"
+    },
     "matrixviewsqlirregularexception": {
       "matrixviewsqlirregularexception": "SQL illegal {0}",
       "matrixviewsqlirregularexception_a": "The configuration file is not a valid XML file"
@@ -1181,6 +1186,65 @@
       "runscriptoncewithjdbc": {
         "failed": "Execution failed, please check and verify the latest database table schema",
         "tenantnotconnect": "Unable to connect to tenant library netlogic_ {0}, please go to the datasource table in the nearlogic library to confirm if the username, password, host, and port fields of the {0} tenant are correct."
+      }
+    }
+  },
+  "nfsn": {
+    "systemnoticeexpiredtimelessthanactivetimeexception": {
+      "message": "The expiration time of a system notice cannot be earlier than its effective time"
+    },
+    "systemnoticehasbeenissuedexception": {
+      "message": "System notice '{0}' has been issued and cannot be modified. Refresh the system notice management page to view its current status"
+    },
+    "systemnoticenotfoundexception": {
+      "message": "System notice {0} does not exist"
+    },
+    "systemnoticerecipientvo": {
+      "entityfield": {
+        "name": {
+          "systemnoticeid": "System Notice ID",
+          "type": "Type",
+          "uuid": "Notification Recipient UUID"
+        }
+      }
+    },
+    "systemnoticerepeatexception": {
+      "message": "System notice '{0}' already exists"
+    },
+    "systemnoticeuservo": {
+      "entityfield": {
+        "name": {
+          "isread": "Read Status (1: Read; 0: Unread)",
+          "systemnoticeid": "System Notice ID",
+          "useruuid": "User UUID"
+        }
+      }
+    },
+    "systemnoticevo": {
+      "entityfield": {
+        "name": {
+          "content": "Content",
+          "direction": "Used by the frontend for queries (before: find notices before issueTime; after: find notices after issueTime)",
+          "endtime": "Expiration Time",
+          "id": "System Notice ID",
+          "ignoreread": "Ignore Read Status",
+          "imglist": "All images in the notice content for frontend display",
+          "isread": "Read Status (1: Read; 0: Unread)",
+          "issuetime": "Issue Time",
+          "popup": "Popup Mode",
+          "recipientlist": "Notification Recipient UUID List",
+          "recipientobjlist": "Notification Recipient List for Frontend Components",
+          "recipientvolist": "Notification Recipient List",
+          "starttime": "Effective Time",
+          "status": "Status (not_issued: Not Issued; issued: Issued; stopped: Stopped)",
+          "statusvo": "Status (including name and color)",
+          "title": "Title"
+        }
+      },
+      "status": {
+        "issued": "Issued",
+        "notissued": "Not Issued",
+        "stopped": "Stopped"
       }
     }
   },

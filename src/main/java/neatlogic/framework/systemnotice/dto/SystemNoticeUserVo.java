@@ -11,11 +11,11 @@ import neatlogic.framework.restful.annotation.EntityField;
  * @Date: 2021/1/13 17:40
  **/
 public class SystemNoticeUserVo {
-    @EntityField(name = "公告id", type = ApiParamType.LONG)
+    @EntityField(name = "nfsn.systemnoticeuservo.entityfield.name.systemnoticeid", type = ApiParamType.LONG)
     private Long systemNoticeId;
-    @EntityField(name = "用户uuid", type = ApiParamType.STRING)
+    @EntityField(name = "nfsn.systemnoticeuservo.entityfield.name.useruuid", type = ApiParamType.STRING)
     private String userUuid;
-    @EntityField(name = "是否已读(1:已读;0:未读)", type = ApiParamType.INTEGER)
+    @EntityField(name = "nfsn.systemnoticeuservo.entityfield.name.isread", type = ApiParamType.INTEGER)
     private Integer isRead;
 
     public SystemNoticeUserVo(Long systemNoticeId, String userUuid) {

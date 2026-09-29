@@ -7,6 +7,6 @@ public class SystemNoticeExpiredTimeLessThanActiveTimeException extends ApiRunti
 	private static final long serialVersionUID = 4814546872753015236L;
 
 	public SystemNoticeExpiredTimeLessThanActiveTimeException() {
-		super("公告失效时间不能早于生效时间");
+		super("nfsn.systemnoticeexpiredtimelessthanactivetimeexception.message");
 	}
 }

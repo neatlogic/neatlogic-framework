@@ -13,8 +13,8 @@ import java.util.List;
  * @date 2022/3/31 5:12 下午
  */
 public enum IntegrationAuditStatus implements IEnum {
-    SUCCEED("succeed", new I18n("成功")),
-    FAILED("failed", new I18n("失败"));
+    SUCCEED("succeed", new I18n("common.succeed")),
+    FAILED("failed", new I18n("common.failed"));
     private final String value;
     private final I18n text;
 
@@ -28,7 +28,7 @@ public enum IntegrationAuditStatus implements IEnum {
     }
 
     public String getText() {
-        return $.t(text.toString());
+        return text.toString();
     }
 
     @Override

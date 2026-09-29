@@ -14,11 +14,11 @@ import java.io.Serializable;
  **/
 public class SystemNoticeRecipientVo implements Serializable {
     private static final long serialVersionUID = 2910089979265665036L;
-    @EntityField(name = "公告id", type = ApiParamType.LONG)
+    @EntityField(name = "nfsn.systemnoticerecipientvo.entityfield.name.systemnoticeid", type = ApiParamType.LONG)
     private Long systemNoticeId;
-    @EntityField(name = "通知对象uuid", type = ApiParamType.STRING)
+    @EntityField(name = "nfsn.systemnoticerecipientvo.entityfield.name.uuid", type = ApiParamType.STRING)
     private String uuid;
-    @EntityField(name = "类型", type = ApiParamType.STRING)
+    @EntityField(name = "nfsn.systemnoticerecipientvo.entityfield.name.type", type = ApiParamType.STRING)
     private String type;
 
     public Long getSystemNoticeId() {

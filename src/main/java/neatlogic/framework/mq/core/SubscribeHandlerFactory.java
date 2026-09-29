@@ -36,6 +36,9 @@ public class SubscribeHandlerFactory extends ModuleInitializedListenerBase imple
         return componentMap.get(handlerId);
     }
 
+    /**
+     * 按当前请求语言重新生成订阅处理器列表，避免在模块初始化时缓存已翻译的标签。
+     */
     public static List<SubscribeHandlerVo> getSubscribeHandlerList() {
         List<SubscribeHandlerVo> result = new ArrayList<>();
         for (ISubscribeHandler component : subscribeHandlerList) {

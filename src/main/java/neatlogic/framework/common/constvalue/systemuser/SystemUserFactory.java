@@ -18,10 +18,7 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class SystemUserFactory {
     private static final Map<String, ISystemUser> systemUserMap = new HashMap<>();
@@ -89,6 +86,18 @@ public class SystemUserFactory {
             }
         }
         return null;
+    }
+
+    /**
+     * 获取已注册系统用户的独立列表，按用户 ID、UUID 排序，不构造用户凭据。
+     *
+     * @return 已注册系统用户列表，修改列表不会影响工厂注册信息
+     */
+    public static List<ISystemUser> getSystemUserList() {
+        List<ISystemUser> systemUserList = new ArrayList<>(systemUserMap.values());
+        systemUserList.sort(Comparator.comparing(ISystemUser::getUserId)
+                .thenComparing(ISystemUser::getUserUuid));
+        return systemUserList;
     }
 
     public static String getUserTokenByUser(String user) {

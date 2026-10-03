@@ -504,6 +504,24 @@
         WHERE b.`auth` = #{auth}
         ORDER BY b.`id`
     </select>
+    <!-- 系统内置用户可以没有普通用户记录，直接查询授权关系，空候选列表不得扩大查询范围。 -->
+    <select id="getUserUuidListByAuthAndUserUuidList" resultType="java.lang.String" useCache="false">
+        SELECT DISTINCT `user_uuid`
+        FROM `user_authority`
+        WHERE `auth` = #{auth}
+        <choose>
+            <when test="userUuidList != null and userUuidList.size() > 0">
+                AND `user_uuid` IN
+                <foreach collection="userUuidList" item="userUuid" open="(" separator="," close=")">
+                    #{userUuid}
+                </foreach>
+            </when>
+            <otherwise>
+                AND 1 = 0
+            </otherwise>
+        </choose>
+        ORDER BY `user_uuid`
+    </select>
     <!-- 用户编辑页面用到该语句，不能使用缓存-->
     <select id="searchUserAuthByUserUuid" parameterType="String" resultType="neatlogic.framework.dto.UserAuthVo"
             useCache="false">

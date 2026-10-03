@@ -73,6 +73,16 @@ public interface UserMapper {
 
     List<UserVo> searchUserByAuth(String auth);
 
+    /**
+     * 查询指定用户 UUID 列表中直接拥有目标权限的用户，不依赖普通用户表。
+     *
+     * @param auth 权限标识
+     * @param userUuidList 候选用户 UUID 列表，空列表不返回任何用户
+     * @return 去重后的用户 UUID 列表
+     */
+    List<String> getUserUuidListByAuthAndUserUuidList(@Param("auth") String auth,
+                                                   @Param("userUuidList") List<String> userUuidList);
+
     List<UserAuthVo> searchUserAuthByUserUuid(String userUuid);
 
     List<UserAuthVo> searchUserAllAuthByUserAuth(@Param("authenticationInfoVo") AuthenticationInfoVo authenticationInfoVo);

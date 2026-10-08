@@ -91,6 +91,7 @@ public class LoginController {
     @Resource
     private TenantMapper tenantMapper;
 
+    /** 完成租户登录，并在登录后处理执行前应用请求时区。 */
     @RequestMapping(value = "/check/{tenant}")
     public void dispatcherForPost(@RequestBody String json, @PathVariable("tenant") String tenant,
                                   HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -186,7 +187,7 @@ public class LoginController {
                         checkUserVo = loginAuth.login(userVo, returnObj);
                     }
                     if (checkUserVo != null) {
-                        String timezone = TimeUtil.ZONE_TIME;
+                        String timezone = UserTimezoneResolver.getRequestTimezone(request);
                         authenticationInfoVo = authenticationInfoService.getAuthenticationInfo(checkUserVo.getUuid());
                         UserContext.init(checkUserVo, authenticationInfoVo, timezone);
                         if (TenantContext.get().getTenantUuid() != null) {

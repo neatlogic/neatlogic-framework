@@ -36,9 +36,10 @@ import java.util.Objects;
 @Component
 @DisallowConcurrentExecution
 public class ReportDataSourceJob extends JobBase {
+    /** 返回数据仓库数据源同步作业的语言 key，避免服务启动时固定显示语言。 */
     @Override
     public String getName() {
-        return "数据仓库数据源同步";
+        return "framework.scheduler.job.reportdatasource.name";
     }
 
     //static Logger logger = LoggerFactory.getLogger(ReportDataSourceJob.class);

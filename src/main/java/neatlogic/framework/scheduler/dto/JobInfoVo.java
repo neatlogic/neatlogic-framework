@@ -13,6 +13,7 @@
 package neatlogic.framework.scheduler.dto;
 
 import neatlogic.framework.scheduler.core.SchedulerManager;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -212,17 +213,17 @@ public class JobInfoVo {
         }
         switch (state) {
             case "NORMAL":
-                return "正常";
+                return $.t("framework.scheduler.state.normal");
             case "PAUSED":
-                return "暂停";
+                return $.t("framework.scheduler.state.paused");
             case "COMPLETE":
-                return "完成";
+                return $.t("framework.scheduler.state.complete");
             case "ERROR":
-                return "错误";
+                return $.t("framework.scheduler.state.error");
             case "BLOCKED":
-                return "阻塞";
+                return $.t("framework.scheduler.state.blocked");
             case "NONE":
-                return "不存在";
+                return $.t("framework.scheduler.state.none");
             default:
                 return state;
         }

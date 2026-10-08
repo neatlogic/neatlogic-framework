@@ -31,9 +31,10 @@ import java.util.Date;
 @Component
 @DisallowConcurrentExecution
 public class UserSessionCleanerJob extends JobBase {
+    /** 返回用户会话清理作业的语言 key，避免服务启动时固定显示语言。 */
     @Override
     public String getName() {
-        return "用户会话定时清理";
+        return "framework.scheduler.job.usersessioncleaner.name";
     }
 
     @Resource

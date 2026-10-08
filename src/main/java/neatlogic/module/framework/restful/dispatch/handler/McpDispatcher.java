@@ -24,7 +24,7 @@ import neatlogic.framework.restful.enums.ApiAccessType;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.mcp.McpToolMetadataBuilder;
 import neatlogic.framework.service.AuthenticationInfoService;
-import neatlogic.framework.util.TimeUtil;
+import neatlogic.framework.util.UserTimezoneResolver;
 import neatlogic.module.framework.filter.handler.BearerTokenAuthHandler;
 import neatlogic.module.framework.filter.handler.DefaultLoginAuthHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -266,7 +266,7 @@ public class McpDispatcher {
         } else {
             userVo.setAuthorization(authorization);
         }
-        UserContext userContext = UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
+        UserContext userContext = UserContext.init(userVo, authenticationInfoVo, UserTimezoneResolver.getRequestTimezone(request));
         request.setAttribute("userId", userContext.getUserId());
         request.setAttribute("userName", userContext.getUserName());
         return true;

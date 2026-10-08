@@ -16,7 +16,7 @@ import neatlogic.framework.listener.ThreadlocalClearListener;
 import neatlogic.framework.restful.annotation.AuthUser;
 import neatlogic.framework.restful.core.ApiComponentTemplateBase;
 import neatlogic.framework.service.AuthenticationInfoService;
-import neatlogic.framework.util.TimeUtil;
+import neatlogic.framework.config.FrameworkTenantConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -519,7 +519,7 @@ public class ApiAuthContextTest {
         userVo.setUserId(userUuid);
         userVo.setAuthorization("test-authorization");
         userVo.setIsSuperAdmin(isSuperAdmin);
-        UserContext.init(userVo, new AuthenticationInfoVo(userUuid), TimeUtil.ZONE_TIME);
+        UserContext.init(userVo, new AuthenticationInfoVo(userUuid), FrameworkTenantConfig.TENANT_DEFAULT_TIMEZONE.getValue());
         USER_MAP.put(userUuid, createUser(userUuid, isSuperAdmin));
     }
 

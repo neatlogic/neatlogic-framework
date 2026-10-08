@@ -19,7 +19,6 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.util.$;
-import neatlogic.framework.util.TimeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,12 +63,6 @@ public enum SystemUser implements ISystemUser {
     public String getUserName() {
         return $.t(userName);
     }
-
-    @Override
-    public String getTimezone() {
-        return TimeUtil.ZONE_TIME;
-    }
-
 
     @Override
     public UserVo getUserVo() {

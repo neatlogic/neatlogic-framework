@@ -15,11 +15,12 @@ public interface ILoginAuthHandler {
     String getType();
 
     /**
-     * 使用场景：接口访问时拦截自定义认证
+     * 使用入口已解析的时区完成认证，并在认证成功后初始化用户上下文。
      *
-     * @return 返回的用户对象，必须包含uuid,否则返回的用户无效
+     * @param timezone 已按请求或租户参数解析的时区
+     * @return 返回的用户对象，必须包含 uuid，否则返回的用户无效
      */
-    UserVo auth(HttpServletRequest request, HttpServletResponse response) throws Exception;
+    UserVo auth(HttpServletRequest request, HttpServletResponse response, String timezone) throws Exception;
 
 
     /**

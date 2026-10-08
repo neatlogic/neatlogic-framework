@@ -17,7 +17,7 @@ import neatlogic.framework.restful.core.privateapi.raw.RawApiComponentBase;
 import neatlogic.framework.restful.core.privateapi.sse.SseApiComponentBase;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.util.SpringContextUtil;
-import neatlogic.framework.util.TimeUtil;
+import neatlogic.framework.config.FrameworkTenantConfig;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -91,7 +91,7 @@ public class ApiAuthExecutionChainTest {
         userVo.setUserId(SystemUser.SYSTEM.getUserId());
         userVo.setAuthorization("test-authorization");
         userVo.setIsSuperAdmin(false);
-        UserContext.init(userVo, new AuthenticationInfoVo(userVo.getUuid()), TimeUtil.ZONE_TIME);
+        UserContext.init(userVo, new AuthenticationInfoVo(userVo.getUuid()), FrameworkTenantConfig.TENANT_DEFAULT_TIMEZONE.getValue());
         TenantContext.init("test-tenant");
     }
 

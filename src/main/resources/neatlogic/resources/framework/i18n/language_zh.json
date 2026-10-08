@@ -395,6 +395,13 @@
     "number": "数字",
     "object": "任意对象",
     "oldvalue": "旧值",
+    "operation": {
+      "create": "增加",
+      "delete": "删除",
+      "operate": "操作",
+      "search": "查询",
+      "update": "更新"
+    },
     "owner": "所有者",
     "ownereditable": "是否可编辑维护人",
     "owneruuid": "维护人",
@@ -592,13 +599,94 @@
     }
   },
   "file": {
+    "handler": {
+      "datawarehousedatasourcefilehandler": {
+        "displayname": "数据仓库数据源配置文件"
+      },
+      "formuploadfilehandler": {
+        "displayname": "表单上传文件"
+      },
+      "formuploadfiletemplatehandler": {
+        "displayname": "表单上传文件模板"
+      },
+      "frameworkfilehandler": {
+        "displayname": "文件型属性附件"
+      }
+    },
     "type": {
       "image": "图片文件"
     }
   },
   "framework": {
+    "healthcheck": {
+      "databasefragment": {
+        "byte": "字节",
+        "datafree": "数据空闲空间（字节）",
+        "datafreetext": "数据空闲空间（带单位）",
+        "datarows": "行数",
+        "datasize": "数据文件占用空间（字节）",
+        "datasizetext": "数据文件占用空间（带单位）",
+        "engine": "引擎",
+        "fragmentrate": "碎片率",
+        "indexsize": "索引文件占用空间（字节）",
+        "indexsizetext": "索引文件占用空间（带单位）",
+        "name": "表名",
+        "schema": "数据库名称",
+        "schematype": "数据库类型",
+        "sortlist": "排序",
+        "totalsize": "总占用空间（字节）",
+        "totalsizetext": "总占用空间（带单位）"
+      }
+    },
     "matrixtype": {
       "customdatasource": "自定义数据源"
+    },
+    "scheduler": {
+      "job": {
+        "auditcleaner": {
+          "name": "审计日志定时清理"
+        },
+        "integration": {
+          "name": "定时调用集成作业"
+        },
+        "licensevalid": {
+          "name": "许可证规则定时校验"
+        },
+        "messageclear": {
+          "name": "站内消息定时清理"
+        },
+        "purgelogincaptcha": {
+          "name": "清除登录验证码数据"
+        },
+        "reportdataexpire": {
+          "name": "数据仓库过期数据清理"
+        },
+        "reportdatasource": {
+          "name": "数据仓库数据源同步"
+        },
+        "usersessioncleaner": {
+          "name": "用户会话定时清理"
+        }
+      },
+      "state": {
+        "blocked": "阻塞",
+        "complete": "完成",
+        "error": "错误",
+        "none": "不存在",
+        "normal": "正常",
+        "paused": "暂停"
+      }
+    },
+    "usertimezoneresolver": {
+      "configreadfailed": "读取租户默认时区失败，使用参数内置默认值，租户：{0}",
+      "invalidcookieencoding": "时区 Cookie 编码无效，使用租户默认时区，异常类型：{0}",
+      "invalidoffset": "{0}不是有效 UTC 偏移量，使用下一级默认时区，异常类型：{1}",
+      "secondprecisionoffset": "{0}包含秒级偏移量，使用下一级默认时区",
+      "source": {
+        "explicit": "显式时区",
+        "request": "请求时区",
+        "tenantdefault": "租户默认时区"
+      }
     }
   },
   "fulltextindex": {
@@ -716,7 +804,8 @@
       "mobilefiledownloadenabled": "是否允许移动端下载附件",
       "passwordexpiredays": "用户密码有效期(天)，超过有效期则强制跳转改密码页面",
       "passwordneedexpiredcheck": "是否需要检验用户密码有效期，默认为0，不需要检查",
-      "tenantdefaultlanguage": "租户默认语言，支持 zh/en。语言优先级：Cookie > 租户默认语言 > 浏览器首选语言 > 中文"
+      "tenantdefaultlanguage": "租户默认语言，支持 zh/en。语言优先级：Cookie > 租户默认语言 > 浏览器首选语言 > 中文",
+      "tenantdefaulttimezone": "租户默认时区，使用固定 UTC 偏移量，例如 +08:00、-05:00 或 +05:45。有效请求 Cookie 优先；Cookie 缺失或无效时使用本参数。参数为空或无效时使用 +08:00。"
     }
   },
   "nfcc": {

@@ -25,6 +25,12 @@ public enum FrameworkTenantConfig implements ITenantConfig{
     PASSWORD_NEED_EXPIRED_CHECK("password.need.expired.check", "0","nfc.frameworktenantconfig.passwordneedexpiredcheck"),
     PASSWORD_EXPIRE_DAYS("password.expire.days", "30","nfc.frameworktenantconfig.passwordexpiredays"),
     TENANT_DEFAULT_LANGUAGE("tenant.default.language", null, ApiParamType.STRING, "zh,en", "nfc.frameworktenantconfig.tenantdefaultlanguage"),
+    TENANT_DEFAULT_TIMEZONE("tenant.default.timezone", "+08:00", ApiParamType.STRING, "nfc.frameworktenantconfig.tenantdefaulttimezone") {
+        @Override
+        public String getDescription() {
+            return $.t("nfc.frameworktenantconfig.tenantdefaulttimezone");
+        }
+    },
     IS_DEBUG("is.debug", "0", ApiParamType.INTEGER, "0,1", "nfc.frameworktenantconfig.isdebug"),
     MATRIX_COLUMNDATA_SEARCHFORBATCH_INPUTPARAM_SEARCHPARAMLIST_SIZE("matrix.columnData.searchForbatch.inputParam.searchParamList.size", "50", ApiParamType.INTEGER, "nfc.frameworktenantconfig.matrixcolumndatasearchforbatchinputparamsearchparamlistsize"),
     MATRIX_COLUMNDATA_SEARCHFORBATCH_REQUEST_CONCURRENCY("matrix.columnData.searchForbatch.request.concurrency", "1", ApiParamType.INTEGER, "nfc.frameworktenantconfig.matrixcolumndatasearchforbatchrequestconcurrency"),

@@ -67,6 +67,7 @@ public class FileTypeHandlerFactory extends ModuleInitializedListenerBase {
 		return null;
 	}
 
+	/** 注册文件类型处理器，并保留处理器引用以便按请求语言解析显示名称。 */
 	@Override
 	public void onInitialized(NeatLogicWebApplicationContext context) {
 		Map<String, IFileTypeHandler> myMap = context.getBeansOfType(IFileTypeHandler.class);
@@ -76,6 +77,7 @@ public class FileTypeHandlerFactory extends ModuleInitializedListenerBase {
 			FileTypeVo fileTypeVo = new FileTypeVo();
 			fileTypeVo.setName(typeHandler.getName());
 			fileTypeVo.setDisplayName(typeHandler.getDisplayName());
+			fileTypeVo.setHandler(typeHandler);
 			fileTypeVo.setModuleId(context.getId());
 			fileTypeList.add(fileTypeVo);
 		}

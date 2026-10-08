@@ -17,7 +17,7 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.healthcheck.enums.SchemaType;
 import neatlogic.framework.restful.annotation.EntityField;
-import org.apache.commons.lang3.StringUtils;
+import neatlogic.framework.util.$;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -26,35 +26,35 @@ import java.util.List;
  * 数据库表数据
  */
 public class DatabaseFragmentVo extends BasePageVo {
-    @EntityField(name = "schema名称", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.schema", type = ApiParamType.STRING)
     private String schema;
-    @EntityField(name = "schema类型", type = ApiParamType.ENUM, member = SchemaType.class)
+    @EntityField(name = "framework.healthcheck.databasefragment.schematype", type = ApiParamType.ENUM, member = SchemaType.class)
     private String schemaType = SchemaType.MAIN.getValue();
-    @EntityField(name = "表名", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.name", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "引擎", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.engine", type = ApiParamType.STRING)
     private String engine;
-    @EntityField(name = "行数", type = ApiParamType.INTEGER)
+    @EntityField(name = "framework.healthcheck.databasefragment.datarows", type = ApiParamType.INTEGER)
     private int dataRows;
-    @EntityField(name = "数据文件占用空间，单位：字节", type = ApiParamType.INTEGER)
+    @EntityField(name = "framework.healthcheck.databasefragment.datasize", type = ApiParamType.INTEGER)
     private int dataSize;
-    @EntityField(name = "数据文件占用空间（带单位）", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.datasizetext", type = ApiParamType.STRING)
     private String dataSizeText;
-    @EntityField(name = "索引文件占用空间，单位：字节", type = ApiParamType.INTEGER)
+    @EntityField(name = "framework.healthcheck.databasefragment.indexsize", type = ApiParamType.INTEGER)
     private int indexSize;
-    @EntityField(name = "索引文件占用空间（带单位）", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.indexsizetext", type = ApiParamType.STRING)
     private String indexSizeText;
-    @EntityField(name = "总使用占用空间，单位：字节", type = ApiParamType.INTEGER)
+    @EntityField(name = "framework.healthcheck.databasefragment.totalsize", type = ApiParamType.INTEGER)
     private int totalSize;
-    @EntityField(name = "总使用占用空间（带单位）", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.totalsizetext", type = ApiParamType.STRING)
     private String totalSizeText;
-    @EntityField(name = "数据空闲空间，单位：字节", type = ApiParamType.INTEGER)
+    @EntityField(name = "framework.healthcheck.databasefragment.datafree", type = ApiParamType.INTEGER)
     private int dataFree;
-    @EntityField(name = "数据空闲空间（带单位）", type = ApiParamType.STRING)
+    @EntityField(name = "framework.healthcheck.databasefragment.datafreetext", type = ApiParamType.STRING)
     private String dataFreeText;
-    @EntityField(name = "碎片率", type = ApiParamType.INTEGER)
+    @EntityField(name = "framework.healthcheck.databasefragment.fragmentrate", type = ApiParamType.INTEGER)
     private float fragmentRate;
-    @EntityField(name = "排序", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "framework.healthcheck.databasefragment.sortlist", type = ApiParamType.JSONARRAY)
     private List<String> sortList;
 
     public String getSchema() {
@@ -150,62 +150,55 @@ public class DatabaseFragmentVo extends BasePageVo {
         this.sortList = sortList;
     }
 
-    String[] units = new String[]{"字节", "K", "M", "G"};
+    private static final String[] SIZE_UNITS = new String[]{"", "K", "M", "G"};
+    private final DecimalFormat decimalFormat = new DecimalFormat("0.##");
 
+    /** 返回按当前语言显示的数据文件大小。 */
     public String getDataSizeText() {
-        if (StringUtils.isBlank(dataSizeText)) {
-            float d = dataSize;
-            int unitindex = 0;
-            while (d > 1024 && unitindex <= 3) {
-                d = d / 1024;
-                unitindex += 1;
-            }
-            dataSizeText = decimalFormat.format(d) + units[unitindex];
+        float d = dataSize;
+        int unitindex = 0;
+        while (d > 1024 && unitindex < SIZE_UNITS.length - 1) {
+            d = d / 1024;
+            unitindex += 1;
         }
-        return dataSizeText;
+        String unit = unitindex == 0 ? $.t("framework.healthcheck.databasefragment.byte") : SIZE_UNITS[unitindex];
+        return decimalFormat.format(d) + unit;
     }
 
-
+    /** 返回按当前语言显示的索引文件大小。 */
     public String getIndexSizeText() {
-        if (StringUtils.isBlank(indexSizeText)) {
-            float d = indexSize;
-            int unitindex = 0;
-            while (d > 1024 && unitindex <= 3) {
-                d = d / 1024;
-                unitindex += 1;
-            }
-            indexSizeText = decimalFormat.format(d) + units[unitindex];
+        float d = indexSize;
+        int unitindex = 0;
+        while (d > 1024 && unitindex < SIZE_UNITS.length - 1) {
+            d = d / 1024;
+            unitindex += 1;
         }
-        return indexSizeText;
+        String unit = unitindex == 0 ? $.t("framework.healthcheck.databasefragment.byte") : SIZE_UNITS[unitindex];
+        return decimalFormat.format(d) + unit;
     }
 
-
+    /** 返回按当前语言显示的总占用空间。 */
     public String getTotalSizeText() {
-        if (StringUtils.isBlank(totalSizeText)) {
-            float d = totalSize;
-            int unitindex = 0;
-            while (d > 1024 && unitindex <= 3) {
-                d = d / 1024;
-                unitindex += 1;
-            }
-            totalSizeText = decimalFormat.format(d) + units[unitindex];
+        float d = totalSize;
+        int unitindex = 0;
+        while (d > 1024 && unitindex < SIZE_UNITS.length - 1) {
+            d = d / 1024;
+            unitindex += 1;
         }
-        return totalSizeText;
+        String unit = unitindex == 0 ? $.t("framework.healthcheck.databasefragment.byte") : SIZE_UNITS[unitindex];
+        return decimalFormat.format(d) + unit;
     }
 
-    DecimalFormat decimalFormat = new DecimalFormat("0.##");
-
+    /** 返回按当前语言显示的数据空闲空间。 */
     public String getDataFreeText() {
-        if (StringUtils.isBlank(dataFreeText)) {
-            float d = dataFree;
-            int unitindex = 0;
-            while (d > 1024 && unitindex <= 3) {
-                d = d / 1024;
-                unitindex += 1;
-            }
-            dataFreeText = decimalFormat.format(d) + units[unitindex];
+        float d = dataFree;
+        int unitindex = 0;
+        while (d > 1024 && unitindex < SIZE_UNITS.length - 1) {
+            d = d / 1024;
+            unitindex += 1;
         }
-        return dataFreeText;
+        String unit = unitindex == 0 ? $.t("framework.healthcheck.databasefragment.byte") : SIZE_UNITS[unitindex];
+        return decimalFormat.format(d) + unit;
     }
 
 }

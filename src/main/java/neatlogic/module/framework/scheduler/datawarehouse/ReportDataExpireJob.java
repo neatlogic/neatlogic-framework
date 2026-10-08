@@ -34,9 +34,10 @@ import java.util.List;
 @Component
 @DisallowConcurrentExecution
 public class ReportDataExpireJob extends JobBase {
+    /** 返回数据仓库过期数据清理作业的语言 key，避免服务启动时固定显示语言。 */
     @Override
     public String getName() {
-        return "数据仓库过期数据清理";
+        return "framework.scheduler.job.reportdataexpire.name";
     }
 
     //static Logger logger = LoggerFactory.getLogger(ReportDataSourceJob.class);

@@ -395,6 +395,13 @@
     "number": "Number",
     "object": "Any object",
     "oldvalue": "Old value",
+    "operation": {
+      "create": "Create",
+      "delete": "Delete",
+      "operate": "Operate",
+      "search": "Search",
+      "update": "Update"
+    },
     "owner": "Owner",
     "ownereditable": "Can the maintainer be edited",
     "owneruuid": "Maintainer",
@@ -592,13 +599,94 @@
     }
   },
   "file": {
+    "handler": {
+      "datawarehousedatasourcefilehandler": {
+        "displayname": "Data Warehouse Data Source Configuration File"
+      },
+      "formuploadfilehandler": {
+        "displayname": "Form Upload File"
+      },
+      "formuploadfiletemplatehandler": {
+        "displayname": "Form Upload File Template"
+      },
+      "frameworkfilehandler": {
+        "displayname": "File Attribute Attachment"
+      }
+    },
     "type": {
       "image": "Image File"
     }
   },
   "framework": {
+    "healthcheck": {
+      "databasefragment": {
+        "byte": "Bytes",
+        "datafree": "Free Data Space (Bytes)",
+        "datafreetext": "Free Data Space (Formatted)",
+        "datarows": "Rows",
+        "datasize": "Data File Size (Bytes)",
+        "datasizetext": "Data File Size (Formatted)",
+        "engine": "Engine",
+        "fragmentrate": "Fragmentation Rate",
+        "indexsize": "Index File Size (Bytes)",
+        "indexsizetext": "Index File Size (Formatted)",
+        "name": "Table Name",
+        "schema": "Database Name",
+        "schematype": "Database Type",
+        "sortlist": "Sort",
+        "totalsize": "Total Space Used (Bytes)",
+        "totalsizetext": "Total Space Used (Formatted)"
+      }
+    },
     "matrixtype": {
       "customdatasource": "Custom Data Source"
+    },
+    "scheduler": {
+      "job": {
+        "auditcleaner": {
+          "name": "Scheduled Audit Log Cleanup"
+        },
+        "integration": {
+          "name": "Scheduled Integration Job"
+        },
+        "licensevalid": {
+          "name": "Scheduled License Rule Validation"
+        },
+        "messageclear": {
+          "name": "Scheduled Internal Message Cleanup"
+        },
+        "purgelogincaptcha": {
+          "name": "Clear Login CAPTCHA Data"
+        },
+        "reportdataexpire": {
+          "name": "Data Warehouse Expired Data Cleanup"
+        },
+        "reportdatasource": {
+          "name": "Data Warehouse Data Source Synchronization"
+        },
+        "usersessioncleaner": {
+          "name": "Scheduled User Session Cleanup"
+        }
+      },
+      "state": {
+        "blocked": "Blocked",
+        "complete": "Completed",
+        "error": "Error",
+        "none": "Not Found",
+        "normal": "Normal",
+        "paused": "Paused"
+      }
+    },
+    "usertimezoneresolver": {
+      "configreadfailed": "Failed to read the tenant default time zone; using the built-in parameter default. Tenant: {0}",
+      "invalidcookieencoding": "Invalid time zone cookie encoding; using the tenant default time zone. Exception type: {0}",
+      "invalidoffset": "{0} is not a valid UTC offset; using the next fallback time zone. Exception type: {1}",
+      "secondprecisionoffset": "{0} contains a seconds component; using the next fallback time zone.",
+      "source": {
+        "explicit": "Explicit time zone",
+        "request": "Request time zone",
+        "tenantdefault": "Tenant default time zone"
+      }
     }
   },
   "fulltextindex": {
@@ -716,7 +804,8 @@
       "mobilefiledownloadenabled": "Do you allow mobile devices to download attachments",
       "passwordexpiredays": "User password validity period (days), if it exceeds the validity period, it will be forcibly redirected to the password change page",
       "passwordneedexpiredcheck": "Do you need to verify the validity period of the user password? It defaults to 0 and does not need to be checked",
-      "tenantdefaultlanguage": "Tenant default language. Supported values: zh/en. Language priority: Cookie > tenant default language > browser preferred language > Chinese"
+      "tenantdefaultlanguage": "Tenant default language. Supported values: zh/en. Language priority: Cookie > tenant default language > browser preferred language > Chinese",
+      "tenantdefaulttimezone": "Tenant default time zone, expressed as a fixed UTC offset, such as +08:00, -05:00, or +05:45. A valid request cookie takes precedence. This parameter applies when the cookie is missing or invalid. An empty or invalid parameter falls back to +08:00."
     }
   },
   "nfcc": {

@@ -42,9 +42,10 @@ import java.util.stream.Collectors;
 @Component
 @DisallowConcurrentExecution
 public class LicenseValidJob extends JobBase {
+    /** 返回许可证校验作业的语言 key，避免服务启动时固定显示语言。 */
     @Override
     public String getName() {
-        return "许可证规则定时校验";
+        return "framework.scheduler.job.licensevalid.name";
     }
 
     @Override

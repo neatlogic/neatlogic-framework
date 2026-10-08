@@ -31,6 +31,7 @@ import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.service.LoginService;
 import neatlogic.framework.util.TimeUtil;
+import neatlogic.framework.util.UserTimezoneResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,9 +43,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.time.ZoneOffset;
 import java.util.Date;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
@@ -82,30 +80,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         return request.getRequestURI().startsWith(contextPath + "/api/mcp/");
     }
 
+    /** 确定租户后解析请求时区，并在各认证分支完成后统一写入用户上下文。 */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
-        Cookie[] cookies = request.getCookies();
-        String timezone = TimeUtil.ZONE_TIME;
         //是否已过期
         boolean isExpired = false;
         UserVo userVo;
         String authType = "default";
         ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth(authType);
         ILoginAuthHandler loginAuth = defaultLoginAuth;
-        //获取时区
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("neatlogic_timezone".equals(cookie.getName())) {
-                    String timezoneTmp = (URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
-                    try {
-                        ZoneOffset.of(timezoneTmp);
-                        timezone = timezoneTmp;
-                    } catch (Exception ignored) {
-
-                    }
-                }
-            }
-        }
         //初始化request上下文
         RequestContext.init(request, request.getRequestURI(), response);
 
@@ -120,10 +103,11 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             }
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
+            String timezone = UserTimezoneResolver.getRequestTimezone(request);
             logger.debug("======= defaultLoginAuth: ");
             //先按 default 认证，不存在才根据具体 AuthType 认证用户
             try {
-                userVo = defaultLoginAuth.auth(cachedRequest, response);
+                userVo = defaultLoginAuth.auth(cachedRequest, response, timezone);
                 if (userVo != null) {
                     logger.debug("======= getUser succeed: " + userVo.getUuid());
                     UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
@@ -155,7 +139,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 if (StringUtils.isNotBlank(authType)) {
                     loginAuth = LoginAuthFactory.getLoginAuth(authType);
                     if (loginAuth != null) {
-                        userVo = loginAuth.auth(cachedRequest, response);
+                        userVo = loginAuth.auth(cachedRequest, response, timezone);
                         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                             logger.debug("======= getUser succeed: " + userVo.getUuid());
                         } else {

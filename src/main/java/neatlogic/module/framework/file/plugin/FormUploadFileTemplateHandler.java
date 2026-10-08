@@ -1,6 +1,7 @@
 package neatlogic.module.framework.file.plugin;
 
 import neatlogic.framework.file.core.FileTypeHandlerBase;
+import neatlogic.framework.util.$;
 import neatlogic.framework.file.dto.FileVo;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
@@ -23,8 +24,9 @@ public class FormUploadFileTemplateHandler extends FileTypeHandlerBase {
         return "FORMUPLOADFILETEMPLATE";
     }
 
+    /** 返回当前语言环境下的文件类型显示名称。 */
     @Override
     public String getDisplayName() {
-        return "表单上传文件模板";
+        return $.t("file.handler.formuploadfiletemplatehandler.displayname");
     }
 }

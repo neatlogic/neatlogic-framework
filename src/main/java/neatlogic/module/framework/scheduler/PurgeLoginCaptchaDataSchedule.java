@@ -27,9 +27,10 @@ public class PurgeLoginCaptchaDataSchedule extends PublicJobBase {
     @Resource
     LoginMapper loginMapper;
 
+    /** 返回登录验证码清理作业的语言 key，避免服务启动时固定显示语言。 */
     @Override
     public String getName() {
-        return "清除登录验证码数据";
+        return "framework.scheduler.job.purgelogincaptcha.name";
     }
 
     @Override

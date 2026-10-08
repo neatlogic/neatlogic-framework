@@ -30,7 +30,6 @@ import neatlogic.framework.service.LoginService;
 import neatlogic.framework.util.HeaderUtil;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.SnowflakeUtil;
-import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -103,8 +102,9 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
         loginService = _loginService;
     }
 
+    /** 使用上层入口已解析的时区初始化用户上下文，认证过程不再读取时区 Cookie。 */
     @Override
-    public UserVo auth(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public UserVo auth(HttpServletRequest request, HttpServletResponse response, String timezone) throws Exception {
         String tenant = request.getHeader("tenant");
         UserVo userVo = myAuth(request);
         //如果userVo没有uuid则这个user不合法，直接置null
@@ -170,7 +170,7 @@ public abstract class LoginAuthHandlerBase implements ILoginAuthHandler {
             userVo.setJwtVo(jwtVo);
             assert authenticationInfoVo != null;
             authenticationInfoVo.setUserUuid(userVo.getUuid());
-            UserContext.init(userVo, authenticationInfoVo, TimeUtil.ZONE_TIME);
+            UserContext.init(userVo, authenticationInfoVo, timezone);
             if (isNeedLoginPost) {
                 for (ILoginPostProcessor loginPostProcessor : LoginPostProcessorFactory.getLoginPostProcessorSet()) {
                     loginPostProcessor.loginAfterInitialization();

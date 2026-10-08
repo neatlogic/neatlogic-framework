@@ -20,13 +20,14 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.user.NoUserException;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
-import neatlogic.framework.util.TimeUtil;
+import neatlogic.framework.util.UserTimezoneResolver;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class UserContext implements Serializable {
     private String userName;
     private String userId;
     private String userUuid;
-    private String timezone = TimeUtil.ZONE_TIME;
+    private String timezone;
     private String token;
     private AuthenticationInfoVo authenticationInfoVo;
     //是否超级管理员
@@ -49,6 +50,7 @@ public class UserContext implements Serializable {
 
     private JwtVo jwtVo;
 
+    /** 复制已解析的时区快照，异步任务不重新读取租户配置。 */
     public UserContext copy() {
         UserContext userContext = new UserContext();
         userContext.setToken(token);
@@ -65,16 +67,25 @@ public class UserContext implements Serializable {
         return userContext;
     }
 
+    /** 新上下文解析租户默认时区，已有上下文按原值复制。 */
     public static UserContext init(UserContext _userContext) {
         UserContext context = new UserContext();
         if (_userContext != null) {
             context = _userContext.copy();
+        } else {
+            context.setTimezone(normalizeTimezone(null));
         }
         instance.set(context);
         MDC.put("userId", context.getUserId());
         return context;
     }
 
+    /** 初始化使用当前租户默认时区的用户上下文。 */
+    public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo) {
+        return init(userVo, authenticationInfoVo, null);
+    }
+
+    /** 初始化用户上下文，显式时区优先，缺失或无效时解析租户默认值。 */
     public static UserContext init(UserVo userVo, AuthenticationInfoVo authenticationInfoVo, String timezone) {
         UserContext context = new UserContext();
         context.setUserId(userVo.getUserId());
@@ -91,7 +102,7 @@ public class UserContext implements Serializable {
         }
         context.setToken(token);
         context.setIsSuperAdmin(userVo.getIsSuperAdmin());
-        context.setTimezone(timezone);
+        context.setTimezone(normalizeTimezone(timezone));
         context.setAuthenticationInfoVo(authenticationInfoVo);
         if (userVo.getJwtVo() != null) {
             context.setTokenHash(userVo.getJwtVo().getTokenHash());
@@ -102,8 +113,15 @@ public class UserContext implements Serializable {
         return context;
     }
 
+    /** 系统身份使用当前租户默认时区初始化，时区不属于系统用户属性。 */
     public static UserContext init(ISystemUser systemUser) {
-        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo(), systemUser.getTimezone());
+        return init(systemUser.getUserVo(), systemUser.getAuthenticationInfoVo());
+    }
+
+    /** 将显式值或租户默认值统一保存为 ±HH:mm。 */
+    private static String normalizeTimezone(String timezone) {
+        ZoneOffset offset = UserTimezoneResolver.resolve(timezone);
+        return ZoneOffset.UTC.equals(offset) ? "+00:00" : offset.getId();
     }
 
 

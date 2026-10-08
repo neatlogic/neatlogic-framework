@@ -45,9 +45,10 @@ public class IntegrationJob extends PublicJobBase {
     @Resource
     private IntegrationMapper integrationMapper;
 
+    /** 返回集成作业的语言 key，避免服务启动时固定显示语言。 */
     @Override
     public String getName() {
-        return "定时调用集成作业";
+        return "framework.scheduler.job.integration.name";
     }
 
     @Prop({

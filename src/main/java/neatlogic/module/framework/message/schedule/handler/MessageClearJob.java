@@ -31,9 +31,10 @@ import java.util.Date;
 @Service
 @DisallowConcurrentExecution
 public class MessageClearJob extends JobBase {
+    /** 返回当前语言环境下的站内消息清理作业名称。 */
     @Override
     public String getName() {
-        return "站内消息定时清理";
+        return "framework.scheduler.job.messageclear.name";
     }
 
     @Resource

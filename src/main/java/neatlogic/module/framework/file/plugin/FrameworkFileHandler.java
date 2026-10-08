@@ -14,6 +14,7 @@ package neatlogic.module.framework.file.plugin;
 
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.file.core.FileTypeHandlerBase;
+import neatlogic.framework.util.$;
 import neatlogic.framework.file.dto.FileVo;
 import org.springframework.stereotype.Component;
 
@@ -31,9 +32,10 @@ public class FrameworkFileHandler extends FileTypeHandlerBase {
         return true;
     }
 
+    /** 返回当前语言环境下的文件类型显示名称。 */
     @Override
     public String getDisplayName() {
-        return "文件型属性附件";
+        return $.t("file.handler.frameworkfilehandler.displayname");
     }
 
     @Override

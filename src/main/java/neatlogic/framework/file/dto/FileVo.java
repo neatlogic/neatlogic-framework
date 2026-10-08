@@ -81,11 +81,12 @@ public class FileVo extends BaseEditorVo {
         this.analyzedResult = analyzedResult;
     }
 
+    /** 返回当前请求语言下的附件类型显示名称，避免缓存上一种语言的结果。 */
     public String getTypeText() {
         if (StringUtils.isNotBlank(type)) {
             IFileTypeHandler handler = FileTypeHandlerFactory.getHandler(type);
             if (handler != null) {
-                typeText = handler.getDisplayName();
+                return handler.getDisplayName();
             }
         }
         return typeText;

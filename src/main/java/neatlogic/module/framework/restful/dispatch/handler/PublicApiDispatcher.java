@@ -47,7 +47,7 @@ import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
 import neatlogic.framework.restful.ratelimiter.RateLimiterTokenBucket;
 import neatlogic.framework.service.AuthenticationInfoService;
-import neatlogic.framework.util.TimeUtil;
+import neatlogic.framework.util.UserTimezoneResolver;
 import neatlogic.module.framework.restful.counter.ApiAccessCountService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -61,12 +61,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.annotation.Resource;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
@@ -90,6 +88,7 @@ public class PublicApiDispatcher {
     private AuthenticationInfoService authenticationInfoService;
 
 
+    /** 公共接口的实名和系统身份均使用当前租户下解析的请求时区。 */
     private void doIt(HttpServletRequest request, HttpServletResponse response, String token, ApiType apiType, JSONObject paramObj, JSONObject returnObj, String action) throws Exception {
         UserContext userContext = UserContext.get();
         if (userContext != null) {
@@ -106,17 +105,6 @@ public class PublicApiDispatcher {
         }
         InputFromContext.init(inputFrom);
         RequestContext.init(request, token, response).setParam(JSON.toJSONString(paramObj, SerializerFeature.PrettyFormat));
-        //初始化时区
-        Cookie[] cookies = request.getCookies();
-        String timezone = TimeUtil.ZONE_TIME;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("neatlogic_timezone".equals(cookie.getName())) {
-                    timezone = (URLDecoder.decode(cookie.getValue(), "UTF-8"));
-                }
-            }
-        }
-
         //authorization
         String authorization = request.getHeader("Authorization");
 
@@ -128,6 +116,7 @@ public class PublicApiDispatcher {
 
         TenantContext.init();
         TenantContext.get().switchTenant(tenant);
+        String timezone = UserTimezoneResolver.getRequestTimezone(request);
 
         //自定义接口 访问人初始化
         String user = request.getHeader("User");
@@ -143,7 +132,8 @@ public class PublicApiDispatcher {
         }
         if (userVo == null) {
             RequestContext.init(request, request.getRequestURI(), response);
-            UserContext.init(SystemUser.SYSTEM);
+            // 已有请求时区快照，直接用于系统身份初始化，避免先查询默认值再覆盖。
+            UserContext.init(SystemUser.SYSTEM.getUserVo(), SystemUser.SYSTEM.getAuthenticationInfoVo(), timezone);
         }
 
         ApiVo interfaceVo = apiMapper.getApiByToken(token);

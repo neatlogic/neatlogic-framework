@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
+import neatlogic.framework.file.core.IFileTypeHandler;
 
 public class FileTypeVo {
 	@EntityField(name = "名称",
@@ -17,6 +18,7 @@ public class FileTypeVo {
 	private String moduleId;
 	private String config;
 	private JSONObject configObj;
+	private transient IFileTypeHandler handler;
 
 	public String getName() {
 		return name;
@@ -26,12 +28,21 @@ public class FileTypeVo {
 		this.name = name;
 	}
 
+	/** 返回当前语言环境下的文件类型显示名称。 */
 	public String getDisplayName() {
+		if (handler != null) {
+			return handler.getDisplayName();
+		}
 		return displayName;
 	}
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	/** 绑定文件类型处理器，使显示名称可按当前请求语言动态解析。 */
+	public void setHandler(IFileTypeHandler handler) {
+		this.handler = handler;
 	}
 
 	public String getModuleId() {

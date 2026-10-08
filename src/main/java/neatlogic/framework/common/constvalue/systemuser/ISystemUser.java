@@ -26,8 +26,6 @@ public interface ISystemUser {
 
     String getUserName();
 
-    String getTimezone();
-
     String getToken();
 
     UserVo getUserVo();

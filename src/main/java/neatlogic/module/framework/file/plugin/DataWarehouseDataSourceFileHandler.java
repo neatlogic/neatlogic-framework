@@ -17,6 +17,7 @@ import neatlogic.framework.auth.core.AuthActionChecker;
 import neatlogic.framework.auth.label.DATA_WAREHOUSE_MODIFY;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.file.core.FileTypeHandlerBase;
+import neatlogic.framework.util.$;
 import neatlogic.framework.file.dto.FileVo;
 import org.springframework.stereotype.Component;
 
@@ -36,9 +37,10 @@ public class DataWarehouseDataSourceFileHandler extends FileTypeHandlerBase {
         return "DATASOURCE";
     }
 
+    /** 返回当前语言环境下的文件类型显示名称。 */
     @Override
     public String getDisplayName() {
-        return "数据仓库数据源配置文件";
+        return $.t("file.handler.datawarehousedatasourcefilehandler.displayname");
     }
 
     @Override

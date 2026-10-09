@@ -16,8 +16,9 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.auth.core.AuthActionChecker;
+import neatlogic.framework.auth.label.FILE_DOWNLOAD;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.common.util.FileUtil;
 import neatlogic.framework.crossover.IFileCrossoverService;
 import neatlogic.framework.exception.file.FileAccessDeniedException;
@@ -79,6 +80,7 @@ public class FileServiceImpl implements IFileCrossoverService {
         return fileMapper.getFileById(id);
     }
 
+    /** 全局下载权限与文件类型对象授权共用下载链路，保留租户和文件存在性校验。 */
     @Override
     public void downloadFile(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) throws Exception {
         Long id = paramObj.getLong("id");
@@ -106,8 +108,8 @@ public class FileServiceImpl implements IFileCrossoverService {
         if (fileVo != null) {
             IFileTypeHandler fileTypeHandler = FileTypeHandlerFactory.getHandler(fileVo.getType());
             if (fileTypeHandler != null) {
-                //system 用户下载权限豁免
-                if (Objects.equals(UserContext.get().getUserUuid(), SystemUser.SYSTEM.getUserUuid()) || fileTypeHandler.valid(UserContext.get().getUserUuid(), fileVo, paramObj)) {
+                // 全局下载授权或附件类型自身的对象授权均可下载。
+                if (AuthActionChecker.check(FILE_DOWNLOAD.class) || fileTypeHandler.valid(UserContext.get().getUserUuid(), fileVo, paramObj)) {
                     ServletOutputStream os = null;
                     InputStream in = null;
                     in = FileUtil.getData(fileVo.getPath());

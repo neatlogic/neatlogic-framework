@@ -24,6 +24,10 @@
       "description": "Add, remove, and otherwise modify online help documentation associated with modules and menus.",
       "name": "Online Help Documentation Configuration Permission"
     },
+    "file_download": {
+      "description": "Allows downloading all attachments in the current tenant without granting deletion or other management permissions.",
+      "name": "Global Attachment Download"
+    },
     "file_modify": {
       "description": "Manage all attachments.",
       "name": "Attachment Management Permission"
@@ -618,6 +622,15 @@
     }
   },
   "framework": {
+    "authvo": {
+      "authgroup": "Permission Group Identifier",
+      "authgroupname": "Permission Group Name",
+      "displayname": "Permission Name",
+      "iscommercial": "Commercial Permission",
+      "name": "Permission Identifier",
+      "rolecount": "Role Count",
+      "usercount": "User Count"
+    },
     "healthcheck": {
       "databasefragment": {
         "byte": "Bytes",

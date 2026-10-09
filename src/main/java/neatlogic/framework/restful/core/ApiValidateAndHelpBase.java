@@ -22,7 +22,6 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.core.AuthAction;
 import neatlogic.framework.auth.core.AuthActionChecker;
-import neatlogic.framework.auth.core.ApiAuthContext;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
@@ -296,17 +295,9 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
         List<String> authNameList = new ArrayList<>();
         if (apiClass != null) {
             if (!Objects.equals(TenantContext.get().getTenantUuid(), "master")) {
-                //判断是否系统用户豁免接口
-                isAuth = ApiAuthContext.isCurrentSystemUserExempt();
-                if (!isAuth) {
-                    //AuthAction action = apiClass.getAnnotation(AuthAction.class);
-                    AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
-                    if (actions.length > 0) {
-                        isAuth = isApiAuth(apiClass, authNameList, actions);
-                    } else {
-                        isAuth = true;
-                    }
-                }
+                // 功能权限只由声明的权限与实际授权决定，不按系统身份豁免。
+                AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
+                isAuth = actions.length == 0 || isApiAuth(apiClass, authNameList, actions);
             } else {
                 isAuth = true;
             }

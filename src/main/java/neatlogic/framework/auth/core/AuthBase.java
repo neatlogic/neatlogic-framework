@@ -12,15 +12,26 @@
 
 package neatlogic.framework.auth.core;
 
+import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Collections;
 import java.util.Objects;
 
+/** 权限定义底座，模块自行声明包含关系与系统用户默认授权，不承载页面授权存储。 */
 public abstract class AuthBase {
 
     private String authModule;
+
+    /**
+     * 声明当前权限的系统用户出厂授权；由代码维护，不写入页面授权记录。
+     * 未声明时不向任何系统用户授予当前权限。
+     */
+    public List<ISystemUser> getDefaultSystemUserList() {
+        return Collections.emptyList();
+    }
 
     public final String getAuthName() {
         return this.getClass().getSimpleName();

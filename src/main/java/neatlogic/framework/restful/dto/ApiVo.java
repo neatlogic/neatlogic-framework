@@ -18,6 +18,7 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BasePageVo;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.common.util.RC4Util;
+import neatlogic.framework.dto.AuthVo;
 import neatlogic.framework.dto.module.ModuleGroupVo;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.restful.annotation.EntityField;
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/** 接口定义与运行配置；声明的执行权限由详情查询补充，不参与配置持久化。 */
 public class ApiVo extends BasePageVo implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3689437871016436622L;
@@ -67,6 +69,9 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
     private List<String> authTypeList = new ArrayList<>(List.of(ApiAuthType.HMAC.getValue()));
     @EntityField(name = "认证方式明", type = ApiParamType.STRING)
     private List<String> authTypeNameList;
+    // null 表示处理器未解析或未加载权限信息，空列表表示无需接口级功能权限。
+    @EntityField(name = "common.executeauthoritylist", type = ApiParamType.JSONARRAY, member = AuthVo.class)
+    private List<AuthVo> requiredAuthList;
     @EntityField(name = "请求时效", type = ApiParamType.INTEGER)
     private Integer timeout = 0;
     @EntityField(name = "是否失效", type = ApiParamType.BOOLEAN)
@@ -134,6 +139,14 @@ public class ApiVo extends BasePageVo implements Serializable, Cloneable {
 
     public void setIsMcp(Integer mcp) {
         isMcp = mcp;
+    }
+
+    public List<AuthVo> getRequiredAuthList() {
+        return requiredAuthList;
+    }
+
+    public void setRequiredAuthList(List<AuthVo> requiredAuthList) {
+        this.requiredAuthList = requiredAuthList;
     }
 
     public ApiVo() {

@@ -24,6 +24,10 @@
       "description": "对模块和菜单绑定的在线帮助文档进行添加、移除等修改操作",
       "name": "在线帮助文档配置管理权限"
     },
+    "file_download": {
+      "description": "允许下载当前租户内所有附件，不授予附件删除或其他管理权限。",
+      "name": "全局附件下载权限"
+    },
     "file_modify": {
       "description": "对所有附件进行管理",
       "name": "附件管理权限"
@@ -618,6 +622,15 @@
     }
   },
   "framework": {
+    "authvo": {
+      "authgroup": "权限组标识",
+      "authgroupname": "权限组名称",
+      "displayname": "权限名称",
+      "iscommercial": "是否商业权限",
+      "name": "权限标识",
+      "rolecount": "角色数量",
+      "usercount": "用户数量"
+    },
     "healthcheck": {
       "databasefragment": {
         "byte": "字节",

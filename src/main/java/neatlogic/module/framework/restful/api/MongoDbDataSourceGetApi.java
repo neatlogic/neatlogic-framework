@@ -16,7 +16,6 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.auth.core.AuthAction;
 import neatlogic.framework.auth.label.ADMIN;
-import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dto.MongoDbVo;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 @Service
-@AuthUser(SystemUser.AUTOEXEC)
+
 @AuthAction(action = ADMIN.class)
 @OperationType(type = OperationTypeEnum.SEARCH)
 public class MongoDbDataSourceGetApi extends PrivateApiComponentBase {

@@ -8,13 +8,13 @@ import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.auth.label.USER_MODIFY;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
+import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
 import neatlogic.framework.dto.UserVo;
-import neatlogic.framework.listener.ThreadlocalClearListener;
-import neatlogic.framework.restful.annotation.AuthUser;
-import neatlogic.framework.restful.core.ApiComponentTemplateBase;
 import neatlogic.framework.service.AuthenticationInfoService;
 import neatlogic.framework.config.FrameworkTenantConfig;
 import org.junit.After;
@@ -25,7 +25,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,9 +37,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 验证同步 API 系统用户豁免及指定用户权限校验边界。
+ * 验证系统用户统一授权及指定用户权限校验边界。
  */
-public class ApiAuthContextTest {
+public class AuthActionCheckerTest {
     private static Field userMapperField;
     private static Object originalUserMapper;
     private static Field authenticationInfoServiceField;
@@ -49,8 +51,15 @@ public class ApiAuthContextTest {
     private static final AtomicInteger USER_QUERY_COUNT = new AtomicInteger();
     private static final AtomicInteger AUTHORIZATION_QUERY_COUNT = new AtomicInteger();
 
+    /** 反射注入测试权限后同步默认授权索引，避免测试依赖生产注册顺序。 */
+    private static void rebuildDefaultAuthIndex() throws Exception {
+        Method method = AuthFactory.class.getDeclaredMethod("initializeDefaultAuthMap");
+        method.setAccessible(true);
+        method.invoke(null);
+    }
+
     /**
-     * 安装不返回任何权限的 UserMapper，隔离数据库并使未豁免路径稳定返回无权限。
+     * 安装不返回任何权限的 UserMapper，隔离数据库并使未授权路径稳定返回无权限。
      */
     @BeforeClass
     public static void installDependencies() throws Exception {
@@ -122,7 +131,7 @@ public class ApiAuthContextTest {
      */
     @After
     public void cleanupContext() {
-        ApiAuthContext.release();
+
         if (UserContext.get() != null) {
             UserContext.get().release();
         }
@@ -130,117 +139,115 @@ public class ApiAuthContextTest {
     }
 
     /**
-     * 未声明当前系统用户豁免时，所有公开校验入口都必须进入实际权限判断。
+     * 所有系统用户校验入口都必须进入实际权限判断。
      */
     @Test
-    public void shouldRequireAuthForSystemUserWithoutMatchingAuthUser() {
+    public void shouldRequireActualAuthForSystemUser() {
         initUser(SystemUser.SYSTEM.getUserUuid());
-        ApiAuthContext.enter(OtherSystemUserApi.class);
 
         Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
         Assert.assertFalse(AuthActionChecker.check(SystemUser.SYSTEM.getUserUuid(), TestAuth.class));
     }
 
     /**
-     * 未豁免的系统用户拥有目标权限时仍可正常通过。
+     * 系统用户拥有页面授权时正常通过。
      */
     @Test
     public void shouldAllowSystemUserWithGrantedAuth() {
         initUser(SystemUser.SYSTEM.getUserUuid());
         userAuthList = Collections.singletonList(new UserAuthVo(SystemUser.SYSTEM.getUserUuid(), TestAuth.class.getSimpleName()));
-        ApiAuthContext.enter(OtherSystemUserApi.class);
 
         Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
         Assert.assertTrue(AuthActionChecker.check(SystemUser.SYSTEM.getUserUuid(), TestAuth.class));
     }
 
-    /**
-     * 接口显式匹配当前系统用户时，入口及同步业务内部校验均允许豁免。
-     */
+    /** 系统身份不能借用当前上下文的超级管理员标记放行。 */
     @Test
-    public void shouldBypassAuthForMatchingSystemUser() {
-        initUser(SystemUser.SYSTEM.getUserUuid());
-        ApiAuthContext.enter(SystemUserApi.class);
+    public void shouldIgnoreSuperAdminFlagForSystemUser() {
+        initUser(SystemUser.SYSTEM.getUserUuid(), true);
+        Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
+        Assert.assertEquals(0, USER_QUERY_COUNT.get());
+        Assert.assertEquals(0, AUTHENTICATION_INFO_QUERY_COUNT.get());
+    }
 
-        Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
-        Assert.assertTrue(AuthActionChecker.check(SystemUser.SYSTEM.getUserUuid(), TestAuth.class));
-        Assert.assertFalse(AuthActionChecker.check(SystemUser.AUTOEXEC.getUserUuid(), TestAuth.class));
+    /** 默认授权与页面授权取并集，包含关系复用原逻辑，并受租户模块启用状态约束。 */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldMergeCodeAndPageAuthWithinActiveModules() throws Exception {
+        Field authMapField = AuthFactory.class.getDeclaredField("authMap");
+        authMapField.setAccessible(true);
+        Map<String, AuthBase> authMap = (Map<String, AuthBase>) authMapField.get(null);
+        Map<String, AuthBase> originalAuthMap = new HashMap<>(authMap);
+        Field cacheField = TenantContext.class.getDeclaredField("tenantModuleGroupListMap");
+        cacheField.setAccessible(true);
+        Map<String, List<String>> cache = (Map<String, List<String>>) cacheField.get(null);
+        String tenantUuid = "code-auth-test-tenant";
+        List<String> originalGroups = cache.put(tenantUuid, new ArrayList<>(Collections.singletonList("test")));
+        ModuleVo module = new ModuleVo();
+        module.setId("code-auth-test-module");
+        module.setGroup("test");
+        ModuleUtil.addModule(module);
+        TenantContext.init(tenantUuid);
+        authMap.put(TEST_CODE_AUTH.class.getSimpleName(), new TEST_CODE_AUTH());
+        rebuildDefaultAuthIndex();
+        authMap.put(TEST_INCLUDED_AUTH.class.getSimpleName(), new TEST_INCLUDED_AUTH());
+        rebuildDefaultAuthIndex();
+        try {
+            initUser(SystemUser.SYSTEM.getUserUuid());
+            USER_AUTH_MAP.put(SystemUser.SYSTEM.getUserUuid(), Collections.singletonList(
+                    new UserAuthVo(SystemUser.SYSTEM.getUserUuid(), TestAuth.class.getSimpleName())));
+            Assert.assertTrue(AuthActionChecker.check(TEST_CODE_AUTH.class));
+            Assert.assertTrue(AuthActionChecker.check(TEST_INCLUDED_AUTH.class));
+            Assert.assertEquals("代码直接及包含权限命中不查询数据库", 0, AUTHORIZATION_QUERY_COUNT.get());
+            Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
+            Assert.assertTrue(AuthFactory.getDefaultAuthListBySystemUser("normal-user").isEmpty());
+
+            // 撤销页面记录不会撤销代码默认权限，也不会保留已撤销的页面权限。
+            USER_AUTH_MAP.put(SystemUser.SYSTEM.getUserUuid(), Collections.emptyList());
+            Assert.assertTrue(AuthActionChecker.check(TEST_INCLUDED_AUTH.class));
+            Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
+            List<UserAuthVo> expanded = new ArrayList<>(Collections.singletonList(
+                    new UserAuthVo(SystemUser.SYSTEM.getUserUuid(), new TEST_CODE_AUTH())));
+            UserContext.get().release();
+            AuthActionChecker.getAuthList(expanded);
+            Assert.assertEquals(2, expanded.size());
+            Assert.assertTrue(expanded.stream().allMatch(auth -> SystemUser.SYSTEM.getUserUuid().equals(auth.getUserUuid())));
+            Assert.assertTrue(AuthActionChecker.check(SystemUser.SYSTEM.getUserUuid(), TEST_INCLUDED_AUTH.class));
+
+            cache.put(tenantUuid, new ArrayList<>());
+            Assert.assertTrue(AuthFactory.getDefaultAuthListBySystemUser(SystemUser.SYSTEM.getUserUuid()).isEmpty());
+            Assert.assertFalse(AuthActionChecker.check(SystemUser.SYSTEM.getUserUuid(), TEST_INCLUDED_AUTH.class));
+            Assert.assertEquals(0, USER_QUERY_COUNT.get());
+        } finally {
+            authMap.clear();
+            authMap.putAll(originalAuthMap);
+            rebuildDefaultAuthIndex();
+            ModuleUtil.removeModule(module);
+            if (originalGroups == null) {
+                cache.remove(tenantUuid);
+            } else {
+                cache.put(tenantUuid, originalGroups);
+            }
+        }
     }
 
     /**
-     * AuthUser 不向普通用户授予权限。
+     * 系统身份不会向普通用户授予权限。
      */
     @Test
-    public void shouldNotApplyAuthUserToNormalUser() {
+    public void shouldNotGrantSystemPermissionsToNormalUser() {
         initUser("normal-user");
-        ApiAuthContext.enter(SystemUserApi.class);
 
         Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
     }
 
     /**
-     * 嵌套 API 必须使用内层声明，并在退出后恢复外层豁免。
+     * 普通异步线程必须按指定系统用户的实际权限校验。
      */
     @Test
-    public void shouldRestoreOuterScopeAfterNestedApi() {
+    public void shouldRequireAuthInAsyncThread() throws Exception {
         initUser(SystemUser.SYSTEM.getUserUuid());
-        ApiAuthContext.enter(SystemUserApi.class);
-        Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
 
-        ApiAuthContext.enter(OtherSystemUserApi.class);
-        Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
-        ApiAuthContext.exit();
-
-        Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
-    }
-
-    /**
-     * 请求结束清理应一次移除全部嵌套 API 鉴权状态，并允许重复清理。
-     */
-    @Test
-    public void shouldReleaseAllApiAuthStatesAtRequestEnd() {
-        initUser(SystemUser.SYSTEM.getUserUuid());
-        ApiAuthContext.enter(SystemUserApi.class);
-        ApiAuthContext.enter(SystemUserApi.class);
-        Assert.assertTrue(ApiAuthContext.isCurrentSystemUserExempt());
-
-        new ThreadlocalClearListener().requestDestroyed(null);
-        Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
-        Assert.assertTrue(ApiAuthContext.shouldBypassSystemUserAuth(SystemUser.SYSTEM.getUserUuid()));
-
-        ApiAuthContext.release();
-        ApiAuthContext.release();
-        Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
-    }
-
-    /**
-     * 重复声明的 AuthUser 任一匹配即可豁免，内层不匹配作用域退出后必须恢复外层状态。
-     */
-    @Test
-    public void shouldApplyAnyRepeatedAuthUserAndRestoreOuterScope() {
-        initUser(SystemUser.SYSTEM.getUserUuid());
-        ApiAuthContext.enter(MultipleSystemUserApi.class);
-        Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
-
-        ApiAuthContext.enter(OtherSystemUserApi.class);
-        Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
-        ApiAuthContext.exit();
-        Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
-        ApiAuthContext.exit();
-
-        UserContext.get().release();
-        initUser(SystemUser.ANONYMOUS.getUserUuid());
-        ApiAuthContext.enter(MultipleSystemUserApi.class);
-        Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
-    }
-
-    /**
-     * 普通 ThreadLocal 不向接口派生线程传播，异步线程保持后台系统用户放行规则。
-     */
-    @Test
-    public void shouldNotPropagateApiScopeToAsyncThread() throws Exception {
-        initUser(SystemUser.SYSTEM.getUserUuid());
-        ApiAuthContext.enter(OtherSystemUserApi.class);
         Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
 
         AtomicBoolean asyncResult = new AtomicBoolean(false);
@@ -249,20 +256,7 @@ public class ApiAuthContextTest {
         thread.start();
         thread.join();
 
-        Assert.assertTrue(asyncResult.get());
-    }
-
-    /**
-     * API 执行抛出异常时也必须清理当前作用域。
-     */
-    @Test(expected = Exception.class)
-    public void shouldRestoreScopeAfterException() throws Exception {
-        initUser(SystemUser.SYSTEM.getUserUuid());
-        try {
-            new TestApiTemplate().invokeFailure(OtherSystemUserApi.class);
-        } finally {
-            Assert.assertTrue(AuthActionChecker.check(TestAuth.class));
-        }
+        Assert.assertFalse(asyncResult.get());
     }
 
     /**
@@ -381,29 +375,29 @@ public class ApiAuthContextTest {
     }
 
     /**
-     * NeatLogicThread 只复制用户上下文，不继承同步 API 的系统用户鉴权状态。
+     * NeatLogicThread 复制用户上下文后仍执行实际权限校验。
      */
     @Test
-    public void shouldNotPropagateApiScopeToNeatLogicThread() throws Exception {
+    public void shouldRequireAuthInNeatLogicThread() throws Exception {
         initUser(SystemUser.SYSTEM.getUserUuid());
         TenantContext.init("test-tenant");
-        ApiAuthContext.enter(OtherSystemUserApi.class);
+
         Assert.assertFalse(AuthActionChecker.check(TestAuth.class));
 
         AtomicBoolean asyncResult = new AtomicBoolean(false);
-        NeatLogicThread task = new NeatLogicThread("api-auth-context-test") {
+        NeatLogicThread task = new NeatLogicThread("system-auth-check-test") {
             @Override
             protected void execute() {
                 asyncResult.set(AuthActionChecker.check(TestAuth.class));
             }
         };
         task.setNeedAwaitAdvance(false);
-        ApiAuthContext.exit();
+
         Thread thread = new Thread(task);
         thread.start();
         thread.join();
 
-        Assert.assertTrue(asyncResult.get());
+        Assert.assertFalse(asyncResult.get());
     }
 
     /**
@@ -536,42 +530,6 @@ public class ApiAuthContextTest {
     }
 
     /**
-     * 豁免 SYSTEM 用户的测试接口。
-     */
-    @AuthUser(SystemUser.SYSTEM)
-    private static class SystemUserApi {
-    }
-
-    /**
-     * 仅豁免 AUTOEXEC 用户的测试接口。
-     */
-    @AuthUser(SystemUser.AUTOEXEC)
-    private static class OtherSystemUserApi {
-    }
-
-    /**
-     * 同时豁免 AUTOEXEC 和 SYSTEM 用户的测试接口。
-     */
-    @AuthUser(SystemUser.AUTOEXEC)
-    @AuthUser(SystemUser.SYSTEM)
-    private static class MultipleSystemUserApi {
-    }
-
-    /**
-     * 暴露公共模板的鉴权作用域包装，验证异常清理行为。
-     */
-    private static class TestApiTemplate extends ApiComponentTemplateBase {
-        /**
-         * 在未豁免接口作用域内抛出测试异常。
-         */
-        private void invokeFailure(Class<?> apiClass) throws Exception {
-            invokeWithApiAuthContext(apiClass, () -> {
-                throw new Exception("test");
-            });
-        }
-    }
-
-    /**
      * 测试专用权限类型，只用于构造一个未授予的权限名称。
      */
     public static class TestAuth extends AuthBase {
@@ -630,6 +588,15 @@ public class ApiAuthContextTest {
      * 测试权限包含关系的子权限。
      */
     public static class TEST_INCLUDED_AUTH extends TestAuth {
+    }
+
+    /** 仅在测试注册表中声明出厂授权，不向生产权限注册表增加默认权限。 */
+    public static class TEST_CODE_AUTH extends TEST_PARENT_AUTH {
+        /** 测试代码声明的系统身份与权限包含关系。 */
+        @Override
+        public List<ISystemUser> getDefaultSystemUserList() {
+            return Collections.singletonList(SystemUser.SYSTEM);
+        }
     }
 
     /**

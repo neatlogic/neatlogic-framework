@@ -18,6 +18,7 @@ import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
+import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
@@ -33,10 +34,10 @@ import java.util.stream.Collectors;
 /**
  * 权限校验入口，支持校验当前用户或显式指定用户，权限标识取 AuthBase 类型的简单类名。
  * 参数无效时返回 false；目标权限包含 NoAuth 时直接通过。
- * 系统用户在 API 执行链外保持直接放行，API 内仅在当前接口通过 AuthUser 匹配该系统用户时豁免，否则继续校验权限。
+ * 系统用户合并代码出厂授权与页面授权，所有执行位置使用相同规则，不按身份直接放行。
  * 维护用户命中任一维护权限时直接通过，否则继续校验权限。
- * 目标用户与当前上下文用户一致时，信任并复用 UserContext 中的超级管理员状态和鉴权信息；
- * 校验其他用户时，实时确认目标用户存在、已启用且未删除，再使用目标用户自身的超级管理员状态和鉴权信息。
+ * 普通目标用户与当前上下文用户一致时，信任并复用 UserContext 中的超级管理员状态和鉴权信息；
+ * 校验其他普通用户时，实时确认目标用户存在、已启用且未删除，再使用目标用户自身的超级管理员状态和鉴权信息。
  * 直接权限未命中时继续递归检查权限包含关系，任一目标权限命中即通过。
  */
 @RootComponent
@@ -124,9 +125,10 @@ public class AuthActionChecker {
         if (actionList.contains(NoAuth.class.getSimpleName())) {
             return true;
         }
-        boolean isSystemUser = SystemUserFactory.getSystemUserByUser(userUuid) != null;
-        if (isSystemUser && ApiAuthContext.shouldBypassSystemUserAuth(userUuid)) {
-            return true;
+        ISystemUser systemUser = SystemUserFactory.getSystemUserByUser(userUuid);
+        if (systemUser != null) {
+            // 系统身份允许按 ID 定位，但数据库授权始终使用注册 UUID。
+            userUuid = systemUser.getUserUuid();
         }
         boolean isMaintenanceUser = Config.ENABLE_MAINTENANCE() && Objects.equals(userUuid, Config.MAINTENANCE());
         if (isMaintenanceUser && !Collections.disjoint(MaintenanceMode.maintenanceAuthSet, actionList)) {
@@ -135,7 +137,16 @@ public class AuthActionChecker {
         AuthenticationInfoVo authenticationInfoVo;
         UserContext userContext = UserContext.get();
         boolean isCurrentUser = userContext != null && Objects.equals(userContext.getUserUuid(), userUuid);
-        if (isCurrentUser) {
+        if (systemUser != null) {
+            // 不读取普通用户表，也不信任系统身份上下文中的超级管理员标记。
+            // 代码默认授权不可由页面撤销，命中后无需查询数据库；未命中仍实时读取页面授权。
+            List<String> defaultAuthList = AuthFactory.getDefaultAuthListBySystemUser(userUuid).stream()
+                    .map(AuthBase::getAuthName).collect(Collectors.toList());
+            if (matchesAuthList(defaultAuthList, actionList)) {
+                return true;
+            }
+            authenticationInfoVo = new AuthenticationInfoVo(userUuid);
+        } else if (isCurrentUser) {
             if (Boolean.TRUE.equals(userContext.getIsSuperAdmin())) {
                 return true;
             }
@@ -153,6 +164,11 @@ public class AuthActionChecker {
 
         List<UserAuthVo> userAuthVoList = userMapper.searchUserAllAuthByUserAuth(authenticationInfoVo);
         List<String> userAuthList = userAuthVoList.stream().map(UserAuthVo::getAuth).collect(Collectors.toList());
+        return matchesAuthList(userAuthList, actionList);
+    }
+
+    /** 代码授权与页面授权复用同一包含关系判断，传入独立列表以隔离遍历追加结果。 */
+    private static boolean matchesAuthList(List<String> userAuthList, List<String> actionList) {
         if (userAuthList.stream().anyMatch(actionList::contains)) {
             return true;
         }
@@ -201,7 +217,7 @@ public class AuthActionChecker {
         for (int i = 0; i < userAuthList.size(); i++) {
             AuthBase authBase = AuthFactory.getAuthInstance(userAuthList.get(i).getAuth().toUpperCase(Locale.ROOT));
             if (authBase != null) {
-                getUserAuthListByAuth(authBase, userAuthList);
+                getUserAuthListByAuth(authBase, userAuthList, userAuthList.get(i).getUserUuid());
             }
         }
     }
@@ -212,16 +228,17 @@ public class AuthActionChecker {
      *
      * @param authBase     权限对象
      * @param userAuthList 用户对应权限
+     * @param userUuid 目标用户 UUID，展开权限不借用当前调用者身份
      */
-    private static void getUserAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList) {
+    private static void getUserAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList, String userUuid) {
         if (authBase != null) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
                 if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
                     AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
                     if (auth != null) {
-                        userAuthList.add(new UserAuthVo(auth));
-                        getUserAuthListByAuth(auth, userAuthList);
+                        userAuthList.add(new UserAuthVo(userUuid, auth));
+                        getUserAuthListByAuth(auth, userAuthList, userUuid);
                     }
                 }
             }

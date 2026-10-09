@@ -54,13 +54,14 @@ public abstract class SseApiComponentBase extends ApiComponentTemplateBase imple
         return getApiComponentHelp(JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
     }
 
+    /**
+     * 校验接口权限和参数后执行服务，所有身份沿用统一鉴权规则。
+     */
     private Object executeService(ApiVo apiVo, JSONObject paramObj, HttpServletRequest request, HttpServletResponse response,
                                   Object component, Class<?> targetClass) throws Exception {
-        return invokeWithApiAuthContext(targetClass, () -> {
-            validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-            validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
-            return invokeComponentMethod(component, "myDoService",
-                    new Class[]{JSONObject.class, HttpServletRequest.class, HttpServletResponse.class}, paramObj, request, response);
-        });
+        validApi(targetClass, paramObj, apiVo, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+        validIsReSubmit(targetClass, apiVo.getToken(), paramObj, JSONObject.class, HttpServletRequest.class, HttpServletResponse.class);
+        return invokeComponentMethod(component, "myDoService",
+                new Class[]{JSONObject.class, HttpServletRequest.class, HttpServletResponse.class}, paramObj, request, response);
     }
 }

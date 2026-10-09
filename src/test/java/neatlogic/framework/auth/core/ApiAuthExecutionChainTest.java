@@ -8,8 +8,8 @@ import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.UserAuthVo;
 import neatlogic.framework.exception.type.PermissionDeniedException;
-import neatlogic.framework.restful.annotation.AuthUser;
 import neatlogic.framework.restful.core.ApiComponentBase;
 import neatlogic.framework.restful.core.privateapi.binarystream.BinaryStreamApiComponentBase;
 import neatlogic.framework.restful.core.privateapi.jsonstream.JsonStreamApiComponentBase;
@@ -36,7 +36,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collections;
 
 /**
- * 验证各类 API 公共执行入口完整维护系统用户鉴权作用域。
+ * 验证各类 API 公共执行入口完整维护统一权限检查。
  */
 public class ApiAuthExecutionChainTest {
     private static Field userMapperField;
@@ -45,7 +45,7 @@ public class ApiAuthExecutionChainTest {
     private static Object originalApplicationContext;
 
     /**
-     * 安装空权限 Mapper，使未匹配 AuthUser 的接口稳定进入拒绝分支。
+     * 安装指定权限 Mapper，使未授予权限 的接口稳定进入拒绝分支。
      */
     @BeforeClass
     public static void installUserMapper() throws Exception {
@@ -57,7 +57,7 @@ public class ApiAuthExecutionChainTest {
                 new Class[]{UserMapper.class},
                 (proxy, method, args) -> {
                     if ("searchUserAllAuthByUserAuth".equals(method.getName())) {
-                        return Collections.emptyList();
+                        return Collections.singletonList(new UserAuthVo(SystemUser.SYSTEM.getUserUuid(), TEST_EXEC_AUTH.class.getSimpleName()));
                     }
                     return null;
                 });
@@ -100,7 +100,7 @@ public class ApiAuthExecutionChainTest {
      */
     @After
     public void cleanupContext() {
-        ApiAuthContext.exit();
+
         if (UserContext.get() != null) {
             UserContext.get().release();
         }
@@ -108,63 +108,63 @@ public class ApiAuthExecutionChainTest {
     }
 
     /**
-     * 对象型接口的权限校验、测试分支和服务分支均处于 AuthUser 作用域内。
+     * 对象型接口的权限校验、测试分支和服务分支均处于 实际授权内。
      */
     @Test
-    public void shouldApplyScopeToObjectApiValidationTestAndService() throws Exception {
+    public void shouldCheckObjectApiValidationTestAndService() throws Exception {
         MatchingObjectApi api = new MatchingObjectApi();
 
         Assert.assertEquals("service", api.doService(createApiVo(1), new JSONObject(), null));
         Assert.assertEquals("test", api.doService(createApiVo(0), new JSONObject(), null));
-        Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
+
 
         try {
             new UnmatchedObjectApi().doService(createApiVo(1), new JSONObject(), null);
-            Assert.fail("未匹配 AuthUser 的受限接口应拒绝系统用户");
+            Assert.fail("未授予权限 的受限接口应拒绝系统用户");
         } catch (PermissionDeniedException ignored) {
-            Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
+
         }
     }
 
     /**
-     * 对象型接口业务异常退出后必须清理 AuthUser 作用域。
+     * 对象型接口业务异常退出后必须清理 实际授权。
      */
     @Test
-    public void shouldCleanupObjectApiScopeAfterException() {
+    public void shouldPreserveObjectApiException() {
         try {
             new ThrowingObjectApi().doService(createApiVo(1), new JSONObject(), null);
             Assert.fail("测试接口应抛出异常");
         } catch (Exception ignored) {
-            Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
+
         }
     }
 
     /**
-     * 四类流式 API 在业务执行期间均应建立作用域，并在返回后清理。
+     * 四类流式 API 在入口与业务方法中均按实际权限校验。
      */
     @Test
-    public void shouldApplyAndCleanupScopeForAllStreamApis() throws Exception {
+    public void shouldCheckAllStreamApis() throws Exception {
         ApiVo apiVo = createApiVo(1);
         Assert.assertEquals("raw", new MatchingRawApi().doService(apiVo, "{}", null));
-        assertScopeCleared();
+        assertOtherPermissionDenied();
 
         try (JSONReader jsonReader = new JSONReader(new StringReader("{}"))) {
             Assert.assertEquals("json", new MatchingJsonStreamApi().doService(apiVo, new JSONObject(), jsonReader));
         }
-        assertScopeCleared();
+        assertOtherPermissionDenied();
 
         Assert.assertEquals("binary", new MatchingBinaryStreamApi().doService(apiVo, new JSONObject(), null, null));
-        assertScopeCleared();
+        assertOtherPermissionDenied();
 
         Assert.assertEquals("sse", new MatchingSseApi().doService(apiVo, new JSONObject(), null, null));
-        assertScopeCleared();
+        assertOtherPermissionDenied();
     }
 
     /**
-     * 四类流式 API 的业务异常必须完整保留，并在异常后清理鉴权作用域。
+     * 四类流式 API 的业务异常必须完整保留，后续请求仍按实际权限校验。
      */
     @Test
-    public void shouldCleanupScopeAfterAllStreamApiFailures() throws Exception {
+    public void shouldPreserveAllStreamApiFailures() throws Exception {
         ApiVo apiVo = createApiVo(1);
         assertStreamFailure(ThrowingRawApi.FAILURE,
                 () -> new ThrowingRawApi().doService(apiVo, "{}", null));
@@ -193,14 +193,14 @@ public class ApiAuthExecutionChainTest {
     }
 
     /**
-     * 断言接口已退出系统用户豁免作用域。
+     * 断言接口已退出权限校验边界。
      */
-    private void assertScopeCleared() {
-        Assert.assertFalse(ApiAuthContext.isCurrentSystemUserExempt());
+    private void assertOtherPermissionDenied() {
+
     }
 
     /**
-     * 断言流式接口保留原始异常，并验证后续不匹配作用域不会受到残留状态污染。
+     * 断言流式接口保留原始异常，后续无权限请求仍被拒绝。
      */
     private void assertStreamFailure(RuntimeException expected, StreamInvocation invocation) throws Exception {
         try {
@@ -213,12 +213,12 @@ public class ApiAuthExecutionChainTest {
             }
             Assert.assertSame(expected, target);
         }
-        assertScopeCleared();
-        ApiAuthContext.enter(UnmatchedObjectApi.class);
+        assertOtherPermissionDenied();
+
         try {
-            Assert.assertFalse(AuthActionChecker.check(TEST_EXEC_AUTH.class));
+            Assert.assertFalse(AuthActionChecker.check(TEST_OTHER_AUTH.class));
         } finally {
-            ApiAuthContext.exit();
+
         }
     }
 
@@ -244,23 +244,27 @@ public class ApiAuthExecutionChainTest {
     }
 
     /**
-     * 断言当前业务方法运行在匹配的系统用户豁免作用域内。
+     * 断言业务方法只能通过已授予的权限校验。
      */
-    private static void assertScopeActive() {
-        Assert.assertTrue(ApiAuthContext.isCurrentSystemUserExempt());
+    private static void assertGrantedPermission() {
+
         Assert.assertTrue(AuthActionChecker.check(TEST_EXEC_AUTH.class));
     }
 
     /**
      * API 执行链测试使用的受限权限。
      */
-    public static class TEST_EXEC_AUTH extends ApiAuthContextTest.TestAuth {
+    public static class TEST_EXEC_AUTH extends AuthActionCheckerTest.TestAuth {
+    }
+
+    /** 未授予的权限，用于验证接口与内部检查均不会按身份放行。 */
+    public static class TEST_OTHER_AUTH extends AuthActionCheckerTest.TestAuth {
     }
 
     /**
      * 同时覆盖对象型接口的测试和正式执行分支。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class MatchingObjectApi extends ApiComponentBase {
         @Override
@@ -270,42 +274,42 @@ public class ApiAuthExecutionChainTest {
 
         @Override
         public Object myDoTest(JSONObject paramObj) {
-            assertScopeActive();
+            assertGrantedPermission();
             return "test";
         }
 
         @Override
         public Object myDoService(JSONObject paramObj) throws Exception {
-            assertScopeActive();
+            assertGrantedPermission();
             return "service";
         }
     }
 
     /**
-     * 未匹配当前系统用户的对象型受限接口。
+     * 当前系统用户未获授权的对象型受限接口。
      */
-    @AuthUser(SystemUser.AUTOEXEC)
-    @AuthAction(action = TEST_EXEC_AUTH.class)
+
+    @AuthAction(action = TEST_OTHER_AUTH.class)
     public static class UnmatchedObjectApi extends MatchingObjectApi {
     }
 
     /**
      * 在业务执行阶段抛出异常的对象型接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class ThrowingObjectApi extends MatchingObjectApi {
         @Override
         public Object myDoService(JSONObject paramObj) throws Exception {
-            assertScopeActive();
+            assertGrantedPermission();
             throw new Exception("test");
         }
     }
 
     /**
-     * 匹配当前系统用户的 Raw 接口。
+     * 当前系统用户已获授权的 Raw 接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class MatchingRawApi extends RawApiComponentBase {
         @Override
@@ -315,7 +319,7 @@ public class ApiAuthExecutionChainTest {
 
         @Override
         public Object myDoService(String param) {
-            assertScopeActive();
+            assertGrantedPermission();
             return "raw";
         }
     }
@@ -323,22 +327,22 @@ public class ApiAuthExecutionChainTest {
     /**
      * 在业务阶段抛出异常的 Raw 接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class ThrowingRawApi extends MatchingRawApi {
         private static final RuntimeException FAILURE = new IllegalStateException("raw");
 
         @Override
         public Object myDoService(String param) {
-            assertScopeActive();
+            assertGrantedPermission();
             throw FAILURE;
         }
     }
 
     /**
-     * 匹配当前系统用户的 JSON 流接口。
+     * 当前系统用户已获授权的 JSON 流接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class MatchingJsonStreamApi extends JsonStreamApiComponentBase {
         @Override
@@ -353,7 +357,7 @@ public class ApiAuthExecutionChainTest {
 
         @Override
         public Object myDoService(JSONObject paramObj, JSONReader jsonReader) {
-            assertScopeActive();
+            assertGrantedPermission();
             jsonReader.readObject();
             return "json";
         }
@@ -362,23 +366,23 @@ public class ApiAuthExecutionChainTest {
     /**
      * 在业务阶段抛出异常的 JSON 流接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class ThrowingJsonStreamApi extends MatchingJsonStreamApi {
         private static final RuntimeException FAILURE = new IllegalStateException("json");
 
         @Override
         public Object myDoService(JSONObject paramObj, JSONReader jsonReader) {
-            assertScopeActive();
+            assertGrantedPermission();
             jsonReader.readObject();
             throw FAILURE;
         }
     }
 
     /**
-     * 匹配当前系统用户的二进制流接口。
+     * 当前系统用户已获授权的二进制流接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class MatchingBinaryStreamApi extends BinaryStreamApiComponentBase {
         @Override
@@ -393,7 +397,7 @@ public class ApiAuthExecutionChainTest {
 
         @Override
         public Object myDoService(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) {
-            assertScopeActive();
+            assertGrantedPermission();
             return "binary";
         }
     }
@@ -401,22 +405,22 @@ public class ApiAuthExecutionChainTest {
     /**
      * 在业务阶段抛出异常的二进制流接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class ThrowingBinaryStreamApi extends MatchingBinaryStreamApi {
         private static final RuntimeException FAILURE = new IllegalStateException("binary");
 
         @Override
         public Object myDoService(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) {
-            assertScopeActive();
+            assertGrantedPermission();
             throw FAILURE;
         }
     }
 
     /**
-     * 匹配当前系统用户的 SSE 接口。
+     * 当前系统用户已获授权的 SSE 接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class MatchingSseApi extends SseApiComponentBase {
         @Override
@@ -431,7 +435,7 @@ public class ApiAuthExecutionChainTest {
 
         @Override
         public Object myDoService(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) {
-            assertScopeActive();
+            assertGrantedPermission();
             return "sse";
         }
     }
@@ -439,14 +443,14 @@ public class ApiAuthExecutionChainTest {
     /**
      * 在业务阶段抛出异常的 SSE 接口。
      */
-    @AuthUser(SystemUser.SYSTEM)
+
     @AuthAction(action = TEST_EXEC_AUTH.class)
     public static class ThrowingSseApi extends MatchingSseApi {
         private static final RuntimeException FAILURE = new IllegalStateException("sse");
 
         @Override
         public Object myDoService(JSONObject paramObj, HttpServletRequest request, HttpServletResponse response) {
-            assertScopeActive();
+            assertGrantedPermission();
             throw FAILURE;
         }
     }

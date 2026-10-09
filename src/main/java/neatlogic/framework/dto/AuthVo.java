@@ -1,22 +1,34 @@
 package neatlogic.framework.dto;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.dto.module.ModuleGroupVo;
+import neatlogic.framework.restful.annotation.EntityField;
 import neatlogic.framework.util.$;
 
+/** 权限元数据，供权限管理和接口声明权限展示共用；展示名称及说明按当前语言返回。 */
 public class AuthVo {
 
     public static final String AUTH_DELETE = "delete";
     public static final String AUTH_ADD = "add";
     public static final String AUTH_COVER = "cover";
+    @EntityField(name = "framework.authvo.name", type = ApiParamType.STRING)
     private String name;
+    @EntityField(name = "framework.authvo.displayname", type = ApiParamType.STRING)
     private String displayName;
+    @EntityField(name = "common.description", type = ApiParamType.STRING)
     private String description;
+    @EntityField(name = "framework.authvo.authgroupname", type = ApiParamType.STRING)
     private String authGroupName;
+    @EntityField(name = "framework.authvo.authgroup", type = ApiParamType.STRING)
     private String authGroup;
+    @EntityField(name = "framework.authvo.iscommercial", type = ApiParamType.BOOLEAN)
     private boolean isCommercial = false;
+    @EntityField(name = "framework.authvo.usercount", type = ApiParamType.INTEGER)
     private int userCount;
+    @EntityField(name = "framework.authvo.rolecount", type = ApiParamType.INTEGER)
     private int roleCount;
+    @EntityField(name = "common.sort", type = ApiParamType.INTEGER)
     private int sort;
 
     public AuthVo() {

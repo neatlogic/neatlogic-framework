@@ -690,6 +690,13 @@
         "paused": "暂停"
       }
     },
+    "teamlevel": {
+      "center": "中心",
+      "company": "公司",
+      "department": "部门",
+      "group": "集团",
+      "team": "组"
+    },
     "usertimezoneresolver": {
       "configreadfailed": "读取租户默认时区失败，使用参数内置默认值，租户：{0}",
       "invalidcookieencoding": "时区 Cookie 编码无效，使用租户默认时区，异常类型：{0}",
@@ -1155,6 +1162,9 @@
     },
     "paramvaluetooshortexception": {
       "paramvaluetooshortexception": "参数：“{0}”允许最小长度是{1}个字符"
+    },
+    "teamlevelnotfoundexception": {
+      "teamlevelnotfoundexception": "组层级：“{0}”不存在"
     },
     "teamnamerepeatexception": {
       "teamnamerepeatexception": "分组：“{0}”已存在"

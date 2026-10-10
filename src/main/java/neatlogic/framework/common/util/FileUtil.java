@@ -49,6 +49,10 @@ public class FileUtil {
             }
             filePath = handler.saveData(tenantUuid, inputStream, file);
         } catch (Exception ex) {
+            // 未注册的处理器以及禁止兜底的安全存储必须直接失败，不能转存本地。
+            if (handler == null || !handler.isAllowLocalFallback()) {
+                throw ex;
+            }
             logger.error(ex.getMessage(), ex);
             if (!Objects.equals(Config.FILE_HANDLER(), "FILE")) {
                 handler = FileStorageMediumFactory.getHandler("FILE");
@@ -74,16 +78,22 @@ public class FileUtil {
      * @throws Exception 异常
      */
     public static String saveData(InputStream inputStream, String contentType, String filePath) throws Exception {
+        // 保留本次调用实际选择的处理器，以其声明决定是否允许本地兜底。
+        IFileStorageHandler handler = null;
         try {
-            IFileStorageHandler handler = FileStorageMediumFactory.getHandler(Config.FILE_HANDLER());
+            handler = FileStorageMediumFactory.getHandler(Config.FILE_HANDLER());
             if (handler == null) {
                 throw new FileStorageMediumHandlerNotFoundException(Config.FILE_HANDLER());
             }
             return handler.saveData(inputStream, contentType, filePath);
         } catch (Exception ex) {
+            // 两个上传入口采用相同规则，固定路径上传也不得绕过安全存储。
+            if (handler == null || !handler.isAllowLocalFallback()) {
+                throw ex;
+            }
             logger.error(ex.getMessage(), ex);
             if (!Objects.equals(Config.FILE_HANDLER(), "FILE")) {
-                IFileStorageHandler handler = FileStorageMediumFactory.getHandler("FILE");
+                handler = FileStorageMediumFactory.getHandler("FILE");
                 return handler.saveData(inputStream, contentType, filePath);
             }
         } finally {

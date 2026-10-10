@@ -20,6 +20,14 @@ public interface IFileStorageHandler {
 
     String getName();
 
+    /**
+     * 上传失败时是否允许转存本地。安全存储可关闭兜底，避免保存未经保护的文件。
+     * 默认保留现有存储处理器的本地兜底行为。
+     */
+    default boolean isAllowLocalFallback() {
+        return true;
+    }
+
     String saveData(String tenantUuid, InputStream inputStream, FileVo file) throws Exception;
 
     /**

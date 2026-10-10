@@ -22,9 +22,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.HashMap;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RootComponent
 public class DatasourceManager {
@@ -69,14 +71,151 @@ public class DatasourceManager {
     @Resource(name = "dataSourceMaster")
     private NeatLogicBasicDataSource masterDatasource;
 
-    private static final Map<Object, Object> datasourceMap = new HashMap<>();
+    // SQL采集按连接识别数据源时可能与租户注册、卸载并发，注册表支持安全遍历。
+    private static final Map<Object, Object> datasourceMap = new ConcurrentHashMap<>();
 
     public static NeatLogicBasicDataSource getDatasource() {
-        return (NeatLogicBasicDataSource) (datasourceMap.get(TenantContext.get().getTenantUuid()));
+        return getDatasource(TenantContext.get().getTenantUuid());
     }
 
     public static NeatLogicBasicDataSource getDatasource(String tenantUuid) {
+        if (tenantUuid == null) {
+            return null;
+        }
         return (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
+    }
+
+    /**
+     * 按当前路由取得有效的数据源键，未注册的路由沿用路由数据源的主库回退。
+     */
+    public static String getCurrentDatasourceKey() {
+        TenantContext context = TenantContext.get();
+        if (context != null && StringUtils.isNotBlank(context.getTenantUuid())) {
+            String key = context.getTenantUuid();
+            if (Boolean.TRUE.equals(context.isData())) {
+                key = getTenantDataDatasourceKey(key);
+            }
+            if (datasourceMap.containsKey(key)) {
+                return key;
+            }
+        }
+        return "master";
+    }
+
+    /**
+     * 从已注册连接池配置读取库名，缓存命中时也无需额外建立数据库连接。
+     */
+    public static String getDatasourceDatabaseName(String datasourceKey) {
+        NeatLogicBasicDataSource target = getDatasource(datasourceKey);
+        if (target == null) {
+            return null;
+        }
+        if (StringUtils.isNotBlank(target.getCatalog())) {
+            return target.getCatalog();
+        }
+        String jdbcUrl = getJdbcUrlWithoutParameters(target.getJdbcUrl());
+        if (StringUtils.isBlank(jdbcUrl)) {
+            return null;
+        }
+        int authority = jdbcUrl.indexOf("//");
+        if (authority < 0) {
+            return null;
+        }
+        int databaseStart = jdbcUrl.indexOf('/', authority + 2);
+        if (databaseStart < 0 || databaseStart == jdbcUrl.length() - 1) {
+            return null;
+        }
+        return jdbcUrl.substring(databaseStart + 1);
+    }
+
+    /**
+     * 按实际连接校正数据源，避免事务绑定的旧连接被误记成刚切换的租户路由。
+     * 无法唯一确认时返回空值，禁止用错误的数据源重新获取执行计划。
+     */
+    public static String getDatasourceKey(Connection connection, String preferredKey) throws SQLException {
+        String catalog = connection.getCatalog();
+        String connectionUrl = null;
+        try {
+            connectionUrl = getJdbcUrlWithoutParameters(connection.getMetaData().getURL());
+        } catch (SQLException ignored) {
+            // 驱动无法提供URL时，仍可根据实际库名与注册配置确认唯一的数据源。
+        }
+        String databaseMatch = null;
+        String urlMatch = null;
+        boolean multipleDatabaseMatches = false;
+        boolean multipleUrlMatches = false;
+        for (Map.Entry<Object, Object> entry : datasourceMap.entrySet()) {
+            String key = entry.getKey().toString();
+            NeatLogicBasicDataSource target = (NeatLogicBasicDataSource) entry.getValue();
+            if (StringUtils.isNotBlank(catalog) && !StringUtils.equals(catalog, getDatasourceDatabaseName(key))) {
+                continue;
+            }
+            if (StringUtils.isNotBlank(catalog)) {
+                if (databaseMatch != null) {
+                    multipleDatabaseMatches = true;
+                }
+                databaseMatch = key;
+            }
+            String targetUrl = getJdbcUrlWithoutParameters(target.getJdbcUrl());
+            boolean matchesConnectionUrl = StringUtils.isNotBlank(connectionUrl)
+                    && StringUtils.equals(connectionUrl, targetUrl);
+            // 连接若通过其他代码切过catalog，metadata URL可能仍带原库名；此时比较服务器和实际catalog。
+            if (StringUtils.isNotBlank(catalog) && StringUtils.isNotBlank(connectionUrl)
+                    && StringUtils.equals(getJdbcServerUrl(connectionUrl), getJdbcServerUrl(targetUrl))) {
+                matchesConnectionUrl = true;
+            }
+            if (matchesConnectionUrl) {
+                // 当前路由与实际连接都匹配时优先保留正式路由键，兼容历史数据源别名。
+                if (StringUtils.equals(key, preferredKey)) {
+                    return key;
+                }
+                if (urlMatch != null) {
+                    multipleUrlMatches = true;
+                }
+                urlMatch = key;
+            }
+        }
+        if (urlMatch != null && !multipleUrlMatches) {
+            return urlMatch;
+        }
+        if (StringUtils.isBlank(connectionUrl)) {
+            if (StringUtils.isNotBlank(catalog)
+                    && StringUtils.equals(catalog, getDatasourceDatabaseName(preferredKey))) {
+                return preferredKey;
+            }
+            if (!multipleDatabaseMatches) {
+                return databaseMatch;
+            }
+        }
+        return null;
+    }
+
+    /** 去除连接参数，只比较服务器地址与默认库，避免驱动增补参数影响识别。 */
+    private static String getJdbcUrlWithoutParameters(String jdbcUrl) {
+        if (jdbcUrl == null) {
+            return null;
+        }
+        int parameterStart = jdbcUrl.indexOf('?');
+        if (parameterStart >= 0) {
+            return jdbcUrl.substring(0, parameterStart);
+        }
+        return jdbcUrl;
+    }
+
+    /** 读取JDBC URL中的服务器地址，实际库名以连接的catalog为准。 */
+    private static String getJdbcServerUrl(String jdbcUrl) {
+        if (jdbcUrl == null) {
+            return null;
+        }
+        int authority = jdbcUrl.indexOf("//");
+        if (authority < 0) {
+            return jdbcUrl;
+        }
+        int databaseStart = jdbcUrl.indexOf('/', authority + 2);
+        if (databaseStart >= 0) {
+            return jdbcUrl.substring(0, databaseStart);
+        }
+        return jdbcUrl;
     }
 
     /**
@@ -91,6 +230,9 @@ public class DatasourceManager {
     }
 
     public static void removeDatasource(String tenantUuid) {
+        if (tenantUuid == null) {
+            return;
+        }
         if (datasourceMap.containsKey(tenantUuid)) {
             NeatLogicBasicDataSource dataSource = (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
             dataSource.close();

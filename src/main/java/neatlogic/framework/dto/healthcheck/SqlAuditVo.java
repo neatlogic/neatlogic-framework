@@ -31,6 +31,10 @@ public class SqlAuditVo extends BasePageVo {
     private int recordCount = 0;
     @EntityField(name = "租户", type = ApiParamType.STRING)
     private String tenant;
+    @EntityField(name = "执行数据库", type = ApiParamType.STRING)
+    private String databaseName;
+    @EntityField(name = "执行数据源标识", type = ApiParamType.STRING)
+    private String datasourceKey;
     @EntityField(name = "用户", type = ApiParamType.STRING)
     private String userId;
     @EntityField(name = "使用到的缓存级别", type = ApiParamType.STRING)
@@ -52,6 +56,22 @@ public class SqlAuditVo extends BasePageVo {
 
     public void setTenant(String tenant) {
         this.tenant = tenant;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
+    }
+
+    public String getDatasourceKey() {
+        return datasourceKey;
+    }
+
+    public void setDatasourceKey(String datasourceKey) {
+        this.datasourceKey = datasourceKey;
     }
 
     public String getUserId() {

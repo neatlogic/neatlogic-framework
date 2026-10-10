@@ -16,11 +16,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class RequestSqlAuditVo implements Serializable {
     private Long id;
@@ -220,6 +216,9 @@ public class RequestSqlAuditVo implements Serializable {
                     SqlAuditVo sqlAudit = new SqlAuditVo();
                     sqlAudit.setId(sqlAuditVo.getId());
                     sqlAudit.setTenant(sqlAuditVo.getTenant());
+                    // 同一个SQL ID可能跨库执行，复制时保留每次执行的数据源。
+                    sqlAudit.setDatabaseName(sqlAuditVo.getDatabaseName());
+                    sqlAudit.setDatasourceKey(sqlAuditVo.getDatasourceKey());
                     sqlAudit.setUserId(sqlAuditVo.getUserId());
                     sqlAudit.setTimeCost(sqlAuditVo.getTimeCost());
                     sqlAudit.setSql(sqlAuditVo.getSql());

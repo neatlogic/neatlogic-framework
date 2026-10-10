@@ -112,6 +112,9 @@
         <property name="databaseIdProvider" ref="neatLogicDatabaseIdProvider"/>
     </bean>
 
+    <!-- 明确引用框架Mapper配置，避免模块中的同名SqlSessionFactory遮蔽。 -->
+    <alias name="sqlSessionFactory" alias="frameworkSqlSessionFactory"/>
+
     <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="false"/>
 
     <context:component-scan base-package="neatlogic.framework"/>

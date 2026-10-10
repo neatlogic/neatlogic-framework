@@ -17,6 +17,7 @@ import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.healthcheck.SqlAuditVo;
 import neatlogic.framework.healthcheck.SqlAuditManager;
+import neatlogic.framework.store.mysql.DatasourceManager;
 import neatlogic.framework.util.TimeUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,11 +27,7 @@ import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
-import org.apache.ibatis.plugin.Interceptor;
-import org.apache.ibatis.plugin.Intercepts;
-import org.apache.ibatis.plugin.Invocation;
-import org.apache.ibatis.plugin.Plugin;
-import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.plugin.*;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
@@ -62,8 +59,26 @@ import java.util.regex.Matcher;
 public class SqlCostInterceptor implements Interceptor {
     private static final Logger logger = LoggerFactory.getLogger(SqlCostInterceptor.class);
     private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(TimeUtil.YYYY_MM_DD_HH_MM_SS_SSS);
-    // 判断是否真的访问了数据库，用于区分一级/二级缓存命中情况
-    private static final ThreadLocal<Boolean> QUERY_FROM_DATABASE_INSTANCE = new ThreadLocal<>();
+    // 每次Executor调用独立保存采集上下文，嵌套查询不能覆盖外层的连接及缓存信息。
+    private static final ThreadLocal<Deque<SqlExecutionContext>> SQL_EXECUTION_CONTEXT = new ThreadLocal<>();
+
+    private static class SqlExecutionContext {
+        private boolean queryFromDatabase;
+        private boolean captureDatabase;
+        private String datasourceKey;
+        private String databaseName;
+
+        /** 先保存当前有效路由，缓存命中时直接使用连接池配置中的库名。 */
+        private SqlExecutionContext() {
+            try {
+                datasourceKey = DatasourceManager.getCurrentDatasourceKey();
+                databaseName = DatasourceManager.getDatasourceDatabaseName(datasourceKey);
+            } catch (Exception e) {
+                // 库配置异常只影响审计信息，不影响原始SQL；避免输出可能含密码的连接配置。
+                logger.warn("读取SQL审计数据源配置失败，异常类型：{}", e.getClass().getSimpleName());
+            }
+        }
+    }
     public static class SqlIdMap {
         private static final ConcurrentMap<String, Object> sqlMap = new ConcurrentHashMap<>();
 
@@ -142,9 +157,56 @@ public class SqlCostInterceptor implements Interceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         Method method = invocation.getMethod();
         if (Objects.equals(method.getName(), "prepare")) {
-            QUERY_FROM_DATABASE_INSTANCE.set(true);
+            recordPreparedConnection((Connection) invocation.getArgs()[0]);
             return invocation.proceed();
         }
+        Deque<SqlExecutionContext> contexts = SQL_EXECUTION_CONTEXT.get();
+        if (contexts == null) {
+            contexts = new ArrayDeque<>();
+            SQL_EXECUTION_CONTEXT.set(contexts);
+        }
+        SqlExecutionContext context = new SqlExecutionContext();
+        contexts.push(context);
+        try {
+            return interceptExecutor(invocation, context);
+        } finally {
+            contexts.pop();
+            if (contexts.isEmpty()) {
+                SQL_EXECUTION_CONTEXT.remove();
+            }
+        }
+    }
+
+    /** 根据真正用于prepare的连接修正库信息，采集异常不能影响原SQL的执行。 */
+    private void recordPreparedConnection(Connection connection) {
+        Deque<SqlExecutionContext> contexts = SQL_EXECUTION_CONTEXT.get();
+        if (contexts == null || contexts.isEmpty()) {
+            return;
+        }
+        SqlExecutionContext context = contexts.peek();
+        context.queryFromDatabase = true;
+        if (!context.captureDatabase) {
+            return;
+        }
+        try {
+            String catalog = connection.getCatalog();
+            if (StringUtils.isNotBlank(catalog)) {
+                context.databaseName = catalog;
+            }
+            context.datasourceKey = DatasourceManager.getDatasourceKey(connection, context.datasourceKey);
+            if (StringUtils.isBlank(catalog) && context.datasourceKey != null) {
+                context.databaseName = DatasourceManager.getDatasourceDatabaseName(context.datasourceKey);
+            }
+        } catch (Exception e) {
+            // 实际连接身份没有确认时清空目标键，避免后续执行计划误用逻辑路由。
+            context.datasourceKey = null;
+            // 驱动异常信息可能含完整连接URL，采集日志只保留异常类型。
+            logger.warn("采集SQL执行数据库信息失败，异常类型：{}", e.getClass().getSimpleName());
+        }
+    }
+
+    /** 执行原始MyBatis调用，并将当前调用的数据库、耗时和缓存信息写入审计记录。 */
+    private Object interceptExecutor(Invocation invocation, SqlExecutionContext context) throws Throwable {
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
         long starttime = 0;
         SqlAuditVo sqlAuditVo = null;
@@ -161,6 +223,7 @@ public class SqlCostInterceptor implements Interceptor {
                 isMonitorUrl = StringUtils.isNotBlank(requestUrl) && !UrlMap.isEmpty() && UrlMap.isExists(requestUrl);
             }
             if (isMonitorSqlId || isMonitorUrl) {
+                context.captureDatabase = true;
                 sqlAuditVo = buildSqlAuditVo(invocation, mappedStatement, sqlId);
                 starttime = System.currentTimeMillis();
                 // 两种监控方式都会展示缓存命中情况，所以只要命中任意监控都需要计算缓存级别
@@ -171,27 +234,20 @@ public class SqlCostInterceptor implements Interceptor {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-        try {
-            QUERY_FROM_DATABASE_INSTANCE.set(false);
-            // 执行完上面的记录准备后，不改变原有SQL执行过程
-            Object val = invocation.proceed();
-            if (sqlAuditVo != null) {
-                fillSqlAuditResult(sqlAuditVo, starttime, hasCacheFirstLevel, val);
-                if (isMonitorSqlId) {
-                    // sqlId监控沿用原明细表，一条SQL执行记录对应表格一行
-                    SqlAuditManager.addSqlAudit(sqlAuditVo);
-                }
-                if (isMonitorUrl) {
-                    if (RequestContext.get() != null) {
-                        // URL监控聚合对象统一保存在RequestContext，确保同一次HTTP请求内的SQL都追加到同一个对象
-                        RequestContext.get().addSqlAudit(sqlAuditVo);
-                    }
-                }
+        // 执行完上面的记录准备后，不改变原有SQL执行过程。
+        Object val = invocation.proceed();
+        if (sqlAuditVo != null) {
+            fillSqlAuditResult(sqlAuditVo, starttime, hasCacheFirstLevel, val, context);
+            if (isMonitorSqlId) {
+                // sqlId监控沿用原明细表，一条SQL执行记录对应表格一行。
+                SqlAuditManager.addSqlAudit(sqlAuditVo);
             }
-            return val;
-        } finally {
-            QUERY_FROM_DATABASE_INSTANCE.remove();
+            if (isMonitorUrl && RequestContext.get() != null) {
+                // URL监控保留每次SQL执行的数据源，同一SQL ID在不同库执行仍有独立明细。
+                RequestContext.get().addSqlAudit(sqlAuditVo);
+            }
         }
+        return val;
     }
 
     private SqlAuditVo buildSqlAuditVo(Invocation invocation, MappedStatement mappedStatement, String sqlId) {
@@ -227,8 +283,12 @@ public class SqlCostInterceptor implements Interceptor {
         return executor.isCached(mappedStatement, key);
     }
 
-    private void fillSqlAuditResult(SqlAuditVo sqlAuditVo, long starttime, boolean hasCacheFirstLevel, Object val) {
-        if (Boolean.TRUE.equals(QUERY_FROM_DATABASE_INSTANCE.get())) {
+    /** 将当前调用独立保存的执行库和缓存信息填入明细，缺失配置保持为空。 */
+    private void fillSqlAuditResult(SqlAuditVo sqlAuditVo, long starttime, boolean hasCacheFirstLevel, Object val,
+                                   SqlExecutionContext context) {
+        sqlAuditVo.setDatasourceKey(context.datasourceKey);
+        sqlAuditVo.setDatabaseName(context.databaseName);
+        if (context.queryFromDatabase) {
             // SQL语句被实际执行，说明没有使用缓存
             sqlAuditVo.setUseCacheLevel(StringUtils.EMPTY);
         } else if (hasCacheFirstLevel) {

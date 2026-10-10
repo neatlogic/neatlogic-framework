@@ -8,18 +8,16 @@ import java.util.List;
 
 public enum TeamLevel implements IEnum {
 
-    GROUP("group", "集团", 1),
-    COMPANY("company", "公司", 2),
-    CENTER("center", "中心", 3),
-    DEPARTMENT("department", "部门", 4),
-    TEAM("team", "组", 5);
+    GROUP("group", 1),
+    COMPANY("company", 2),
+    CENTER("center", 3),
+    DEPARTMENT("department", 4),
+    TEAM("team", 5);
     private final String value;
-    private final String text;
     private final int level;
 
-    TeamLevel(String value, String text, int level) {
+    TeamLevel(String value, int level) {
         this.value = value;
-        this.text = text;
         this.level = level;
     }
 
@@ -27,8 +25,19 @@ public enum TeamLevel implements IEnum {
         return value;
     }
 
+    /**
+     * 根据组织层级返回当前请求语言的显示文本。
+     *
+     * @return 当前请求语言下的组织层级名称
+     */
     public String getText() {
-        return $.t(text);
+        return switch (this) {
+            case GROUP -> $.t("framework.teamlevel.group");
+            case COMPANY -> $.t("framework.teamlevel.company");
+            case CENTER -> $.t("framework.teamlevel.center");
+            case DEPARTMENT -> $.t("framework.teamlevel.department");
+            case TEAM -> $.t("framework.teamlevel.team");
+        };
     }
 
     public int getLevel() {

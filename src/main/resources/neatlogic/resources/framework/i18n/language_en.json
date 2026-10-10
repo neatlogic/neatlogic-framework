@@ -690,6 +690,13 @@
         "paused": "Paused"
       }
     },
+    "teamlevel": {
+      "center": "Center",
+      "company": "Company",
+      "department": "Department",
+      "group": "Group",
+      "team": "Team"
+    },
     "usertimezoneresolver": {
       "configreadfailed": "Failed to read the tenant default time zone; using the built-in parameter default. Tenant: {0}",
       "invalidcookieencoding": "Invalid time zone cookie encoding; using the tenant default time zone. Exception type: {0}",
@@ -1155,6 +1162,9 @@
     },
     "paramvaluetooshortexception": {
       "paramvaluetooshortexception": "Parameter: \"{0}\" allows a minimum length of {1} characters"
+    },
+    "teamlevelnotfoundexception": {
+      "teamlevelnotfoundexception": "Team level \"{0}\" does not exist"
     },
     "teamnamerepeatexception": {
       "teamnamerepeatexception": "Grouping: \"{0}\" already exists"

@@ -89,9 +89,9 @@ public class EmailUtil {
             props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         } else {
-            // STARTTLS (587)
-            props.put("mail.smtp.starttls.enable", "true");
-            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+            // 明文SMTP配置 (25)
+            props.put("mail.smtp.starttls.enable", "false");
+//            props.put("mail.smtp.ssl.protocols", "TLSv1.2");
         }
 
         Session session;

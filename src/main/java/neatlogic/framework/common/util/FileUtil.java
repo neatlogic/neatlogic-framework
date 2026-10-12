@@ -15,9 +15,12 @@ package neatlogic.framework.common.util;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.file.FilePathIllegalException;
 import neatlogic.framework.exception.file.FileStorageMediumHandlerNotFoundException;
+import neatlogic.framework.exception.file.FileTypeHandlerNotFoundException;
 import neatlogic.framework.exception.file.UploadFileFailedException;
 import neatlogic.framework.file.core.FileStorageMediumFactory;
+import neatlogic.framework.file.core.FileTypeHandlerFactory;
 import neatlogic.framework.file.core.IFileStorageHandler;
+import neatlogic.framework.file.core.IFileTypeHandler;
 import neatlogic.framework.file.dto.FileVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,9 +46,13 @@ public class FileUtil {
         IFileStorageHandler handler = null;
         String filePath = null;
         try {
-            handler = FileStorageMediumFactory.getHandler(Config.FILE_HANDLER());
+            IFileTypeHandler fileTypeHandler = FileTypeHandlerFactory.getHandler(file.getType());
+            if (fileTypeHandler == null) {
+                throw new FileTypeHandlerNotFoundException(file.getType());
+            }
+            handler = FileStorageMediumFactory.getHandler(fileTypeHandler.getFileStorageHandlerName());// Config.FILE_HANDLER()
             if (handler == null) {
-                throw new FileStorageMediumHandlerNotFoundException(Config.FILE_HANDLER());
+                throw new FileStorageMediumHandlerNotFoundException(fileTypeHandler.getFileStorageHandlerName());
             }
             filePath = handler.saveData(tenantUuid, inputStream, file);
         } catch (Exception ex) {

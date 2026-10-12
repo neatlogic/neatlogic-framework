@@ -13,6 +13,7 @@
 package neatlogic.framework.file.core;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.file.dto.FileVo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -91,5 +92,9 @@ public interface IFileTypeHandler {
      */
     default JSONObject analyze(MultipartFile multipartFile, JSONObject paramObj) throws Exception {
         return null;
+    }
+
+    default String getFileStorageHandlerName() {
+        return Config.FILE_HANDLER();
     }
 }

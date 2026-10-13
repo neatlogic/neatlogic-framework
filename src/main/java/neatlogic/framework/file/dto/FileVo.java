@@ -65,6 +65,8 @@ public class FileVo extends BaseEditorVo {
     private List<Map<String, String>> sortList;//排序设置
     @EntityField(name = "分析结果")
     private JSONObject analyzedResult;
+    @JSONField(serialize = false)
+    private JSONObject extendParam;
 
     public Long getId() {
         if (id == null) {
@@ -224,5 +226,13 @@ public class FileVo extends BaseEditorVo {
 
     public void setPathName(String pathName) {
         this.pathName = pathName;
+    }
+
+    public JSONObject getExtendParam() {
+        return extendParam;
+    }
+
+    public void setExtendParam(JSONObject extendParam) {
+        this.extendParam = extendParam;
     }
 }

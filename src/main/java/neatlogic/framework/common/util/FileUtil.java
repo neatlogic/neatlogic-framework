@@ -50,7 +50,7 @@ public class FileUtil {
             if (fileTypeHandler == null) {
                 throw new FileTypeHandlerNotFoundException(file.getType());
             }
-            handler = FileStorageMediumFactory.getHandler(fileTypeHandler.getFileStorageHandlerName());// Config.FILE_HANDLER()
+            handler = FileStorageMediumFactory.getHandler(fileTypeHandler.getFileStorageHandlerName());
             if (handler == null) {
                 throw new FileStorageMediumHandlerNotFoundException(fileTypeHandler.getFileStorageHandlerName());
             }

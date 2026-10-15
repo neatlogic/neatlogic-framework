@@ -19,6 +19,7 @@ import neatlogic.framework.common.constvalue.Expression;
 import neatlogic.framework.exception.integration.*;
 import neatlogic.framework.exception.type.ParamIrregularException;
 import neatlogic.framework.integration.core.IIntegrationHandler;
+import neatlogic.framework.integration.core.ITableDataIntegrationHandler;
 import neatlogic.framework.integration.core.IntegrationHandlerFactory;
 import neatlogic.framework.integration.crossover.IntegrationCrossoverService;
 import neatlogic.framework.integration.dao.mapper.IntegrationMapper;
@@ -185,6 +186,10 @@ public class IntegrationServiceImpl implements IntegrationService, IntegrationCr
         IIntegrationHandler handler = IntegrationHandlerFactory.getHandler(integrationVo.getHandler());
         if (handler == null) {
             throw new IntegrationHandlerNotFoundException(integrationVo.getHandler());
+        }
+        // 模块规范可自行取数；未实现扩展的集成继续使用原有表单主键、回显和分页逻辑。
+        if (handler instanceof ITableDataIntegrationHandler) {
+            return ((ITableDataIntegrationHandler) handler).searchTableData(integrationVo, jsonObj);
         }
         List<ColumnVo> columnVoList = getColumnList(integrationVo);
         if (CollectionUtils.isNotEmpty(columnVoList)) {

@@ -23,6 +23,10 @@ public class IntegrationHandlerVo {
 	private Integer hasInputPattern;
 	@EntityField(name = "是否拥有输出参数模板", type = ApiParamType.INTEGER)
 	private Integer hasOutputPattern;
+	@EntityField(name = "是否允许编辑自定义输入参数", type = ApiParamType.INTEGER)
+	private Integer allowEditInputParam;
+	@EntityField(name = "是否允许编辑自定义输出参数", type = ApiParamType.INTEGER)
+	private Integer allowEditOutputParam;
 	@EntityField(name = "支持的请求方式", type = ApiParamType.JSONARRAY)
 	private String[] methodList;
 
@@ -122,6 +126,36 @@ public class IntegrationHandlerVo {
 			}
 		}
 		return methodList;
+	}
+
+	/** 查询和列表接口都从处理器读取编辑权限，不再通过是否有固定规范推断。 */
+	public Integer getAllowEditInputParam() {
+		if (allowEditInputParam == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				allowEditInputParam = integrationHandler.allowEditInputParam();
+			}
+		}
+		return allowEditInputParam;
+	}
+
+	public void setAllowEditInputParam(Integer allowEditInputParam) {
+		this.allowEditInputParam = allowEditInputParam;
+	}
+
+	/** 输出编辑权限单独返回，以支持只开放一个方向的处理器。 */
+	public Integer getAllowEditOutputParam() {
+		if (allowEditOutputParam == null && StringUtils.isNotBlank(handler)) {
+			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+			if (integrationHandler != null) {
+				allowEditOutputParam = integrationHandler.allowEditOutputParam();
+			}
+		}
+		return allowEditOutputParam;
+	}
+
+	public void setAllowEditOutputParam(Integer allowEditOutputParam) {
+		this.allowEditOutputParam = allowEditOutputParam;
 	}
 
 	public void setMethodList(String[] methodList) {

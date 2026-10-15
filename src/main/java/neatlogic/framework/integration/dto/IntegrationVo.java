@@ -19,6 +19,7 @@ import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.dto.BaseEditorVo;
 import neatlogic.framework.integration.core.IIntegrationHandler;
 import neatlogic.framework.integration.core.IntegrationHandlerFactory;
+import neatlogic.framework.integration.core.IntegrationPatternUtil;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
 
@@ -188,10 +189,10 @@ public class IntegrationVo extends BaseEditorVo {
             if (integrationHandler != null) {
                 hasHelp = integrationHandler.hasPattern();
             }
-            if ((hasHelp == null || hasHelp.equals(0)) && this.config != null && this.config.containsKey("param")) {
-                if (this.config.getJSONObject("param").containsKey("paramList") && this.config.getJSONObject("param").getJSONArray("paramList").size() > 0) {
-                    hasHelp = 1;
-                }
+            // 保留旧帮助开关，并允许未声明固定规范但实际返回参数的处理器显示完整帮助。
+            if (!Integer.valueOf(1).equals(hasHelp)
+                    && !IntegrationPatternUtil.merge(integrationHandler, config).isEmpty()) {
+                hasHelp = 1;
             }
         }
         return hasHelp;

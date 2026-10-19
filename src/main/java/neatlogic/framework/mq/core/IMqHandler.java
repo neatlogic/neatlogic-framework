@@ -14,6 +14,7 @@ package neatlogic.framework.mq.core;
 
 import neatlogic.framework.exception.mq.SubscribeTopicException;
 import neatlogic.framework.mq.dto.HealthcheckResultVo;
+import neatlogic.framework.mq.dto.MqSendResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
 
 import java.util.List;
@@ -33,6 +34,11 @@ public interface IMqHandler {
     void destroy(SubscribeVo subscribeVo);
 
     void send(String topicName, String content);
+
+    /** 等待消息代理确认发送结果；扩展实现必须明确支持，不能将日志容错接口当作发送成功。 */
+    default MqSendResultVo sendWithResult(String topicName, String content) throws Exception {
+        throw new UnsupportedOperationException("当前消息队列处理器不支持发送回执：" + getName());
+    }
 
     boolean isEnable();
 

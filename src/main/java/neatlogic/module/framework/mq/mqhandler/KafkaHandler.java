@@ -14,12 +14,14 @@ package neatlogic.module.framework.mq.mqhandler;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.exception.mq.MqSendUnconfirmedException;
 import neatlogic.framework.exception.mq.SubscribeHandlerNotFoundException;
 import neatlogic.framework.exception.mq.SubscribeTopicException;
 import neatlogic.framework.mq.core.IMqHandler;
 import neatlogic.framework.mq.core.ISubscribeHandler;
 import neatlogic.framework.mq.core.SubscribeHandlerFactory;
 import neatlogic.framework.mq.dto.HealthcheckResultVo;
+import neatlogic.framework.mq.dto.MqSendResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.admin.AdminClient;
@@ -28,9 +30,7 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -44,10 +44,9 @@ import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -170,15 +169,94 @@ public class KafkaHandler implements IMqHandler {
         }
     }
 
+    /** 保留旧调用方的发送配置和日志容错约定，复用发送及资源释放流程。 */
     @Override
     public void send(String topicName, String content) {
-        //topicName = (TenantContext.get().getTenantUuid() + "_" + topicName).toLowerCase();
-        try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps)) {
-            ProducerRecord<String, String> producerRecord = new ProducerRecord<>(topicName, content);
-            producer.send(producerRecord);
+        try {
+            sendInternal(topicName, content, false);
         } catch (Exception ex) {
-            logger.error("发送消息到Kafka失败，异常：{}", ex.getMessage());
+            logger.error("发送消息到Kafka失败，异常：{}", ex.getMessage(), ex);
         }
+    }
+
+    /** 等待代理回执，Kafka 目标名称保持大小写，不附加租户前缀。 */
+    @Override
+    public MqSendResultVo sendWithResult(String topicName, String content) throws Exception {
+        return sendInternal(topicName, content, true);
+    }
+
+    /** 共享发送和资源释放，严格确认路径的超时及重试配置不改变旧调用方。 */
+    private MqSendResultVo sendInternal(String topicName, String content, boolean waitForResult) throws Exception {
+        if (StringUtils.isBlank(topicName)) {
+            throw new IllegalArgumentException("Topic名称不能为空");
+        }
+        Map<String, Object> properties = new HashMap<>(producerProps);
+        if (waitForResult) {
+            // 限制元数据等待、发送确认及关闭时间；不修改消费者和原有发送配置。
+            properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 30000L);
+            properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);
+            properties.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, 30000);
+            properties.put(ProducerConfig.LINGER_MS_CONFIG, 0);
+            properties.put(ProducerConfig.ACKS_CONFIG, "all");
+            properties.put(ProducerConfig.RETRIES_CONFIG, 0);
+            properties.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, false);
+        }
+        Producer<String, String> producer = null;
+        boolean restoreInterrupt = false;
+        try {
+            producer = createProducer(properties);
+            Future<RecordMetadata> future = producer.send(new ProducerRecord<>(topicName, content));
+            if (!waitForResult) {
+                return null;
+            }
+            RecordMetadata metadata = future.get(30, TimeUnit.SECONDS);
+            if (metadata == null || metadata.offset() < 0) {
+                throw new MqSendUnconfirmedException(getName(), topicName, "Kafka发送结果未确认：" + topicName, null);
+            }
+            MqSendResultVo result = new MqSendResultVo();
+            result.setHandler(getName());
+            result.setDestination(metadata.topic());
+            result.setPartition(metadata.partition());
+            result.setOffset(metadata.offset());
+            return result;
+        } catch (InterruptedException | org.apache.kafka.common.errors.InterruptException ex) {
+            restoreInterrupt = true;
+            Thread.currentThread().interrupt();
+            throw new MqSendUnconfirmedException(getName(), topicName, "等待Kafka发送确认被中断：" + topicName, ex);
+        } catch (TimeoutException | org.apache.kafka.common.errors.TimeoutException ex) {
+            throw new MqSendUnconfirmedException(getName(), topicName, "等待Kafka发送确认超时：" + topicName, ex);
+        } catch (ExecutionException ex) {
+            if (ex.getCause() instanceof org.apache.kafka.common.errors.TimeoutException) {
+                throw new MqSendUnconfirmedException(getName(), topicName, "等待Kafka发送确认超时：" + topicName, ex.getCause());
+            }
+            if (ex.getCause() instanceof InterruptedException || ex.getCause() instanceof org.apache.kafka.common.errors.InterruptException) {
+                restoreInterrupt = true;
+                Thread.currentThread().interrupt();
+                throw new MqSendUnconfirmedException(getName(), topicName, "等待Kafka发送确认被中断：" + topicName, ex.getCause());
+            }
+            throw ex;
+        } finally {
+            if (producer != null) {
+                try {
+                    if (waitForResult) {
+                        producer.close(Duration.ofSeconds(5));
+                    } else {
+                        producer.close();
+                    }
+                } catch (Exception ex) {
+                    // 资源关闭不改变已经收到的代理回执，也不覆盖原发送异常。
+                    logger.error("关闭Kafka发送器失败：{}", ex.getMessage(), ex);
+                }
+            }
+            if (restoreInterrupt) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /** 创建发送客户端，测试可在此替换外部消息代理。 */
+    protected Producer<String, String> createProducer(Map<String, Object> properties) {
+        return new KafkaProducer<>(properties);
     }
 
     @Override

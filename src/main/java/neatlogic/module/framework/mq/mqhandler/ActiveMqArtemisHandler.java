@@ -14,13 +14,18 @@ package neatlogic.module.framework.mq.mqhandler;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
+import neatlogic.framework.exception.mq.MqSendUnconfirmedException;
 import neatlogic.framework.exception.mq.SubscribeHandlerNotFoundException;
 import neatlogic.framework.exception.mq.SubscribeTopicException;
 import neatlogic.framework.mq.core.IMqHandler;
 import neatlogic.framework.mq.core.ISubscribeHandler;
 import neatlogic.framework.mq.core.SubscribeHandlerFactory;
 import neatlogic.framework.mq.dto.HealthcheckResultVo;
+import neatlogic.framework.mq.dto.MqSendResultVo;
 import neatlogic.framework.mq.dto.SubscribeVo;
+import org.apache.activemq.artemis.api.core.ActiveMQException;
+import org.apache.activemq.artemis.api.core.ActiveMQExceptionType;
+import org.apache.activemq.artemis.api.core.ActiveMQInterruptedException;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.apache.activemq.artemis.jms.client.ActiveMQQueue;
 import org.apache.commons.lang3.StringUtils;
@@ -116,30 +121,94 @@ public class ActiveMqArtemisHandler implements IMqHandler {
         }
     }
 
+    /** 旧接口继续记录异常，不让消息发送失败打断原调用方。 */
     @Override
     public void send(String topicName, String content) {
-        String queueName = buildQueueName(TenantContext.get().getTenantUuid(), topicName);
+        try {
+            sendInternal(topicName, content, false);
+        } catch (Exception ex) {
+            logger.error("发送消息到 Artemis 失败，异常：{}", ex.getMessage(), ex);
+        }
+    }
+
+    /** 发送持久化文本消息，并等待代理确认；目的地沿用既有租户命名规则。 */
+    @Override
+    public MqSendResultVo sendWithResult(String topicName, String content) throws Exception {
+        return sendInternal(topicName, content, true);
+    }
+
+    /** 共享发送和释放逻辑，仅严格确认路径覆盖连接工厂的超时及重连策略。 */
+    private MqSendResultVo sendInternal(String topicName, String content, boolean waitForResult) throws Exception {
+        if (StringUtils.isBlank(topicName)) {
+            throw new IllegalArgumentException("消息目标名称不能为空");
+        }
+        String destinationName = buildQueueName(TenantContext.get().getTenantUuid(), topicName);
         ActiveMQConnectionFactory connectionFactory = null;
         Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
+        boolean restoreInterrupt = false;
         try {
-            connectionFactory = new ActiveMQConnectionFactory(brokerUrl, user, password);
+            connectionFactory = createSendConnectionFactory();
+            if (waitForResult) {
+                connectionFactory.setBlockOnDurableSend(true);
+                connectionFactory.setCallTimeout(30000L);
+                connectionFactory.setCallFailoverTimeout(30000L);
+                connectionFactory.setInitialConnectAttempts(1);
+                connectionFactory.setReconnectAttempts(0);
+            }
             connection = connectionFactory.createConnection();
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-            Destination destination = new ActiveMQQueue(queueName);
+            Destination destination = new ActiveMQQueue(destinationName);
             producer = session.createProducer(destination);
             TextMessage message = session.createTextMessage(content);
             producer.setDeliveryMode(DeliveryMode.PERSISTENT);
             producer.send(message);
-        } catch (Exception ex) {
-            logger.error("发送消息到 Artemis 失败，异常：{}", ex.getMessage());
+            if (!waitForResult) {
+                return null;
+            }
+            MqSendResultVo result = new MqSendResultVo();
+            result.setHandler(getName());
+            result.setDestination(destinationName);
+            result.setMessageId(message.getJMSMessageID());
+            return result;
+        } catch (JMSException ex) {
+            Throwable cause = ex;
+            // Artemis 同时可能使用 cause 或 JMS linkedException 包装超时及线程中断。
+            for (int depth = 0; cause != null && depth < 16; depth++) {
+                if (cause instanceof InterruptedException || cause instanceof ActiveMQInterruptedException) {
+                    restoreInterrupt = true;
+                    Thread.currentThread().interrupt();
+                    throw new MqSendUnconfirmedException(getName(), destinationName, "等待Artemis发送确认被中断：" + destinationName, ex);
+                }
+                if (cause instanceof java.util.concurrent.TimeoutException
+                        || cause instanceof ActiveMQException
+                        && ((ActiveMQException) cause).getType() == ActiveMQExceptionType.CONNECTION_TIMEDOUT) {
+                    throw new MqSendUnconfirmedException(getName(), destinationName, "等待Artemis发送确认超时：" + destinationName, ex);
+                }
+                if (cause.getCause() != null) {
+                    cause = cause.getCause();
+                } else if (cause instanceof JMSException) {
+                    cause = ((JMSException) cause).getLinkedException();
+                } else {
+                    cause = null;
+                }
+            }
+            throw ex;
         } finally {
             JmsUtils.closeMessageProducer(producer);
             JmsUtils.closeSession(session);
             JmsUtils.closeConnection(connection);
             closeConnectionFactory(connectionFactory);
+            if (restoreInterrupt) {
+                Thread.currentThread().interrupt();
+            }
         }
+    }
+
+    /** 创建独立发送连接工厂，测试可替换连接边界，消费者配置不受影响。 */
+    protected ActiveMQConnectionFactory createSendConnectionFactory() {
+        return new ActiveMQConnectionFactory(brokerUrl, user, password);
     }
 
     @Override

@@ -48,7 +48,7 @@ public class CasLoginAuthHandler extends LoginAuthHandlerBase {
     @Override
     public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException {
 
-        String ticket = request.getHeader("AuthValue");
+        String ticket = request.getHeader(Config.SSO_TICKET_KEY());
         String tenant = request.getHeader("Tenant");
         String casUrl = Config.DIRECT_URL();
         String selfUrl = Config.HOME_URL().trim();

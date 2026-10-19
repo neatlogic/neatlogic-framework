@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.WechatVo;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.wechat.WechatAuthenticationInformationNotFoundException;
 import neatlogic.framework.exception.wechat.WechatGetAccessTokenFailedException;
 import neatlogic.framework.exception.wechat.WechatGetCodeFailedException;

@@ -94,6 +94,12 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
     protected abstract void afterReturn(IntegrationVo integrationVo);
 
+    /** 输入准备顺序固定为补齐默认值、原有校验，随后才允许转换和发送。 */
+    protected void prepareInputParam(IntegrationVo integrationVo) {
+        integrationVo.setParamObj(IntegrationDefaultValueUtil.apply(this, integrationVo.getConfig(), "input", integrationVo.getParamObj()));
+        validateInputParam(integrationVo);
+    }
+
     /** 启用校验后同时检查固定和自定义输入，保持原来的必填字段存在性判断。 */
     protected void validateInputParam(IntegrationVo integrationVo) {
         JSONObject config = integrationVo.getConfig();
@@ -185,13 +191,12 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         JSONObject authConfig = config.getJSONObject("authentication");
         JSONArray headConfig = config.getJSONArray("head");
         JSONObject outputConfig = config.getJSONObject("output");
+        // 默认值独立于 needValid；先复制并补齐输入，转换和审计读取同一份请求参数。
+        prepareInputParam(integrationVo);
         JSONObject requestParamObj = integrationVo.getParamObj();
         if (otherConfig == null) {
             otherConfig = new JSONObject();
         }
-        // 转换和发送前校验完整输入定义，输出定义继续交给原处理器校验。
-        validateInputParam(integrationVo);
-
         /*
         转换入参开始
          */
@@ -377,6 +382,17 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             }
             if (!hasTransferred) {
                 resultVo.setTransformedResult(resultVo.getRawResult());
+            }
+
+            // 只处理成功的对象响应；输出默认值不能掩盖网络错误或转换失败。
+            if (!"failed".equals(integrationAuditVo.getStatus())) {
+                try {
+                    IntegrationDefaultValueUtil.applyOutput(this, config, resultVo);
+                } catch (Exception ex) {
+                    resultVo.appendError(ex.getMessage());
+                    integrationAuditVo.appendError(ex.getMessage());
+                    integrationAuditVo.setStatus("failed");
+                }
             }
 
             integrationAuditVo.setResult(resultVo.getRawResult());

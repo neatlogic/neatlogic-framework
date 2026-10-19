@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.dao.mapper.NotifyConfigMapper;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.WechatVo;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.wechat.WechatAuthenticationInformationNotFoundException;
 import neatlogic.framework.exception.wechat.WechatGetAccessTokenFailedException;
 import neatlogic.framework.exception.wechat.WechatGetCodeFailedException;
@@ -44,7 +45,7 @@ public class WechatLoginAuthHandler extends LoginAuthHandlerBase {
 
     @Override
     public UserVo myAuth(HttpServletRequest request) throws ServletException, IOException {
-        String code = request.getHeader("AuthValue");
+        String code = request.getHeader(Config.SSO_TICKET_KEY());
         String userId;
         String access_token;
         logger.info("---> code:" + code);

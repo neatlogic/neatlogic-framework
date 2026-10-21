@@ -7,6 +7,6 @@ public class IntegrationDefaultValueInvalidException extends ApiRuntimeException
     private static final long serialVersionUID = 1L;
 
     public IntegrationDefaultValueInvalidException(String path, String reason) {
-        super("参数默认值配置错误：" + path + "，" + reason);
+        super("nfei.integrationdefaultvalueinvalidexception.integrationdefaultvalueinvalidexception", String.valueOf(path), String.valueOf(reason));
     }
 }

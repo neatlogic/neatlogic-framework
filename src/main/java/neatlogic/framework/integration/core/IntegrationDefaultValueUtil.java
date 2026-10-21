@@ -8,6 +8,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.exception.integration.IntegrationDefaultValueInvalidException;
 import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.PatternVo;
+import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -23,7 +24,7 @@ import java.util.*;
 public final class IntegrationDefaultValueUtil {
     private static final Set<String> TYPES = new HashSet<>(Arrays.asList(
             "string", "number", "int", "boolean", "enum", "date", "array", "object"));
-    private static final String DATE_ERROR = "日期必须符合 yyyy-MM、yyyy-MM-dd、yyyy-MM-dd HH:mm 或 yyyy-MM-dd HH:mm:ss，且为有效日期时间";
+    private static final String DATE_ERROR = "nfic.integrationdefaultvalueutil.date_error";
     // uuuu 配合 STRICT 校验真实日历；对外仍使用用户熟悉的 yyyy 文案，不进行时区转换。
     private static final DateTimeFormatter DATE_MONTH = DateTimeFormatter.ofPattern("uuuu-MM", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
     private static final DateTimeFormatter DATE_DAY = DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
@@ -125,7 +126,7 @@ public final class IntegrationDefaultValueUtil {
         }
         String path = pattern.getMode() + "." + pattern.getName();
         if (!defaults.containsKey("value")) {
-            fail(path, "已启用但未填写默认值");
+            fail(path, "nfic.integrationdefaultvalueutil.validatedefault.missingvalue");
         }
         JSONObject schema = getEffectiveSchema(pattern);
         validateSchema(schema, path, true);
@@ -136,7 +137,7 @@ public final class IntegrationDefaultValueUtil {
     public static JSONObject getEffectiveSchema(PatternVo pattern) {
         JSONObject defaults = pattern.getDefaultConfig();
         if (defaults != null && defaults.containsKey("schema") && !(defaults.get("schema") instanceof Map)) {
-            fail(pattern.getMode() + "." + pattern.getName(), "参数结构格式不正确");
+            fail(pattern.getMode() + "." + pattern.getName(), "nfic.integrationdefaultvalueutil.geteffectiveschema.invalidschema");
         }
         JSONObject supplement = defaults == null ? null : defaults.getJSONObject("schema");
         // 旧选项已不参与默认值约束，先在副本清理，避免历史格式或选项变动导致失效。
@@ -269,10 +270,10 @@ public final class IntegrationDefaultValueUtil {
                 List<String> key = Arrays.asList(entry.getString("mode"), entry.getString("name"));
                 String path = entry.getString("mode") + "." + entry.getString("name");
                 if (!seen.add(key)) {
-                    fail(path, "固定参数默认值重复");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatebuiltinentries.duplicatedefault");
                 }
                 if (isEnabled(entry.getJSONObject("defaultConfig")) && !definitions.contains(key)) {
-                    fail(path, "参数结构已变化，请重新配置默认值");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatebuiltinentries.schemachanged");
                 }
             }
         }
@@ -290,7 +291,7 @@ public final class IntegrationDefaultValueUtil {
         if (StringUtils.isNotBlank(type)) {
             if (supplement != null && StringUtils.isNotBlank(supplement.getString("type"))
                     && !type.equals(normalizeType(supplement.getString("type")))) {
-                fail(path, "参数结构已变化，请重新配置默认值");
+                fail(path, "nfic.integrationdefaultvalueutil.validatebuiltinentries.schemachanged");
             }
             merged.put("type", type);
         }
@@ -300,7 +301,7 @@ public final class IntegrationDefaultValueUtil {
         if (declared.get("isRequired") != null) {
             if (supplement != null && supplement.containsKey("isRequired")
                     && required(declared) != required(supplement)) {
-                fail(path, "固定字段的必填要求不能修改，请重新配置默认值");
+                fail(path, "nfic.integrationdefaultvalueutil.mergeschema.requiredconstraintchanged");
             }
             merged.put("isRequired", declared.get("isRequired"));
         }
@@ -314,7 +315,7 @@ public final class IntegrationDefaultValueUtil {
             Map<String, JSONObject> additions = childrenByName(customChildren, path);
             // 页面保存完整结构快照；提供列清单时须与固定结构一致，识别规范新增或删除列。
             if (customChildren != null && additions.size() != fixedChildren.size()) {
-                fail(path, "固定子字段结构已变化，请重新配置默认值");
+                fail(path, "nfic.integrationdefaultvalueutil.mergeschema.fixedchildrenchanged");
             }
             JSONArray children = new JSONArray();
             for (int i = 0; i < fixedChildren.size(); i++) {
@@ -323,7 +324,7 @@ public final class IntegrationDefaultValueUtil {
                 children.add(mergeSchema(child, additions.remove(name), path + "." + name));
             }
             if (!additions.isEmpty()) {
-                fail(path, "固定子字段结构已变化，请重新配置默认值");
+                fail(path, "nfic.integrationdefaultvalueutil.mergeschema.fixedchildrenchanged");
             }
             merged.put("children", children);
         }
@@ -335,12 +336,12 @@ public final class IntegrationDefaultValueUtil {
         if (children != null) {
             for (int i = 0; i < children.size(); i++) {
                 if (!(children.get(i) instanceof Map)) {
-                    fail(path, "对象列结构格式不正确");
+                    fail(path, "nfic.integrationdefaultvalueutil.childrenbyname.invalidstructure");
                 }
                 JSONObject child = children.getJSONObject(i);
                 String name = child == null ? null : child.getString("name");
                 if (StringUtils.isBlank(name) || result.putIfAbsent(name, child) != null) {
-                    fail(path, "对象列名不能为空或重复");
+                    fail(path, "nfic.integrationdefaultvalueutil.childrenbyname.invalidname");
                 }
             }
         }
@@ -352,13 +353,13 @@ public final class IntegrationDefaultValueUtil {
         String type = normalizeType(schema.getString("type"));
         schema.put("type", type);
         if (!TYPES.contains(type)) {
-            fail(path, "请选择有效的数据类型或数组元素类型");
+            fail(path, "nfic.integrationdefaultvalueutil.validateschema.invalidtype");
         }
         if ("array".equals(type)) {
             JSONObject items = schema.getJSONObject("items");
             if (items == null) {
                 if (requireStructure) {
-                    fail(path, "请先配置数组元素结构");
+                    fail(path, "nfic.integrationdefaultvalueutil.validateschema.missingarrayitems");
                 }
                 return;
             }
@@ -367,7 +368,7 @@ public final class IntegrationDefaultValueUtil {
             JSONArray children = schema.getJSONArray("children");
             if (children == null || children.isEmpty()) {
                 if (requireStructure) {
-                    fail(path, "请先配置对象列结构");
+                    fail(path, "nfic.integrationdefaultvalueutil.validateschema.missingobjectcolumns");
                 }
                 return;
             }
@@ -381,10 +382,10 @@ public final class IntegrationDefaultValueUtil {
     /** 不将字符串等错误 JSON 类型自动转换成结构对象，保持与页面校验一致。 */
     private static void validateNodeShape(JSONObject schema, String path) {
         if (schema.containsKey("items") && !(schema.get("items") instanceof Map)) {
-            fail(path, "数组元素结构格式不正确");
+            fail(path, "nfic.integrationdefaultvalueutil.validatenodeshape.invalidarrayitems");
         }
         if (schema.containsKey("children") && !(schema.get("children") instanceof List)) {
-            fail(path, "对象列结构格式不正确");
+            fail(path, "nfic.integrationdefaultvalueutil.childrenbyname.invalidstructure");
         }
     }
 
@@ -398,11 +399,11 @@ public final class IntegrationDefaultValueUtil {
             case "date":
             case "string":
                 if (!(value instanceof String)) {
-                    fail(path, "必须为字符串");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.stringrequired");
                 }
                 // 必填文本与前端 trim 判空保持一致，可选文本仍允许明确保存空字符串。
                 if (required(schema) && isBlankDefaultText((String) value)) {
-                    fail(path, "必填字段未填写");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.requiredfieldmissing");
                 }
                 if ("date".equals(type) && !isValidDefaultDate((String) value)) {
                     fail(path, DATE_ERROR);
@@ -411,20 +412,20 @@ public final class IntegrationDefaultValueUtil {
             case "number":
             case "int":
                 if (!(value instanceof Number) || !Double.isFinite(((Number) value).doubleValue())) {
-                    fail(path, "必须为有限数字");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.finitenumberrequired");
                 }
                 if ("int".equals(type) && new BigDecimal(value.toString()).stripTrailingZeros().scale() > 0) {
-                    fail(path, "必须为整数");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.integerrequired");
                 }
                 break;
             case "boolean":
                 if (!(value instanceof Boolean)) {
-                    fail(path, "必须为布尔值 true 或 false");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.booleanrequired");
                 }
                 break;
             case "array":
                 if (!(value instanceof List)) {
-                    fail(path, "必须为数组");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.arrayrequired");
                 }
                 List<?> rows = (List<?>) value;
                 JSONObject items = schema.getJSONObject("items");
@@ -434,12 +435,12 @@ public final class IntegrationDefaultValueUtil {
                 }
                 for (int i = 0; i < rows.size(); i++) {
                     // 数组元素继承所在字段的上下文，顶层数组不能借空对象元素绕过结构要求。
-                    validateValue(rows.get(i), items, path + "[第 " + (i + 1) + " 项]", nested);
+                    validateValue(rows.get(i), items, path + $.t("nfic.integrationdefaultvalueutil.validatevalue.arrayitem", i + 1), nested);
                 }
                 break;
             case "object":
                 if (!(value instanceof Map)) {
-                    fail(path, "必须为对象");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatevalue.objectrequired");
                 }
                 Map<?, ?> object = (Map<?, ?>) value;
                 Map<String, JSONObject> columns = childrenByName(schema.getJSONArray("children"), path);
@@ -451,7 +452,7 @@ public final class IntegrationDefaultValueUtil {
                     String childPath = path + "." + child.getKey();
                     if (!object.containsKey(child.getKey())) {
                         if (required(child.getValue())) {
-                            fail(childPath, "必填字段未填写");
+                            fail(childPath, "nfic.integrationdefaultvalueutil.validatevalue.requiredfieldmissing");
                         }
                     } else {
                         validateValue(object.get(child.getKey()), child.getValue(), childPath, true);
@@ -459,12 +460,12 @@ public final class IntegrationDefaultValueUtil {
                 }
                 for (Object key : object.keySet()) {
                     if (!columns.containsKey(key)) {
-                        fail(path + "." + key, "字段不在已声明的对象列结构中");
+                        fail(path + "." + key, "nfic.integrationdefaultvalueutil.validatevalue.undeclaredfield");
                     }
                 }
                 break;
             default:
-                fail(path, "不支持的数据类型");
+                fail(path, "nfic.integrationdefaultvalueutil.validatevalue.unsupportedtype");
         }
     }
 
@@ -494,27 +495,27 @@ public final class IntegrationDefaultValueUtil {
         }
         if (value instanceof Number) {
             if (!Double.isFinite(((Number) value).doubleValue())) {
-                fail(path, "必须为有限数字");
+                fail(path, "nfic.integrationdefaultvalueutil.validatevalue.finitenumberrequired");
             }
             return;
         }
         if (value instanceof List) {
             List<?> items = (List<?>) value;
             for (int i = 0; i < items.size(); i++) {
-                validateJsonValue(items.get(i), path + "[第 " + (i + 1) + " 项]");
+                validateJsonValue(items.get(i), path + $.t("nfic.integrationdefaultvalueutil.validatevalue.arrayitem", i + 1));
             }
             return;
         }
         if (value instanceof Map) {
             for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
                 if (!(entry.getKey() instanceof String)) {
-                    fail(path, "JSON 对象字段名必须为字符串");
+                    fail(path, "nfic.integrationdefaultvalueutil.validatejsonvalue.stringkeyrequired");
                 }
                 validateJsonValue(entry.getValue(), path + "." + entry.getKey());
             }
             return;
         }
-        fail(path, "必须为合法 JSON 值");
+        fail(path, "nfic.integrationdefaultvalueutil.validatejsonvalue.jsonvaluerequired");
     }
 
     private static boolean required(JSONObject schema) {
@@ -556,6 +557,6 @@ public final class IntegrationDefaultValueUtil {
     }
 
     private static void fail(String path, String reason) {
-        throw new IntegrationDefaultValueInvalidException(path, reason);
+        throw new IntegrationDefaultValueInvalidException(path, $.t(reason));
     }
 }

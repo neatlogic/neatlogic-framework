@@ -79,28 +79,28 @@ public class PatternVo implements Serializable {
         isRequired = 0;
     }
 
-    @EntityField(name = "参数名", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.name", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "唯一键，名称和类型的组合", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.key", type = ApiParamType.STRING)
     private String key;
-    @EntityField(name = "数据类型", type = ApiParamType.STRING)
+    @EntityField(name = "common.datatype", type = ApiParamType.STRING)
     private String type;
-    @EntityField(name = "参数类型", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.mode", type = ApiParamType.STRING)
     private String mode;
-    @EntityField(name = "参数类型名称", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.typename", type = ApiParamType.STRING)
     private String typeName;
-    @EntityField(name = "子参数", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfid.patternvo.entityfield.name.children", type = ApiParamType.JSONOBJECT)
     private List<PatternVo> children;
-    @EntityField(name = "是否必填", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isrequired", type = ApiParamType.INTEGER)
     private Integer isRequired;
-    @EntityField(name = "描述", type = ApiParamType.STRING)
+    @EntityField(name = "common.description", type = ApiParamType.STRING)
     private String description;
-    @EntityField(name = "是否显示", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isshow", type = ApiParamType.INTEGER)
     private Integer isShow = 1;
     // 默认值属于当前集成，固定处理器定义仅声明可用的枚举选项和结构。
-    @EntityField(name = "当前集成的默认值配置", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfid.patternvo.entityfield.name.defaultconfig", type = ApiParamType.JSONOBJECT)
     private JSONObject defaultConfig;
-    @EntityField(name = "固定枚举选项", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfid.patternvo.entityfield.name.options", type = ApiParamType.JSONARRAY)
     private JSONArray options;
 
     public JSONObject getDefaultConfig() {

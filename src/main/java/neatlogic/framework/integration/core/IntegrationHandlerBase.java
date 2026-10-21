@@ -208,7 +208,6 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             if (StringUtils.isNotBlank(inputParam)) {
                 try {
                     inputParam = JavascriptUtil.transform(integrationVo.getParamObj(), inputParam);
-                    resultVo.setTransformedParam(inputParam);
                 } catch (Exception ex) {
                     throw new ParamTransferException(ex.getMessage());
                 }
@@ -218,7 +217,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         } else {
             inputParam = integrationVo.getParamObj().toJSONString();
         }
-
+        // 无论是否配置输入转换，都回传实际发送使用的参数，包含已经补齐的默认值。
+        resultVo.setTransformedParam(inputParam);
 
         List<String> fullIndexParamValueList = new ArrayList<>();
         integrationAuditVo.setRequestFrom(iRequestFrom.toString());

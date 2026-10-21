@@ -11,12 +11,24 @@ import neatlogic.framework.integration.dto.PatternVo;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.*;
 
 /** 默认值的保存校验、结构合并和运行补齐共用同一规则，配置仍存放在原 JSON 中。 */
 public final class IntegrationDefaultValueUtil {
     private static final Set<String> TYPES = new HashSet<>(Arrays.asList(
             "string", "number", "int", "boolean", "enum", "date", "array", "object"));
+    private static final String DATE_ERROR = "日期必须符合 yyyy-MM、yyyy-MM-dd、yyyy-MM-dd HH:mm 或 yyyy-MM-dd HH:mm:ss，且为有效日期时间";
+    // uuuu 配合 STRICT 校验真实日历；对外仍使用用户熟悉的 yyyy 文案，不进行时区转换。
+    private static final DateTimeFormatter DATE_MONTH = DateTimeFormatter.ofPattern("uuuu-MM", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter DATE_DAY = DateTimeFormatter.ofPattern("uuuu-MM-dd", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter DATE_MINUTE = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
+    private static final DateTimeFormatter DATE_SECOND = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
 
     private IntegrationDefaultValueUtil() {
     }
@@ -381,7 +393,7 @@ public final class IntegrationDefaultValueUtil {
         validateSchema(schema, path, !nested);
         String type = schema.getString("type");
         switch (type) {
-            // 枚举和日期默认值与文本框一致，仅要求真实字符串，不再限制范围或格式。
+            // 日期仍保存原字符串，但保存及运行都检查严格格式；不修改全局日期校验器。
             case "enum":
             case "date":
             case "string":
@@ -391,6 +403,9 @@ public final class IntegrationDefaultValueUtil {
                 // 必填文本与前端 trim 判空保持一致，可选文本仍允许明确保存空字符串。
                 if (required(schema) && isBlankDefaultText((String) value)) {
                     fail(path, "必填字段未填写");
+                }
+                if ("date".equals(type) && !isValidDefaultDate((String) value)) {
+                    fail(path, DATE_ERROR);
                 }
                 break;
             case "number":
@@ -450,6 +465,25 @@ public final class IntegrationDefaultValueUtil {
                 break;
             default:
                 fail(path, "不支持的数据类型");
+        }
+    }
+
+    /** 日期只接受四种完整格式和真实日历字段，不补全、不裁剪，也不转换原字符串。 */
+    private static boolean isValidDefaultDate(String value) {
+        if (!value.matches("(?!0000)[0-9]{4}-[0-9]{2}(?:-[0-9]{2}(?: [0-9]{2}:[0-9]{2}(?::[0-9]{2})?)?)?")) {
+            return false;
+        }
+        try {
+            switch (value.length()) {
+                case 7: YearMonth.parse(value, DATE_MONTH); break;
+                case 10: LocalDate.parse(value, DATE_DAY); break;
+                case 16: LocalDateTime.parse(value, DATE_MINUTE); break;
+                case 19: LocalDateTime.parse(value, DATE_SECOND); break;
+                default: return false;
+            }
+            return true;
+        } catch (DateTimeException exception) {
+            return false;
         }
     }
 

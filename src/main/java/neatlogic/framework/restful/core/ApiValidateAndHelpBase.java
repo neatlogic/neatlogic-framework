@@ -72,7 +72,7 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
      */
     protected void saveAudit(ApiVo apiVo, JSONObject paramObj, Object result, String error, Long startTime, Long endTime) {
         HttpServletRequest request = RequestContext.get().getRequest();
-        String requestIp = IpUtil.getIpAddr(request);
+        String requestIp = request == null ? RequestContext.get().getRemoteAddr() : IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
         data.put("type", getApiAccessType(request));
@@ -101,7 +101,7 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
     protected void saveAudit(ApiVo apiVo, String param, Object result, String error, Long startTime, Long endTime) {
         UserContext userContext = UserContext.get();
         HttpServletRequest request = RequestContext.get().getRequest();
-        String requestIp = IpUtil.getIpAddr(request);
+        String requestIp = request == null ? RequestContext.get().getRemoteAddr() : IpUtil.getIpAddr(request);
         JSONObject data = new JSONObject();
         data.put("token", apiVo.getToken());
         data.put("type", getApiAccessType(request));
@@ -128,7 +128,10 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
      * 从服务端请求属性读取审计访问类型，普通 API 和缺少请求上下文的内部调用默认按 REST 记录。
      */
     private String getApiAccessType(HttpServletRequest request) {
-        return ApiAccessType.normalize(request == null ? null : request.getAttribute(ApiAccessType.REQUEST_ATTRIBUTE));
+        // 内部 MCP 使用线程级来源；普通 HTTP 请求继续使用服务端请求属性。
+        String internalType = RequestContext.get().getApiAccessType();
+        return ApiAccessType.normalize(internalType != null ? internalType
+                : request == null ? null : request.getAttribute(ApiAccessType.REQUEST_ATTRIBUTE));
     }
 
 

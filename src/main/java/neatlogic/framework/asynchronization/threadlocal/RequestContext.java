@@ -36,6 +36,8 @@ public class RequestContext implements Serializable {
     private static final long serialVersionUID = -5420998728515359626L;
     private String url;
     private String remoteAddr;
+    // 服务端调用来源，供无 Servlet 请求的后台任务审计使用。
+    private String apiAccessType;
     private String param;
     private HttpServletRequest request;
     private HttpServletResponse response;
@@ -57,6 +59,10 @@ public class RequestContext implements Serializable {
     public void setUrl(String url) {
         this.url = url;
     }
+
+    public String getApiAccessType() { return apiAccessType; }
+
+    public void setApiAccessType(String apiAccessType) { this.apiAccessType = apiAccessType; }
 
     public String getRemoteAddr() {
         return remoteAddr;
@@ -149,6 +155,7 @@ public class RequestContext implements Serializable {
             context.setLocale(_requestContext.getLocale());
             context.setRequestSqlAuditVo(_requestContext.requestSqlAuditVo);
             context.setRemoteAddr(_requestContext.getRemoteAddr());
+            context.setApiAccessType(_requestContext.getApiAccessType());
             context.setParam(_requestContext.getParam());
             String tempUrl = _requestContext.getUrl();
             if (tempUrl == null) {

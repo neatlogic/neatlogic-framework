@@ -242,6 +242,15 @@
         </foreach>
     </select>
 
+
+    <!-- 能力目录只需要安全标识，不读取认证配置，也不受管理页实例分页限制。 -->
+    <select id="getActiveIntegrationForSelectByMethod" resultType="neatlogic.framework.common.dto.ValueTextVo">
+        SELECT `uuid` AS `value`, `name` AS `text`
+        FROM `integration`
+        WHERE `is_active` = 1 AND `method` = #{method}
+        ORDER BY `uuid`
+    </select>
+
     <select id="searchIntegrationForSelect" parameterType="neatlogic.framework.integration.dto.IntegrationVo"
             resultType="neatlogic.framework.common.dto.ValueTextVo">
         SELECT

@@ -18,6 +18,7 @@ import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
+import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.ParamType;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
 import neatlogic.framework.exception.type.ParamIrregularException;
@@ -38,6 +39,7 @@ import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import neatlogic.framework.integration.dto.PatternVo;
 import neatlogic.framework.param.validate.core.ParamValidatorBase;
+import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
 import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import neatlogic.module.framework.integration.audit.IntegrationAuditAppendPostProcessor;
@@ -92,6 +94,64 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
     protected abstract void afterReturn(IntegrationVo integrationVo);
 
+    /** 输入准备顺序固定为补齐默认值、原有校验，随后才允许转换和发送。 */
+    protected void prepareInputParam(IntegrationVo integrationVo) {
+        integrationVo.setParamObj(IntegrationDefaultValueUtil.apply(this, integrationVo.getConfig(), "input", integrationVo.getParamObj()));
+        validateInputParam(integrationVo);
+    }
+
+    /** 启用校验后同时检查固定和自定义输入，保持原来的必填字段存在性判断。 */
+    protected void validateInputParam(IntegrationVo integrationVo) {
+        JSONObject config = integrationVo.getConfig();
+        JSONObject param = IntegrationPatternUtil.getParamConfig(config);
+        if (param == null || !Integer.valueOf(1).equals(param.getInteger("needValid"))) {
+            return;
+        }
+        JSONObject request = integrationVo.getParamObj();
+        if (request == null) {
+            request = new JSONObject();
+        }
+        for (PatternVo pattern : IntegrationPatternUtil.merge(this, config, "input")) {
+            if (Integer.valueOf(1).equals(pattern.getIsRequired()) && !request.containsKey(pattern.getName())) {
+                throw new ParamNotExistsException(pattern.getName());
+            }
+            validateParamType(pattern, request.get(pattern.getName()));
+        }
+    }
+
+    /** 优先使用已有自定义类型校验器；无旧校验器时复用 API 类型校验，兼容固定规范类型。 */
+    private void validateParamType(PatternVo pattern, Object value) {
+        ParamType paramType = ParamType.getParamType(pattern.getType());
+        if (paramType != null) {
+            ParamValidatorBase validator = ParamValidatorFactory.getAuthInstance(paramType);
+            if (validator != null) {
+                if (value != null && !validator.validate(value, null)) {
+                    throw new ParamIrregularException(pattern.getName());
+                }
+                return;
+            }
+        }
+        ApiParamType apiType;
+        if (paramType == ParamType.NUMBER) {
+            apiType = ApiParamType.DOUBLE;
+        } else if (paramType == ParamType.ARRAY) {
+            apiType = ApiParamType.JSONARRAY;
+        } else if (paramType == ParamType.ENUM || paramType == ParamType.DATE) {
+            // 旧配置未提供枚举规则或日期格式，继续保留没有专用校验器时的行为。
+            return;
+        } else {
+            apiType = ApiParamType.getApiParamType(pattern.getType());
+            // API 类型查询会将未知值回退为 NOAUTH，未知配置仍须明确报错。
+            if (apiType == ApiParamType.NOAUTH && !apiType.getValue().equals(pattern.getType())) {
+                throw new ParamTypeNotFoundException(pattern.getType());
+            }
+        }
+        ApiParamValidatorBase validator = ParamValidatorFactory.getAuthInstance(apiType);
+        if (value != null && validator != null && !validator.validate(value, null)) {
+            throw new ParamIrregularException(pattern.getName());
+        }
+    }
+
     // 构建带参数的 URL
     private String buildUrlWithParams(String baseURL, String inputParam) {
         StringJoiner sj = new StringJoiner("&");
@@ -122,61 +182,21 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
 
         String url = integrationVo.getUrl();
         JSONObject config = integrationVo.getConfig();
+        // 未配置可选项时按空配置处理，运行校验是否开启仍由 needValid 决定。
+        if (config == null) {
+            config = new JSONObject();
+        }
         JSONObject otherConfig = config.getJSONObject("other");
         JSONObject inputConfig = config.getJSONObject("input");
         JSONObject authConfig = config.getJSONObject("authentication");
         JSONArray headConfig = config.getJSONArray("head");
         JSONObject outputConfig = config.getJSONObject("output");
-        JSONObject paramObj = config.getJSONObject("param");
+        // 默认值独立于 needValid；先复制并补齐输入，转换和审计读取同一份请求参数。
+        prepareInputParam(integrationVo);
         JSONObject requestParamObj = integrationVo.getParamObj();
         if (otherConfig == null) {
             otherConfig = new JSONObject();
         }
-		/*
-		  校验请求参数开始
-		 */
-        if (paramObj != null && paramObj.getInteger("needValid") != null && paramObj.getInteger("needValid").equals(1)) {
-            List<PatternVo> patternList;
-            // 包含内置参数
-            if (Integer.valueOf(1).equals(this.hasInputPattern())) {
-                patternList = this.getInputPattern();
-            } else {// 自定义参数
-                patternList = new ArrayList<>();
-                JSONArray paramList = paramObj.getJSONArray("paramList");
-                if (CollectionUtils.isNotEmpty(paramList)) {
-                    for (int i = 0; i < paramList.size(); i++) {
-                        JSONObject pObj = paramList.getJSONObject(i);
-                        PatternVo patternVo = JSON.toJavaObject(pObj, PatternVo.class);
-                        patternList.add(patternVo);
-                    }
-                }
-            }
-            if (CollectionUtils.isNotEmpty(patternList)) {
-                for (PatternVo patternVo : patternList) {
-                    if (patternVo.getIsRequired() != null && patternVo.getIsRequired().equals(1)) {
-                        if (!requestParamObj.containsKey(patternVo.getName())) {
-                            throw new ParamNotExistsException(patternVo.getName());
-                        }
-
-                    }
-                    Object paramValue = requestParamObj.get(patternVo.getName());
-                    ParamType paramType = ParamType.getParamType(patternVo.getType());
-                    if (paramType == null) {
-                        throw new ParamTypeNotFoundException(patternVo.getType());
-                    }
-                    if (paramValue != null) {
-                        ParamValidatorBase validator = ParamValidatorFactory.getAuthInstance(paramType);
-                        if (validator != null && !validator.validate(paramValue, null)) {
-                            throw new ParamIrregularException(patternVo.getName());
-                        }
-                    }
-                }
-            }
-        }
-		/*
-		  校验请求参数结束
-		 */
-
         /*
         转换入参开始
          */
@@ -188,7 +208,6 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             if (StringUtils.isNotBlank(inputParam)) {
                 try {
                     inputParam = JavascriptUtil.transform(integrationVo.getParamObj(), inputParam);
-                    resultVo.setTransformedParam(inputParam);
                 } catch (Exception ex) {
                     throw new ParamTransferException(ex.getMessage());
                 }
@@ -198,7 +217,8 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         } else {
             inputParam = integrationVo.getParamObj().toJSONString();
         }
-
+        // 无论是否配置输入转换，都回传实际发送使用的参数，包含已经补齐的默认值。
+        resultVo.setTransformedParam(inputParam);
 
         List<String> fullIndexParamValueList = new ArrayList<>();
         integrationAuditVo.setRequestFrom(iRequestFrom.toString());
@@ -362,6 +382,17 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
             }
             if (!hasTransferred) {
                 resultVo.setTransformedResult(resultVo.getRawResult());
+            }
+
+            // 只处理成功的对象响应；输出默认值不能掩盖网络错误或转换失败。
+            if (!"failed".equals(integrationAuditVo.getStatus())) {
+                try {
+                    IntegrationDefaultValueUtil.applyOutput(this, config, resultVo);
+                } catch (Exception ex) {
+                    resultVo.appendError(ex.getMessage());
+                    integrationAuditVo.appendError(ex.getMessage());
+                    integrationAuditVo.setStatus("failed");
+                }
             }
 
             integrationAuditVo.setResult(resultVo.getRawResult());

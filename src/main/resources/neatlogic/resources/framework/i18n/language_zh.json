@@ -1083,6 +1083,11 @@
       "homepagenotfoundexception": "首页配置：“{0}”不存在"
     }
   },
+  "nfei": {
+    "integrationdefaultvalueinvalidexception": {
+      "integrationdefaultvalueinvalidexception": "参数默认值配置错误：{0}，{1}"
+    }
+  },
   "nfel": {
     "policyrepeatexception": {
       "policyrepeatexception": "存在重复license规则{0}"
@@ -1265,6 +1270,83 @@
     "heartbeatmanager": {
       "myinit": {
         "startupfailureprompt": "启动失败，服务器ID:{0}已经被服务器({1})使用，请修改类路径下config/serverid.conf文件中数值"
+      }
+    }
+  },
+  "nfic": {
+    "integrationdefaultvalueutil": {
+      "childrenbyname": {
+        "invalidname": "对象列名不能为空或重复",
+        "invalidstructure": "对象列结构格式不正确"
+      },
+      "date_error": "日期必须符合 yyyy-MM、yyyy-MM-dd、yyyy-MM-dd HH:mm 或 yyyy-MM-dd HH:mm:ss，且为有效日期时间",
+      "geteffectiveschema": {
+        "invalidschema": "参数结构格式不正确"
+      },
+      "mergeschema": {
+        "fixedchildrenchanged": "固定子字段结构已变化，请重新配置默认值",
+        "requiredconstraintchanged": "固定字段的必填要求不能修改，请重新配置默认值"
+      },
+      "validatebuiltinentries": {
+        "duplicatedefault": "固定参数默认值重复",
+        "schemachanged": "参数结构已变化，请重新配置默认值"
+      },
+      "validatedefault": {
+        "missingvalue": "已启用但未填写默认值"
+      },
+      "validatejsonvalue": {
+        "jsonvaluerequired": "必须为合法 JSON 值",
+        "stringkeyrequired": "JSON 对象字段名必须为字符串"
+      },
+      "validatenodeshape": {
+        "invalidarrayitems": "数组元素结构格式不正确"
+      },
+      "validateschema": {
+        "invalidtype": "请选择有效的数据类型或数组元素类型",
+        "missingarrayitems": "请先配置数组元素结构",
+        "missingobjectcolumns": "请先配置对象列结构"
+      },
+      "validatevalue": {
+        "arrayitem": "[第 {0} 项]",
+        "arrayrequired": "必须为数组",
+        "booleanrequired": "必须为布尔值 true 或 false",
+        "finitenumberrequired": "必须为有限数字",
+        "integerrequired": "必须为整数",
+        "objectrequired": "必须为对象",
+        "requiredfieldmissing": "必填字段未填写",
+        "stringrequired": "必须为字符串",
+        "undeclaredfield": "字段不在已声明的对象列结构中",
+        "unsupportedtype": "不支持的数据类型"
+      }
+    }
+  },
+  "nfid": {
+    "integrationhandlervo": {
+      "entityfield": {
+        "name": {
+          "alloweditinputparam": "是否允许编辑自定义输入参数",
+          "alloweditoutputparam": "是否允许编辑自定义输出参数",
+          "handler": "处理器",
+          "hasinputpattern": "是否拥有输入参数模板",
+          "hasoutputpattern": "是否拥有输出参数模板",
+          "haspattern": "是否拥有参数模板",
+          "inputpattern": "输入参数模板",
+          "methodlist": "支持的请求方式",
+          "outputpattern": "输出参数模板"
+        }
+      }
+    },
+    "patternvo": {
+      "entityfield": {
+        "name": {
+          "children": "子参数",
+          "defaultconfig": "当前集成的默认值配置",
+          "key": "唯一键，名称和类型的组合",
+          "mode": "参数类型",
+          "name": "参数名",
+          "options": "固定枚举选项",
+          "typename": "参数类型名称"
+        }
       }
     }
   },

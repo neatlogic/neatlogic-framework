@@ -12,6 +12,9 @@
 
 package neatlogic.framework.integration.dto;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.restful.annotation.EntityField;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +29,30 @@ public class PatternVo implements Serializable {
 
     public PatternVo() {
 
+    }
+
+    /** 直接复制字段避免触发 typeName 懒加载，子结构及默认值也与处理器单例隔离。 */
+    public PatternVo(PatternVo source) {
+        name = source.name;
+        key = source.key;
+        type = source.type;
+        mode = source.mode;
+        typeName = source.typeName;
+        isRequired = source.isRequired;
+        description = source.description;
+        isShow = source.isShow;
+        if (source.children != null) {
+            children = new ArrayList<>();
+            for (PatternVo child : source.children) {
+                children.add(child == null ? null : new PatternVo(child));
+            }
+        }
+        if (source.defaultConfig != null) {
+            defaultConfig = JSONObject.parseObject(JSONObject.toJSONString(source.defaultConfig, SerializerFeature.WriteMapNullValue));
+        }
+        if (source.options != null) {
+            options = JSONArray.parseArray(JSONArray.toJSONString(source.options, SerializerFeature.WriteMapNullValue));
+        }
     }
 
     public PatternVo(String _name, String _mode, ApiParamType _type, Integer _isRequired, String _description) {
@@ -52,24 +79,45 @@ public class PatternVo implements Serializable {
         isRequired = 0;
     }
 
-    @EntityField(name = "参数名", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.name", type = ApiParamType.STRING)
     private String name;
-    @EntityField(name = "唯一键，名称和类型的组合", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.key", type = ApiParamType.STRING)
     private String key;
-    @EntityField(name = "数据类型", type = ApiParamType.STRING)
+    @EntityField(name = "common.datatype", type = ApiParamType.STRING)
     private String type;
-    @EntityField(name = "参数类型", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.mode", type = ApiParamType.STRING)
     private String mode;
-    @EntityField(name = "参数类型名称", type = ApiParamType.STRING)
+    @EntityField(name = "nfid.patternvo.entityfield.name.typename", type = ApiParamType.STRING)
     private String typeName;
-    @EntityField(name = "子参数", type = ApiParamType.JSONOBJECT)
+    @EntityField(name = "nfid.patternvo.entityfield.name.children", type = ApiParamType.JSONOBJECT)
     private List<PatternVo> children;
-    @EntityField(name = "是否必填", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isrequired", type = ApiParamType.INTEGER)
     private Integer isRequired;
-    @EntityField(name = "描述", type = ApiParamType.STRING)
+    @EntityField(name = "common.description", type = ApiParamType.STRING)
     private String description;
-    @EntityField(name = "是否显示", type = ApiParamType.INTEGER)
+    @EntityField(name = "common.isshow", type = ApiParamType.INTEGER)
     private Integer isShow = 1;
+    // 默认值属于当前集成，固定处理器定义仅声明可用的枚举选项和结构。
+    @EntityField(name = "nfid.patternvo.entityfield.name.defaultconfig", type = ApiParamType.JSONOBJECT)
+    private JSONObject defaultConfig;
+    @EntityField(name = "nfid.patternvo.entityfield.name.options", type = ApiParamType.JSONARRAY)
+    private JSONArray options;
+
+    public JSONObject getDefaultConfig() {
+        return defaultConfig;
+    }
+
+    public void setDefaultConfig(JSONObject defaultConfig) {
+        this.defaultConfig = defaultConfig;
+    }
+
+    public JSONArray getOptions() {
+        return options;
+    }
+
+    public void setOptions(JSONArray options) {
+        this.options = options;
+    }
 
     public String getName() {
         return name;

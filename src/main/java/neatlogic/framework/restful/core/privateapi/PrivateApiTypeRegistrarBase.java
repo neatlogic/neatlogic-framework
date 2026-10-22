@@ -19,6 +19,9 @@ package neatlogic.framework.restful.core.privateapi;
 
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.restful.enums.ApiType;
+import neatlogic.framework.restful.annotation.Mcp;
+import neatlogic.framework.restful.dto.ApiVo;
+import org.springframework.aop.support.AopUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -95,9 +98,7 @@ public abstract class PrivateApiTypeRegistrarBase<T> implements IPrivateApiTypeR
             String token = getToken(component);
             if (StringUtils.isNotBlank(token)) {
                 token = PrivateApiComponentFactory.normalizeToken(token);
-                PrivateApiComponentFactory.registerApiToken(
-                        token,
-                        PrivateApiComponentFactory.createSystemApiVo(
+                ApiVo apiVo = PrivateApiComponentFactory.createSystemApiVo(
                                 token,
                                 className,
                                 getName(component),
@@ -107,8 +108,10 @@ public abstract class PrivateApiTypeRegistrarBase<T> implements IPrivateApiTypeR
                                 getNeedAudit(component),
                                 isBasicSupport(component),
                                 isSupportAnonymousAccess(component)
-                        )
-                );
+                        );
+                apiVo.setIsMcp(getApiType() == ApiType.OBJECT
+                        && AopUtils.getTargetClass(component).isAnnotationPresent(Mcp.class) ? 1 : 0);
+                PrivateApiComponentFactory.registerApiToken(token, apiVo);
             }
         }
     }

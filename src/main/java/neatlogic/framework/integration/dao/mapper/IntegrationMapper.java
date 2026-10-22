@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 
 public interface IntegrationMapper {
+    /** 按协议读取已启用集成的安全选择项，不读取配置或依赖实例分页。 */
+    List<ValueTextVo> getActiveIntegrationForSelectByMethod(@Param("method") String method);
 
     IntegrationAuditVo getIntegrationAuditById(Long id);
 

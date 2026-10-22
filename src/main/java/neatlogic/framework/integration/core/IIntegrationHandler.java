@@ -40,6 +40,16 @@ public interface IIntegrationHandler {
         return hasPattern();
     }
 
+    /** 是否允许编辑自定义输入参数；默认沿用旧处理器的固定规范互斥规则。 */
+    default Integer allowEditInputParam() {
+        return Integer.valueOf(1).equals(hasInputPattern()) ? 0 : 1;
+    }
+
+    /** 是否允许编辑自定义输出参数；与输入方向独立，兼容未声明新开关的处理器。 */
+    default Integer allowEditOutputParam() {
+        return Integer.valueOf(1).equals(hasOutputPattern()) ? 0 : 1;
+    }
+
     List<PatternVo> getInputPattern();
 
     List<PatternVo> getOutputPattern();

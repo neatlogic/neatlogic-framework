@@ -92,6 +92,18 @@
       "description": "Add, modify, and delete scheduled jobs.",
       "name": "Scheduled Job Management Permission"
     },
+    "self_check_execute": {
+      "description": "Debug self-check items and manually run self-check scenarios.",
+      "name": "Self-check Execution Permission"
+    },
+    "self_check_modify": {
+      "description": "Add, modify, and delete self-check scenarios.",
+      "name": "Self-check Management Permission"
+    },
+    "self_check_view": {
+      "description": "View self-check scenarios, run history, and result details.",
+      "name": "Self-check View Permission"
+    },
     "system_notice_modify": {
       "description": "Add, modify, and delete system announcements.",
       "name": "System Announcement Management Permission"

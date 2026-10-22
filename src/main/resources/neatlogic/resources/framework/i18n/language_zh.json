@@ -92,6 +92,18 @@
       "description": "对定时作业进行添加、修改和删除",
       "name": "定时作业管理权限"
     },
+    "self_check_execute": {
+      "description": "调试检查项和手工运行功能自检场景",
+      "name": "功能自检执行权限"
+    },
+    "self_check_modify": {
+      "description": "对功能自检场景进行添加、修改和删除",
+      "name": "功能自检管理权限"
+    },
+    "self_check_view": {
+      "description": "查看功能自检场景、执行历史和结果详情",
+      "name": "功能自检查看权限"
+    },
     "system_notice_modify": {
       "description": "对系统公告进行添加、修改和删除",
       "name": "系统公告管理权限"

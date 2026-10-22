@@ -10,6 +10,13 @@
 	</parent>
 	<artifactId>neatlogic-framework</artifactId>
     <version>0.4.0.0-SNAPSHOT</version>
+    <dependencies>
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>${graalvm.version}</version>
+        </dependency>
+    </dependencies>
     <build>
 		<plugins>
 			<plugin>

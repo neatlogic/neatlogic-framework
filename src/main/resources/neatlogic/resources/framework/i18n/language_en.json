@@ -1071,6 +1071,11 @@
       "homepagenotfoundexception": "Homepage configuration: '{0}' does not exist"
     }
   },
+  "nfei": {
+    "integrationdefaultvalueinvalidexception": {
+      "integrationdefaultvalueinvalidexception": "Invalid parameter default configuration: {0}, {1}"
+    }
+  },
   "nfel": {
     "policyrepeatexception": {
       "policyrepeatexception": "There is a duplicate license rule {0}"
@@ -1253,6 +1258,83 @@
     "heartbeatmanager": {
       "myinit": {
         "startupfailureprompt": "Startup failed, server ID: {0} is already in use by server ({1}), please modify the values in the config/serviceid.exe file under the class path"
+      }
+    }
+  },
+  "nfic": {
+    "integrationdefaultvalueutil": {
+      "childrenbyname": {
+        "invalidname": "Object column names must not be empty or duplicated.",
+        "invalidstructure": "The object column structure format is invalid."
+      },
+      "date_error": "The date must use yyyy-MM, yyyy-MM-dd, yyyy-MM-dd HH:mm, or yyyy-MM-dd HH:mm:ss and represent a valid date and time.",
+      "geteffectiveschema": {
+        "invalidschema": "The parameter structure format is invalid."
+      },
+      "mergeschema": {
+        "fixedchildrenchanged": "The fixed child field structure has changed. Please reconfigure the default value.",
+        "requiredconstraintchanged": "The required constraint of a fixed field cannot be changed. Please reconfigure the default value."
+      },
+      "validatebuiltinentries": {
+        "duplicatedefault": "Default values for a fixed parameter are duplicated.",
+        "schemachanged": "The parameter structure has changed. Please reconfigure the default value."
+      },
+      "validatedefault": {
+        "missingvalue": "Default values are enabled, but no default value is provided."
+      },
+      "validatejsonvalue": {
+        "jsonvaluerequired": "A valid JSON value is required.",
+        "stringkeyrequired": "JSON object field names must be strings."
+      },
+      "validatenodeshape": {
+        "invalidarrayitems": "The array element structure format is invalid."
+      },
+      "validateschema": {
+        "invalidtype": "Please select a valid data type or array element type.",
+        "missingarrayitems": "Please configure the array element structure first.",
+        "missingobjectcolumns": "Please configure the object column structure first."
+      },
+      "validatevalue": {
+        "arrayitem": "[Item {0}]",
+        "arrayrequired": "An array is required.",
+        "booleanrequired": "A Boolean value of true or false is required.",
+        "finitenumberrequired": "A finite number is required.",
+        "integerrequired": "An integer is required.",
+        "objectrequired": "An object is required.",
+        "requiredfieldmissing": "A required field is missing.",
+        "stringrequired": "A string is required.",
+        "undeclaredfield": "The field is not in the declared object column structure.",
+        "unsupportedtype": "The data type is not supported."
+      }
+    }
+  },
+  "nfid": {
+    "integrationhandlervo": {
+      "entityfield": {
+        "name": {
+          "alloweditinputparam": "Allow Custom Input Parameter Editing",
+          "alloweditoutputparam": "Allow Custom Output Parameter Editing",
+          "handler": "Handler",
+          "hasinputpattern": "Has Input Parameter Templates",
+          "hasoutputpattern": "Has Output Parameter Templates",
+          "haspattern": "Has Parameter Templates",
+          "inputpattern": "Input Parameter Template",
+          "methodlist": "Supported Request Methods",
+          "outputpattern": "Output Parameter Template"
+        }
+      }
+    },
+    "patternvo": {
+      "entityfield": {
+        "name": {
+          "children": "Child Parameters",
+          "defaultconfig": "Default Value Configuration for the Current Integration",
+          "key": "Unique Key Combining Name and Type",
+          "mode": "Parameter Type",
+          "name": "Parameter Name",
+          "options": "Fixed Enum Options",
+          "typename": "Parameter Type Name"
+        }
       }
     }
   },

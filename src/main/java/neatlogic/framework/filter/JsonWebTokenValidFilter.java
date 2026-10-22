@@ -30,7 +30,6 @@ import neatlogic.framework.exception.user.UserPasswordExpiredException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.service.LoginService;
-import neatlogic.framework.util.TimeUtil;
 import neatlogic.framework.util.UserTimezoneResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -44,10 +43,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
 
 public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     //前端定时心跳的时间
-    public static final int WEB_HEARTBEAT_INTERVAL= 60;
+    public static final int WEB_HEARTBEAT_INTERVAL = 60;
+
+    public static final String DEFAULT_AUTH_TYPE = "default";
 
     @Resource
     private UserSessionMapper userSessionMapper;
@@ -80,13 +82,17 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         return request.getRequestURI().startsWith(contextPath + "/api/mcp/");
     }
 
-    /** 确定租户后解析请求时区，并在各认证分支完成后统一写入用户上下文。 */
+    /**
+     * 确定租户后解析请求时区，并在各认证分支完成后统一写入用户上下文。
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException {
         //是否已过期
         boolean isExpired = false;
-        UserVo userVo;
-        String authType = "default";
+        UserVo userVo = null;
+        //默认认证通过的用户
+        UserVo defaultAuthUser;
+        String authType = DEFAULT_AUTH_TYPE;
         ILoginAuthHandler defaultLoginAuth = LoginAuthFactory.getLoginAuth(authType);
         ILoginAuthHandler loginAuth = defaultLoginAuth;
         //初始化request上下文
@@ -107,19 +113,16 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             logger.debug("======= defaultLoginAuth: ");
             //先按 default 认证，不存在才根据具体 AuthType 认证用户
             try {
-                userVo = defaultLoginAuth.auth(cachedRequest, response, timezone);
-                if (userVo != null) {
-                    logger.debug("======= getUser succeed: " + userVo.getUuid());
-                    UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(userVo.getJwtVo().getTokenHash());
-                    isExpired = userExpirationValid(userSessionVo, userVo.getJwtVo());
-                    //用户如果过期则抛弃
-                    if (isExpired) {
-                        logger.debug("======= login expired: " + userVo.getUuid());
-                        loginService.logout(userVo.getJwtVo());
-                        returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
-                        return;
-                    } else {
-                        initUserContext(userSessionVo, userVo, timezone);
+                defaultAuthUser = defaultLoginAuth.auth(cachedRequest, response, timezone);
+                if (defaultAuthUser != null) {
+                    logger.debug("======= getUser succeed: " + defaultAuthUser.getUuid());
+                    UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(defaultAuthUser.getJwtVo().getTokenHash());
+                    isExpired = userExpirationValid(userSessionVo, defaultAuthUser.getJwtVo());
+                    if (!isExpired) {
+                        initUserContext(userSessionVo, defaultAuthUser, timezone);
+                        userVo = defaultAuthUser;
+                    }else{
+                        logger.debug("======= default auth is expired: " + defaultAuthUser.getUuid() + ". next step to check other authType");
                     }
                 }
             } catch (UserPasswordExpiredException e) {
@@ -136,7 +139,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     authType = Config.LOGIN_AUTH_TYPE();
                 }
                 logger.debug("AuthType: " + authType);
-                if (StringUtils.isNotBlank(authType)) {
+                if (StringUtils.isNotBlank(authType) && !DEFAULT_AUTH_TYPE.equalsIgnoreCase(authType)) {
                     loginAuth = LoginAuthFactory.getLoginAuth(authType);
                     if (loginAuth != null) {
                         userVo = loginAuth.auth(cachedRequest, response, timezone);
@@ -152,7 +155,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                         return;
                     }
                 } else {
-                    returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, "认证失败，原因：缺少认证类型，请检查请求头AuthType或租户登录认证配置");
+                    //无需第三方认证，则按默认认证结果返回
+                    if (isExpired) {
+                        loginService.logout(defaultAuthUser.getJwtVo());
+                        returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
+                    } else {
+                        returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, loginAuth.getType());
+                    }
                     return;
                 }
             } else {
@@ -164,13 +173,13 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             } catch (Exception ex) {
                 //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
                 logger.error(ex.getMessage(), ex);
-                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, loginAuth != null ? loginAuth : defaultLoginAuth, ex.getMessage());
+                returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, loginAuth, ex.getMessage());
             }
         } catch (ApiRuntimeException ex) {
             logger.error(ex.getMessage(), ex);
             try {
                 // 不返回跳转地址，直接到显示错误信息页面
-                returnErrorResponseJson(false, ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getMessage());
+                returnErrorResponseJson(false, ResponseCode.API_RUNTIME, response, loginAuth != null ? loginAuth : Objects.requireNonNull(defaultLoginAuth), ex, ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
@@ -178,7 +187,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
             try {
-                returnErrorResponseJson(false, ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : defaultLoginAuth, ex, ex.getClass().getName() + ":" + ex.getMessage());
+                returnErrorResponseJson(false, ResponseCode.EXCEPTION, response, loginAuth != null ? loginAuth : Objects.requireNonNull(defaultLoginAuth), ex, ex.getClass().getName() + ":" + ex.getMessage());
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);

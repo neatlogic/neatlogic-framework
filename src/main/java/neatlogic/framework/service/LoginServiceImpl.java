@@ -18,6 +18,7 @@
 package neatlogic.framework.service;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.config.ConfigManager;
 import neatlogic.framework.config.FrameworkTenantConfig;
@@ -30,6 +31,7 @@ import neatlogic.framework.exception.captcha.LoginCaptchaIsEmptyException;
 import neatlogic.framework.exception.captcha.LoginCaptchaNotInvalidException;
 import neatlogic.framework.exception.login.LoginAuthNotFoundException;
 import neatlogic.framework.exception.user.LoginLockedException;
+import neatlogic.framework.filter.JsonWebTokenValidFilter;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.transaction.util.TransactionUtil;
@@ -40,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionStatus;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -120,7 +123,7 @@ public class LoginServiceImpl implements LoginService {
                 LoginFailedCountVo loginFailedCountVo = loginMapper.getLoginFailedCountLockByUserId(paramUser.getUserId());
                 if (loginFailedCountVo != null && loginFailedCountVo.getLockedUntil() != null && new Date().before(loginFailedCountVo.getLockedUntil())) {
                     int failedCountLimit = Integer.parseInt(ConfigManager.getConfig(FrameworkTenantConfig.LOGIN_LOCKED_FAILED_COUNT));
-                    String lockUtil = TimeUtil.convertDateToString(loginFailedCountVo.getLockedUntil(),TimeUtil.YYYY_MM_DD_HH_MM_SS);
+                    String lockUtil = TimeUtil.convertDateToString(loginFailedCountVo.getLockedUntil(), TimeUtil.YYYY_MM_DD_HH_MM_SS);
                     throw new LoginLockedException(failedCountLimit, lockUtil);
                 }
                 TransactionUtil.commitTx(tx);
@@ -134,15 +137,18 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public String logout(JwtVo jwtVo){
-        ILoginAuthHandler loginAuth;
-        if(StringUtils.isBlank(Config.LOGIN_AUTH_TYPE())){
-            loginAuth = LoginAuthFactory.getLoginAuth("default");
-        }else{
-            loginAuth = LoginAuthFactory.getLoginAuth(Config.LOGIN_AUTH_TYPE());
+    public String logout(JwtVo jwtVo) {
+        HttpServletRequest request = RequestContext.get().getRequest();
+        String authType = JsonWebTokenValidFilter.DEFAULT_AUTH_TYPE;
+        String authTypeHeader = request.getHeader("AuthType");
+        if (StringUtils.isNotBlank(authTypeHeader)) {
+            authType = authTypeHeader;
+        } else if (StringUtils.isNotBlank(Config.LOGIN_AUTH_TYPE())) {
+            authType = Config.LOGIN_AUTH_TYPE();
         }
-        if(loginAuth == null){
-            throw new LoginAuthNotFoundException(Config.LOGIN_AUTH_TYPE());
+        ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
+        if (loginAuth == null) {
+            throw new LoginAuthNotFoundException(authType);
         }
         return loginAuth.logout(jwtVo);
     }

@@ -12,6 +12,7 @@
       "description": "对权限进行添加、修改和删除",
       "name": "权限管理权限"
     },
+    "buildinhmacauth": "内部Hmac验证",
     "data_warehouse_base": {
       "description": "对数据仓库数据源进行访问",
       "name": "数据仓库默认权限"
@@ -44,6 +45,8 @@
       "description": "拥有此权限才能使用搜索中心基础权限功能",
       "name": "搜索中心基础权限"
     },
+    "hmaccurrentusermissing": "内部Hmac验证无法获取当前登录用户",
+    "hmacuserinvalid": "内部Hmac验证必须选择当前登录用户或一个指定用户",
     "integration_modify": {
       "description": "对集成进行添加、修改和删除",
       "name": "集成管理权限"

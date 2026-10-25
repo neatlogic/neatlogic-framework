@@ -12,6 +12,7 @@
       "description": "Add, modify, and delete permissions.",
       "name": "Permission Management Permission"
     },
+    "buildinhmacauth": "Internal Hmac authentication",
     "data_warehouse_base": {
       "description": "Access data warehouse data sources.",
       "name": "Data Warehouse Default Permission"
@@ -44,6 +45,8 @@
       "description": "Use basic search center features.",
       "name": "Search Center Access Permission"
     },
+    "hmaccurrentusermissing": "The current user is unavailable for internal Hmac authentication",
+    "hmacuserinvalid": "Internal Hmac authentication requires the current user or one specified user",
     "integration_modify": {
       "description": "Add, modify, and delete integrations.",
       "name": "Integration Management Permission"

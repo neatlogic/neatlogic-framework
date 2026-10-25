@@ -94,11 +94,6 @@ public class HmacAuthenticateHandler implements IAuthenticateHandler {
         if (!Objects.equals(connection.getRequestMethod().toUpperCase(), "GET")) {
             inputParam = config.getString("inputParam");
         }
-        System.out.println("token = " + token);
-        System.out.println("userId = " + userId);
-        System.out.println("connection.getURL().getPath() = " + connection.getURL().getPath());
-        System.out.println("connection.getURL().getQuery() = " + connection.getURL().getQuery());
-        System.out.println("inputParam = " + inputParam);
         String signature = sign(token, userId, connection.getURL().getPath(), connection.getURL().getQuery(), inputParam);
         connection.setRequestProperty("AuthType", "hmac");
         connection.setRequestProperty("x-access-key", userId);

@@ -22,7 +22,7 @@ import java.util.List;
 public enum AuthenticateType implements IEnum {
     NOAUTH("noauth", "common.noauth"),
     BUILDIN("buildin", "common.buildinauth"),
-    HMAC("hmac", "auth.buildinhmacauth"),
+    HMAC("buildinhmac", "auth.buildinhmacauth"),
     BASIC("basicauth", "common.basicauth"),
 
     BEARER("bearertoken", "common.bearerauth");

@@ -53,7 +53,7 @@ public abstract class ApiComponentTemplateBase extends ApiValidateAndHelpBase {
 
     /**
      * 统一封装“优先走代理、失败后回退本地实例”的调用模式，
-     * 同时保留原有的 ApiRuntimeException 包装语义。
+     * 业务异常保留原实例，避免丢失子类类型和结构化详情。
      */
     protected final Object invokeWithProxyFallback(ProxyInvocation proxyInvocation, LocalInvocation localInvocation) throws Exception {
         try {
@@ -63,7 +63,8 @@ public abstract class ApiComponentTemplateBase extends ApiValidateAndHelpBase {
             return localInvocation.execute();
         } catch (Exception ex) {
             if (ex.getCause() instanceof ApiRuntimeException) {
-                throw new ApiRuntimeException(ex.getCause().getMessage(), ex.getCause());
+                // 反射调用仅解除包装；异常详情和专用分发规则由原业务异常保留。
+                throw (ApiRuntimeException) ex.getCause();
             }
             throw ex;
         }

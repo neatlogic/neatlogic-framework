@@ -268,6 +268,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 JSONObject authConf = authConfig.getJSONObject("config");
                 IAuthenticateHandler handler = AuthenticateHandlerFactory.getHandler(type);
                 if (handler != null) {
+                    authConf.put("inputParam", inputParam);
                     handler.authenticate(connection, authConf);
                 }
             }

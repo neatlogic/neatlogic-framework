@@ -19,12 +19,14 @@ import neatlogic.framework.dto.JwtVo;
 import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.util.$;
+import neatlogic.framework.util.Md5Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @ClassName: SystemUser
@@ -87,6 +89,8 @@ public enum SystemUser implements ISystemUser {
     public String getToken() {
         if (Objects.equals(userId, AUTOEXEC.getUserId())) {
             return Config.AUTOEXEC_TOKEN();
+        } else if (Objects.equals(userId, SYSTEM.getUserId())) {
+            return Md5Util.encryptMD5(UUID.nameUUIDFromBytes(userId.getBytes()).toString());
         }
         return null;
     }

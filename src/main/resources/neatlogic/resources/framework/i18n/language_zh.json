@@ -133,13 +133,6 @@
     }
   },
   "common": {
-    "uncategorized": "未分类",
-    "inspectstatus": {
-      "critical": "严重",
-      "fatal": "致命",
-      "normal": "正常",
-      "warn": "告警"
-    },
     "aborted": "已中止",
     "accesstype": "访问类型",
     "account": "账号",
@@ -225,13 +218,13 @@
     "defaultpriorityuuid": "默认优先级uuid",
     "defaultvalue": "默认值列表",
     "defaultvaluelist": "用于回显的参数列表",
-    "disconnected": "未连接",
     "delaytime": "延迟时间",
     "delegateauthoritylist": "代报权限列表",
     "deletable": "是否可删除",
     "delete": "删除",
     "dependency": "依赖",
     "description": "描述",
+    "disconnected": "未连接",
     "displaymode": "显示模式",
     "displaytype": "显示类型",
     "doing": "进行中",
@@ -319,6 +312,12 @@
     "inittype": "前端初始化类型，取值范围[user,team,role]",
     "inputfrom": "更新方式",
     "inputfromname": "变更方式名称",
+    "inspectstatus": {
+      "critical": "严重",
+      "fatal": "致命",
+      "normal": "正常",
+      "warn": "告警"
+    },
     "int": "整形",
     "ip": "ip",
     "iplist": "IP列表",
@@ -561,6 +560,7 @@
     "typeid": "类型ID",
     "typename": "类型名称",
     "typeuuid": "分类uuid",
+    "uncategorized": "未分类",
     "uncommited": "未提交",
     "unequal": "不等于",
     "unique": "唯一",
@@ -770,6 +770,21 @@
       }
     },
     "unlockerror": "解锁异常"
+  },
+  "integration": {
+    "customintegrationhandler": {
+      "getname": "自定义"
+    },
+    "formintegrationhandler": {
+      "getname": "表单外部数据源查询"
+    },
+    "paramtype": {
+      "array": "数组",
+      "date": "日期",
+      "enum": "枚举",
+      "number": "数字",
+      "string": "字符串"
+    }
   },
   "nf": {
     "api": {
@@ -1530,21 +1545,6 @@
   "nmtc": {
     "regiontype": {
       "owner": "上报人"
-    }
-  },
-  "integration": {
-    "customintegrationhandler": {
-      "getname": "自定义"
-    },
-    "formintegrationhandler": {
-      "getname": "表单外部数据源查询"
-    },
-    "paramtype": {
-      "array": "数组",
-      "date": "日期",
-      "enum": "枚举",
-      "number": "数字",
-      "string": "字符串"
     }
   },
   "notify": {

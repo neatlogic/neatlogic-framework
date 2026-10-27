@@ -133,13 +133,6 @@
     }
   },
   "common": {
-    "uncategorized": "Uncategorized",
-    "inspectstatus": {
-      "critical": "Critical",
-      "fatal": "Fatal",
-      "normal": "Normal",
-      "warn": "Warning"
-    },
     "aborted": "Aborted",
     "accesstype": "Access Type",
     "account": "Account",
@@ -225,13 +218,13 @@
     "defaultpriorityuuid": "Default Priority UUID",
     "defaultvalue": "Default Value List",
     "defaultvaluelist": "List of parameters for echo",
-    "disconnected": "Disconnected",
     "delaytime": "Delay Time",
     "delegateauthoritylist": "List of Authorization for Proxy Reporting",
     "deletable": "Can I delete it",
     "delete": "Delete",
     "dependency": "Dependency",
     "description": "Description",
+    "disconnected": "Disconnected",
     "displaymode": "display mode",
     "displaytype": "Display Type",
     "doing": "In Progress",
@@ -319,6 +312,12 @@
     "inittype": "Front end initialization type, value range [user, team, role]",
     "inputfrom": "Update method",
     "inputfromname": "Change method name",
+    "inspectstatus": {
+      "critical": "Critical",
+      "fatal": "Fatal",
+      "normal": "Normal",
+      "warn": "Warning"
+    },
     "int": "int",
     "ip": "IP",
     "iplist": "IP List",
@@ -561,6 +560,7 @@
     "typeid": "Type ID",
     "typename": "Type Name",
     "typeuuid": "Type UUID",
+    "uncategorized": "Uncategorized",
     "uncommited": "Not Submitted",
     "unequal": "Not Equal To",
     "unique": "only",
@@ -770,6 +770,21 @@
       }
     },
     "unlockerror": "Release Error"
+  },
+  "integration": {
+    "customintegrationhandler": {
+      "getname": "Custom"
+    },
+    "formintegrationhandler": {
+      "getname": "Form External Data Source Query"
+    },
+    "paramtype": {
+      "array": "Array",
+      "date": "Date",
+      "enum": "Enum",
+      "number": "Number",
+      "string": "String"
+    }
   },
   "nf": {
     "api": {
@@ -1530,21 +1545,6 @@
   "nmtc": {
     "regiontype": {
       "owner": "Requester"
-    }
-  },
-  "integration": {
-    "customintegrationhandler": {
-      "getname": "Custom"
-    },
-    "formintegrationhandler": {
-      "getname": "Form External Data Source Query"
-    },
-    "paramtype": {
-      "array": "Array",
-      "date": "Date",
-      "enum": "Enum",
-      "number": "Number",
-      "string": "String"
     }
   },
   "notify": {

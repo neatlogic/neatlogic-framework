@@ -206,11 +206,16 @@ public class McpToolMetadataBuilder {
         return getParamSchema(input, allowNestedObject, false);
     }
 
+    /** 按统一帮助声明生成字段 Schema，显式元素类型优先，未声明数组保持原兼容行为。 */
     private static JSONObject getParamSchema(JSONObject input, boolean allowNestedObject, boolean loose) {
         JSONObject schema = new JSONObject();
         JSONArray children = input.getJSONArray("children");
         String inputType = input.getString("type");
-        if (allowNestedObject && Objects.equals(inputType, "jsonArray")) {
+        // 帮助元数据中的显式标量声明同时用于输入与输出，旧数组不推测元素类型。
+        if (Objects.equals(inputType, "jsonArray") && StringUtils.isNotBlank(input.getString("itemType"))) {
+            schema.put("type", "array");
+            schema.put("items", new JSONObject().fluentPut("type", getJsonSchemaType(input.getString("itemType"))));
+        } else if (allowNestedObject && Objects.equals(inputType, "jsonArray")) {
             schema.put("type", "array");
             JSONObject itemSchema = new JSONObject();
             itemSchema.put("type", "object");

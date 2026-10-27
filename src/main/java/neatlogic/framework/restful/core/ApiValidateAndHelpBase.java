@@ -521,6 +521,7 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
                             }
                             paramObj.put("type", p.type().getValue());
                             paramObj.put("typeText", p.type().getText());
+                            addScalarArrayItemType(p, paramObj);
                             String rule = "";
                             if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
                                 rule = getEnumMember(p);
@@ -554,14 +555,17 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
                                     paramObj.put("type", ApiParamType.JSONARRAY.getValue());
                                     paramObj.put("typeText", ApiParamType.JSONARRAY.getText());
                                     if (StringUtils.isNotBlank(p.desc())) {
-                                        paramObj.put("description", p.desc());
+                                        paramObj.put("description", $.t(p.desc()));
                                     }
                                     if (StringUtils.isNotBlank(p.help())) {
-                                        paramObj.put("help", p.help());
+                                        paramObj.put("help", $.t(p.help()));
                                     }
+                                    addScalarArrayItemType(p, paramObj);
                                     JSONArray elementObjList = new JSONArray();
-                                    for (Field field : p.explode().getComponentType().getDeclaredFields()) {
-                                        drawFieldMessageRecursive(field, elementObjList, true);
+                                    if (!paramObj.containsKey("itemType")) {
+                                        for (Field field : p.explode().getComponentType().getDeclaredFields()) {
+                                            drawFieldMessageRecursive(field, elementObjList, true);
+                                        }
                                     }
                                     if (!elementObjList.isEmpty()) {
                                         paramObj.put("children", elementObjList);
@@ -595,6 +599,31 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
             jsonObj.put("input", inputList);
         }
         return jsonObj;
+    }
+
+    /** 仅根据显式声明的标量数组补齐元素类型，未声明或对象数组继续沿用原帮助规则。 */
+    private void addScalarArrayItemType(Param param, JSONObject metadata) {
+        if (!ApiParamType.JSONARRAY.getValue().equals(metadata.getString("type")) || !param.explode().isArray()) {
+            return;
+        }
+        Class<?> component = param.explode().getComponentType();
+        ApiParamType itemType = null;
+        if (component == Long.class || component == long.class) {
+            itemType = ApiParamType.LONG;
+        } else if (component == Integer.class || component == int.class || component == Short.class
+                || component == short.class || component == Byte.class || component == byte.class) {
+            itemType = ApiParamType.INTEGER;
+        } else if (component == Double.class || component == double.class || component == Float.class
+                || component == float.class) {
+            itemType = ApiParamType.DOUBLE;
+        } else if (component == Boolean.class || component == boolean.class) {
+            itemType = ApiParamType.BOOLEAN;
+        } else if (component == String.class || component == Character.class || component == char.class) {
+            itemType = ApiParamType.STRING;
+        }
+        if (itemType != null) {
+            metadata.put("itemType", itemType.getValue());
+        }
     }
 
     private CacheControlVo cacheControlVo;

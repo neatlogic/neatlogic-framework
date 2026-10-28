@@ -13,10 +13,13 @@
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.util.Base64;
+
+import java.nio.charset.StandardCharsets;
 
 public class AnonymousApiTokenUtil {
 
@@ -58,5 +61,28 @@ public class AnonymousApiTokenUtil {
         resultObj.put("token", token);
         resultObj.put("paramObj", paramObj);
         return resultObj;
+    }
+
+    public static String getSign(String token) {
+        String[] split = token.split("\\?", 2);
+        token = split[0];
+        JSONObject paramObj = new JSONObject();
+        if (split.length == 2) {
+            String[] params = split[1].split("&");
+            for (String param : params) {
+                String[] array = param.split("=", 2);
+                if (array.length == 2) {
+                    paramObj.put(array[0], array[1]);
+                }
+            }
+        }
+        return getSign(token, paramObj);
+    }
+
+    public static String getSign(String token, JSONObject paramObj) {
+        String paramStr = JSONObject.toJSONString(paramObj, SerializerFeature.MapSortField);
+        String str = token + "#" + Base64.encodeBase64StringUnChunked(paramStr.getBytes(StandardCharsets.UTF_8));
+        String encryptMD5 = Md5Util.encryptMD5To16(str);
+        return encryptMD5;
     }
 }

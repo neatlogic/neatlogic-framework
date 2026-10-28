@@ -169,7 +169,24 @@ public class HtmlUtil {
         for (UrlInfoVo urlInfo : urlInfoVoList) {
             String source = urlInfo.getSource();
             //source = api/binary/image/download?id=314907690737664
-            String target = AnonymousApiTokenUtil.encrypt(source);
+//            String target = AnonymousApiTokenUtil.encrypt(source);
+            String path = source;
+            int fromIndex = path.indexOf("api/");
+            int beginIndex = fromIndex;
+            fromIndex += 4;
+            int endIndex = path.indexOf("/", fromIndex) + 1;
+            String token = path.substring(endIndex);
+            String sign = AnonymousApiTokenUtil.getSign(token);
+            if (token.contains("?")) {
+                token += "&neatlogicApiSign=" + sign;
+            } else {
+                token += "?neatlogicApiSign=" + sign;
+            }
+            String[] split = path.substring(beginIndex, endIndex).split("/");
+            String api = split[0];
+            String apiType = split[1];
+            String tenant = TenantContext.get().getTenantUuid();
+            String target = "anonymous/" + api + "/t/" + tenant + "/" + apiType + "/" + token;
             urlInfo.setTarget(target);
             sourceTotalLength += source.length();
             targetTotalLength += target.length();

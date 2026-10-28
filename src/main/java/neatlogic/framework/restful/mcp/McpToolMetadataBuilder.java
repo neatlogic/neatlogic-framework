@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.restful.annotation.OperationType;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.IApiComponent;
+import neatlogic.framework.restful.core.ApiValidateAndHelpBase;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentFactory;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.restful.enums.ApiType;
@@ -53,6 +54,47 @@ public class McpToolMetadataBuilder {
             token = token.substring(1);
         }
         return token == null ? null : token.replaceAll("[^A-Za-z0-9_.-]", ".");
+    }
+
+    /** 从同一 API 声明投影检索字段，不索引示例、默认值或输出数据。 */
+    public static JSONObject buildSearchMetadata(ApiVo api) {
+        JSONObject metadata = new JSONObject(true);
+        metadata.put("name", getToolName(api));
+        metadata.put("token", api.getToken());
+        metadata.put("module", api.getModuleGroup());
+        metadata.put("title", $.t(api.getName()));
+        metadata.put("description", $.t(api.getDescription()));
+        StringBuilder parameters = new StringBuilder();
+        IApiComponent component = PrivateApiComponentFactory.getComponent(api.getHandler(), ApiType.OBJECT, IApiComponent.class);
+        JSONArray inputs = component == null ? new JSONArray()
+                : ApiValidateAndHelpBase.getApiComponentInputHelp(component, JSONObject.class);
+        appendSearchParameters(parameters, inputs);
+        metadata.put("parameters", parameters.toString().trim());
+        return metadata;
+    }
+
+    /** 只提取字段名称、标签、帮助和枚举候选，递归保留嵌套参数用途。 */
+    private static void appendSearchParameters(StringBuilder text, JSONArray parameters) {
+        if (parameters == null) return;
+        for (int i = 0; i < parameters.size(); i++) {
+            JSONObject parameter = parameters.getJSONObject(i);
+            for (String key : new String[]{"name", "description", "help"}) {
+                if (StringUtils.isNotBlank(parameter.getString(key))) text.append(parameter.getString(key)).append('\n');
+            }
+            if ("enum".equals(parameter.getString("type")) || "string".equals(parameter.getString("type"))) {
+                if (StringUtils.isNotBlank(parameter.getString("rule"))) text.append(parameter.getString("rule")).append('\n');
+            }
+            JSONArray options = parameter.getJSONArray("enumOptions");
+            if (options != null) {
+                for (int j = 0; j < options.size(); j++) {
+                    JSONObject option = options.getJSONObject(j);
+                    for (String key : new String[]{"text", "description"}) {
+                        if (StringUtils.isNotBlank(option.getString(key))) text.append(option.getString(key)).append('\n');
+                    }
+                }
+            }
+            appendSearchParameters(text, parameter.getJSONArray("children"));
+        }
     }
 
     /** 读取已翻译的接口帮助；组件不可用时返回空结构。 */

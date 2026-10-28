@@ -29,6 +29,7 @@ public interface ApiMapper {
 
     List<ApiVo> getAllApiByModuleId(@Param("moduleIdList") List<String> moduleIdList);
 
+    /** 实时读取 MCP 配置覆盖值，包含显式关闭记录；可用性由配置解析器判定。 */
     List<ApiVo> getMcpApiListByModuleId(@Param("moduleIdList") List<String> moduleIdList);
 
     List<ApiVo> getApiListByTokenList(List<String> tokenList);

@@ -26,6 +26,7 @@ import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.ApiParamType;
 import neatlogic.framework.common.constvalue.IEnum;
+import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.common.util.IpUtil;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.crossover.CrossoverServiceFactory;
@@ -49,17 +50,21 @@ import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPostProcessor;
 import neatlogic.module.framework.restful.apiaudit.ApiAuditAppendPreProcessor;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.util.ClassUtils;
+import org.springframework.aop.support.AopUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.List;
 import java.util.Objects;
 
@@ -496,6 +501,55 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
         }
     }
 
+    /** 仅解析输入声明，供检索等静态资料读取使用，不执行示例或业务方法。 */
+    public static JSONArray getApiComponentInputHelp(Object component, Class<?>... arguments) {
+        try {
+            // 与 API 注册器一致，读取代理的目标类型，兼容 JDK 与 CGLIB 代理。
+            Method method = ClassUtils.getUserClass(AopUtils.getTargetClass(component)).getMethod("myDoService", arguments);
+            return parseInput(method.getAnnotation(Input.class));
+        } catch (NoSuchMethodException | SecurityException ex) {
+            logger.error("读取 API 输入声明失败，component: {}", component.getClass().getName(), ex);
+            return new JSONArray();
+        }
+    }
+
+    /** 完整帮助与静态投影共用输入解析，避免两份参数规则发生偏差。 */
+    private static JSONArray parseInput(Input input) {
+        JSONArray inputList = new JSONArray();
+        if (input == null) return inputList;
+        Param[] params = input.value();
+        for (Param p : params) {
+            if (p.isExcluded()) {
+                continue;
+            }
+            JSONObject paramObj = new JSONObject();
+            paramObj.put("name", p.name());
+            if (p.maxLength() > 0) {
+                paramObj.put("maxLength", p.maxLength());
+            }
+            paramObj.put("type", p.type().getValue());
+            paramObj.put("typeText", p.type().getText());
+            addScalarArrayItemType(p, paramObj);
+            String rule = "";
+            if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
+                rule = getEnumMember(p);
+                paramObj.put("enumOptions", getEnumOptions(p, rule));
+            } else if (StringUtils.isNotBlank(p.rule())) {
+                rule = p.rule();
+            }
+            paramObj.put("rule", rule);
+            paramObj.put("isRequired", p.isRequired());
+            if (StringUtils.isNotBlank(p.desc())) {
+                paramObj.put("description", $.t(p.desc()));
+            }
+            if (StringUtils.isNotBlank(p.help())) {
+                paramObj.put("help", $.t(p.help()));
+            }
+            inputList.add(paramObj);
+        }
+        return inputList;
+    }
+
     /** 从真实接口类提取声明，统一供 Object、Raw 和 SSE 帮助使用。 */
     protected final JSONObject getApiComponentHelp(Class<?>... arg) {
         JSONObject jsonObj = new JSONObject();
@@ -508,36 +562,7 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
             if (method.isAnnotationPresent(Input.class) || method.isAnnotationPresent(Output.class) || method.isAnnotationPresent(Description.class)) {
                 for (Annotation anno : method.getDeclaredAnnotations()) {
                     if (anno.annotationType().equals(Input.class)) {
-                        Input input = (Input) anno;
-                        Param[] params = input.value();
-                        for (Param p : params) {
-                            if (p.isExcluded()) {
-                                continue;
-                            }
-                            JSONObject paramObj = new JSONObject();
-                            paramObj.put("name", p.name());
-                            if (p.maxLength() > 0) {
-                                paramObj.put("maxLength", p.maxLength());
-                            }
-                            paramObj.put("type", p.type().getValue());
-                            paramObj.put("typeText", p.type().getText());
-                            addScalarArrayItemType(p, paramObj);
-                            String rule = "";
-                            if (ApiParamType.ENUM.equals(p.type()) && p.member() != NotDefined.class) {
-                                rule = getEnumMember(p);
-                            } else if (StringUtils.isNotBlank(p.rule())) {
-                                rule = p.rule();
-                            }
-                            paramObj.put("rule", rule);
-                            paramObj.put("isRequired", p.isRequired());
-                            if (StringUtils.isNotBlank(p.desc())) {
-                                paramObj.put("description", $.t(p.desc()));
-                            }
-                            if (StringUtils.isNotBlank(p.help())) {
-                                paramObj.put("help", $.t(p.help()));
-                            }
-                            inputList.add(paramObj);
-                        }
+                        inputList.addAll(parseInput((Input) anno));
                     } else if (anno.annotationType().equals(Output.class)) {
                         Output output = (Output) anno;
                         Param[] params = output.value();
@@ -602,7 +627,7 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
     }
 
     /** 仅根据显式声明的标量数组补齐元素类型，未声明或对象数组继续沿用原帮助规则。 */
-    private void addScalarArrayItemType(Param param, JSONObject metadata) {
+    private static void addScalarArrayItemType(Param param, JSONObject metadata) {
         if (!ApiParamType.JSONARRAY.getValue().equals(metadata.getString("type")) || !param.explode().isArray()) {
             return;
         }
@@ -678,46 +703,73 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
         return null;
     }
 
-    /**
-     * 获取注解中引用的枚举值
-     */
-    private String getEnumMember(Param p) {
+    /** 复用同一成员解析，保持接口枚举和普通枚举的参数校验、帮助投影一致。 */
+    private static List<IEnum<?>> getEnumMembers(Param param) {
+        List<IEnum<?>> members = new ArrayList<>();
+        List<Class<?>> classes = new ArrayList<>();
+        if (param.member().isInterface()) {
+            for (Class<?> type : ReflectionManager.getInstance().getSubTypesOf(param.member())) classes.add(type);
+        } else {
+            classes.add(param.member());
+        }
+        for (Class<?> type : classes) {
+            // 参数合法值来自枚举常量；不实例化可能依赖业务状态的普通实现类。
+            Object[] constants = type.getEnumConstants();
+            if (constants == null) continue;
+            for (Object constant : constants) members.add((IEnum<?>) constant);
+        }
+        return members;
+    }
+
+    /** 合法值仍只来自 getValue，读取参数说明不改变校验规则。 */
+    private static String getEnumMember(Param param) {
         try {
-            if (!p.member().isInterface()) {
-                Object[] objects = p.member().getEnumConstants();
-                List<String> valueList = new ArrayList<>();
-                for (Object object : objects) {
-                    String value = ((IEnum) object).getValue();
-                    if (value != null) {
-                        valueList.add(value);
-                    }
-                }
-                if (!valueList.isEmpty()) {
-                    return String.join(",", valueList);
-                }
-            } else {
-                Reflections reflections = ReflectionManager.getInstance();
-                List<String> valueList = new ArrayList<>();
-                for (Class<?> cls : reflections.getSubTypesOf(p.member())) {
-                    if (!cls.isInterface()) {
-                        Object[] objects = cls.getEnumConstants();
+            List<String> values = new ArrayList<>();
+            for (IEnum<?> member : getEnumMembers(param)) {
+                String value = member.getValue();
+                if (value != null) values.add(value);
+            }
+            return String.join(",", values);
+        } catch (Exception ex) {
+            logger.error("读取 API 枚举合法值失败，parameter: {}, enum: {}", param.name(), param.member().getName(), ex);
+            return "";
+        }
+    }
 
-                        for (Object object : objects) {
-                            String value = ((IEnum) object).getValue();
-                            if (value != null) {
-                                valueList.add(value);
-                            }
-                        }
-
+    /** 复用枚举已有的 value/text 声明，只保留合法值的说明，不序列化其他业务字段。 */
+    private static JSONArray getEnumOptions(Param param, String rule) {
+        JSONArray result = new JSONArray();
+        Set<String> allowed = new HashSet<>(Arrays.asList(rule.split(",")));
+        Set<Class<?>> visited = new HashSet<>();
+        try {
+            for (IEnum<?> member : getEnumMembers(param)) {
+                Class<?> type = ((Enum<?>) member).getDeclaringClass();
+                if (!visited.add(type)) continue;
+                List<?> options = member.getValueTextList();
+                if (options == null) continue;
+                for (Object option : options) {
+                    Object value;
+                    Object text;
+                    Object description = null;
+                    if (option instanceof ValueTextVo) {
+                        value = ((ValueTextVo) option).getValue();
+                        text = ((ValueTextVo) option).getText();
+                    } else if (option instanceof Map) {
+                        Map<?, ?> entry = (Map<?, ?>) option;
+                        value = entry.get("value"); text = entry.get("text"); description = entry.get("description");
+                    } else {
+                        continue; // 没有显式 value/text 结构时不推断显示说明。
                     }
-                }
-                if (!valueList.isEmpty()) {
-                    return String.join(",", valueList);
+                    if (value == null || !allowed.contains(String.valueOf(value))) continue;
+                    JSONObject entry = new JSONObject(true).fluentPut("value", String.valueOf(value));
+                    if (text instanceof String) entry.put("text", text);
+                    if (description instanceof String) entry.put("description", description);
+                    result.add(entry);
                 }
             }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+        } catch (Exception ex) {
+            logger.error("读取 API 枚举说明失败，parameter: {}, enum: {}", param.name(), param.member().getName(), ex);
         }
-        return "";
+        return result;
     }
 }

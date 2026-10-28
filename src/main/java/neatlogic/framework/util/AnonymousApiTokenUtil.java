@@ -24,26 +24,19 @@ public class AnonymousApiTokenUtil {
         if (StringUtils.isBlank(source)) {
             return source;
         }
-        //source = api/binary/image/download?id=314907690737664
-        String[] split = source.split("\\?");
-        String path = split[0];
-        String queryString = split[1];
+        String path = source;
+        //source = api/binary/image/download?id=31490769073766
         String tenant = TenantContext.get().getTenantUuid();
         int fromIndex = path.indexOf("api/");
         int beginIndex = fromIndex;
         fromIndex += 4;
         int endIndex = path.indexOf("/", fromIndex) + 1;
         String token = path.substring(endIndex);
-        String encryptedData = RC4Util.encrypt(token + "/" + tenant + "?" + queryString);
-        String backEndUrl = Config.BACK_END_URL();
-        if(StringUtils.isNotBlank(backEndUrl)) {
-            if (!backEndUrl.endsWith("/")) {
-                backEndUrl += "/";
-            }
-        } else {
-            backEndUrl = "";
-        }
-        String target = backEndUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
+        String encryptedData = RC4Util.encrypt(token);
+        String[] split = path.substring(beginIndex, endIndex).split("/");
+        String api = split[0];
+        String apiType = split[1];
+        String target = "anonymous/" + api + "/t/" + tenant + "/" + apiType + "/" + encryptedData;
         return target;
     }
 
@@ -51,8 +44,7 @@ public class AnonymousApiTokenUtil {
         JSONObject resultObj = new JSONObject();
         String decryptData = RC4Util.decrypt(token);
         String[] split = decryptData.split("\\?", 2);
-        token = split[0].substring(0, split[0].lastIndexOf("/"));
-        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+        token = split[0];
         JSONObject paramObj = new JSONObject();
         if (split.length == 2) {
             String[] params = split[1].split("&");
@@ -64,7 +56,6 @@ public class AnonymousApiTokenUtil {
             }
         }
         resultObj.put("token", token);
-        resultObj.put("tenant", tenant);
         resultObj.put("paramObj", paramObj);
         return resultObj;
     }

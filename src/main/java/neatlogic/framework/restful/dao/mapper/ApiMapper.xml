@@ -146,19 +146,21 @@
         order by `create_time` desc
     </select>
 
-    <select id="getMcpApiListByModuleId" resultType="neatlogic.framework.restful.dto.ApiVo" useCache="true">
+    <!-- 实时配置绕过二级缓存，但不使整个 ApiMapper 缓存失效。
+         调用方使用 CacheUtil 清理当前会话一级缓存；保留关闭记录供统一配置规则判断。 -->
+    <select id="getMcpApiListByModuleId" resultType="neatlogic.framework.restful.dto.ApiVo" useCache="false" flushCache="false">
         SELECT `token`,
         `is_active` AS isActive,
         `qps`,
         `need_audit` AS needAudit,
         `is_mcp` AS isMcp
         FROM `api`
-        WHERE `is_mcp` = 1
-        AND `is_active` = 1
-        <if test="moduleIdList != null and moduleIdList.size() > 0">
-            AND `module_id` IN
-            <foreach collection="moduleIdList" item="item" open="(" close=")" separator=",">#{item}</foreach>
-        </if>
+        <where>
+            <if test="moduleIdList != null and moduleIdList.size() > 0">
+                `module_id` IN
+                <foreach collection="moduleIdList" item="item" open="(" close=")" separator=",">#{item}</foreach>
+            </if>
+        </where>
         ORDER BY `create_time` DESC
     </select>
 

@@ -17,11 +17,11 @@ package neatlogic.framework.restful.constvalue;
  */
 public enum ApiAnonymousAccessSupportEnum {
     ANONYMOUS_ACCESS_FORBIDDEN(false, false), // 不支持匿名访问
-    ANONYMOUS_ACCESS_WITH_ENCRYPTION(true, true), // 支持匿名访问但token需要加密
-    ANONYMOUS_ACCESS_WITHOUT_ENCRYPTION(true, false); // 支持匿名访问且token无需加密
+    ANONYMOUS_ACCESS_WITH_ENCRYPTION(true, true), // 支持匿名访问但token需要加上签名
+    ANONYMOUS_ACCESS_WITHOUT_ENCRYPTION(true, false); // 支持匿名访问且token无需加上签名
 
     private final boolean isSupportAnonymousAccess; // 是否支持匿名访问
-    private final boolean isRequireTokenEncryption; // token是否需要加密
+    private final boolean isRequireTokenEncryption; // token是否需要加上签名
 
     public boolean isSupportAnonymousAccess() {
         return isSupportAnonymousAccess;

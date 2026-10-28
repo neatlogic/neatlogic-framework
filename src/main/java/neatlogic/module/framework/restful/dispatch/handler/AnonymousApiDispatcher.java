@@ -335,7 +335,7 @@ public class AnonymousApiDispatcher {
         return dbApiVo;
     }
 
-    @RequestMapping(value = "/t/{tenant}/rest/**", method = RequestMethod.GET)//
+    @RequestMapping(value = "/t/{tenant}/rest/**", method = RequestMethod.GET)
     public void dispatcherForGet(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
@@ -600,7 +600,7 @@ public class AnonymousApiDispatcher {
         }
     }
 
-    @RequestMapping(value = "/t/{tenant}/binary/**", method = RequestMethod.GET)//
+    @RequestMapping(value = "/t/{tenant}/binary/**", method = RequestMethod.GET)
     public void dispatcherForGetBinary(@PathVariable("tenant") String tenant, HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());

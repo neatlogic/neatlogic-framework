@@ -788,6 +788,11 @@
   },
   "nf": {
     "api": {
+      "anonymous": {
+        "signature": {
+          "invalid": "匿名访问签名失效"
+        }
+      },
       "example": {
         "invalid": "接口 {0} 的场景 {1} 请求示例不是有效的 JSON 对象或数组。",
         "mcparguments": "以下各场景的 JSON 是 tools/call 的 params.arguments。先根据适用条件选择场景，再替换示例值；不要把标题、说明或整个示例列表放入 arguments。",

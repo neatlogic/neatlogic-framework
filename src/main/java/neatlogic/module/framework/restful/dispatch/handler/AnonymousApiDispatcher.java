@@ -160,12 +160,12 @@ public class AnonymousApiDispatcher {
                     } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
                         String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
                         if (StringUtils.isBlank(neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                         paramObj.remove("neatlogicApiSign");
                         String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
                         if (!Objects.equals(sign, neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                     }
                     if (action.equals("doservice")) {
@@ -201,12 +201,12 @@ public class AnonymousApiDispatcher {
                     } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
                         String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
                         if (StringUtils.isBlank(neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                         paramObj.remove("neatlogicApiSign");
                         String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
                         if (!Objects.equals(sign, neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                     }
                     if (action.equals("doservice")) {
@@ -242,12 +242,12 @@ public class AnonymousApiDispatcher {
                     } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
                         String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
                         if (StringUtils.isBlank(neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                         paramObj.remove("neatlogicApiSign");
                         String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
                         if (!Objects.equals(sign, neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                     }
                     if (action.equals("doservice")) {
@@ -283,12 +283,12 @@ public class AnonymousApiDispatcher {
                     } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
                         String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
                         if (StringUtils.isBlank(neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                         paramObj.remove("neatlogicApiSign");
                         String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
                         if (!Objects.equals(sign, neatlogicApiSign)) {
-                            throw new AnonymousExceptionMessage();
+                            throw new AnonymousApiSignatureInvalidException();
                         }
                     }
                     if (action.equals("doservice")) {

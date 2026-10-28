@@ -788,6 +788,11 @@
   },
   "nf": {
     "api": {
+      "anonymous": {
+        "signature": {
+          "invalid": "Anonymous access signature is invalid."
+        }
+      },
       "example": {
         "invalid": "The request example for scenario {1} in API {0} is not a valid JSON object or array.",
         "mcparguments": "The JSON in each scenario below is params.arguments for tools/call. Select a scenario based on its prerequisites and replace the example values. Do not include titles, descriptions, or the entire example list in arguments.",

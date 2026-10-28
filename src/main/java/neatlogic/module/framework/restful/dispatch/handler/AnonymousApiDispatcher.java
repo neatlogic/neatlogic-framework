@@ -288,14 +288,22 @@ public class AnonymousApiDispatcher {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
         JSONObject paramObj = new JSONObject();
-        Enumeration<String> paraNames = request.getParameterNames();
-        while (paraNames.hasMoreElements()) {
-            String p = paraNames.nextElement();
-            String[] vs = request.getParameterValues(p);
-            if (vs.length > 1) {
-                paramObj.put(p, vs);
-            } else {
-                paramObj.put(p, request.getParameter(p));
+        boolean tokenHasEncrypted = false;
+        if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
+            tokenHasEncrypted = true;
+            JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
+            token = resultObj.getString("token");
+            paramObj.putAll(resultObj.getJSONObject("paramObj"));
+        } else {
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
             }
         }
         if (TenantUtil.hasTenant(tenant)) {
@@ -306,7 +314,7 @@ public class AnonymousApiDispatcher {
         }
         JSONObject returnObj = new JSONObject();
         try {
-            doIt(request, response, token, false, ApiType.OBJECT, paramObj, returnObj, "doservice");
+            doIt(request, response, token, tokenHasEncrypted, ApiType.OBJECT, paramObj, returnObj, "doservice");
         } catch (ApiRuntimeException ex) {
             response.setStatus(ResponseCode.API_RUNTIME.getCode());
             returnObj.put("Status", "ERROR");
@@ -554,14 +562,21 @@ public class AnonymousApiDispatcher {
         String token = new AntPathMatcher().extractPathWithinPattern(pattern, request.getServletPath());
         JSONObject paramObj = new JSONObject();
         boolean tokenHasEncrypted = false;
-        Enumeration<String> paraNames = request.getParameterNames();
-        while (paraNames.hasMoreElements()) {
-            String p = paraNames.nextElement();
-            String[] vs = request.getParameterValues(p);
-            if (vs.length > 1) {
-                paramObj.put(p, vs);
-            } else {
-                paramObj.put(p, request.getParameter(p));
+        if (token.startsWith(RC4Util.PRE) || token.startsWith(RC4Util.PRE_OLD)) {
+            tokenHasEncrypted = true;
+            JSONObject resultObj = AnonymousApiTokenUtil.decrypt(token);
+            token = resultObj.getString("token");
+            paramObj.putAll(resultObj.getJSONObject("paramObj"));
+        } else {
+            Enumeration<String> paraNames = request.getParameterNames();
+            while (paraNames.hasMoreElements()) {
+                String p = paraNames.nextElement();
+                String[] vs = request.getParameterValues(p);
+                if (vs.length > 1) {
+                    paramObj.put(p, vs);
+                } else {
+                    paramObj.put(p, request.getParameter(p));
+                }
             }
         }
         JSONObject returnObj = new JSONObject();
@@ -615,6 +630,7 @@ public class AnonymousApiDispatcher {
         }
     }
 
+    @Deprecated
     @RequestMapping(value = "/rest/**", method = RequestMethod.GET)
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -675,6 +691,7 @@ public class AnonymousApiDispatcher {
         }
     }
 
+    @Deprecated
     @RequestMapping(value = "/rest/**", method = RequestMethod.POST)
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -768,6 +785,7 @@ public class AnonymousApiDispatcher {
 
     }
 
+    @Deprecated
     @RequestMapping(value = "/binary/**", method = RequestMethod.GET)
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);

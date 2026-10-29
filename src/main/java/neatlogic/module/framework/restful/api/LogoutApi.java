@@ -61,7 +61,9 @@ public class LogoutApi extends PrivateApiComponentBase {
 		String url = loginService.logout(UserContext.get().getJwtVo());
 		JSONObject returnObj = new JSONObject();
 		returnObj.put("url", StringUtils.isBlank(url) ? StringUtils.EMPTY : url);
-		logger.debug("{}({})用户主动登出", UserContext.get().getUserName(), UserContext.get().getUserId());
+		if (logger.isDebugEnabled()) {
+			logger.debug("{}({})用户主动登出", UserContext.get().getUserName(), UserContext.get().getUserId());
+		}
 		return returnObj;
 	}
 }

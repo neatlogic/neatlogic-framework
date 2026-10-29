@@ -162,7 +162,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     //无需第三方认证，则按默认认证结果返回
                     if (isExpired) {
                         loginService.logout(defaultAuthUser.getJwtVo());
-                        logger.debug(defaultAuthUser.getUserName() + "(" + defaultAuthUser.getUserId() + ")用户超时登出");
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(defaultAuthUser.getUserName() + "(" + defaultAuthUser.getUserId() + ")用户超时登出");
+                        }
                         returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
                     } else {
                         returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, loginAuth.getType());
@@ -276,7 +278,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      */
     private boolean userExpirationValid(UserSessionVo userSessionVo, JwtVo jwtVo, UserVo userVo) {
         if (userSessionVo == null) {
-            logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户没有找到上次访问记录，会话已超时或已被终止，请重新登录");
+            if (logger.isDebugEnabled()) {
+                logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户没有找到上次访问记录，会话已超时或已被终止，请重新登录");
+            }
             return true;
         }
         if (jwtVo.validTokenCreateTime(userSessionVo.getTokenCreateTime())) {
@@ -288,12 +292,16 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             //System.out.println(TimeUtil.millisecondsFormat(expireTime, 4, TimeUnit.SECONDS, " ") + "  expire");
             if (now.getTime() > expireTime) {
                 userSessionMapper.deleteUserSessionByTokenHash(userSessionVo.getTokenHash());
-                logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户上次访问时间为" + LocalDateTime.ofInstant(userSessionVo.getSessionTime().toInstant(), ZoneId.systemDefault()).format(dateTimeFormatter) + ", 登录有效时间为" + Config.USER_EXPIRETIME() + "分钟，会话已超时或已被终止，请重新登录");
+                if (logger.isDebugEnabled()) {
+                    logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户上次访问时间为" + LocalDateTime.ofInstant(userSessionVo.getSessionTime().toInstant(), ZoneId.systemDefault()).format(dateTimeFormatter) + ", 登录有效时间为" + Config.USER_EXPIRETIME() + "分钟，会话已超时或已被终止，请重新登录");
+                }
                 return true;
             }
             return false;
         }
-        logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户同时在不同浏览器中登录，当前ENABLE_CONCURRENT_SESSION值为" + Config.ENABLE_CONCURRENT_SESSION());
+        if (logger.isDebugEnabled()) {
+            logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户同时在不同浏览器中登录，当前ENABLE_CONCURRENT_SESSION值为" + Config.ENABLE_CONCURRENT_SESSION());
+        }
         return true;
 
     }

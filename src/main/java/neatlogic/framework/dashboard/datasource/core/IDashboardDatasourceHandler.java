@@ -1,7 +1,6 @@
 package neatlogic.framework.dashboard.datasource.core;
 
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 
 /** 大屏数据源扩展入口，各模块通过 Spring Bean 提供自身类型的查询实现。 */
 public interface IDashboardDatasourceHandler {
@@ -12,8 +11,11 @@ public interface IDashboardDatasourceHandler {
     /** 查询数据源列表，保留搜索、分页和选中值回显参数。 */
     JSONObject listDatasource(JSONObject params);
 
-    /** 查询数据源详情及字段定义，保留既有 DataSourceVo 返回约定。 */
-    DataSourceVo getDatasource(JSONObject params);
+    /**
+     * 查询数据源字段定义，返回仅包含 fieldList 数组的 JSON 对象，数据源不存在时返回 null。
+     * 每项为仅包含 id、label、type、isCondition、inputType、config 六键的 JSON 对象，config 保留原对象。
+     */
+    JSONObject getDatasource(JSONObject params);
 
     /** 查询组件动态数据，保留过滤、排序及行数限制参数。 */
     JSONObject searchDatasourceData(JSONObject params);

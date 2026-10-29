@@ -37,10 +37,30 @@ public class DatawarehouseDashboardDatasourceHandler implements IDashboardDataso
         return "datawarehouse";
     }
 
-    /** 详情沿用原接口语义，数据源 ID 不存在时返回 null。 */
+    /** 详情只返回组件所需的字段 JSON，数据源 ID 不存在时仍返回 null。 */
     @Override
-    public DataSourceVo getDatasource(JSONObject params) {
-        return dataSourceMapper.getDataSourceById(params.getLong("id"));
+    public JSONObject getDatasource(JSONObject params) {
+        DataSourceVo dataSourceVo = dataSourceMapper.getDataSourceById(params.getLong("id"));
+        if (dataSourceVo == null) {
+            return null;
+        }
+        JSONArray fieldList = new JSONArray();
+        if (CollectionUtils.isNotEmpty(dataSourceVo.getFieldList())) {
+            for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
+                // 显式映射六个公共属性，通过 getter 保留标签回退、默认输入类型和配置解析行为。
+                JSONObject field = new JSONObject();
+                field.put("id", fieldVo.getId());
+                field.put("label", fieldVo.getLabel());
+                field.put("type", fieldVo.getType());
+                field.put("isCondition", fieldVo.getIsCondition());
+                field.put("inputType", fieldVo.getInputType());
+                field.put("config", fieldVo.getConfig());
+                fieldList.add(field);
+            }
+        }
+        JSONObject result = new JSONObject();
+        result.put("fieldList", fieldList);
+        return result;
     }
 
     /** 保留原列表接口的精确回显、筛选和分页响应，不增加默认启用状态过滤。 */

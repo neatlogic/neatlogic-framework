@@ -22,6 +22,7 @@ import neatlogic.framework.file.core.FileTypeHandlerFactory;
 import neatlogic.framework.file.core.IFileStorageHandler;
 import neatlogic.framework.file.core.IFileTypeHandler;
 import neatlogic.framework.file.dto.FileVo;
+import neatlogic.framework.file.dto.FileDownloadVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,6 +131,19 @@ public class FileUtil {
         return handler.getData(filePath);
     }
 
+
+    /** 按附件路径选择存储处理器，返回文件流和可选元信息，由调用方关闭下载结果。 */
+    public static FileDownloadVo getDownloadData(String filePath) throws Exception {
+        if (StringUtils.isBlank(filePath) || !filePath.contains(":")) {
+            throw new FilePathIllegalException(filePath);
+        }
+        String prefix = filePath.split(":")[0];
+        IFileStorageHandler handler = FileStorageMediumFactory.getHandler(prefix.toUpperCase());
+        if (handler == null) {
+            throw new FileStorageMediumHandlerNotFoundException(prefix);
+        }
+        return handler.getDownloadData(filePath);
+    }
 
     /**
      * 删除附件

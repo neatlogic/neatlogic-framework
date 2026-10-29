@@ -13,6 +13,7 @@
 package neatlogic.framework.file.core;
 
 import neatlogic.framework.file.dto.FileVo;
+import neatlogic.framework.file.dto.FileDownloadVo;
 
 import java.io.InputStream;
 
@@ -41,6 +42,11 @@ public interface IFileStorageHandler {
     String saveData(InputStream inputStream, String contentType, String filePath) throws Exception;
 
     InputStream getData(String filePath) throws Exception;
+
+    /** 获取同一次下载的内容及元信息；默认兼容仅提供文件流的已有存储处理器。 */
+    default FileDownloadVo getDownloadData(String filePath) throws Exception {
+        return new FileDownloadVo(getData(filePath), null, null);
+    }
 
     void deleteData(String filePath) throws Exception;
 

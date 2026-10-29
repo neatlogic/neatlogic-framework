@@ -13,10 +13,13 @@
 package neatlogic.framework.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
-import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.RC4Util;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.util.Base64;
+
+import java.nio.charset.StandardCharsets;
 
 public class AnonymousApiTokenUtil {
 
@@ -24,26 +27,19 @@ public class AnonymousApiTokenUtil {
         if (StringUtils.isBlank(source)) {
             return source;
         }
-        //source = api/binary/image/download?id=314907690737664
-        String[] split = source.split("\\?");
-        String path = split[0];
-        String queryString = split[1];
+        String path = source;
+        //source = api/binary/image/download?id=31490769073766
         String tenant = TenantContext.get().getTenantUuid();
         int fromIndex = path.indexOf("api/");
         int beginIndex = fromIndex;
         fromIndex += 4;
         int endIndex = path.indexOf("/", fromIndex) + 1;
         String token = path.substring(endIndex);
-        String encryptedData = RC4Util.encrypt(token + "/" + tenant + "?" + queryString);
-        String backEndUrl = Config.BACK_END_URL();
-        if(StringUtils.isNotBlank(backEndUrl)) {
-            if (!backEndUrl.endsWith("/")) {
-                backEndUrl += "/";
-            }
-        } else {
-            backEndUrl = "";
-        }
-        String target = backEndUrl + "anonymous/" + path.substring(beginIndex, endIndex) + encryptedData;
+        String encryptedData = RC4Util.encrypt(token);
+        String[] split = path.substring(beginIndex, endIndex).split("/");
+        String api = split[0];
+        String apiType = split[1];
+        String target = "anonymous/" + api + "/t/" + tenant + "/" + apiType + "/" + encryptedData;
         return target;
     }
 
@@ -51,8 +47,7 @@ public class AnonymousApiTokenUtil {
         JSONObject resultObj = new JSONObject();
         String decryptData = RC4Util.decrypt(token);
         String[] split = decryptData.split("\\?", 2);
-        token = split[0].substring(0, split[0].lastIndexOf("/"));
-        String tenant = split[0].substring(split[0].lastIndexOf("/") + 1);
+        token = split[0];
         JSONObject paramObj = new JSONObject();
         if (split.length == 2) {
             String[] params = split[1].split("&");
@@ -64,8 +59,30 @@ public class AnonymousApiTokenUtil {
             }
         }
         resultObj.put("token", token);
-        resultObj.put("tenant", tenant);
         resultObj.put("paramObj", paramObj);
         return resultObj;
+    }
+
+    public static String getSign(String token) {
+        String[] split = token.split("\\?", 2);
+        token = split[0];
+        JSONObject paramObj = new JSONObject();
+        if (split.length == 2) {
+            String[] params = split[1].split("&");
+            for (String param : params) {
+                String[] array = param.split("=", 2);
+                if (array.length == 2) {
+                    paramObj.put(array[0], array[1]);
+                }
+            }
+        }
+        return getSign(token, paramObj);
+    }
+
+    public static String getSign(String token, JSONObject paramObj) {
+        String paramStr = JSONObject.toJSONString(paramObj, SerializerFeature.MapSortField);
+        String str = token + "#" + Base64.encodeBase64StringUnChunked(paramStr.getBytes(StandardCharsets.UTF_8));
+        String encryptMD5 = Md5Util.encryptMD5To16(str);
+        return encryptMD5;
     }
 }

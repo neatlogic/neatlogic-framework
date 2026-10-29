@@ -86,6 +86,16 @@ public class Md5Util {
         return "00000000000000000000000000000000";
     }
 
+    /**
+     * 使用UTF-8字符集生成16位小写MD5，取32位MD5结果的中间16位。
+     *
+     * @param content 待计算内容，null按空字符串处理
+     * @return 16位小写MD5
+     */
+    public static String encryptMD5To16(String content) {
+        return encryptMD5Utf8(content).substring(8, 24);
+    }
+
     public static boolean isMd5(String content) {
         if (StringUtils.isNotBlank(content)) {
             if (content.length() == 32) {

@@ -43,6 +43,13 @@ public class HtmlUtil {
     //	private static final Pattern IMGSRCPATTREN = Pattern.compile("\"[^<>]*?/api/binary/image/download\\?id=[0-9]*\"");// 定义img标签中src的正则表达式
     private static final Pattern IMGSRC_PATTERN = Pattern.compile("img src=\".*?\"");// 定义img标签中src的正则表达式
     private static final Pattern SRCCONTENT_PATTERN = Pattern.compile("\".*?\"");// 定义img标签中src内容的正则表达式
+    // 整体匹配标签，避免把其他属性值、注释或脚本中的文本识别为图片标签。
+    private static final Pattern IMAGE_URL_TAG_PATTERN = Pattern.compile(
+            "<!--[\\s\\S]*?-->|<(script|style)\\b(?:[^'\">]++|\"[^\"]*\"|'[^']*')*>[\\s\\S]*?</\\1\\s*>"
+                    + "|<([a-z][a-z0-9:-]*)(?=\\s|/?>)((?:[^'\">]++|\"[^\"]*\"|'[^']*')*)>",
+            Pattern.CASE_INSENSITIVE);
+    private static final Pattern IMAGE_URL_ATTRIBUTE_PATTERN = Pattern.compile(
+            "\\s+([^\\s=/'\">]+)(?:\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)'|([^\\s'\"<>`]+)))?");
 
 
     public static String removeHtml(String htmlStr) {
@@ -91,6 +98,42 @@ public class HtmlUtil {
         return srcList;
     }
 
+    /**
+     * 提取图片 src 的原始地址及其在 content 中的位置，不改变 HTML 格式。
+     * beginIndex 包含地址首字符，endIndex 不包含结束引号。
+     */
+    public static List<UrlInfoVo> getImgUrlInfoList(String content) {
+        List<UrlInfoVo> resultList = new ArrayList<>();
+        if (StringUtils.isBlank(content)) {
+            return resultList;
+        }
+        Matcher tagMatcher = IMAGE_URL_TAG_PATTERN.matcher(content);
+        while (tagMatcher.find()) {
+            if (!"img".equalsIgnoreCase(tagMatcher.group(2))) {
+                continue;
+            }
+            Matcher attributeMatcher = IMAGE_URL_ATTRIBUTE_PATTERN.matcher(content);
+            attributeMatcher.region(tagMatcher.start(3), tagMatcher.end(3));
+            while (attributeMatcher.find()) {
+                if (!"src".equalsIgnoreCase(attributeMatcher.group(1))) {
+                    continue;
+                }
+                for (int group = 2; group <= 4; group++) {
+                    String source = attributeMatcher.group(group);
+                    if (source != null) {
+                        if (StringUtils.isNotBlank(source)) {
+                            resultList.add(new UrlInfoVo(attributeMatcher.start(group),
+                                    attributeMatcher.end(group), source));
+                        }
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+        return resultList;
+    }
+
     public static List<UrlInfoVo> getUrlInfoList(String content, String prefix, String suffix) {
         if (StringUtils.isBlank(content)) {
             return null;
@@ -120,14 +163,30 @@ public class HtmlUtil {
         if (CollectionUtils.isEmpty(urlInfoVoList)) {
             return content;
         }
+        homeUrl = homeUrl.endsWith("/") ? homeUrl : homeUrl + "/";
         int sourceTotalLength = 0;
         int targetTotalLength = 0;
         for (UrlInfoVo urlInfo : urlInfoVoList) {
             String source = urlInfo.getSource();
             //source = api/binary/image/download?id=314907690737664
 //            String target = AnonymousApiTokenUtil.encrypt(source);
-            String[] split = source.split("/", 2);
-            String target = "anonymous/" + split[0] + "/t/" + TenantContext.get().getTenantUuid() + "/" + split[1];
+            String path = source;
+            int fromIndex = path.indexOf("api/");
+            int beginIndex = fromIndex;
+            fromIndex += 4;
+            int endIndex = path.indexOf("/", fromIndex) + 1;
+            String token = path.substring(endIndex);
+            String sign = AnonymousApiTokenUtil.getSign(token);
+            if (token.contains("?")) {
+                token += "&neatlogicApiSign=" + sign;
+            } else {
+                token += "?neatlogicApiSign=" + sign;
+            }
+            String[] split = path.substring(beginIndex, endIndex).split("/");
+            String api = split[0];
+            String apiType = split[1];
+            String tenant = TenantContext.get().getTenantUuid();
+            String target = "anonymous/" + api + "/t/" + tenant + "/" + apiType + "/" + token;
             urlInfo.setTarget(target);
             sourceTotalLength += source.length();
             targetTotalLength += target.length();
@@ -138,7 +197,7 @@ public class HtmlUtil {
             for (int i = fromIndex; i < urlInfoVo.getBeginIndex(); i++) {
                 stringBuilder.append(content.charAt(i));
             }
-            stringBuilder.append(homeUrl + "/" + TenantContext.get().getTenantUuid() + "/" + urlInfoVo.getTarget());
+            stringBuilder.append(homeUrl + TenantContext.get().getTenantUuid() + "/" + urlInfoVo.getTarget());
             fromIndex = urlInfoVo.getEndIndex();
         }
         for (int i = fromIndex; i < content.length(); i++) {

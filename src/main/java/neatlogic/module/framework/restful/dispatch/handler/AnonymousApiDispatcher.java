@@ -151,9 +151,22 @@ public class AnonymousApiDispatcher {
             if (apiType.equals(ApiType.OBJECT)) {
                 IApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.OBJECT, IApiComponent.class);
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+//                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                        throw new AnonymousExceptionMessage();
+//                    }
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
+                    } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
+                        String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
+                        if (StringUtils.isBlank(neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
+                        paramObj.remove("neatlogicApiSign");
+                        String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
+                        if (!Objects.equals(sign, neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
@@ -179,9 +192,22 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.STREAM)) {
                 IJsonStreamApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.STREAM, IJsonStreamApiComponent.class);
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+//                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                        throw new AnonymousExceptionMessage();
+//                    }
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
+                    } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
+                        String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
+                        if (StringUtils.isBlank(neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
+                        paramObj.remove("neatlogicApiSign");
+                        String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
+                        if (!Objects.equals(sign, neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
@@ -207,9 +233,22 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.BINARY)) {
                 IBinaryStreamApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.BINARY, IBinaryStreamApiComponent.class);
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+//                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                        throw new AnonymousExceptionMessage();
+//                    }
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
+                    } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
+                        String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
+                        if (StringUtils.isBlank(neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
+                        paramObj.remove("neatlogicApiSign");
+                        String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
+                        if (!Objects.equals(sign, neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
@@ -235,9 +274,22 @@ public class AnonymousApiDispatcher {
             } else if (apiType.equals(ApiType.RAW)) {
                 IRawApiComponent restComponent = PrivateApiComponentFactory.getComponent(interfaceVo.getHandler(), ApiType.RAW, IRawApiComponent.class);
                 if (restComponent != null) {
-                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
-                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()
+//                            || !Objects.equals(restComponent.supportAnonymousAccess().isRequireTokenEncryption(), tokenHasEncrypted)) {
+//                        throw new AnonymousExceptionMessage();
+//                    }
+                    if (!restComponent.supportAnonymousAccess().isSupportAnonymousAccess()) {
                         throw new AnonymousExceptionMessage();
+                    } else if (restComponent.supportAnonymousAccess().isRequireTokenEncryption()) {
+                        String neatlogicApiSign = paramObj.getString("neatlogicApiSign");
+                        if (StringUtils.isBlank(neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
+                        paramObj.remove("neatlogicApiSign");
+                        String sign = AnonymousApiTokenUtil.getSign(token, paramObj);
+                        if (!Objects.equals(sign, neatlogicApiSign)) {
+                            throw new AnonymousApiSignatureInvalidException();
+                        }
                     }
                     if (action.equals("doservice")) {
                         /* 统计接口访问次数 */
@@ -615,6 +667,7 @@ public class AnonymousApiDispatcher {
         }
     }
 
+    @Deprecated
     @RequestMapping(value = "/rest/**", method = RequestMethod.GET)
     public void dispatcherForGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -675,6 +728,7 @@ public class AnonymousApiDispatcher {
         }
     }
 
+    @Deprecated
     @RequestMapping(value = "/rest/**", method = RequestMethod.POST)
     public void dispatcherForPost(@RequestBody String jsonStr, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
@@ -768,6 +822,7 @@ public class AnonymousApiDispatcher {
 
     }
 
+    @Deprecated
     @RequestMapping(value = "/binary/**", method = RequestMethod.GET)
     public void dispatcherForPostBinary(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);

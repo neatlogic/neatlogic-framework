@@ -980,6 +980,11 @@
       }
     }
   },
+  "nfdde": {
+    "dashboarddatasourcetypenotsupportedexception": {
+      "message": "不支持的大屏数据源类型：{0}"
+    }
+  },
   "nfde": {
     "databaseconnectionfailedexception": {
       "configisempty": "数据库连接配置config为空",
@@ -1502,6 +1507,14 @@
       "worktimerangenotfoundexception_a": "服务时间:“{0}”没有设置排班时间或日历",
       "worktimerangenotfoundexception_b": "服务时间:“{0}”的“{1}”年份没有设置排班日历",
       "worktimerangenotfoundexception_c": "服务时间:“{0}”的“{1}”年份排班截止时间为“{2}”，需要追加排班日历"
+    }
+  },
+  "nmfddh": {
+    "datawarehousedashboarddatasourcehandler": {
+      "header": {
+        "expiretime": "过期时间",
+        "inserttime": "同步时间"
+      }
     }
   },
   "nmffh": {

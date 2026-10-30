@@ -42,6 +42,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 
@@ -51,6 +54,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
 
     public static final String DEFAULT_AUTH_TYPE = "default";
 
+    private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     @Resource
     private UserSessionMapper userSessionMapper;
 
@@ -117,7 +121,7 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 if (defaultAuthUser != null) {
                     logger.debug("======= getUser succeed: " + defaultAuthUser.getUuid());
                     UserSessionVo userSessionVo = userSessionMapper.getUserSessionByTokenHash(defaultAuthUser.getJwtVo().getTokenHash());
-                    isExpired = userExpirationValid(userSessionVo, defaultAuthUser.getJwtVo());
+                    isExpired = userExpirationValid(userSessionVo, defaultAuthUser.getJwtVo(), defaultAuthUser);
                     if (!isExpired) {
                         initUserContext(userSessionVo, defaultAuthUser, timezone);
                         userVo = defaultAuthUser;
@@ -158,6 +162,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                     //无需第三方认证，则按默认认证结果返回
                     if (isExpired) {
                         loginService.logout(defaultAuthUser.getJwtVo());
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(defaultAuthUser.getUserName() + "(" + defaultAuthUser.getUserId() + ")用户超时登出");
+                        }
                         returnErrorResponseJson(ResponseCode.LOGIN_EXPIRED, response, defaultLoginAuth, loginAuth.getType());
                     } else {
                         returnErrorResponseJson(ResponseCode.AUTH_FAILED, response, defaultLoginAuth, loginAuth.getType());
@@ -269,8 +276,14 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
      *
      * @return 不超时返回权限信息，否则返回null
      */
-    private boolean userExpirationValid(UserSessionVo userSessionVo, JwtVo jwtVo) {
-        if (userSessionVo != null && (jwtVo.validTokenCreateTime(userSessionVo.getTokenCreateTime()))) {
+    private boolean userExpirationValid(UserSessionVo userSessionVo, JwtVo jwtVo, UserVo userVo) {
+        if (userSessionVo == null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户没有找到上次访问记录，会话已超时或已被终止，请重新登录");
+            }
+            return true;
+        }
+        if (jwtVo.validTokenCreateTime(userSessionVo.getTokenCreateTime())) {
             Date visitTime = userSessionVo.getSessionTime();
             Date now = new Date();
             //超时时间需加上前端定时心跳间隔时间，否则在快超时的极限情况下用户又继续操作，又没到下次定时 heartbeat 会导致误登出
@@ -279,9 +292,15 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
             //System.out.println(TimeUtil.millisecondsFormat(expireTime, 4, TimeUnit.SECONDS, " ") + "  expire");
             if (now.getTime() > expireTime) {
                 userSessionMapper.deleteUserSessionByTokenHash(userSessionVo.getTokenHash());
+                if (logger.isDebugEnabled()) {
+                    logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户上次访问时间为" + LocalDateTime.ofInstant(userSessionVo.getSessionTime().toInstant(), ZoneId.systemDefault()).format(dateTimeFormatter) + ", 登录有效时间为" + Config.USER_EXPIRETIME() + "分钟，会话已超时或已被终止，请重新登录");
+                }
                 return true;
             }
             return false;
+        }
+        if (logger.isDebugEnabled()) {
+            logger.debug(userVo.getUserName() + "(" + userVo.getUserId() + ")用户同时在不同浏览器中登录，当前ENABLE_CONCURRENT_SESSION值为" + Config.ENABLE_CONCURRENT_SESSION());
         }
         return true;
 

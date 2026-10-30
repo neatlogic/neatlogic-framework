@@ -125,6 +125,7 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         IntegrationAuthorityChecker.checkExecute(uuid, integrationMapper);
         IIntegrationHandler handler = getIntegrationHandler();
         JSONArray headers = getTheadList(integration, handler);
+        System.out.println("headers = " + headers);
         JSONObject input = new JSONObject();
         for (String name : new String[]{"conditionList", "sortList", "currentPage", "pageSize", "limit", "isExpired"}) {
             if (params.containsKey(name)) {
@@ -158,30 +159,37 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         }
         handler.validate(execution);
         JSONObject external = JSONObject.parseObject(execution.getTransformedResult());
-        JSONArray theadList = new JSONArray();
-        for (int i = 0; i < headers.size(); i++) {
-            JSONObject header = headers.getJSONObject(i);
-            JSONObject head = new JSONObject();
-            head.put("key", "field_" + header.getString("key"));
-            head.put("name", header.getString("key"));
-            head.put("title", header.getString("title"));
-            theadList.add(head);
+        JSONArray theadList = external.getJSONArray("theadList");
+        if (CollectionUtils.isEmpty(theadList)) {
+            theadList = headers;
         }
+//        JSONArray theadList = new JSONArray();
+//        for (int i = 0; i < headers.size(); i++) {
+//            JSONObject header = headers.getJSONObject(i);
+//            JSONObject head = new JSONObject();
+//            head.put("key", "field_" + header.getString("key"));
+//            head.put("name", header.getString("key"));
+//            head.put("title", header.getString("title"));
+//            theadList.add(head);
+//        }
         JSONArray tbodyList = new JSONArray();
         JSONArray externalRows = external.getJSONArray("tbodyList");
+        System.out.println("externalRows = " + externalRows);
         for (int i = 0; i < externalRows.size(); i++) {
             JSONObject externalRow = externalRows.getJSONObject(i);
             JSONObject row = new JSONObject();
             for (int j = 0; j < headers.size(); j++) {
                 String key = headers.getJSONObject(j).getString("key");
+                System.out.println("key = " + key);
                 // 只返回声明的字段，缺失项补 null；标量和嵌套 JSON 值均保持原类型。
-                row.put("field_" + key, externalRow.get(key));
+//                row.put("field_" + key, externalRow.get(key));
+                row.put(key, externalRow.get(key));
             }
             tbodyList.add(row);
         }
         JSONObject result = new JSONObject();
         result.put("theadList", theadList);
-        result.put("tbodyList", tbodyList);
+        result.put("tbodyList", externalRows);
         for (String name : new String[]{"currentPage", "pageSize", "pageCount", "rowNum"}) {
             result.put(name, external.get(name));
         }

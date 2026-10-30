@@ -1529,7 +1529,7 @@
       "duplicatekey": "Duplicate column key: {0}",
       "invalidhandler": "Only integrations using the Dashboard Data specification are supported",
       "invalidthead": "Column key and title must be non-empty strings",
-      "theadrequired": "Enable the theadList default value and configure a non-empty header array"
+      "theadrequired": "Enable the output parameter theadList default value and configure a non-empty header array"
     }
   },
   "nmfdih": {
@@ -1537,21 +1537,21 @@
       "getname": "Dashboard Data",
       "input": {
         "conditionlist": "Filter conditions handled by the integration",
+        "isexpired": "Whether to query expired data; handled by the integration",
+        "limit": "Row limit: omitted for pagination, 0 for unlimited, positive for a maximum row count",
+        "needpage": "Whether to paginate; set by the dashboard from limit",
+        "sortlist": "Ordered sort definitions handled by the integration"
+      },
+      "output": {
         "config": "Condition control configuration; omit this property when not configured",
         "inputtype": "Condition input control type; defaults to text",
         "iscondition": "Whether the field supports filtering; defaults to 0",
-        "isexpired": "Whether to query expired data; handled by the integration",
         "key": "Unique field identifier for widget bindings and row mapping",
-        "limit": "Row limit: omitted for pagination, 0 for unlimited, positive for a maximum row count",
-        "needpage": "Whether to paginate; set by the dashboard from limit",
-        "sortlist": "Ordered sort definitions handled by the integration",
-        "theadlist": "Header definitions; a non-empty enabled default is required and cannot be overridden by dashboard requests",
+        "rownum": "Total row count; must be an integer",
+        "tbodylist": "Array of row objects; may be empty",
+        "theadlist": "Default headers for the output parameter theadList; must be enabled and non-empty, and are used for dashboard field bindings and data mapping",
         "title": "Field display name",
         "type": "Field data type; defaults to text"
-      },
-      "output": {
-        "rownum": "Total row count; must be an integer",
-        "tbodylist": "Array of row objects; may be empty"
       }
     }
   },

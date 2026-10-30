@@ -12,6 +12,7 @@ import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.integration.core.IIntegrationHandler;
 import neatlogic.framework.integration.core.IRequestFrom;
+import neatlogic.framework.integration.core.IntegrationDefaultValueUtil;
 import neatlogic.framework.integration.core.IntegrationHandlerFactory;
 import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
@@ -256,7 +257,7 @@ public class IntegrationDashboardDatasourceHandlerTest {
         assertEquals(0, authorityCalls);
     }
 
-    /** 关闭、缺失或空表头默认值必须显式失败，不能临时执行接口推断字段。 */
+    /** 输出默认表头关闭、缺失、为空或非数组时，详情与取数均失败且不执行集成推断字段。 */
     @Test
     public void rejectsMissingDisabledAndEmptyHeaderDefaults() {
         List<JSONObject> configs = new ArrayList<>();
@@ -268,9 +269,15 @@ public class IntegrationDashboardDatasourceHandlerTest {
         defaults(missing).remove("value");
         configs.add(missing);
         configs.add(config(new JSONArray()));
+        for (Object invalid : Arrays.asList(new JSONObject(), "not-an-array", 1)) {
+            JSONObject malformed = config(headers());
+            defaults(malformed).put("value", invalid);
+            configs.add(malformed);
+        }
         for (JSONObject value : configs) {
             integration.setConfig(value.toJSONString());
             assertThrows(ApiRuntimeException.class, () -> handler.getDatasource(request()));
+            assertThrows(ApiRuntimeException.class, () -> handler.searchDatasourceData(request()));
         }
         assertEquals(0, outbound.calls);
     }
@@ -283,12 +290,81 @@ public class IntegrationDashboardDatasourceHandlerTest {
                 JSON.parseArray("[{\"title\":\"A\"}]"), JSON.parseArray("[{\"key\":\"a\",\"title\":\" \"}]"))) {
             integration.setConfig(config(invalid).toJSONString());
             assertThrows(ApiRuntimeException.class, () -> handler.getDatasource(request()));
+            assertThrows(ApiRuntimeException.class, () -> handler.searchDatasourceData(request()));
         }
         JSONObject numeric = config(headers());
         defaults(numeric).put("enabled", 1);
         integration.setConfig(numeric.toJSONString());
         assertEquals(2, handler.getDatasource(request()).getJSONArray("fieldList").size());
         assertEquals(0, outbound.calls);
+    }
+
+    /** 仅有旧输入默认表头不能作为详情或取数的字段来源，拒绝前不会进入集成发送链。 */
+    @Test
+    public void rejectsInputOnlyHeadersWithoutExecutingIntegration() {
+        JSONObject legacy = config(headers());
+        legacy.getJSONObject("param").getJSONArray("builtinDefaultList").getJSONObject(0).put("mode", "input");
+        integration.setConfig(legacy.toJSONString());
+        assertThrows(ApiRuntimeException.class, () -> handler.getDatasource(request()));
+        assertThrows(ApiRuntimeException.class, () -> handler.searchDatasourceData(request()));
+        assertEquals(0, outbound.calls);
+        assertEquals(0, outbound.sends);
+        assertEquals(0, outbound.validations);
+    }
+
+    /** 新输出与已启用的旧输入并存时，公共保存及执行规则继续拒绝，真实输入准备失败后不会发送。 */
+    @Test
+    public void rejectsEnabledLegacyInputAlongsideOutputBeforeSending() {
+        JSONObject config = config(headers());
+        appendLegacyInput(config, true);
+        integration.setConfig(config.toJSONString());
+        assertThrows(ApiRuntimeException.class, () -> IntegrationDefaultValueUtil.validate(outbound, config));
+        assertThrows(ApiRuntimeException.class, () -> handler.searchDatasourceData(request()));
+        assertEquals(1, outbound.calls);
+        assertEquals(0, outbound.sends);
+        assertEquals(0, outbound.validations);
+        assertEquals(config, integration.getConfig());
+    }
+
+    /** 禁用的旧输入草稿可保留，但不同方向的同名表头只读取已启用的输出配置。 */
+    @Test
+    public void ignoresDisabledLegacyInputHeaderAndUsesOutputDefaults() throws PermissionDeniedException {
+        JSONObject config = config(headers());
+        appendLegacyInput(config, false);
+        integration.setConfig(config.toJSONString());
+        IntegrationDefaultValueUtil.validate(outbound, config);
+        JSONArray fields = handler.getDatasource(request()).getJSONArray("fieldList");
+        assertEquals("name", fields.getJSONObject(0).getString("id"));
+        assertEquals("duration", fields.getJSONObject(1).getString("id"));
+        JSONObject result = handler.searchDatasourceData(request());
+        assertEquals("field_name", result.getJSONArray("theadList").getJSONObject(0).getString("key"));
+        assertEquals(headers(), JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("theadList"));
+        assertFalse(outbound.parameters.containsKey("theadList"));
+        assertEquals(config, integration.getConfig());
+        assertEquals(1, outbound.sends);
+    }
+
+    /** 外部显式表头按公共规则保留在执行结果中，大屏详情与行映射仍始终使用配置的输出默认表头。 */
+    @Test
+    public void ignoresDifferentRemoteHeaderWhenMappingConfiguredFields() throws PermissionDeniedException {
+        JSONObject remote = JSON.parseObject(outbound.response.getTransformedResult());
+        JSONArray remoteHeaders = JSON.parseArray("[{\"key\":\"remote\",\"title\":\"远端字段\"}]");
+        remote.put("theadList", remoteHeaders);
+        remote.put("tbodyList", JSON.parseArray("[{\"name\":\"作业A\",\"duration\":6,\"remote\":\"不得映射\"}]"));
+        outbound.response.setTransformedResult(remote.toJSONString());
+        JSONObject result = handler.searchDatasourceData(request());
+        assertEquals(remoteHeaders, JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("theadList"));
+        assertEquals("name", handler.getDatasource(request()).getJSONArray("fieldList").getJSONObject(0).getString("id"));
+        JSONArray head = result.getJSONArray("theadList");
+        assertEquals(2, head.size());
+        assertEquals("field_name", head.getJSONObject(0).getString("key"));
+        assertEquals("field_duration", head.getJSONObject(1).getString("key"));
+        JSONObject row = result.getJSONArray("tbodyList").getJSONObject(0);
+        assertEquals(set("field_name", "field_duration"), row.keySet());
+        assertEquals("作业A", row.getString("field_name"));
+        assertEquals(6, row.getIntValue("field_duration"));
+        assertFalse(result.toJSONString().contains("不得映射"));
+        assertFalse(outbound.parameters.containsKey("theadList"));
     }
 
     /** 来源不存在、停用或规范不符时阻止执行，详情不存在继续返回 null。 */
@@ -320,13 +396,15 @@ public class IntegrationDashboardDatasourceHandlerTest {
         JSONObject originalConfig = JSON.parseObject(integration.getConfig().toJSONString());
         outbound.response.setTransformedResult("{\"tbodyList\":[{\"name\":\"作业A\",\"duration\":0,\"private\":\"hidden\"},{\"name\":\"作业B\"}],\"currentPage\":7,\"pageSize\":3,\"rowNum\":12,\"pageCount\":4}");
         JSONObject result = handler.searchDatasourceData(params);
-        assertEquals(set("conditionList", "sortList", "currentPage", "pageSize", "isExpired", "needPage", "theadList"), outbound.parameters.keySet());
+        assertEquals(set("conditionList", "sortList", "currentPage", "pageSize", "isExpired", "needPage"), outbound.parameters.keySet());
         assertEquals(params.getJSONArray("conditionList"), outbound.parameters.getJSONArray("conditionList"));
         assertEquals(params.getJSONArray("sortList"), outbound.parameters.getJSONArray("sortList"));
         assertEquals(2, outbound.parameters.getIntValue("currentPage"));
         assertEquals(5, outbound.parameters.getIntValue("pageSize"));
         assertTrue(outbound.parameters.getBooleanValue("needPage"));
-        assertEquals("name", outbound.parameters.getJSONArray("theadList").getJSONObject(0).getString("key"));
+        assertFalse(outbound.parameters.containsKey("theadList"));
+        // 远端未给出表头时，发送基类公共输出补齐链路提供配置默认值，且不反向写入输入。
+        assertEquals(headers(), JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("theadList"));
         JSONArray head = result.getJSONArray("theadList");
         assertEquals("field_name", head.getJSONObject(0).getString("key"));
         assertEquals("name", head.getJSONObject(0).getString("name"));
@@ -446,11 +524,21 @@ public class IntegrationDashboardDatasourceHandlerTest {
         return JSON.parseArray("[{\"key\":\"name\",\"title\":\"作业名\"},{\"key\":\"duration\",\"title\":\"耗时\",\"type\":\"number\",\"isCondition\":1,\"inputType\":\"select\",\"config\":{\"dataList\":[{\"value\":1,\"text\":\"一\"}],\"isMultiple\":false,\"params\":{\"nested\":true}}}]");
     }
 
-    /** 固定输入默认值存储位置与集成编辑页一致，不使用自定义同名参数覆盖固定定义。 */
+    /** 固定输出默认值存储位置与集成编辑页一致，不读取输入方向同名表头。 */
     private static JSONObject config(JSONArray headerList) {
-        JSONObject entry = new JSONObject().fluentPut("handler", HANDLER).fluentPut("mode", "input").fluentPut("name", "theadList")
+        JSONObject entry = new JSONObject().fluentPut("handler", HANDLER).fluentPut("mode", "output").fluentPut("name", "theadList")
                 .fluentPut("defaultConfig", new JSONObject().fluentPut("enabled", true).fluentPut("value", headerList));
         return new JSONObject().fluentPut("param", new JSONObject().fluentPut("builtinDefaultList", new JSONArray(Collections.singletonList(entry))));
+    }
+
+    /** 用不同字段构造旧输入草稿，区分禁用保留与启用后按公共规则拒绝两种状态。 */
+    private static void appendLegacyInput(JSONObject config, boolean enabled) {
+        JSONObject legacy = new JSONObject().fluentPut("handler", HANDLER).fluentPut("mode", "input").fluentPut("name", "theadList")
+                .fluentPut("defaultConfig", new JSONObject().fluentPut("enabled", enabled)
+                        .fluentPut("value", JSON.parseArray("[{\"key\":\"legacy\",\"title\":\"旧输入字段\"}]")));
+        JSONArray entries = JSON.parseArray(config.getJSONObject("param").getJSONArray("builtinDefaultList").toJSONString());
+        entries.add(legacy);
+        config.getJSONObject("param").put("builtinDefaultList", entries);
     }
 
     /** 只修改用例自己的默认配置草稿。 */
@@ -475,6 +563,7 @@ public class IntegrationDashboardDatasourceHandlerTest {
     /** 仅替换真实网络调用，输出校验继续调用生产大屏规范。 */
     private static class RecordingIntegrationHandler extends DashboardIntegrationHandler {
         private int calls;
+        private int sends;
         private int validations;
         private JSONObject parameters;
         private IRequestFrom requestFrom;
@@ -491,7 +580,10 @@ public class IntegrationDashboardDatasourceHandlerTest {
             prepareInputParam(source);
             parameters = JSON.parseObject(source.getParamObj().toJSONString());
             requestFrom = from;
+            // 在真实输入准备成功后才进入模拟发送，随后执行基类原有输出默认值补齐。
+            sends++;
             if (failure != null) throw failure;
+            IntegrationDefaultValueUtil.applyOutput(this, source.getConfig(), response);
             return response;
         }
 

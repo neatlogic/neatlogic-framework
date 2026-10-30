@@ -89,7 +89,7 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         return TableResultUtil.getResult(rows, query);
     }
 
-    /** 字段只来自已启用的输入表头默认值；详情不存在仍返回 null，不执行集成请求。 */
+    /** 字段只来自已启用的输出表头默认值；详情不存在仍返回 null，不执行集成请求。 */
     @Override
     public JSONObject getDatasource(JSONObject params) {
         IntegrationVo integration = getIntegration(params.getString("id"));
@@ -143,8 +143,7 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         input.put("currentPage", page.getCurrentPage());
         input.put("pageSize", page.getPageSize());
         input.put("needPage", limit == null);
-        // 表头始终使用服务器端默认配置，客户端同名参数不能覆盖；自定义默认值由发送基类补齐。
-        input.put("theadList", headers);
+        // 输出表头不作为请求参数传递，自定义输入默认值由发送基类补齐。
         integration.setParamObj(input);
         IntegrationResultVo execution = handler.sendRequest(integration, FrameworkRequestFrom.DASHBOARD);
         // 调用或转换失败先向上抛出，只有成功结果才进入返回结构校验。
@@ -212,10 +211,10 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         return handler;
     }
 
-    /** 合并当前规范的表头默认值并在副本上读取，禁止远程取数及修改持久化配置。 */
+    /** 仅合并当前输出规范的表头默认值并在副本上读取，禁止远程取数及修改持久化配置。 */
     private JSONArray getTheadList(IntegrationVo integration, IIntegrationHandler handler) {
         PatternVo thead = null;
-        for (PatternVo pattern : IntegrationPatternUtil.merge(handler, integration.getConfig(), "input")) {
+        for (PatternVo pattern : IntegrationPatternUtil.merge(handler, integration.getConfig(), "output")) {
             if ("theadList".equals(pattern.getName())) {
                 thead = pattern;
                 break;

@@ -20,7 +20,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 大屏集成规范，固定表头输入与分页输出，实际请求及审计仍由集成基类执行。 */
+/** 大屏集成规范，固定查询输入、表头与分页输出，实际请求及审计仍由集成基类执行。 */
 @Component
 public class DashboardIntegrationHandler extends IntegrationHandlerBase {
 
@@ -48,19 +48,10 @@ public class DashboardIntegrationHandler extends IntegrationHandlerBase {
         return 1;
     }
 
-    /** 表头必须配置默认值；空 config 省略，保留公共默认值工具原有的严格空值规则。 */
+    /** 输入保留筛选、排序及分页参数，表头在输出规范中配置。 */
     @Override
     public List<PatternVo> getInputPattern() {
         List<PatternVo> patterns = new ArrayList<>();
-        PatternVo thead = new PatternVo("theadList", "input", ApiParamType.JSONARRAY, 1,
-                $.t("nmfdih.dashboardintegrationhandler.input.theadlist"));
-        thead.addChild(new PatternVo("key", "input", ApiParamType.STRING, 1, $.t("nmfdih.dashboardintegrationhandler.input.key")));
-        thead.addChild(new PatternVo("title", "input", ApiParamType.STRING, 1, $.t("nmfdih.dashboardintegrationhandler.input.title")));
-        thead.addChild(new PatternVo("type", "input", ApiParamType.STRING, 0, $.t("nmfdih.dashboardintegrationhandler.input.type")));
-        thead.addChild(new PatternVo("isCondition", "input", ApiParamType.INTEGER, 0, $.t("nmfdih.dashboardintegrationhandler.input.iscondition")));
-        thead.addChild(new PatternVo("inputType", "input", ApiParamType.STRING, 0, $.t("nmfdih.dashboardintegrationhandler.input.inputtype")));
-        thead.addChild(new PatternVo("config", "input", ApiParamType.JSONOBJECT, 0, $.t("nmfdih.dashboardintegrationhandler.input.config")));
-        patterns.add(thead);
         patterns.add(new PatternVo("conditionList", "input", ApiParamType.JSONARRAY, 0, $.t("nmfdih.dashboardintegrationhandler.input.conditionlist")));
         patterns.add(new PatternVo("sortList", "input", ApiParamType.JSONARRAY, 0, $.t("nmfdih.dashboardintegrationhandler.input.sortlist")));
         patterns.add(new PatternVo("currentPage", "input", ApiParamType.INTEGER, 0, $.t("common.currentpage")));
@@ -71,10 +62,19 @@ public class DashboardIntegrationHandler extends IntegrationHandlerBase {
         return patterns;
     }
 
-    /** 表头由输入默认配置生成，外部输出只要求对象行数组及四个整数分页字段。 */
+    /** 表头必须在输出规范配置默认值，空 config 省略；外部输出仍只要求对象行数组及四个整数分页字段。 */
     @Override
     public List<PatternVo> getOutputPattern() {
         List<PatternVo> patterns = new ArrayList<>();
+        PatternVo thead = new PatternVo("theadList", "output", ApiParamType.JSONARRAY, 1,
+                $.t("nmfdih.dashboardintegrationhandler.output.theadlist"));
+        thead.addChild(new PatternVo("key", "output", ApiParamType.STRING, 1, $.t("nmfdih.dashboardintegrationhandler.output.key")));
+        thead.addChild(new PatternVo("title", "output", ApiParamType.STRING, 1, $.t("nmfdih.dashboardintegrationhandler.output.title")));
+        thead.addChild(new PatternVo("type", "output", ApiParamType.STRING, 0, $.t("nmfdih.dashboardintegrationhandler.output.type")));
+        thead.addChild(new PatternVo("isCondition", "output", ApiParamType.INTEGER, 0, $.t("nmfdih.dashboardintegrationhandler.output.iscondition")));
+        thead.addChild(new PatternVo("inputType", "output", ApiParamType.STRING, 0, $.t("nmfdih.dashboardintegrationhandler.output.inputtype")));
+        thead.addChild(new PatternVo("config", "output", ApiParamType.JSONOBJECT, 0, $.t("nmfdih.dashboardintegrationhandler.output.config")));
+        patterns.add(thead);
         patterns.add(new PatternVo("tbodyList", "output", ApiParamType.JSONARRAY, 1, $.t("nmfdih.dashboardintegrationhandler.output.tbodylist")));
         patterns.add(new PatternVo("currentPage", "output", ApiParamType.INTEGER, 1, $.t("common.currentpage")));
         patterns.add(new PatternVo("pageSize", "output", ApiParamType.INTEGER, 1, $.t("common.pagesize")));

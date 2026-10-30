@@ -1,6 +1,7 @@
 package neatlogic.framework.dashboard.datasource.core;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.exception.type.PermissionDeniedException;
 
 /** 大屏数据源扩展入口，各模块通过 Spring Bean 提供自身类型的查询实现。 */
 public interface IDashboardDatasourceHandler {
@@ -17,6 +18,6 @@ public interface IDashboardDatasourceHandler {
      */
     JSONObject getDatasource(JSONObject params);
 
-    /** 查询组件动态数据，保留过滤、排序及行数限制参数。 */
-    JSONObject searchDatasourceData(JSONObject params);
+    /** 查询组件动态数据，保留过滤、排序及行数限制参数；原样抛出来源执行权限异常，由接口框架处理。 */
+    JSONObject searchDatasourceData(JSONObject params) throws PermissionDeniedException;
 }

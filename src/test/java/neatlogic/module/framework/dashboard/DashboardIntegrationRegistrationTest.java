@@ -1,5 +1,7 @@
 package neatlogic.module.framework.dashboard;
 
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.dashboard.datasource.core.DashboardDatasourceHandlerFactory;
 import neatlogic.framework.dashboard.datasource.core.IDashboardDatasourceHandler;
@@ -22,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -113,6 +116,8 @@ public class DashboardIntegrationRegistrationTest {
                     DashboardDatasourceHandlerFactory.getHandler("datawarehouse"));
             assertSame(DashboardDatasourceHandlerFactory.getHandler("datawarehouse"),
                     DashboardDatasourceHandlerFactory.getHandler(null));
+            // 使用真实已注册组件和 framework 语言资源验证类型选项随请求语言刷新。
+            assertLocalizedDatasourceTypes();
 
             DashboardIntegrationHandler pattern = context.getBean(DashboardIntegrationHandler.class);
             assertEquals(1, context.getBeansOfType(IIntegrationHandler.class).size());
@@ -126,6 +131,35 @@ public class DashboardIntegrationRegistrationTest {
             assertEquals("DashboardIntegrationHandler", options.get(0).getHandler());
         } finally {
             context.close();
+        }
+    }
+
+    /** 连续切换真实请求语言，类型名称及列表均重新翻译，完成后恢复原线程上下文。 */
+    private void assertLocalizedDatasourceTypes() {
+        RequestContext originalContext = RequestContext.get();
+        Locale originalLocale = originalContext == null ? null : originalContext.getLocale();
+        RequestContext requestContext = originalContext == null ? RequestContext.init((RequestContext) null) : originalContext;
+        try {
+            for (Locale locale : Arrays.asList(Locale.CHINESE, Locale.ENGLISH, Locale.CHINESE)) {
+                requestContext.setLocale(locale);
+                boolean english = Locale.ENGLISH.equals(locale);
+                String warehouseName = english ? "Data Warehouse" : "数据仓库";
+                String integrationName = english ? "Integration" : "集成";
+                assertEquals(warehouseName, DashboardDatasourceHandlerFactory.getHandler("datawarehouse").getTypeName());
+                assertEquals(integrationName, DashboardDatasourceHandlerFactory.getHandler("integration").getTypeName());
+                List<JSONObject> options = DashboardDatasourceHandlerFactory.getTypeList();
+                assertEquals(2, options.size());
+                assertEquals("datawarehouse", options.get(0).getString("value"));
+                assertEquals(warehouseName, options.get(0).getString("text"));
+                assertEquals("integration", options.get(1).getString("value"));
+                assertEquals(integrationName, options.get(1).getString("text"));
+            }
+        } finally {
+            if (originalContext == null) {
+                requestContext.release();
+            } else {
+                originalContext.setLocale(originalLocale);
+            }
         }
     }
 

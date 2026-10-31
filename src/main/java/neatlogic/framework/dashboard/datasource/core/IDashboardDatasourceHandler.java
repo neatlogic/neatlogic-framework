@@ -9,6 +9,9 @@ public interface IDashboardDatasourceHandler {
     /** 返回唯一的数据源类型标识，注册和查找均保留非空值的原始内容。 */
     String getType();
 
+    /** 按当前请求语言返回类型展示名称，每次查询时解析，不缓存翻译结果。 */
+    String getTypeName();
+
     /** 查询数据源列表，保留搜索、分页和选中值回显参数。 */
     JSONObject listDatasource(JSONObject params);
 

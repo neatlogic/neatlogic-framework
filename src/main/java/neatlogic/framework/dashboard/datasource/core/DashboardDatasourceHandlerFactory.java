@@ -1,11 +1,15 @@
 package neatlogic.framework.dashboard.datasource.core;
 
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.applicationlistener.core.ModuleInitializedListenerBase;
 import neatlogic.framework.bootstrap.NeatLogicWebApplicationContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.dashboard.datasource.exception.DashboardDatasourceTypeNotSupportedException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -24,6 +28,21 @@ public class DashboardDatasourceHandlerFactory extends ModuleInitializedListener
             throw new DashboardDatasourceTypeNotSupportedException(type);
         }
         return handler;
+    }
+
+    /** 基于注册快照构造独立选项，数据仓库优先，其余按类型排序；名称按本次请求语言解析。 */
+    public static List<JSONObject> getTypeList() {
+        List<IDashboardDatasourceHandler> handlers = new ArrayList<>(handlerMap.values());
+        handlers.sort(Comparator.comparing((IDashboardDatasourceHandler handler) -> !DEFAULT_TYPE.equals(handler.getType()))
+                .thenComparing(IDashboardDatasourceHandler::getType));
+        List<JSONObject> result = new ArrayList<>();
+        for (IDashboardDatasourceHandler handler : handlers) {
+            JSONObject option = new JSONObject();
+            option.put("value", handler.getType());
+            option.put("text", handler.getTypeName());
+            result.add(option);
+        }
+        return result;
     }
 
     /** 每个模块刷新后追加注册其 Spring Bean，同一实例重复事件保持幂等。 */

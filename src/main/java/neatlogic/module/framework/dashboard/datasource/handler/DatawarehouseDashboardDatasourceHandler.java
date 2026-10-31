@@ -37,6 +37,12 @@ public class DatawarehouseDashboardDatasourceHandler implements IDashboardDataso
         return "datawarehouse";
     }
 
+    /** 按当前请求语言展示数据源类型名称，保持类型标识用于查询分发。 */
+    @Override
+    public String getTypeName() {
+        return $.t("nmfddh.datawarehousedashboarddatasourcehandler.gettypename");
+    }
+
     /** 详情只返回组件所需的字段 JSON，数据源 ID 不存在时仍返回 null。 */
     @Override
     public JSONObject getDatasource(JSONObject params) {

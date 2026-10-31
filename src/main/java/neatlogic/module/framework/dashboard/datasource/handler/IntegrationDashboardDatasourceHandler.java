@@ -50,6 +50,12 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         return "integration";
     }
 
+    /** 按当前请求语言展示数据源类型名称，保持类型标识用于查询分发。 */
+    @Override
+    public String getTypeName() {
+        return $.t("nmfddh.integrationdashboarddatasourcehandler.gettypename");
+    }
+
     /** 固定启用状态和规范，回显不分页且按实际命中计数，普通查询保留原分页。 */
     @Override
     public JSONObject listDatasource(JSONObject params) {

@@ -10,8 +10,10 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.GenericApplicationContext;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CountDownLatch;
@@ -19,6 +21,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -96,6 +101,9 @@ public class DashboardDatasourceHandlerFactoryTest {
         refresh("another-module", handler);
         assertSame(handler, DashboardDatasourceHandlerFactory.getHandler("datawarehouse"));
         assertEquals(1, handlers.size());
+        // 重复事件不能在对外的类型选项中产生重复记录。
+        assertEquals(1, DashboardDatasourceHandlerFactory.getTypeList().size());
+        assertEquals("datawarehouse", DashboardDatasourceHandlerFactory.getTypeList().get(0).getString("value"));
     }
 
     /** 不同 Bean 声明同一类型使初始化失败，同时保留已注册实例。 */
@@ -155,6 +163,100 @@ public class DashboardDatasourceHandlerFactoryTest {
         }
     }
 
+    /** 尚未加载任何模块时返回可独立使用的空列表。 */
+    @Test
+    public void shouldReturnIndependentEmptyTypeLists() {
+        List<JSONObject> first = DashboardDatasourceHandlerFactory.getTypeList();
+        List<JSONObject> second = DashboardDatasourceHandlerFactory.getTypeList();
+        assertTrue(first.isEmpty());
+        assertTrue(second.isEmpty());
+        assertNotSame(first, second);
+    }
+
+    /** 新增类型无需修改工厂；数据仓库优先，其余按标识升序，与注册顺序无关。 */
+    @Test
+    public void shouldListDefaultFirstAndSortAdditionalTypes() {
+        refresh("z-module", new StubHandler("z-source"));
+        refresh("integration-module", new StubHandler("integration"));
+        refresh("a-module", new StubHandler("a-source"));
+        refresh("warehouse-module", new StubHandler("datawarehouse"));
+        List<JSONObject> options = DashboardDatasourceHandlerFactory.getTypeList();
+        assertEquals(Arrays.asList("datawarehouse", "a-source", "integration", "z-source"),
+                options.stream().map(option -> option.getString("value")).collect(Collectors.toList()));
+        for (JSONObject option : options) {
+            assertEquals(2, option.size());
+            assertEquals(option.getString("value"), option.getString("text"));
+        }
+    }
+
+    /** 未注册数据仓库时不补造默认选项，仅排序当前已注册的类型。 */
+    @Test
+    public void shouldSortOnlyRegisteredTypesWithoutDefault() {
+        refresh("integration-module", new StubHandler("integration"));
+        refresh("a-module", new StubHandler("a-source"));
+        assertEquals(Arrays.asList("a-source", "integration"), DashboardDatasourceHandlerFactory.getTypeList()
+                .stream().map(option -> option.getString("value")).collect(Collectors.toList()));
+    }
+
+    /** 调用方修改列表或其中的 JSON 对象，不影响后续响应和内部注册表。 */
+    @Test
+    public void shouldReturnIndependentListsAndOptionObjects() {
+        IDashboardDatasourceHandler handler = new StubHandler("datawarehouse");
+        refresh("framework", handler);
+        List<JSONObject> first = DashboardDatasourceHandlerFactory.getTypeList();
+        List<JSONObject> second = DashboardDatasourceHandlerFactory.getTypeList();
+        assertNotSame(first, second);
+        assertNotSame(first.get(0), second.get(0));
+        first.get(0).put("value", "changed");
+        first.get(0).put("text", "changed");
+        first.clear();
+        assertEquals("datawarehouse", second.get(0).getString("value"));
+        assertEquals("datawarehouse", second.get(0).getString("text"));
+        assertEquals(second, DashboardDatasourceHandlerFactory.getTypeList());
+        assertSame(handler, DashboardDatasourceHandlerFactory.getHandler("datawarehouse"));
+        assertEquals(1, handlers.size());
+    }
+
+    /** 每次列表调用都读取当前展示名称，模拟请求语言切换而不缓存旧翻译。 */
+    @Test
+    public void shouldResolveTypeNameOnEveryListCall() {
+        AtomicReference<String> name = new AtomicReference<>("数据仓库");
+        AtomicInteger nameCalls = new AtomicInteger();
+        refresh("framework", new StubHandler("datawarehouse") {
+            /** 每次调用返回当前模拟语言，并记录实际解析次数。 */
+            @Override
+            public String getTypeName() {
+                nameCalls.incrementAndGet();
+                return name.get();
+            }
+        });
+        List<JSONObject> chinese = DashboardDatasourceHandlerFactory.getTypeList();
+        name.set("Data Warehouse");
+        List<JSONObject> english = DashboardDatasourceHandlerFactory.getTypeList();
+        name.set("数据仓库");
+        assertEquals("数据仓库", DashboardDatasourceHandlerFactory.getTypeList().get(0).getString("text"));
+        assertEquals("数据仓库", chinese.get(0).getString("text"));
+        assertEquals("Data Warehouse", english.get(0).getString("text"));
+        assertEquals(3, nameCalls.get());
+    }
+
+    /** 名称解析期间新增注册项只影响下一次列表，当前响应使用调用开始时的快照。 */
+    @Test
+    public void shouldUseRegistrySnapshotWhenResolvingNames() {
+        StubHandler integration = new StubHandler("integration");
+        refresh("framework", new StubHandler("datawarehouse") {
+            /** 在名称解析时触发另一个模块的真实刷新事件。 */
+            @Override
+            public String getTypeName() {
+                refresh("integration-module", integration);
+                return "数据仓库";
+            }
+        });
+        assertEquals(1, DashboardDatasourceHandlerFactory.getTypeList().size());
+        assertEquals(Arrays.asList("datawarehouse", "integration"), DashboardDatasourceHandlerFactory.getTypeList()
+                .stream().map(option -> option.getString("value")).collect(Collectors.toList()));
+    }
+
     /** 使用屏障让两个真实模块事件竞争同一个注册项，仅捕获预期的类型冲突。 */
     private IllegalStateException registerConcurrently(String moduleId, IDashboardDatasourceHandler handler,
                                                        CountDownLatch ready, CountDownLatch start) throws InterruptedException {
@@ -201,6 +303,12 @@ public class DashboardDatasourceHandlerFactoryTest {
         /** 返回测试指定的原始类型。 */
         @Override
         public String getType() {
+            return type;
+        }
+
+        /** 返回测试展示名称，不依赖实际语言资源。 */
+        @Override
+        public String getTypeName() {
             return type;
         }
 

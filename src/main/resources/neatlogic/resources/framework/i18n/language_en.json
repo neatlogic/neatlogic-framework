@@ -1520,6 +1520,7 @@
   },
   "nmfddh": {
     "datawarehousedashboarddatasourcehandler": {
+      "gettypename": "Data Warehouse",
       "header": {
         "expiretime": "Expiration Time",
         "inserttime": "Sync Time"
@@ -1527,6 +1528,7 @@
     },
     "integrationdashboarddatasourcehandler": {
       "duplicatekey": "Duplicate column key: {0}",
+      "gettypename": "Integration",
       "invalidhandler": "Only integrations using the Dashboard Data specification are supported",
       "invalidthead": "Column key and title must be non-empty strings",
       "theadrequired": "Enable the output parameter theadList default value and configure a non-empty header array"

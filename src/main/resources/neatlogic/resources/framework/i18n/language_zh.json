@@ -1520,6 +1520,7 @@
   },
   "nmfddh": {
     "datawarehousedashboarddatasourcehandler": {
+      "gettypename": "数据仓库",
       "header": {
         "expiretime": "过期时间",
         "inserttime": "同步时间"
@@ -1527,6 +1528,7 @@
     },
     "integrationdashboarddatasourcehandler": {
       "duplicatekey": "表头 key 重复：{0}",
+      "gettypename": "集成",
       "invalidhandler": "仅支持使用大屏数据规范的集成配置",
       "invalidthead": "表头 key 和 title 必须为非空字符串",
       "theadrequired": "必须启用输出参数 theadList 默认值并配置非空表头数组"

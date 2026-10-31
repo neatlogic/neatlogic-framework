@@ -21,6 +21,8 @@ import neatlogic.framework.restful.constvalue.OperationTypeEnum;
 import neatlogic.framework.restful.core.privateapi.PrivateApiComponentBase;
 import neatlogic.framework.service.LoginService;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -30,6 +32,8 @@ import javax.annotation.Resource;
 @AuthAction(action = NoAuth.class)
 @OperationType(type = OperationTypeEnum.OPERATE)
 public class LogoutApi extends PrivateApiComponentBase {
+
+	private final Logger logger = LoggerFactory.getLogger(LogoutApi.class);
 
     @Resource
     private LoginService loginService;
@@ -57,6 +61,9 @@ public class LogoutApi extends PrivateApiComponentBase {
 		String url = loginService.logout(UserContext.get().getJwtVo());
 		JSONObject returnObj = new JSONObject();
 		returnObj.put("url", StringUtils.isBlank(url) ? StringUtils.EMPTY : url);
+		if (logger.isDebugEnabled()) {
+			logger.debug("{}({})用户主动登出", UserContext.get().getUserName(), UserContext.get().getUserId());
+		}
 		return returnObj;
 	}
 }

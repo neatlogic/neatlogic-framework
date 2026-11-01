@@ -1012,6 +1012,14 @@
       "documentonlinenotfoundexception": "Online help document: {0} does not exist"
     }
   },
+  "nfds": {
+    "datasourceserviceimpl": {
+      "header": {
+        "expiretime": "Expiration Time",
+        "inserttime": "Sync Time"
+      }
+    }
+  },
   "nfdt": {
     "status": {
       "building": "Building",
@@ -1520,11 +1528,7 @@
   },
   "nmfddh": {
     "datawarehousedashboarddatasourcehandler": {
-      "gettypename": "Data Warehouse",
-      "header": {
-        "expiretime": "Expiration Time",
-        "inserttime": "Sync Time"
-      }
+      "gettypename": "Data Warehouse"
     },
     "integrationdashboarddatasourcehandler": {
       "duplicatekey": "Duplicate column key: {0}",

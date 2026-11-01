@@ -3,43 +3,36 @@ package neatlogic.module.framework.dashboard.datasource.handler;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import neatlogic.framework.asynchronization.threadlocal.RequestContext;
-import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceDataMapper;
-import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceMapper;
 import neatlogic.framework.datawarehouse.dto.DataSourceDataVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceFieldVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import neatlogic.framework.datawarehouse.exceptions.DataSourceIsNotFoundException;
+import neatlogic.framework.datawarehouse.service.DataSourceService;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import static org.junit.Assert.*;
 
-/** 使用真实 DTO 和处理器、代理 Mapper 验证旧数据仓库查询契约，无需业务数据库。 */
+/** 保留真实 DTO 的最小字段投影，并通过服务代理验证 Handler 只做转换与委托。 */
 public class DatawarehouseDashboardDatasourceHandlerTest {
     private DatawarehouseDashboardDatasourceHandler handler;
     private DataSourceVo datasource;
-    private List<DataSourceVo> datasourceList;
-    private List<HashMap<String, Object>> rows;
     private DataSourceVo listQuery;
     private DataSourceDataVo dataQuery;
     private Long detailId;
-    private int listCountQueryCount;
+    private JSONObject listResult;
+    private JSONObject dataResult;
+    private RuntimeException queryFailure;
 
-    /** 初始化字段与结果样例，捕获实际传给 Mapper 的查询对象。 */
+    /** 初始化原字段样例，并捕获 Handler 传给公共服务的 DTO。 */
     @Before
     public void initialize() throws Exception {
         handler = new DatawarehouseDashboardDatasourceHandler();
@@ -58,81 +51,29 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         valueField.setLabel("耗时");
         valueField.setType("number");
         datasource.setFieldList(Arrays.asList(nameField, valueField));
-        datasourceList = Collections.singletonList(datasource);
-        HashMap<String, Object> row = new HashMap<>();
-        row.put("id", 1001L);
-        row.put("field_101", "应用一");
-        row.put("field_102", 12.5);
-        rows = Collections.singletonList(row);
-        DataWarehouseDataSourceMapper sourceMapper = (DataWarehouseDataSourceMapper) Proxy.newProxyInstance(
-                DataWarehouseDataSourceMapper.class.getClassLoader(), new Class<?>[]{DataWarehouseDataSourceMapper.class},
+        listResult = new JSONObject().fluentPut("tbodyList", new JSONArray()).fluentPut("rowNum", 0);
+        dataResult = new JSONObject().fluentPut("theadList", new JSONArray()).fluentPut("tbodyList", new JSONArray());
+        DataSourceService service = (DataSourceService) Proxy.newProxyInstance(
+                DataSourceService.class.getClassLoader(), new Class<?>[]{DataSourceService.class},
                 (proxy, method, args) -> {
+                    if (queryFailure != null) {
+                        throw queryFailure;
+                    }
                     switch (method.getName()) {
-                        case "searchDataSource":
-                            listQuery = (DataSourceVo) args[0];
-                            return datasourceList;
-                        case "searchDataSourceCount":
-                            listCountQueryCount++;
-                            return 41;
                         case "getDataSourceById":
                             detailId = (Long) args[0];
                             return datasource;
+                        case "searchDataSource":
+                            listQuery = (DataSourceVo) args[0];
+                            return listResult;
+                        case "searchDataSourceData":
+                            dataQuery = (DataSourceDataVo) args[0];
+                            return dataResult;
                         default:
-                            throw new AssertionError("非预期 Mapper 调用：" + method.getName());
+                            throw new AssertionError("非预期公共服务调用：" + method.getName());
                     }
                 });
-        DataWarehouseDataSourceDataMapper dataMapper = (DataWarehouseDataSourceDataMapper) Proxy.newProxyInstance(
-                DataWarehouseDataSourceDataMapper.class.getClassLoader(), new Class<?>[]{DataWarehouseDataSourceDataMapper.class},
-                (proxy, method, args) -> {
-                    dataQuery = (DataSourceDataVo) args[0];
-                    if ("searchDataSourceDataCount".equals(method.getName())) {
-                        return rows.size();
-                    }
-                    if ("searchDataSourceData".equals(method.getName())) {
-                        return rows;
-                    }
-                    throw new AssertionError("非预期 Mapper 调用：" + method.getName());
-                });
-        inject(handler, "dataSourceMapper", sourceMapper);
-        inject(handler, "dataSourceDataMapper", dataMapper);
-    }
-
-    /** 列表原有筛选、分页和 defaultValue 回显保持不变，结果不二次包装。 */
-    @Test
-    public void shouldPreserveListFiltersPaginationAndSelectedValues() {
-        JSONObject params = JSON.parseObject("{\"datasourceType\":\"datawarehouse\",\"keyword\":\"job\",\"moduleId\":\"autoexec\",\"isActive\":1,\"currentPage\":2,\"pageSize\":10,\"idList\":[999],\"defaultValue\":[\"10\",20]}");
-        JSONObject result = handler.listDatasource(params);
-        assertEquals("job", listQuery.getKeyword());
-        assertEquals("autoexec", listQuery.getModuleId());
-        assertEquals(Integer.valueOf(1), listQuery.getIsActive());
-        assertEquals(Arrays.asList(10L, 20L), listQuery.getIdList());
-        assertEquals(Integer.valueOf(10), listQuery.getStartNum());
-        assertEquals(2, result.getIntValue("currentPage"));
-        assertEquals(10, result.getIntValue("pageSize"));
-        assertEquals(41, result.getIntValue("rowNum"));
-        assertEquals(5, result.getIntValue("pageCount"));
-        assertSame(datasourceList, result.get("tbodyList"));
-        assertTrue(result.containsKey("theadList"));
-        assertFalse(result.containsKey("Return"));
-    }
-
-    /** 未提供回显参数时保留显式 ID 列表，不凭空添加启用状态过滤。 */
-    @Test
-    public void shouldPreserveIdListAndUnfilteredActiveState() {
-        handler.listDatasource(JSON.parseObject("{\"idList\":[10]}"));
-        assertEquals(Collections.singletonList(10L), listQuery.getIdList());
-        assertNull(listQuery.getIsActive());
-    }
-
-    /** 空列表保留原分页结构，且不额外查询总数。 */
-    @Test
-    public void shouldPreserveEmptyListResponse() {
-        datasourceList = new ArrayList<>();
-        JSONObject result = handler.listDatasource(new JSONObject());
-        assertEquals(0, result.getIntValue("rowNum"));
-        assertEquals(0, result.getIntValue("pageCount"));
-        assertTrue(result.getJSONArray("tbodyList").isEmpty());
-        assertEquals(0, listCountQueryCount);
+        inject(handler, "dataSourceService", service);
     }
 
     /** 详情保持 ID 参数和缺失数据源语义，取数仍按原规则抛不存在异常。 */
@@ -142,8 +83,10 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         assertEquals(Long.valueOf(10), detailId);
         datasource = null;
         assertNull(handler.getDatasource(request()));
-        assertThrows(DataSourceIsNotFoundException.class, () -> handler.searchDatasourceData(request()));
+        queryFailure = new DataSourceIsNotFoundException(10L);
+        assertSame(queryFailure, assertThrows(DataSourceIsNotFoundException.class, () -> handler.searchDatasourceData(request())));
     }
+
 
     /** 详情只暴露六个字段属性，使用真实 JSON 容器并保留原字段顺序、配置引用和源对象。 */
     @Test
@@ -207,6 +150,7 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         assertEquals("下拉框", nameField.getInputTypeText());
     }
 
+
     /** 使用 getter 的标签回退和 text 默认值，不把默认值写回源字段。 */
     @Test
     public void shouldPreserveDetailGetterDefaults() throws Exception {
@@ -231,6 +175,7 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         }
     }
 
+
     /** configStr 沿用 getter 的延迟解析和无效配置处理，不重新包装或改写配置对象。 */
     @Test
     public void shouldPreserveConfigStringParsingAndReference() throws Exception {
@@ -252,6 +197,7 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         }
     }
 
+
     /** null 或空字段列表统一输出 JSON 空数组，且不修改 Mapper 返回的字段列表。 */
     @Test
     public void shouldReturnEmptyJsonArrayForMissingFields() {
@@ -265,32 +211,23 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         }
     }
 
-    /** 取数响应保留业务列别名、系统列、分页元数据和行中的真实值。 */
+
+    /** 列表只完成 JSON 到 DTO 的转换，回显优先级及分页由公共服务处理，返回对象原样透传。 */
     @Test
-    public void shouldPreserveTableShapeAndRawRows() {
-        JSONObject result = handler.searchDatasourceData(request());
-        JSONArray headers = result.getJSONArray("theadList");
-        assertEquals(4, headers.size());
-        assertEquals("field_101", headers.getJSONObject(0).getString("key"));
-        assertEquals("jobName", headers.getJSONObject(0).getString("name"));
-        assertEquals("作业名", headers.getJSONObject(0).getString("title"));
-        assertEquals("field_102", headers.getJSONObject(1).getString("key"));
-        assertEquals("duration", headers.getJSONObject(1).getString("name"));
-        assertEquals("insertTime", headers.getJSONObject(2).getString("key"));
-        assertEquals("expireTime", headers.getJSONObject(3).getString("key"));
-        assertEquals("time", headers.getJSONObject(2).getString("type"));
-        assertFalse(headers.getJSONObject(2).containsKey("name"));
-        assertSame(rows, result.get("tbodyList"));
-        assertSame(datasource.getFieldList(), dataQuery.getFieldList());
-        assertEquals(1, result.getIntValue("rowNum"));
-        assertEquals(1, result.getIntValue("currentPage"));
-        assertEquals(20, result.getIntValue("pageSize"));
-        assertFalse(result.containsKey("Return"));
+    public void shouldDelegateListQueryWithoutChangingServiceResult() {
+        JSONObject params = JSON.parseObject("{\"datasourceType\":\"datawarehouse\",\"keyword\":\"job\",\"moduleId\":\"autoexec\",\"currentPage\":2,\"pageSize\":10,\"idList\":[999],\"defaultValue\":[\"10\",20]}");
+        assertSame(listResult, handler.listDatasource(params));
+        assertEquals("job", listQuery.getKeyword());
+        assertEquals("autoexec", listQuery.getModuleId());
+        assertEquals(Collections.singletonList(999L), listQuery.getIdList());
+        assertEquals(params.getJSONArray("defaultValue"), listQuery.getDefaultValue());
+        assertEquals(Integer.valueOf(2), listQuery.getCurrentPage());
+        assertEquals(Integer.valueOf(10), listQuery.getPageSize());
     }
 
-    /** limit 缺省/0/正数原样进入 Mapper，同时保留多字段顺序、过滤及过期配置。 */
+    /** 动态取数的过滤、排序、过期及 limit 三态完整交给服务，Handler 不重新包装响应。 */
     @Test
-    public void shouldForwardLimitFilteringAndSortPriority() {
+    public void shouldDelegateDataQueryWithoutChangingServiceResult() {
         for (Integer limit : Arrays.asList(null, 0, 5)) {
             JSONObject params = request();
             params.put("currentPage", 3);
@@ -301,62 +238,28 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
             if (limit != null) {
                 params.put("limit", limit);
             }
-            handler.searchDatasourceData(params);
+            assertSame(dataResult, handler.searchDatasourceData(params));
+            assertEquals(Long.valueOf(10), dataQuery.getDataSourceId());
             assertEquals(limit, dataQuery.getLimit());
-            assertEquals(Integer.valueOf(20), dataQuery.getStartNum());
+            assertEquals(Integer.valueOf(3), dataQuery.getCurrentPage());
+            assertEquals(Integer.valueOf(10), dataQuery.getPageSize());
             assertEquals(Integer.valueOf(1), dataQuery.getIsExpired());
             assertEquals(Long.valueOf(102), dataQuery.getSortList().get(0).getFieldId());
             assertEquals("DESC", dataQuery.getSortList().get(0).getType());
             assertEquals(Long.valueOf(101), dataQuery.getSortList().get(1).getFieldId());
             assertEquals("ASC", dataQuery.getSortList().get(1).getType());
             assertEquals("应用一", dataQuery.getConditionList().get(0).getValue());
+            assertNull(dataQuery.getFieldList());
         }
     }
 
-    /** 存在字段但无数据时仍返回表头；没有字段时沿用原接口空对象响应。 */
+    /** 查询失败由接口框架处理，Handler 保留服务异常实例，不吞错或更换业务异常类型。 */
     @Test
-    public void shouldDistinguishNoRowsFromNoFields() {
-        rows = new ArrayList<>();
-        JSONObject result = handler.searchDatasourceData(request());
-        assertEquals(0, result.getIntValue("rowNum"));
-        assertEquals(4, result.getJSONArray("theadList").size());
-        assertTrue(result.getJSONArray("tbodyList").isEmpty());
-        datasource.setFieldList(Collections.emptyList());
-        dataQuery = null;
-        assertTrue(handler.searchDatasourceData(request()).isEmpty());
-        assertNull(dataQuery);
-    }
-
-    /** 仅加载 framework 的真实资源，按请求语言切换系统表头，并恢复已有线程语言。 */
-    @Test
-    public void shouldLocalizeSystemHeadersUsingFrameworkResources() throws Exception {
-        RequestContext originalContext = RequestContext.get();
-        Locale originalLocale = originalContext == null ? null : originalContext.getLocale();
-        RequestContext context = originalContext == null ? RequestContext.init((RequestContext) null) : originalContext;
-        try {
-            for (Locale locale : Arrays.asList(Locale.CHINESE, Locale.ENGLISH, Locale.CHINESE)) {
-                context.setLocale(locale);
-                String language = locale.getLanguage();
-                String resource = "/neatlogic/resources/framework/i18n/language_" + language + ".json";
-                try (InputStream stream = getClass().getResourceAsStream(resource)) {
-                    assertNotNull("framework 必须独立提供系统表头资源", stream);
-                    JSONObject bundle = JSON.parseObject(new String(stream.readAllBytes(), StandardCharsets.UTF_8));
-                    JSONObject expected = bundle.getJSONObject("nmfddh")
-                            .getJSONObject("datawarehousedashboarddatasourcehandler").getJSONObject("header");
-                    JSONArray headers = handler.searchDatasourceData(request()).getJSONArray("theadList");
-                    assertEquals(expected.getString("inserttime"), headers.getJSONObject(2).getString("title"));
-                    assertEquals(expected.getString("expiretime"), headers.getJSONObject(3).getString("title"));
-                    assertEquals("en".equals(language) ? "Sync Time" : "同步时间", headers.getJSONObject(2).getString("title"));
-                    assertEquals("en".equals(language) ? "Expiration Time" : "过期时间", headers.getJSONObject(3).getString("title"));
-                }
-            }
-        } finally {
-            if (originalContext == null) {
-                context.release();
-            } else {
-                originalContext.setLocale(originalLocale);
-            }
-        }
+    public void shouldPropagateServiceQueryFailures() {
+        queryFailure = new DataSourceIsNotFoundException(10L);
+        assertSame(queryFailure, assertThrows(DataSourceIsNotFoundException.class, () -> handler.getDatasource(request())));
+        assertSame(queryFailure, assertThrows(DataSourceIsNotFoundException.class, () -> handler.listDatasource(request())));
+        assertSame(queryFailure, assertThrows(DataSourceIsNotFoundException.class, () -> handler.searchDatasourceData(request())));
     }
 
     /** 生成两个旧接口各自使用的 ID 参数，不引入新的统一别名。 */
@@ -371,7 +274,7 @@ public class DatawarehouseDashboardDatasourceHandlerTest {
         return field.get(target);
     }
 
-    /** 通过反射注入 Mapper 代理，保持生产处理器的字段注入风格。 */
+    /** 通过反射注入服务代理，保持生产处理器的字段注入风格。 */
     private void inject(Object target, String name, Object value) throws Exception {
         Field field = target.getClass().getDeclaredField(name);
         field.setAccessible(true);

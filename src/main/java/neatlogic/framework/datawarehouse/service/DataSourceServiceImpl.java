@@ -12,6 +12,8 @@
 
 package neatlogic.framework.datawarehouse.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.datawarehouse.core.DataSourceServiceHandlerFactory;
 import neatlogic.framework.datawarehouse.core.IDataSourceServiceHandler;
@@ -22,6 +24,7 @@ import neatlogic.framework.datawarehouse.dao.mapper.DataWarehouseDataSourceSchem
 import neatlogic.framework.datawarehouse.dto.*;
 import neatlogic.framework.datawarehouse.enums.Status;
 import neatlogic.framework.datawarehouse.exceptions.CreateDataSourceSchemaException;
+import neatlogic.framework.datawarehouse.exceptions.DataSourceIsNotFoundException;
 import neatlogic.framework.datawarehouse.exceptions.DeleteDataSourceSchemaException;
 import neatlogic.framework.datawarehouse.exceptions.ReportDataSourceIsSyncingException;
 import neatlogic.framework.scheduler.core.IJob;
@@ -30,6 +33,8 @@ import neatlogic.framework.scheduler.dto.JobObject;
 import neatlogic.framework.scheduler.enums.JobLoadTriggerType;
 import neatlogic.framework.transaction.core.AfterTransactionJob;
 import neatlogic.framework.transaction.core.EscapeTransactionJob;
+import neatlogic.framework.util.$;
+import neatlogic.framework.util.TableResultUtil;
 import neatlogic.module.framework.scheduler.datawarehouse.ReportDataSourceJob;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +43,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -63,6 +70,73 @@ public class DataSourceServiceImpl implements DataSourceService {
     @Resource
     private DataWarehouseDataSourceAuditMapper dataSourceAuditMapper;
 
+
+    /** 直接返回完整数据源 DTO，保留 Mapper 的字段配置及不存在时返回 null 的语义。 */
+    @Override
+    public DataSourceVo getDataSourceById(Long id) {
+        return dataSourceMapper.getDataSourceById(id);
+    }
+
+    /** 保留原列表接口的精确回显、筛选和分页响应，不增加默认启用状态过滤。 */
+    @Override
+    public JSONObject searchDataSource(DataSourceVo dataSourceVo) {
+        if (CollectionUtils.isNotEmpty(dataSourceVo.getDefaultValue())) {
+            List<Long> idList = new ArrayList<>();
+            for (int i = 0; i < dataSourceVo.getDefaultValue().size(); i++) {
+                idList.add(dataSourceVo.getDefaultValue().getLongValue(i));
+            }
+            dataSourceVo.setIdList(idList);
+        }
+        List<DataSourceVo> dataSourceList = dataSourceMapper.searchDataSource(dataSourceVo);
+        if (CollectionUtils.isNotEmpty(dataSourceList)) {
+            dataSourceVo.setRowNum(dataSourceMapper.searchDataSourceCount(dataSourceVo));
+        }
+        return TableResultUtil.getResult(dataSourceList, dataSourceVo);
+    }
+
+    /**
+     * 保留原取数接口的字段别名、元数据和空结果语义。
+     * limit 不补默认值：缺省分页、0 不限、正数限行，由既有 MyBatis SQL 处理。
+     */
+    @Override
+    public JSONObject searchDataSourceData(DataSourceDataVo dataVo) {
+        DataSourceVo dataSourceVo = dataSourceMapper.getDataSourceById(dataVo.getDataSourceId());
+        if (dataSourceVo == null) {
+            throw new DataSourceIsNotFoundException(dataVo.getDataSourceId());
+        }
+        JSONObject result = new JSONObject();
+        if (CollectionUtils.isNotEmpty(dataSourceVo.getFieldList())) {
+            dataVo.setFieldList(dataSourceVo.getFieldList());
+            dataVo.setRowNum(dataSourceDataMapper.searchDataSourceDataCount(dataVo));
+            List<HashMap<String, Object>> resultList = dataSourceDataMapper.searchDataSourceData(dataVo);
+            JSONArray headerList = new JSONArray();
+            for (DataSourceFieldVo fieldVo : dataSourceVo.getFieldList()) {
+                JSONObject head = new JSONObject();
+                head.put("key", "field_" + fieldVo.getId());
+                head.put("name", fieldVo.getName());
+                head.put("title", fieldVo.getLabel());
+                headerList.add(head);
+            }
+            // 系统时间列保持原键名，共用服务文案，调用方仍通过 name/field_ID 完成映射。
+            JSONObject insertTimeHead = new JSONObject();
+            insertTimeHead.put("key", "insertTime");
+            insertTimeHead.put("title", $.t("nfds.datasourceserviceimpl.header.inserttime"));
+            insertTimeHead.put("type", "time");
+            headerList.add(insertTimeHead);
+            JSONObject expireTimeHead = new JSONObject();
+            expireTimeHead.put("key", "expireTime");
+            expireTimeHead.put("title", $.t("nfds.datasourceserviceimpl.header.expiretime"));
+            expireTimeHead.put("type", "time");
+            headerList.add(expireTimeHead);
+            result.put("currentPage", dataVo.getCurrentPage());
+            result.put("pageSize", dataVo.getPageSize());
+            result.put("pageCount", dataVo.getPageCount());
+            result.put("rowNum", dataVo.getRowNum());
+            result.put("theadList", headerList);
+            result.put("tbodyList", resultList);
+        }
+        return result;
+    }
 
     @Override
     public void deleteReportDataSource(DataSourceVo reportDataSourceVo) {

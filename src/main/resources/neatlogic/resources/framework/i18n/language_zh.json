@@ -1012,6 +1012,14 @@
       "documentonlinenotfoundexception": "在线帮助文档：“{0}”不存在"
     }
   },
+  "nfds": {
+    "datasourceserviceimpl": {
+      "header": {
+        "expiretime": "过期时间",
+        "inserttime": "同步时间"
+      }
+    }
+  },
   "nfdt": {
     "status": {
       "building": "构建中",
@@ -1520,11 +1528,7 @@
   },
   "nmfddh": {
     "datawarehousedashboarddatasourcehandler": {
-      "gettypename": "数据仓库",
-      "header": {
-        "expiretime": "过期时间",
-        "inserttime": "同步时间"
-      }
+      "gettypename": "数据仓库"
     },
     "integrationdashboarddatasourcehandler": {
       "duplicatekey": "表头 key 重复：{0}",

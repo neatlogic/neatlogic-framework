@@ -164,15 +164,7 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         if (CollectionUtils.isEmpty(theadList)) {
             theadList = headers;
         }
-//        JSONArray theadList = new JSONArray();
-//        for (int i = 0; i < headers.size(); i++) {
-//            JSONObject header = headers.getJSONObject(i);
-//            JSONObject head = new JSONObject();
-//            head.put("key", "field_" + header.getString("key"));
-//            head.put("name", header.getString("key"));
-//            head.put("title", header.getString("title"));
-//            theadList.add(head);
-//        }
+
         JSONArray tbodyList = new JSONArray();
         JSONArray externalRows = external.getJSONArray("tbodyList");
         for (int i = 0; i < externalRows.size(); i++) {

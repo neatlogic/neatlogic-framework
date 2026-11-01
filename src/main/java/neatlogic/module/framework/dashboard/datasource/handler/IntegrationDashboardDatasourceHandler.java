@@ -59,40 +59,36 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
     /** 固定启用状态和规范，回显不分页且按实际命中计数，普通查询保留原分页。 */
     @Override
     public JSONObject listDatasource(JSONObject params) {
-        JSONArray selected = params.getJSONArray("defaultValue");
-        if (CollectionUtils.isEmpty(selected)) {
-            selected = params.getJSONArray("idList");
-        }
-        final boolean exactMatch = CollectionUtils.isNotEmpty(selected);
-        // BasePageVo.getNeedPage 固定返回 true，局部覆盖以确保精确回显的 SQL 确实不带 LIMIT。
-        IntegrationVo query = new IntegrationVo() {
-            @Override
-            public Boolean getNeedPage() {
-                return !exactMatch;
+        List<JSONObject> tbodyList = new ArrayList<>();
+        IntegrationVo query = params.toJavaObject(IntegrationVo.class);
+        JSONArray defaultValue = params.getJSONArray("defaultValue");
+        if (CollectionUtils.isNotEmpty(defaultValue)) {
+            List<String> uuidList = defaultValue.toJavaList(String.class);
+            List<IntegrationVo> integrationList = integrationMapper.getIntegrationListByUuidList(uuidList);
+            if (CollectionUtils.isNotEmpty(integrationList)) {
+                for (IntegrationVo integration : integrationList) {
+                    JSONObject row = new JSONObject();
+                    row.put("id", integration.getUuid());
+                    row.put("label", integration.getName());
+                    tbodyList.add(row);
+                }
+                query.setRowNum(tbodyList.size());
             }
-        };
-        query.setHandler(HANDLER);
-        query.setIsActive(1);
-        query.setKeyword(params.getString("keyword"));
-        if (params.getInteger("currentPage") != null && params.getInteger("currentPage") > 0) {
-            query.setCurrentPage(params.getInteger("currentPage"));
-        }
-        query.setPageSize(params.getInteger("pageSize"));
-        if (exactMatch) {
-            query.setDefaultValue(selected);
-        }
-        List<ValueTextVo> options = integrationMapper.searchIntegrationForSelect(query);
-        List<JSONObject> rows = new ArrayList<>();
-        if (options != null) {
-            for (ValueTextVo option : options) {
-                JSONObject row = new JSONObject();
-                row.put("id", option.getValue());
-                row.put("label", option.getText());
-                rows.add(row);
+        } else {
+            query.setHandler(HANDLER);
+            query.setIsActive(1);
+            List<IntegrationVo> integrationList = integrationMapper.searchIntegration(query);
+            if (CollectionUtils.isNotEmpty(integrationList)) {
+                for (IntegrationVo integration : integrationList) {
+                    JSONObject row = new JSONObject();
+                    row.put("id", integration.getUuid());
+                    row.put("label", integration.getName());
+                    tbodyList.add(row);
+                }
+                query.setRowNum(integrationMapper.searchIntegrationCount(query));
             }
         }
-        query.setRowNum(exactMatch ? rows.size() : integrationMapper.searchIntegrationCount(query));
-        return TableResultUtil.getResult(rows, query);
+        return TableResultUtil.getResult(tbodyList, query);
     }
 
     /** 字段只来自已启用的输出表头默认值；详情不存在仍返回 null，不执行集成请求。 */
@@ -131,7 +127,6 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         IntegrationAuthorityChecker.checkExecute(uuid, integrationMapper);
         IIntegrationHandler handler = getIntegrationHandler();
         JSONArray headers = getTheadList(integration, handler);
-        System.out.println("headers = " + headers);
         JSONObject input = new JSONObject();
         for (String name : new String[]{"conditionList", "sortList", "currentPage", "pageSize", "limit", "isExpired"}) {
             if (params.containsKey(name)) {
@@ -180,13 +175,11 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
 //        }
         JSONArray tbodyList = new JSONArray();
         JSONArray externalRows = external.getJSONArray("tbodyList");
-        System.out.println("externalRows = " + externalRows);
         for (int i = 0; i < externalRows.size(); i++) {
             JSONObject externalRow = externalRows.getJSONObject(i);
             JSONObject row = new JSONObject();
             for (int j = 0; j < headers.size(); j++) {
                 String key = headers.getJSONObject(j).getString("key");
-                System.out.println("key = " + key);
                 // 只返回声明的字段，缺失项补 null；标量和嵌套 JSON 值均保持原类型。
 //                row.put("field_" + key, externalRow.get(key));
                 row.put(key, externalRow.get(key));
@@ -195,7 +188,7 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
         }
         JSONObject result = new JSONObject();
         result.put("theadList", theadList);
-        result.put("tbodyList", externalRows);
+        result.put("tbodyList", tbodyList);
         for (String name : new String[]{"currentPage", "pageSize", "pageCount", "rowNum"}) {
             result.put(name, external.get(name));
         }

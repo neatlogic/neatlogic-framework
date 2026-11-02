@@ -13,11 +13,13 @@
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 
 import java.util.Collections;
 import java.util.List;
 
 /** 新增、修改和删除功能自检场景的权限。 */
+@AuthModule("framework")
 public class SELF_CHECK_MODIFY extends AuthBase {
     @Override
     public String getAuthDisplayName() {

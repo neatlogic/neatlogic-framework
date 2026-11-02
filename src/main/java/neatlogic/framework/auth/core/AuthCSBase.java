@@ -12,16 +12,6 @@
 
 package neatlogic.framework.auth.core;
 
-/** 商业权限标签，所属模块按标准包根目录确定，不受 cs 或子功能目录影响。 */
+/** 商业权限标签，模块归属统一由具体类的 AuthModule 注解声明。 */
 public abstract class AuthCSBase extends AuthBase {
-    /** 识别标准框架及业务模块包；自定义包结构继续沿用父类规则。 */
-    @Override
-    public String getAuthModule() {
-        String[] packages = getClass().getName().split("\\.");
-        if (packages.length > 3 && "neatlogic".equals(packages[0])
-                && ("module".equals(packages[1]) || "framework".equals(packages[1]))) {
-            return packages[2];
-        }
-        return super.getAuthModule();
-    }
 }

@@ -1,0 +1,1550 @@
+{
+  "excludedRepositories": [
+    "neatlogic-diagnosis",
+    "neatlogic-diagnosis-base"
+  ],
+  "labels": [
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_AGENT_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_AGENT_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_CHAT.java",
+      "class": "neatlogic.framework.ai.auth.AI_CHAT",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_MODEL_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_MODEL_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_RAG_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_RAG_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_SKILL_MANAGE.java",
+      "class": "neatlogic.framework.ai.auth.AI_SKILL_MANAGE",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_SKILL_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_SKILL_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_TOOL_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_TOOL_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_WORKFLOW_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_WORKFLOW_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-ai-base/src/main/java/neatlogic/framework/ai/auth/AI_WORKFLOW_TASK_MODIFY.java",
+      "class": "neatlogic.framework.ai.auth.AI_WORKFLOW_TASK_MODIFY",
+      "module": "ai",
+      "repo": "neatlogic-ai-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_ACTION_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_ACTION_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_ADMIN.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_ADMIN",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_ALLALERTCONFIG_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_ALLALERTCONFIG_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_ATTR_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_ATTR_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_BASE.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_BASE",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_BATCH_DELETE.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_BATCH_DELETE",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_BREAKER_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_BREAKER_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_EVENT_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_EVENT_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_EVENT_PLUGIN_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_EVENT_PLUGIN_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_EXPORT.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_EXPORT",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_INDEX.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_INDEX",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_LEVEL_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_LEVEL_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_MARK_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_MARK_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_NOTIFY_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_NOTIFY_TEMPLATE_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_RULE_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_RULE_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_SOURCE_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_SOURCE_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_STATUS_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_STATUS_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_TYPE_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_TYPE_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-base/src/main/java/neatlogic/framework/alert/auth/ALERT_VIEW_MODIFY.java",
+      "class": "neatlogic.framework.alert.auth.ALERT_VIEW_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-base"
+    },
+    {
+      "path": "neatlogic-alert-commercial/src/main/java/neatlogic/module/alert/cs/auth/ALERT_SUBSCRIBE_MODIFY.java",
+      "class": "neatlogic.module.alert.cs.auth.ALERT_SUBSCRIBE_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-commercial"
+    },
+    {
+      "path": "neatlogic-alert-commercial/src/main/java/neatlogic/module/alert/cs/auth/ALERT_SUPPRESSION_MODIFY.java",
+      "class": "neatlogic.module.alert.cs.auth.ALERT_SUPPRESSION_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-commercial"
+    },
+    {
+      "path": "neatlogic-alert-commercial/src/main/java/neatlogic/module/alert/cs/auth/ALERT_TITLE_AI.java",
+      "class": "neatlogic.module.alert.cs.auth.ALERT_TITLE_AI",
+      "module": "alert",
+      "repo": "neatlogic-alert-commercial"
+    },
+    {
+      "path": "neatlogic-alert-commercial/src/main/java/neatlogic/module/alert/cs/auth/ALERT_TOPO_MODIFY.java",
+      "class": "neatlogic.module.alert.cs.auth.ALERT_TOPO_MODIFY",
+      "module": "alert",
+      "repo": "neatlogic-alert-commercial"
+    },
+    {
+      "path": "neatlogic-approval-base/src/main/java/neatlogic/framework/approval/auth/label/APPROVAL_BASE.java",
+      "class": "neatlogic.framework.approval.auth.label.APPROVAL_BASE",
+      "module": "approval",
+      "repo": "neatlogic-approval-base"
+    },
+    {
+      "path": "neatlogic-approval-base/src/main/java/neatlogic/framework/approval/auth/label/APPROVAL_CONFIG_MANAGE.java",
+      "class": "neatlogic.framework.approval.auth.label.APPROVAL_CONFIG_MANAGE",
+      "module": "approval",
+      "repo": "neatlogic-approval-base"
+    },
+    {
+      "path": "neatlogic-approval-base/src/main/java/neatlogic/framework/approval/auth/label/APPROVAL_OBJECT_MANAGE.java",
+      "class": "neatlogic.framework.approval.auth.label.APPROVAL_OBJECT_MANAGE",
+      "module": "approval",
+      "repo": "neatlogic-approval-base"
+    },
+    {
+      "path": "neatlogic-approval-base/src/main/java/neatlogic/framework/approval/auth/label/APPROVAL_RULE_MANAGE.java",
+      "class": "neatlogic.framework.approval.auth.label.APPROVAL_RULE_MANAGE",
+      "module": "approval",
+      "repo": "neatlogic-approval-base"
+    },
+    {
+      "path": "neatlogic-approval-base/src/main/java/neatlogic/framework/approval/auth/label/APPROVAL_WORKFLOW_MANAGE.java",
+      "class": "neatlogic.framework.approval.auth.label.APPROVAL_WORKFLOW_MANAGE",
+      "module": "approval",
+      "repo": "neatlogic-approval-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_BASE.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_BASE",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_COMBOP_ADD.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_COMBOP_ADD",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_COMBOP_SEARCH.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_COMBOP_SEARCH",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_CREATE_PUBLIC_JOB.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_CREATE_PUBLIC_JOB",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_CUSTOMTEMPLATE_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_CUSTOMTEMPLATE_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_JOB_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_JOB_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_RESOURCECENTER_ACCOUNT_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_RESOURCECENTER_ACCOUNT_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_RESOURCECENTER_RESOURCE_VIEW.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_RESOURCECENTER_RESOURCE_VIEW",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_RESOURCECENTER_TAG_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_RESOURCECENTER_TAG_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_RESOURCECENTER_VIEW_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_RESOURCECENTER_VIEW_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_SCHEDULE_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_SCHEDULE_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_SCRIPT_MANAGE.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_SCRIPT_MANAGE",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_SCRIPT_MODIFY.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_SCRIPT_MODIFY",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_SCRIPT_SEARCH.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_SCRIPT_SEARCH",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-base/src/main/java/neatlogic/framework/autoexec/auth/AUTOEXEC_SERVICE_MANAGE.java",
+      "class": "neatlogic.framework.autoexec.auth.AUTOEXEC_SERVICE_MANAGE",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-base"
+    },
+    {
+      "path": "neatlogic-autoexec-commercial/src/main/java/neatlogic/module/autoexec/cs/auth/AUTOEXEC_EXECRTOOL_EXECUTE.java",
+      "class": "neatlogic.module.autoexec.cs.auth.AUTOEXEC_EXECRTOOL_EXECUTE",
+      "module": "autoexec",
+      "repo": "neatlogic-autoexec-commercial"
+    },
+    {
+      "path": "neatlogic-change/src/main/java/neatlogic/module/change/auth/label/CHANGE_MODIFY.java",
+      "class": "neatlogic.module.change.auth.label.CHANGE_MODIFY",
+      "module": "change",
+      "repo": "neatlogic-change"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/ALERTLEVEL_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.ALERTLEVEL_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CIENTITY_ALERT_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CIENTITY_ALERT_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CIENTITY_BATCH_IMPORT.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CIENTITY_BATCH_IMPORT",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CIENTITY_EXPORT.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CIENTITY_EXPORT",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CIENTITY_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CIENTITY_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CI_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CI_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CMDB.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CMDB",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CMDB_BASE.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CMDB_BASE",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/CUSTOMVIEW_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.CUSTOMVIEW_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/GRAPH_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.GRAPH_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/GROUP_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.GROUP_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/PRIVATE_CUSTOMVIEW_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.PRIVATE_CUSTOMVIEW_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RELTYPE_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RELTYPE_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RESOURCECENTER_ACCOUNT_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RESOURCECENTER_ACCOUNT_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RESOURCECENTER_APP_VIEW.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RESOURCECENTER_APP_VIEW",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RESOURCECENTER_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RESOURCECENTER_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RESOURCECENTER_RESOURCE_VIEW.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RESOURCECENTER_RESOURCE_VIEW",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RESOURCECENTER_TAG_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RESOURCECENTER_TAG_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/RESOURCECENTER_VIEW_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.RESOURCECENTER_VIEW_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/SYNC_MODIFY.java",
+      "class": "neatlogic.framework.cmdb.auth.label.SYNC_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-base/src/main/java/neatlogic/framework/cmdb/auth/label/TRANSACTION_MANAGE.java",
+      "class": "neatlogic.framework.cmdb.auth.label.TRANSACTION_MANAGE",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-base"
+    },
+    {
+      "path": "neatlogic-cmdb-commercial/src/main/java/neatlogic/module/cmdb/cs/auth/CMDB_EVENT_MODIFY.java",
+      "class": "neatlogic.module.cmdb.cs.auth.CMDB_EVENT_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-commercial"
+    },
+    {
+      "path": "neatlogic-cmdb-commercial/src/main/java/neatlogic/module/cmdb/cs/auth/CMDB_EVENT_VIEW.java",
+      "class": "neatlogic.module.cmdb.cs.auth.CMDB_EVENT_VIEW",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-commercial"
+    },
+    {
+      "path": "neatlogic-cmdb-transfer/src/main/java/neatlogic/module/cmdb/transfer/auth/label/BSM_CIENTITY_SYNC_MODIFY.java",
+      "class": "neatlogic.module.cmdb.transfer.auth.label.BSM_CIENTITY_SYNC_MODIFY",
+      "module": "cmdb",
+      "repo": "neatlogic-cmdb-transfer"
+    },
+    {
+      "path": "neatlogic-codehub-base/src/main/java/neatlogic/framework/codehub/auth/CODEHUB_BASE.java",
+      "class": "neatlogic.framework.codehub.auth.CODEHUB_BASE",
+      "module": "codehub",
+      "repo": "neatlogic-codehub-base"
+    },
+    {
+      "path": "neatlogic-codehub-base/src/main/java/neatlogic/framework/codehub/auth/CODEHUB_MANAGER.java",
+      "class": "neatlogic.framework.codehub.auth.CODEHUB_MANAGER",
+      "module": "codehub",
+      "repo": "neatlogic-codehub-base"
+    },
+    {
+      "path": "neatlogic-codehub-base/src/main/java/neatlogic/framework/codehub/auth/CODEHUB_VERSION.java",
+      "class": "neatlogic.framework.codehub.auth.CODEHUB_VERSION",
+      "module": "codehub",
+      "repo": "neatlogic-codehub-base"
+    },
+    {
+      "path": "neatlogic-credit/src/main/java/neatlogic/module/credit/auth/label/CREDIT_APPLICATION_CREATE.java",
+      "class": "neatlogic.module.credit.auth.label.CREDIT_APPLICATION_CREATE",
+      "module": "credit",
+      "repo": "neatlogic-credit"
+    },
+    {
+      "path": "neatlogic-credit/src/main/java/neatlogic/module/credit/auth/label/CREDIT_APPLICATION_MANAGE.java",
+      "class": "neatlogic.module.credit.auth.label.CREDIT_APPLICATION_MANAGE",
+      "module": "credit",
+      "repo": "neatlogic-credit"
+    },
+    {
+      "path": "neatlogic-credit/src/main/java/neatlogic/module/credit/auth/label/CREDIT_APPLICATION_VIEW.java",
+      "class": "neatlogic.module.credit.auth.label.CREDIT_APPLICATION_VIEW",
+      "module": "credit",
+      "repo": "neatlogic-credit"
+    },
+    {
+      "path": "neatlogic-credit/src/main/java/neatlogic/module/credit/auth/label/CREDIT_INDEX.java",
+      "class": "neatlogic.module.credit.auth.label.CREDIT_INDEX",
+      "module": "credit",
+      "repo": "neatlogic-credit"
+    },
+    {
+      "path": "neatlogic-dashboard-base/src/main/java/neatlogic/module/dashboard/auth/label/DASHBOARD_BASE.java",
+      "class": "neatlogic.module.dashboard.auth.label.DASHBOARD_BASE",
+      "module": "dashboard",
+      "repo": "neatlogic-dashboard-base"
+    },
+    {
+      "path": "neatlogic-dashboard-base/src/main/java/neatlogic/module/dashboard/auth/label/DASHBOARD_MODIFY.java",
+      "class": "neatlogic.module.dashboard.auth.label.DASHBOARD_MODIFY",
+      "module": "dashboard",
+      "repo": "neatlogic-dashboard-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/APP_CONFIG_MODIFY.java",
+      "class": "neatlogic.framework.deploy.auth.APP_CONFIG_MODIFY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/BATCHDEPLOY_MODIFY.java",
+      "class": "neatlogic.framework.deploy.auth.BATCHDEPLOY_MODIFY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/BATCHDEPLOY_VERIFY.java",
+      "class": "neatlogic.framework.deploy.auth.BATCHDEPLOY_VERIFY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/DEPLOY.java",
+      "class": "neatlogic.framework.deploy.auth.DEPLOY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/DEPLOY_BASE.java",
+      "class": "neatlogic.framework.deploy.auth.DEPLOY_BASE",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/DEPLOY_MODIFY.java",
+      "class": "neatlogic.framework.deploy.auth.DEPLOY_MODIFY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/DEPLOY_SCHEDULE_MODIFY.java",
+      "class": "neatlogic.framework.deploy.auth.DEPLOY_SCHEDULE_MODIFY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-deploy-base/src/main/java/neatlogic/framework/deploy/auth/PIPELINE_MODIFY.java",
+      "class": "neatlogic.framework.deploy.auth.PIPELINE_MODIFY",
+      "module": "deploy",
+      "repo": "neatlogic-deploy-base"
+    },
+    {
+      "path": "neatlogic-diagram/src/main/java/neatlogic/module/cmdb/cs/diagram/auth/label/DIAGRAM_BASE.java",
+      "class": "neatlogic.module.cmdb.cs.diagram.auth.label.DIAGRAM_BASE",
+      "module": "diagram",
+      "repo": "neatlogic-diagram"
+    },
+    {
+      "path": "neatlogic-diagram/src/main/java/neatlogic/module/cmdb/cs/diagram/auth/label/DIAGRAM_CATALOG_MODIFY.java",
+      "class": "neatlogic.module.cmdb.cs.diagram.auth.label.DIAGRAM_CATALOG_MODIFY",
+      "module": "diagram",
+      "repo": "neatlogic-diagram"
+    },
+    {
+      "path": "neatlogic-diagram/src/main/java/neatlogic/module/cmdb/cs/diagram/auth/label/DIAGRAM_GRAPH_MODIFY.java",
+      "class": "neatlogic.module.cmdb.cs.diagram.auth.label.DIAGRAM_GRAPH_MODIFY",
+      "module": "diagram",
+      "repo": "neatlogic-diagram"
+    },
+    {
+      "path": "neatlogic-diagram/src/main/java/neatlogic/module/cmdb/cs/diagram/auth/label/DIAGRAM_TASK_CONFIG.java",
+      "class": "neatlogic.module.cmdb.cs.diagram.auth.label.DIAGRAM_TASK_CONFIG",
+      "module": "diagram",
+      "repo": "neatlogic-diagram"
+    },
+    {
+      "path": "neatlogic-diagram/src/main/java/neatlogic/module/cmdb/cs/diagram/auth/label/DIAGRAM_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.module.cmdb.cs.diagram.auth.label.DIAGRAM_TEMPLATE_MODIFY",
+      "module": "diagram",
+      "repo": "neatlogic-diagram"
+    },
+    {
+      "path": "neatlogic-diagram/src/main/java/neatlogic/module/cmdb/cs/diagram/auth/label/DIAGRAM_WIDGET_MODIFY.java",
+      "class": "neatlogic.module.cmdb.cs.diagram.auth.label.DIAGRAM_WIDGET_MODIFY",
+      "module": "diagram",
+      "repo": "neatlogic-diagram"
+    },
+    {
+      "path": "neatlogic-dr-base/src/main/java/neatlogic/framework/dr/auth/label/DR_ADMIN.java",
+      "class": "neatlogic.framework.dr.auth.label.DR_ADMIN",
+      "module": "dr",
+      "repo": "neatlogic-dr-base"
+    },
+    {
+      "path": "neatlogic-dr-base/src/main/java/neatlogic/framework/dr/auth/label/DR_BASE.java",
+      "class": "neatlogic.framework.dr.auth.label.DR_BASE",
+      "module": "dr",
+      "repo": "neatlogic-dr-base"
+    },
+    {
+      "path": "neatlogic-dr-base/src/main/java/neatlogic/framework/dr/auth/label/EXERCISE_MODIFY.java",
+      "class": "neatlogic.framework.dr.auth.label.EXERCISE_MODIFY",
+      "module": "dr",
+      "repo": "neatlogic-dr-base"
+    },
+    {
+      "path": "neatlogic-dr-base/src/main/java/neatlogic/framework/dr/auth/label/PREPARATION_EXECUTE.java",
+      "class": "neatlogic.framework.dr.auth.label.PREPARATION_EXECUTE",
+      "module": "dr",
+      "repo": "neatlogic-dr-base"
+    },
+    {
+      "path": "neatlogic-dr-base/src/main/java/neatlogic/framework/dr/auth/label/PREPARATION_MODIFY.java",
+      "class": "neatlogic.framework.dr.auth.label.PREPARATION_MODIFY",
+      "module": "dr",
+      "repo": "neatlogic-dr-base"
+    },
+    {
+      "path": "neatlogic-edu/src/main/java/neatlogic/module/edu/auth/label/ASSIGN_MODIFY.java",
+      "class": "neatlogic.module.edu.auth.label.ASSIGN_MODIFY",
+      "module": "edu",
+      "repo": "neatlogic-edu"
+    },
+    {
+      "path": "neatlogic-edu/src/main/java/neatlogic/module/edu/auth/label/EDU_BASE.java",
+      "class": "neatlogic.module.edu.auth.label.EDU_BASE",
+      "module": "edu",
+      "repo": "neatlogic-edu"
+    },
+    {
+      "path": "neatlogic-edu/src/main/java/neatlogic/module/edu/auth/label/PROJECT_MODIFY.java",
+      "class": "neatlogic.module.edu.auth.label.PROJECT_MODIFY",
+      "module": "edu",
+      "repo": "neatlogic-edu"
+    },
+    {
+      "path": "neatlogic-edu/src/main/java/neatlogic/module/edu/auth/label/QUALIFY_MODIFY.java",
+      "class": "neatlogic.module.edu.auth.label.QUALIFY_MODIFY",
+      "module": "edu",
+      "repo": "neatlogic-edu"
+    },
+    {
+      "path": "neatlogic-edu/src/main/java/neatlogic/module/edu/auth/label/STUDENT_MODIFY.java",
+      "class": "neatlogic.module.edu.auth.label.STUDENT_MODIFY",
+      "module": "edu",
+      "repo": "neatlogic-edu"
+    },
+    {
+      "path": "neatlogic-edu/src/main/java/neatlogic/module/edu/auth/label/TEACHER_MODIFY.java",
+      "class": "neatlogic.module.edu.auth.label.TEACHER_MODIFY",
+      "module": "edu",
+      "repo": "neatlogic-edu"
+    },
+    {
+      "path": "neatlogic-eoa-base/src/main/java/neatlogic/framework/eoa/auth/label/EOA_BASE.java",
+      "class": "neatlogic.framework.eoa.auth.label.EOA_BASE",
+      "module": "eoa",
+      "repo": "neatlogic-eoa-base"
+    },
+    {
+      "path": "neatlogic-event/src/main/java/neatlogic/module/event/auth/label/EVENT_SOLUTION_MODIFY.java",
+      "class": "neatlogic.module.event.auth.label.EVENT_SOLUTION_MODIFY",
+      "module": "event",
+      "repo": "neatlogic-event"
+    },
+    {
+      "path": "neatlogic-event/src/main/java/neatlogic/module/event/auth/label/EVENT_TYPE_MODIFY.java",
+      "class": "neatlogic.module.event.auth.label.EVENT_TYPE_MODIFY",
+      "module": "event",
+      "repo": "neatlogic-event"
+    },
+    {
+      "path": "neatlogic-fdbank/src/main/java/neatlogic/module/fdbank/auth/FDBANK_CONTAINERSERVICE_BASE.java",
+      "class": "neatlogic.module.fdbank.auth.FDBANK_CONTAINERSERVICE_BASE",
+      "module": "fdbank",
+      "repo": "neatlogic-fdbank"
+    },
+    {
+      "path": "neatlogic-fdbank/src/main/java/neatlogic/module/fdbank/auth/FDBANK_CONTAINERSERVICE_MODIFY.java",
+      "class": "neatlogic.module.fdbank.auth.FDBANK_CONTAINERSERVICE_MODIFY",
+      "module": "fdbank",
+      "repo": "neatlogic-fdbank"
+    },
+    {
+      "path": "neatlogic-fileservice-base/src/main/java/neatlogic/framework/fileservice/auth/label/FILESERVICE_BASE.java",
+      "class": "neatlogic.framework.fileservice.auth.label.FILESERVICE_BASE",
+      "module": "fileservice",
+      "repo": "neatlogic-fileservice-base"
+    },
+    {
+      "path": "neatlogic-fileservice-base/src/main/java/neatlogic/framework/fileservice/auth/label/FILESERVICE_EXECUTE.java",
+      "class": "neatlogic.framework.fileservice.auth.label.FILESERVICE_EXECUTE",
+      "module": "fileservice",
+      "repo": "neatlogic-fileservice-base"
+    },
+    {
+      "path": "neatlogic-fileservice-base/src/main/java/neatlogic/framework/fileservice/auth/label/FILESERVICE_MODIFY.java",
+      "class": "neatlogic.framework.fileservice.auth.label.FILESERVICE_MODIFY",
+      "module": "fileservice",
+      "repo": "neatlogic-fileservice-base"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/ADMIN.java",
+      "class": "neatlogic.framework.auth.label.ADMIN",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/API_AUDIT_VIEW.java",
+      "class": "neatlogic.framework.auth.label.API_AUDIT_VIEW",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/AUTHORITY_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.AUTHORITY_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/DATA_WAREHOUSE_BASE.java",
+      "class": "neatlogic.framework.auth.label.DATA_WAREHOUSE_BASE",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/DATA_WAREHOUSE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.DATA_WAREHOUSE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/DOCUMENTONLINE_CONFIG_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.DOCUMENTONLINE_CONFIG_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/EXTRA_MENU_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.EXTRA_MENU_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/FILE_DOWNLOAD.java",
+      "class": "neatlogic.framework.auth.label.FILE_DOWNLOAD",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/FILE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.FILE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/FORM_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.FORM_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/FULLTEXTINDEX_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.FULLTEXTINDEX_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/GLOBALSEARCH_BASE.java",
+      "class": "neatlogic.framework.auth.label.GLOBALSEARCH_BASE",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/HOME_PAGE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.HOME_PAGE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/INTEGRATION_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.INTEGRATION_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/INTERFACE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.INTERFACE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/LICENSE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.LICENSE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/MATRIX_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.MATRIX_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/MODULE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.MODULE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/MQ_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.MQ_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/NOTIFY_CONFIG_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.NOTIFY_CONFIG_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/NOTIFY_JOB_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.NOTIFY_JOB_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/NOTIFY_POLICY_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.NOTIFY_POLICY_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/NoAuth.java",
+      "class": "neatlogic.framework.auth.label.NoAuth",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/REGION_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.REGION_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/ROLE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.ROLE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/RUNNER_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.RUNNER_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/SCHEDULE_JOB_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.SCHEDULE_JOB_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/SELF_CHECK_EXECUTE.java",
+      "class": "neatlogic.framework.auth.label.SELF_CHECK_EXECUTE",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/SELF_CHECK_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.SELF_CHECK_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/SELF_CHECK_VIEW.java",
+      "class": "neatlogic.framework.auth.label.SELF_CHECK_VIEW",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/SYSTEM_NOTICE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.SYSTEM_NOTICE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/TEAM_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.TEAM_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/THEME_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.THEME_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/USER_EXPORT_FILE_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.USER_EXPORT_FILE_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/USER_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.USER_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/VIP_VIEW.java",
+      "class": "neatlogic.framework.auth.label.VIP_VIEW",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-framework/src/main/java/neatlogic/framework/auth/label/WORKTIME_MODIFY.java",
+      "class": "neatlogic.framework.auth.label.WORKTIME_MODIFY",
+      "module": "framework",
+      "repo": "neatlogic-framework"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/cep/HADAY_CEP_READ.java",
+      "class": "neatlogic.module.haday.auth.label.cep.HADAY_CEP_READ",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/common/HADAY_BASE.java",
+      "class": "neatlogic.module.haday.auth.label.common.HADAY_BASE",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/dictionary/HADAY_DICTIONARY_MODIFY.java",
+      "class": "neatlogic.module.haday.auth.label.dictionary.HADAY_DICTIONARY_MODIFY",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/font/HADAY_FONT_INSPECTION_EXECUTE.java",
+      "class": "neatlogic.module.haday.auth.label.font.HADAY_FONT_INSPECTION_EXECUTE",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/font/HADAY_FONT_INSPECTION_MANAGE.java",
+      "class": "neatlogic.module.haday.auth.label.font.HADAY_FONT_INSPECTION_MANAGE",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/font/HADAY_FONT_INSPECTION_REVIEW.java",
+      "class": "neatlogic.module.haday.auth.label.font.HADAY_FONT_INSPECTION_REVIEW",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/font/HADAY_FONT_INSPECTION_VIEW.java",
+      "class": "neatlogic.module.haday.auth.label.font.HADAY_FONT_INSPECTION_VIEW",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/operation/HADAY_OPERATION_LOG_VIEW.java",
+      "class": "neatlogic.module.haday.auth.label.operation.HADAY_OPERATION_LOG_VIEW",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/plugin/HADAY_PLUGIN_MODIFY.java",
+      "class": "neatlogic.module.haday.auth.label.plugin.HADAY_PLUGIN_MODIFY",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/template/HADAY_TEMPLATE_ACTIVATE.java",
+      "class": "neatlogic.module.haday.auth.label.template.HADAY_TEMPLATE_ACTIVATE",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-haday/src/main/java/neatlogic/module/haday/auth/label/template/HADAY_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.module.haday.auth.label.template.HADAY_TEMPLATE_MODIFY",
+      "module": "haday",
+      "repo": "neatlogic-haday"
+    },
+    {
+      "path": "neatlogic-informant-base/src/main/java/neatlogic/framework/informant/auth/label/INFORMANT_BASE.java",
+      "class": "neatlogic.framework.informant.auth.label.INFORMANT_BASE",
+      "module": "informant",
+      "repo": "neatlogic-informant-base"
+    },
+    {
+      "path": "neatlogic-informant-base/src/main/java/neatlogic/framework/informant/auth/label/INFORMANT_BATCH_DELETE.java",
+      "class": "neatlogic.framework.informant.auth.label.INFORMANT_BATCH_DELETE",
+      "module": "informant",
+      "repo": "neatlogic-informant-base"
+    },
+    {
+      "path": "neatlogic-informant-base/src/main/java/neatlogic/framework/informant/auth/label/INFORMANT_HEARTBEAT.java",
+      "class": "neatlogic.framework.informant.auth.label.INFORMANT_HEARTBEAT",
+      "module": "informant",
+      "repo": "neatlogic-informant-base"
+    },
+    {
+      "path": "neatlogic-informant-base/src/main/java/neatlogic/framework/informant/auth/label/INFORMANT_MODIFY.java",
+      "class": "neatlogic.framework.informant.auth.label.INFORMANT_MODIFY",
+      "module": "informant",
+      "repo": "neatlogic-informant-base"
+    },
+    {
+      "path": "neatlogic-informant/src/main/java/neatlogic/module/informant/auth/label/INFORMANT_AI.java",
+      "class": "neatlogic.module.informant.auth.label.INFORMANT_AI",
+      "module": "informant",
+      "repo": "neatlogic-informant"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_BASE.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_BASE",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_BASELINE_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_BASELINE_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_BASELINE_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_BASELINE_TEMPLATE_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_BASELINE_VIEW.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_BASELINE_VIEW",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_CONFIG_FILE_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_CONFIG_FILE_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_EXECUTE.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_EXECUTE",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_RESOURCECENTER_ACCOUNT_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_RESOURCECENTER_ACCOUNT_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_RESOURCECENTER_RESOURCE_VIEW.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_RESOURCECENTER_RESOURCE_VIEW",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_RESOURCECENTER_TAG_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_RESOURCECENTER_TAG_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_RESOURCECENTER_VIEW_MODIFY.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_RESOURCECENTER_VIEW_MODIFY",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-inspect-base/src/main/java/neatlogic/framework/inspect/auth/INSPECT_SCHEDULE_EXECUTE.java",
+      "class": "neatlogic.framework.inspect.auth.INSPECT_SCHEDULE_EXECUTE",
+      "module": "inspect",
+      "repo": "neatlogic-inspect-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/BATCH_REPORT_PROCESS_TASK.java",
+      "class": "neatlogic.framework.process.auth.BATCH_REPORT_PROCESS_TASK",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/CATALOG_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.CATALOG_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/CHANNELTYPE_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.CHANNELTYPE_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PRIORITY_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.PRIORITY_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PROCESS.java",
+      "class": "neatlogic.framework.process.auth.PROCESS",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PROCESSTASK_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.PROCESSTASK_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PROCESS_BASE.java",
+      "class": "neatlogic.framework.process.auth.PROCESS_BASE",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PROCESS_COMMENT_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.PROCESS_COMMENT_TEMPLATE_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PROCESS_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.PROCESS_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/PROCESS_STEP_HANDLER_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.PROCESS_STEP_HANDLER_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/SCORE_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.SCORE_TEMPLATE_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/WORKCENTER_ADVANCED_SEARCH.java",
+      "class": "neatlogic.framework.process.auth.WORKCENTER_ADVANCED_SEARCH",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/WORKCENTER_MODIFY.java",
+      "class": "neatlogic.framework.process.auth.WORKCENTER_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-base/src/main/java/neatlogic/framework/process/auth/WORKCENTER_NEW_TYPE.java",
+      "class": "neatlogic.framework.process.auth.WORKCENTER_NEW_TYPE",
+      "module": "process",
+      "repo": "neatlogic-itsm-base"
+    },
+    {
+      "path": "neatlogic-itsm-commercial/src/main/java/neatlogic/module/process/cs/auth/PROCESS_COLLECTION.java",
+      "class": "neatlogic.module.process.cs.auth.PROCESS_COLLECTION",
+      "module": "process",
+      "repo": "neatlogic-itsm-commercial"
+    },
+    {
+      "path": "neatlogic-itsm-commercial/src/main/java/neatlogic/module/process/cs/auth/PROCESS_COLLECTION_PREPARATION_MODIFY.java",
+      "class": "neatlogic.module.process.cs.auth.PROCESS_COLLECTION_PREPARATION_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-commercial"
+    },
+    {
+      "path": "neatlogic-itsm-commercial/src/main/java/neatlogic/module/process/cs/auth/PROCESS_COLLECTION_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.module.process.cs.auth.PROCESS_COLLECTION_TEMPLATE_MODIFY",
+      "module": "process",
+      "repo": "neatlogic-itsm-commercial"
+    },
+    {
+      "path": "neatlogic-itsm-commercial/src/main/java/neatlogic/module/process/cs/auth/eoa/EOA_BASE.java",
+      "class": "neatlogic.module.process.cs.auth.eoa.EOA_BASE",
+      "module": "process",
+      "repo": "neatlogic-itsm-commercial"
+    },
+    {
+      "path": "neatlogic-knowledge-base/src/main/java/neatlogic/framework/knowledge/auth/label/KNOWLEDGE.java",
+      "class": "neatlogic.framework.knowledge.auth.label.KNOWLEDGE",
+      "module": "knowledge",
+      "repo": "neatlogic-knowledge-base"
+    },
+    {
+      "path": "neatlogic-knowledge/src/main/java/neatlogic/module/knowledge/auth/label/KNOWLEDGE_BASE.java",
+      "class": "neatlogic.module.knowledge.auth.label.KNOWLEDGE_BASE",
+      "module": "knowledge",
+      "repo": "neatlogic-knowledge"
+    },
+    {
+      "path": "neatlogic-knowledge/src/main/java/neatlogic/module/knowledge/auth/label/KNOWLEDGE_CIRCLE_MODIFY.java",
+      "class": "neatlogic.module.knowledge.auth.label.KNOWLEDGE_CIRCLE_MODIFY",
+      "module": "knowledge",
+      "repo": "neatlogic-knowledge"
+    },
+    {
+      "path": "neatlogic-knowledge/src/main/java/neatlogic/module/knowledge/auth/label/KNOWLEDGE_FEISHU_SYNC_MODIFY.java",
+      "class": "neatlogic.module.knowledge.auth.label.KNOWLEDGE_FEISHU_SYNC_MODIFY",
+      "module": "knowledge",
+      "repo": "neatlogic-knowledge"
+    },
+    {
+      "path": "neatlogic-knowledge/src/main/java/neatlogic/module/knowledge/auth/label/KNOWLEDGE_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.module.knowledge.auth.label.KNOWLEDGE_TEMPLATE_MODIFY",
+      "module": "knowledge",
+      "repo": "neatlogic-knowledge"
+    },
+    {
+      "path": "neatlogic-master/src/main/java/neatlogic/module/master/auth/label/MASTER_ADMIN.java",
+      "class": "neatlogic.module.master.auth.label.MASTER_ADMIN",
+      "module": "master",
+      "repo": "neatlogic-master"
+    },
+    {
+      "path": "neatlogic-master/src/main/java/neatlogic/module/master/auth/label/MASTER_BASE.java",
+      "class": "neatlogic.module.master.auth.label.MASTER_BASE",
+      "module": "master",
+      "repo": "neatlogic-master"
+    },
+    {
+      "path": "neatlogic-master/src/main/java/neatlogic/module/master/auth/label/MASTER_MANAGER.java",
+      "class": "neatlogic.module.master.auth.label.MASTER_MANAGER",
+      "module": "master",
+      "repo": "neatlogic-master"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/EXAGENT_FILE_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.EXAGENT_FILE_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/EXAGENT_MANAGE_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.EXAGENT_MANAGE_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/EXAGENT_SCOPE_VIEW.java",
+      "class": "neatlogic.framework.monitor.auth.EXAGENT_SCOPE_VIEW",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/EXAGENT_VERSION_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.EXAGENT_VERSION_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_ACTION_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_ACTION_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_AGENT_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_AGENT_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_ALERT_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_ALERT_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_BASE.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_BASE",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_JOB_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_JOB_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_PLUGIN_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_PLUGIN_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_SCOPE_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_SCOPE_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_SCOPE_VIEW.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_SCOPE_VIEW",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TABLE_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TABLE_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TARGET_ADD.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TARGET_ADD",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TARGET_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TARGET_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TARGET_LOCK.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TARGET_LOCK",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TEMPLATE_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TEMPLATE_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TMPEXP_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TMPEXP_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-monitor-base/src/main/java/neatlogic/framework/monitor/auth/MONITOR_TOPO_EDIT.java",
+      "class": "neatlogic.framework.monitor.auth.MONITOR_TOPO_EDIT",
+      "module": "monitor",
+      "repo": "neatlogic-monitor-base"
+    },
+    {
+      "path": "neatlogic-oncall/src/main/java/neatlogic/module/oncall/auth/ONCALL_BASE.java",
+      "class": "neatlogic.module.oncall.auth.ONCALL_BASE",
+      "module": "oncall",
+      "repo": "neatlogic-oncall"
+    },
+    {
+      "path": "neatlogic-oncall/src/main/java/neatlogic/module/oncall/auth/ONCALL_MANAGE.java",
+      "class": "neatlogic.module.oncall.auth.ONCALL_MANAGE",
+      "module": "oncall",
+      "repo": "neatlogic-oncall"
+    },
+    {
+      "path": "neatlogic-oncall/src/main/java/neatlogic/module/oncall/auth/ONCALL_SCHEDULE.java",
+      "class": "neatlogic.module.oncall.auth.ONCALL_SCHEDULE",
+      "module": "oncall",
+      "repo": "neatlogic-oncall"
+    },
+    {
+      "path": "neatlogic-pbc/src/main/java/neatlogic/module/pbc/auth/label/PBC_BASE.java",
+      "class": "neatlogic.module.pbc.auth.label.PBC_BASE",
+      "module": "pbc",
+      "repo": "neatlogic-pbc"
+    },
+    {
+      "path": "neatlogic-pbc/src/main/java/neatlogic/module/pbc/auth/label/PBC_INTERFACE_MODIFY.java",
+      "class": "neatlogic.module.pbc.auth.label.PBC_INTERFACE_MODIFY",
+      "module": "pbc",
+      "repo": "neatlogic-pbc"
+    },
+    {
+      "path": "neatlogic-rdm-base/src/main/java/neatlogic/framework/rdm/auth/label/PRIORITY_MANAGE.java",
+      "class": "neatlogic.framework.rdm.auth.label.PRIORITY_MANAGE",
+      "module": "rdm",
+      "repo": "neatlogic-rdm-base"
+    },
+    {
+      "path": "neatlogic-rdm-base/src/main/java/neatlogic/framework/rdm/auth/label/PROJECT_MANAGE.java",
+      "class": "neatlogic.framework.rdm.auth.label.PROJECT_MANAGE",
+      "module": "rdm",
+      "repo": "neatlogic-rdm-base"
+    },
+    {
+      "path": "neatlogic-rdm-base/src/main/java/neatlogic/framework/rdm/auth/label/PROJECT_TEMPLATE_MANAGE.java",
+      "class": "neatlogic.framework.rdm.auth.label.PROJECT_TEMPLATE_MANAGE",
+      "module": "rdm",
+      "repo": "neatlogic-rdm-base"
+    },
+    {
+      "path": "neatlogic-rdm-base/src/main/java/neatlogic/framework/rdm/auth/label/RDM_BASE.java",
+      "class": "neatlogic.framework.rdm.auth.label.RDM_BASE",
+      "module": "rdm",
+      "repo": "neatlogic-rdm-base"
+    },
+    {
+      "path": "neatlogic-report/src/main/java/neatlogic/module/report/auth/label/REPORT_ADMIN.java",
+      "class": "neatlogic.module.report.auth.label.REPORT_ADMIN",
+      "module": "report",
+      "repo": "neatlogic-report"
+    },
+    {
+      "path": "neatlogic-report/src/main/java/neatlogic/module/report/auth/label/REPORT_BASE.java",
+      "class": "neatlogic.module.report.auth.label.REPORT_BASE",
+      "module": "report",
+      "repo": "neatlogic-report"
+    },
+    {
+      "path": "neatlogic-report/src/main/java/neatlogic/module/report/auth/label/REPORT_MODIFY.java",
+      "class": "neatlogic.module.report.auth.label.REPORT_MODIFY",
+      "module": "report",
+      "repo": "neatlogic-report"
+    },
+    {
+      "path": "neatlogic-report/src/main/java/neatlogic/module/report/auth/label/REPORT_STATEMENT_MODIFY.java",
+      "class": "neatlogic.module.report.auth.label.REPORT_STATEMENT_MODIFY",
+      "module": "report",
+      "repo": "neatlogic-report"
+    },
+    {
+      "path": "neatlogic-report/src/main/java/neatlogic/module/report/auth/label/REPORT_TEMPLATE_MODIFY.java",
+      "class": "neatlogic.module.report.auth.label.REPORT_TEMPLATE_MODIFY",
+      "module": "report",
+      "repo": "neatlogic-report"
+    },
+    {
+      "path": "neatlogic-resourcepool/src/main/java/neatlogic/module/resourcepool/auth/ASSET_POSITION_BASE.java",
+      "class": "neatlogic.module.resourcepool.auth.ASSET_POSITION_BASE",
+      "module": "resourcepool",
+      "repo": "neatlogic-resourcepool"
+    },
+    {
+      "path": "neatlogic-resourcepool/src/main/java/neatlogic/module/resourcepool/auth/ASSET_POSITION_MANAGE.java",
+      "class": "neatlogic.module.resourcepool.auth.ASSET_POSITION_MANAGE",
+      "module": "resourcepool",
+      "repo": "neatlogic-resourcepool"
+    },
+    {
+      "path": "neatlogic-resourcepool/src/main/java/neatlogic/module/resourcepool/auth/IP_MANAGE.java",
+      "class": "neatlogic.module.resourcepool.auth.IP_MANAGE",
+      "module": "resourcepool",
+      "repo": "neatlogic-resourcepool"
+    },
+    {
+      "path": "neatlogic-resourcepool/src/main/java/neatlogic/module/resourcepool/auth/RESOURCEPOOL_MANAGE.java",
+      "class": "neatlogic.module.resourcepool.auth.RESOURCEPOOL_MANAGE",
+      "module": "resourcepool",
+      "repo": "neatlogic-resourcepool"
+    },
+    {
+      "path": "neatlogic-suzhoubank/src/main/java/neatlogic/module/suzhoubank/auth/label/OPERATIONS_MAINTENANCE_MANAGE.java",
+      "class": "neatlogic.module.suzhoubank.auth.label.OPERATIONS_MAINTENANCE_MANAGE",
+      "module": "suzhoubank",
+      "repo": "neatlogic-suzhoubank"
+    },
+    {
+      "path": "neatlogic-suzhoubank/src/main/java/neatlogic/module/suzhoubank/auth/label/PRODUCTION_HELPER.java",
+      "class": "neatlogic.module.suzhoubank.auth.label.PRODUCTION_HELPER",
+      "module": "suzhoubank",
+      "repo": "neatlogic-suzhoubank"
+    },
+    {
+      "path": "neatlogic-tagent-base/src/main/java/neatlogic/framework/tagent/auth/label/TAGENT_BASE.java",
+      "class": "neatlogic.framework.tagent.auth.label.TAGENT_BASE",
+      "module": "tagent",
+      "repo": "neatlogic-tagent-base"
+    },
+    {
+      "path": "neatlogic-tagent-base/src/main/java/neatlogic/framework/tagent/auth/label/TAGENT_MANAGE.java",
+      "class": "neatlogic.framework.tagent.auth.label.TAGENT_MANAGE",
+      "module": "tagent",
+      "repo": "neatlogic-tagent-base"
+    },
+    {
+      "path": "neatlogic-tenant-commercial/src/main/java/neatlogic/module/tenant/cs/portal/auth/PORTAL_MANAGE.java",
+      "class": "neatlogic.module.tenant.cs.portal.auth.PORTAL_MANAGE",
+      "module": "tenant",
+      "repo": "neatlogic-tenant-commercial"
+    },
+    {
+      "path": "neatlogic-tenant-commercial/src/main/java/neatlogic/module/tenant/cs/portal/auth/PORTAL_WIDGET_MANAGE.java",
+      "class": "neatlogic.module.tenant.cs.portal.auth.PORTAL_WIDGET_MANAGE",
+      "module": "tenant",
+      "repo": "neatlogic-tenant-commercial"
+    },
+    {
+      "path": "neatlogic-tlcbbank/src/main/java/neatlogic/module/framework/auth/ASSEST_AUTH.java",
+      "class": "neatlogic.module.framework.auth.ASSEST_AUTH",
+      "module": "tlcbbank",
+      "repo": "neatlogic-tlcbbank"
+    }
+  ]
+}

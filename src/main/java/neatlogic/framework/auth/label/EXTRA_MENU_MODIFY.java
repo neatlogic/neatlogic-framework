@@ -13,7 +13,9 @@
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 
+@AuthModule("framework")
 public class EXTRA_MENU_MODIFY extends AuthBase {
     @Override
     public String getAuthDisplayName() {

@@ -13,8 +13,10 @@
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 
 /** 查看功能自检场景、执行历史和结果详情的权限。 */
+@AuthModule("framework")
 public class SELF_CHECK_VIEW extends AuthBase {
     @Override
     public String getAuthDisplayName() {

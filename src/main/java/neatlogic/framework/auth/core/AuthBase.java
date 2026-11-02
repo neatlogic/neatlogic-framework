@@ -16,14 +16,11 @@ import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
 import java.util.Collections;
-import java.util.Objects;
+import java.util.List;
 
 /** 权限定义底座，模块自行声明包含关系与系统用户默认授权，不承载页面授权存储。 */
 public abstract class AuthBase {
-
-    private String authModule;
 
     /**
      * 声明当前权限的系统用户出厂授权；由代码维护，不写入页面授权记录。
@@ -43,20 +40,21 @@ public abstract class AuthBase {
 
     public abstract String getAuthGroup();
 
-    public String getAuthModule() {
-        if(StringUtils.isBlank(authModule)) {
-            String moduleName = null;
-            String packageName = this.getClass().getName();
-            String[] packages = packageName.split("\\.");
-            for (String p : packages) {
-                if (Objects.equals(p, "auth")) {
-                    authModule = moduleName;
-                    break;
-                }
-                moduleName = p;
-            }
+    /** 只读取当前具体权限类的显式模块声明，不允许子类改写归属解析。 */
+    public final String getAuthModule() {
+        return getAuthModule(getClass());
+    }
+
+    /** 读取类级模块元数据，不实例化标签或触发权限工厂初始化。 */
+    public static String getAuthModule(Class<? extends AuthBase> authClass) {
+        if (authClass == null) {
+            return null;
         }
-        return authModule;
+        AuthModule annotation = authClass.getDeclaredAnnotation(AuthModule.class);
+        if (annotation == null || StringUtils.isBlank(annotation.value())) {
+            return null;
+        }
+        return annotation.value().trim();
     }
 
     public abstract Integer getSort();

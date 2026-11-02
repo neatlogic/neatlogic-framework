@@ -161,6 +161,61 @@ public class CommercialApiAuthExecutionChainTest {
         }
     }
 
+    /** 所有类型的接口在普通租户和 master 都不能使用未声明模块的标签。 */
+    @Test
+    public void rejectsUndeclaredLabelsAcrossApiKindsAndMaster() throws Exception {
+        initUser(true);
+        storedAuths.add(new UserAuthVo(USER, UNDECLARED_CHAIN_AUTH.class.getSimpleName()));
+        for (String tenant : Arrays.asList("commercial-api-chain-tenant", "master")) {
+            TenantContext.get().release();
+            TenantContext.init(tenant);
+            assertDenied(() -> new UndeclaredObjectApi().doService(api(), new JSONObject(), null));
+            assertDenied(() -> new UndeclaredRawApi().doService(api(), "{}", null));
+            try (JSONReader reader = new JSONReader(new StringReader("{}"))) {
+                reader.readObject();
+                assertDenied(() -> new UndeclaredJsonApi().doService(api(), new JSONObject(), reader));
+            }
+            assertDenied(() -> new UndeclaredBinaryApi().doService(api(), new JSONObject(), null, new MockHttpServletResponse()));
+            assertDenied(() -> new UndeclaredSseApi().doService(api(), new JSONObject(), null, null));
+        }
+        assertEquals(0, EXECUTIONS.get());
+    }
+
+    /** 合法 NoAuth 可以作为未声明标签之外的另一条访问路径。 */
+    @Test
+    public void preservesDeclaredNoAuthAlternativeForUndeclaredLabel() throws Exception {
+        assertEquals("public-alternative", new UndeclaredPublicAlternativeApi().doService(api(), new JSONObject(), null));
+    }
+
+    /** 故意省略模块声明，不能继承商业父类注解。 */
+    public static class UNDECLARED_CHAIN_AUTH extends CHAIN_COMMERCIAL_AUTH { }
+
+    /** 验证对象入口未声明时拒绝。 */
+    @AuthAction(action = UNDECLARED_CHAIN_AUTH.class)
+    public static class UndeclaredObjectApi extends CommercialObjectApi { }
+    /** 验证原始流入口未声明时拒绝。 */
+    @AuthAction(action = UNDECLARED_CHAIN_AUTH.class)
+    public static class UndeclaredRawApi extends CommercialRawApi { }
+    /** 验证 JSON 流入口未声明时拒绝。 */
+    @AuthAction(action = UNDECLARED_CHAIN_AUTH.class)
+    public static class UndeclaredJsonApi extends CommercialJsonApi { }
+    /** 验证二进制入口未声明时拒绝。 */
+    @AuthAction(action = UNDECLARED_CHAIN_AUTH.class)
+    public static class UndeclaredBinaryApi extends CommercialBinaryApi { }
+    /** 验证 SSE 入口未声明时拒绝。 */
+    @AuthAction(action = UNDECLARED_CHAIN_AUTH.class)
+    public static class UndeclaredSseApi extends CommercialSseApi { }
+
+    /** 未声明标签不生效，但其他声明合法的候选仍可任选其一。 */
+    @AuthAction(action = UNDECLARED_CHAIN_AUTH.class)
+    @AuthAction(action = NoAuth.class)
+    public static class UndeclaredPublicAlternativeApi extends ApiComponentBase {
+        /** 返回测试名称。 */
+        @Override public String getName() { return "test"; }
+        /** 记录允许候选命中的业务执行。 */
+        @Override public Object myDoService(JSONObject input) { return executed("public-alternative"); }
+    }
+
     /** 所有执行入口必须在调用业务方法前拒绝访问。 */
     private void assertAllDenied() throws Exception {
         assertDenied(() -> new CommercialObjectApi().doService(api(), new JSONObject(), null));
@@ -230,10 +285,10 @@ public class CommercialApiAuthExecutionChainTest {
     private interface Invocation { Object execute() throws Exception; }
 
     /** 测试商业权限明确声明所属模块，避免测试包路径影响判断。 */
+    @AuthModule("commercial-api-chain-test")
     public static class CHAIN_COMMERCIAL_AUTH extends AuthCSBase {
         /** 返回固定测试模块。 */
-        @Override public String getAuthModule() { return MODULE; }
-        /** 返回测试权限显示键。 */
+            /** 返回测试权限显示键。 */
         @Override public String getAuthDisplayName() { return "test.commercial"; }
         /** 返回测试权限说明键。 */
         @Override public String getAuthIntroduction() { return "test.commercial"; }
@@ -244,12 +299,13 @@ public class CommercialApiAuthExecutionChainTest {
     }
 
     /** 另一个授权有效的商业模块，验证商业权限之间也保留任选其一。 */
+    @AuthModule("other-commercial-api-chain-test")
     public static class CHAIN_OTHER_COMMERCIAL_AUTH extends CHAIN_COMMERCIAL_AUTH {
         /** 返回另一个固定测试模块。 */
-        @Override public String getAuthModule() { return "other-commercial-api-chain-test"; }
-    }
+        }
 
     /** 测试非商业替代权限。 */
+    @AuthModule("framework")
     public static class CHAIN_FREE_AUTH extends AuthBase {
         /** 返回测试权限显示键。 */
         @Override public String getAuthDisplayName() { return "test.free"; }

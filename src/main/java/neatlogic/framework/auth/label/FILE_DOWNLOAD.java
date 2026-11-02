@@ -1,12 +1,14 @@
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
 
 import java.util.List;
 
 /** 允许下载当前租户内所有附件，不授予附件删除或其他管理权限。系统用户通过默认授权获得该能力，普通用户可通过页面授权获得相同能力。 */
+@AuthModule("framework")
 public class FILE_DOWNLOAD extends AuthBase {
     @Override
     public String getAuthDisplayName() {

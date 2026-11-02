@@ -598,6 +598,60 @@ public class AuthActionCheckerTest {
         }
     }
 
+    /** 即使存在历史记录或超级管理员身份，未声明或空模块的普通权限也不能生效。 */
+    @Test
+    public void shouldRejectUndeclaredPermissionsBeforeHistoryAndIdentity() throws Exception {
+        try (CommercialAuthFixture fixture = new CommercialAuthFixture()) {
+            fixture.authMap.put(UNDECLARED_AUTH.class.getSimpleName(), new UNDECLARED_AUTH());
+            fixture.authMap.put(BLANK_MODULE_AUTH.class.getSimpleName(), new BLANK_MODULE_AUTH());
+            initUser("undeclared-user");
+            userAuthList = Collections.singletonList(new UserAuthVo("undeclared-user", UNDECLARED_AUTH.class.getSimpleName()));
+            Assert.assertFalse(AuthActionChecker.check(UNDECLARED_AUTH.class));
+            Assert.assertFalse(AuthActionChecker.check(BLANK_MODULE_AUTH.class));
+            initUser("undeclared-admin", true);
+            Assert.assertFalse(AuthActionChecker.check(UNDECLARED_AUTH.class));
+            Assert.assertFalse(AuthActionChecker.check(BLANK_MODULE_AUTH.class));
+            Assert.assertTrue(AuthActionChecker.check(UNDECLARED_AUTH.class, NoAuth.class));
+            Assert.assertEquals(1, userAuthList.size());
+        }
+    }
+
+    /** 未声明的节点不能把合法父权限和合法子权限接通，展开同样必须截断。 */
+    @Test
+    public void shouldStopUndeclaredPermissionBranches() throws Exception {
+        try (CommercialAuthFixture fixture = new CommercialAuthFixture()) {
+            fixture.authMap.put(UNDECLARED_AUTH.class.getSimpleName(), new UNDECLARED_AUTH());
+            fixture.authMap.put(DECLARED_WRAPPER.class.getSimpleName(), new DECLARED_WRAPPER());
+            initUser("undeclared-user");
+            userAuthList = Collections.singletonList(new UserAuthVo("undeclared-user", DECLARED_WRAPPER.class.getSimpleName()));
+            Assert.assertFalse(AuthActionChecker.check(TEST_INCLUDED_AUTH.class));
+            List<UserAuthVo> expanded = new ArrayList<>(userAuthList);
+            AuthActionChecker.getAuthList(expanded);
+            Assert.assertEquals(1, expanded.size());
+        }
+    }
+
+    /** 故意省略声明，验证不会继承 TestAuth 上的注解。 */
+    public static class UNDECLARED_AUTH extends TestAuth {
+        /** 未声明节点也不能作为包含权限的中转。 */
+        @Override public List<Class<? extends AuthBase>> getIncludeAuths() {
+            return Collections.singletonList(TEST_INCLUDED_AUTH.class);
+        }
+    }
+
+    /** 故意声明空模块，必须始终无效。 */
+    @AuthModule(" ")
+    public static class BLANK_MODULE_AUTH extends TestAuth { }
+
+    /** 合法父权限用于检查未声明节点的递归隔离。 */
+    @AuthModule("framework")
+    public static class DECLARED_WRAPPER extends TestAuth {
+        /** 只包含一个无模块声明的节点。 */
+        @Override public List<Class<? extends AuthBase>> getIncludeAuths() {
+            return Collections.singletonList(UNDECLARED_AUTH.class);
+        }
+    }
+
     /** 临时注册商业测试权限，并完整还原注册表、模块状态和系统默认权限索引。 */
     private static class CommercialAuthFixture implements AutoCloseable {
         private static final String MODULE = "commercial-auth-test";
@@ -663,6 +717,7 @@ public class AuthActionCheckerTest {
     }
 
     /** 同时拥有普通子权限和反向包含关系的商业权限，用于验证失效中转与循环。 */
+    @AuthModule("commercial-auth-test")
     public static class TEST_COMMERCIAL_AUTH extends AuthCSBase {
         /** 测试权限的显示名。 */
         @Override public String getAuthDisplayName() { return "test.commercial"; }
@@ -671,8 +726,7 @@ public class AuthActionCheckerTest {
         /** 隔离生产模块权限。 */
         @Override public String getAuthGroup() { return CommercialAuthFixture.MODULE; }
         /** 测试模块显式声明，避免由测试包路径推断生产归属。 */
-        @Override public String getAuthModule() { return CommercialAuthFixture.MODULE; }
-        /** 测试排序值。 */
+            /** 测试排序值。 */
         @Override public Integer getSort() { return 0; }
         /** 同时包含普通权限与回指父节点，验证混合循环。 */
         @Override public List<Class<? extends AuthBase>> getIncludeAuths() {
@@ -683,6 +737,7 @@ public class AuthActionCheckerTest {
     }
 
     /** 普通权限包含商业分支，不应绕过商业中转节点的授权。 */
+    @AuthModule("framework")
     public static class TEST_COMMERCIAL_WRAPPER extends TestAuth {
         /** 将商业节点作为唯一子权限。 */
         @Override public List<Class<? extends AuthBase>> getIncludeAuths() { return Collections.singletonList(TEST_COMMERCIAL_AUTH.class); }
@@ -741,6 +796,7 @@ public class AuthActionCheckerTest {
     /**
      * 测试专用权限类型，只用于构造一个未授予的权限名称。
      */
+    @AuthModule("framework")
     public static class TestAuth extends AuthBase {
         @Override
         public String getAuthDisplayName() {
@@ -766,6 +822,7 @@ public class AuthActionCheckerTest {
     /**
      * 测试权限包含关系的父权限。
      */
+    @AuthModule("framework")
     public static class TEST_PARENT_AUTH extends AuthBase {
         @Override
         public String getAuthDisplayName() {
@@ -796,10 +853,12 @@ public class AuthActionCheckerTest {
     /**
      * 测试权限包含关系的子权限。
      */
+    @AuthModule("framework")
     public static class TEST_INCLUDED_AUTH extends TestAuth {
     }
 
     /** 仅在测试注册表中声明出厂授权，不向生产权限注册表增加默认权限。 */
+    @AuthModule("framework")
     public static class TEST_CODE_AUTH extends TEST_PARENT_AUTH {
         /** 测试代码声明的系统身份与权限包含关系。 */
         @Override
@@ -811,6 +870,7 @@ public class AuthActionCheckerTest {
     /**
      * 多层递归测试的根权限。
      */
+    @AuthModule("framework")
     public static class TEST_RECURSIVE_A extends TestAuth {
         @Override
         public List<Class<? extends AuthBase>> getIncludeAuths() {
@@ -821,6 +881,7 @@ public class AuthActionCheckerTest {
     /**
      * 多层递归测试的中间权限，并回指根权限构造循环。
      */
+    @AuthModule("framework")
     public static class TEST_RECURSIVE_B extends TestAuth {
         @Override
         public List<Class<? extends AuthBase>> getIncludeAuths() {
@@ -831,6 +892,7 @@ public class AuthActionCheckerTest {
     /**
      * 多层递归测试的目标权限。
      */
+    @AuthModule("framework")
     public static class TEST_RECURSIVE_C extends TestAuth {
     }
 }

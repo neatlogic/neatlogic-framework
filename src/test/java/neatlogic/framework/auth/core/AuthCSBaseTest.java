@@ -3,35 +3,42 @@ package neatlogic.framework.auth.core;
 import neatlogic.module.licensefixture.cs.portal.auth.CommercialAuthModuleFixture;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import java.lang.reflect.Modifier;
 
-/** 验证商业包移动和子目录不会改变权限对应的 License 模块。 */
+import static org.junit.Assert.*;
+
+/** 验证模块归属仅由具体类的注解声明，不能由包路径、父类或方法覆盖提供。 */
 public class AuthCSBaseTest {
-    /** 商业子目录的标签属于包根模块，不能被识别为 cs、portal 或权限组。 */
+    /** 商业子目录与权限组都不影响注解声明的模块。 */
     @Test
-    public void resolvesModuleBeforeCommercialSubdirectories() {
+    public void readsExplicitModuleRegardlessOfPackageAndGroup() {
         CommercialAuthModuleFixture auth = new CommercialAuthModuleFixture();
         assertEquals("licensefixture", auth.getAuthModule());
         assertEquals("framework", auth.getAuthGroup());
+        assertEquals("explicit-module", new FrameworkCommercialAuth().getAuthModule());
+        assertEquals("explicit-module", AuthBase.getAuthModule(FrameworkCommercialAuth.class));
     }
 
-    /** base 模块中框架命名空间的商业标签仍解析所属模块。 */
+    /** 子类和匿名类必须重新声明，不能继承父类或外部类的模块。 */
     @Test
-    public void resolvesFrameworkPackageModule() {
-        assertEquals("auth", new FrameworkCommercialAuth().getAuthModule());
+    public void refusesMissingBlankAndInheritedDeclarations() {
+        assertNull(new MissingModuleAuth().getAuthModule());
+        assertNull(new BlankModuleAuth().getAuthModule());
+        assertNull(new CommercialAuthModuleFixture() { }.getAuthModule());
+        assertNull(AuthBase.getAuthModule(null));
+        assertFalse(AuthFactory.isAuthLicenseValid(MissingModuleAuth.class));
+        assertFalse(AuthFactory.isAuthLicenseValid(BlankModuleAuth.class));
     }
 
-    /** 标签显式覆盖模块时，保持原有覆盖优先级。 */
+    /** 具体标签无法通过覆盖读取方法绕过声明规则。 */
     @Test
-    public void preservesExplicitModuleOverride() {
-        CommercialAuthModuleFixture auth = new CommercialAuthModuleFixture() {
-            /** 显式模块约定优先于默认包路径识别。 */
-            @Override public String getAuthModule() { return "explicit-module"; }
-        };
-        assertEquals("explicit-module", auth.getAuthModule());
+    public void moduleGetterCannotBeOverridden() throws Exception {
+        assertTrue(Modifier.isFinal(AuthBase.class.getMethod("getAuthModule").getModifiers()));
+        assertFalse(AuthModule.class.isAnnotationPresent(java.lang.annotation.Inherited.class));
     }
 
-    /** 此标签位于 neatlogic.framework.auth 包下，模拟 base 模块标签。 */
+    /** 特殊位置的权限也使用显式模块，而不是包路径推导。 */
+    @AuthModule("explicit-module")
     public static class FrameworkCommercialAuth extends AuthCSBase {
         /** 返回测试显示名。 */
         @Override public String getAuthDisplayName() { return "fixture"; }
@@ -42,4 +49,11 @@ public class AuthCSBaseTest {
         /** 返回测试排序。 */
         @Override public Integer getSort() { return 0; }
     }
+
+    /** 故意不声明模块，用于验证具体子类不继承注解。 */
+    public static class MissingModuleAuth extends FrameworkCommercialAuth { }
+
+    /** 故意声明空值，用于验证空白不构成合法模块。 */
+    @AuthModule("  ")
+    public static class BlankModuleAuth extends FrameworkCommercialAuth { }
 }

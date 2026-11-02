@@ -41,8 +41,8 @@ import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.reflection.ReflectionManager;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.dto.ApiVo;
-import neatlogic.framework.restful.util.ApiExampleUtil;
 import neatlogic.framework.restful.enums.ApiAccessType;
+import neatlogic.framework.restful.util.ApiExampleUtil;
 import neatlogic.framework.util.$;
 import neatlogic.framework.util.Md5Util;
 import neatlogic.framework.util.XssUtil;
@@ -54,19 +54,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopContext;
-import org.springframework.util.ClassUtils;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @NeatLogicApi
 public class ApiValidateAndHelpBase implements IApiExampleProvider {
@@ -302,9 +296,20 @@ public class ApiValidateAndHelpBase implements IApiExampleProvider {
         boolean isAuth = false;
         List<String> authNameList = new ArrayList<>();
         if (apiClass != null) {
+            AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
+            boolean hasDeclaredModule = actions.length == 0;
+            for (AuthAction action : actions) {
+                if (AuthBase.getAuthModule(action.action()) != null) {
+                    hasDeclaredModule = true;
+                    break;
+                }
+            }
+            // 模块声明是标签生效的必要条件，master 也不能使用未声明模块的标签。
+            if (!hasDeclaredModule) {
+                throw new PermissionDeniedException(authNameList);
+            }
             if (!Objects.equals(TenantContext.get().getTenantUuid(), "master")) {
                 // 功能权限只由声明的权限与实际授权决定，不按系统身份豁免。
-                AuthAction[] actions = apiClass.getAnnotationsByType(AuthAction.class);
                 isAuth = actions.length == 0 || isApiAuth(apiClass, authNameList, actions);
             } else {
                 isAuth = true;

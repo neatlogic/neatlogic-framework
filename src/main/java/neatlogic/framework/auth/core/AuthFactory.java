@@ -43,6 +43,10 @@ public class AuthFactory {
             try {
                 //排除抽象类
                 if (!Modifier.isAbstract(c.getModifiers()) && c != NoAuth.class) {
+                    if (AuthBase.getAuthModule(c) == null) {
+                        logger.error("权限标签缺少有效的 AuthModule 模块声明，跳过注册: " + c.getName());
+                        continue;
+                    }
                     AuthBase authIns = c.newInstance();
                     if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || (authIns instanceof AuthCSBase && ModuleUtil.isModuleInvalidated(authIns.getAuthModule()))) {
                         continue;
@@ -96,9 +100,9 @@ public class AuthFactory {
         return authMap.get(authName);
     }
 
-    /** 商业权限必须已注册且模块授权有效；非商业权限沿用既有鉴权行为。 */
+    /** 所有权限必须声明模块；商业权限还必须已注册且模块授权有效。 */
     public static boolean isAuthLicenseValid(Class<? extends AuthBase> authClass) {
-        if (authClass == null) {
+        if (AuthBase.getAuthModule(authClass) == null) {
             return false;
         }
         if (!AuthCSBase.class.isAssignableFrom(authClass)) {

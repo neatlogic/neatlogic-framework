@@ -54,11 +54,11 @@ public class DashboardIntegrationHandler extends IntegrationHandlerBase {
         List<PatternVo> patterns = new ArrayList<>();
         patterns.add(new PatternVo("conditionList", "input", ApiParamType.JSONARRAY, 0, $.t("nmfdih.dashboardintegrationhandler.input.conditionlist")));
         patterns.add(new PatternVo("sortList", "input", ApiParamType.JSONARRAY, 0, $.t("nmfdih.dashboardintegrationhandler.input.sortlist")));
+        patterns.add(new PatternVo("limit", "input", ApiParamType.INTEGER, 0, $.t("nmfdih.dashboardintegrationhandler.input.limit")));
         patterns.add(new PatternVo("currentPage", "input", ApiParamType.INTEGER, 0, $.t("common.currentpage")));
         patterns.add(new PatternVo("pageSize", "input", ApiParamType.INTEGER, 0, $.t("common.pagesize")));
-        patterns.add(new PatternVo("limit", "input", ApiParamType.INTEGER, 0, $.t("nmfdih.dashboardintegrationhandler.input.limit")));
-        patterns.add(new PatternVo("isExpired", "input", ApiParamType.INTEGER, 0, $.t("nmfdih.dashboardintegrationhandler.input.isexpired")));
-        patterns.add(new PatternVo("needPage", "input", ApiParamType.BOOLEAN, 0, $.t("nmfdih.dashboardintegrationhandler.input.needpage")));
+//        patterns.add(new PatternVo("isExpired", "input", ApiParamType.INTEGER, 0, $.t("nmfdih.dashboardintegrationhandler.input.isexpired")));
+//        patterns.add(new PatternVo("needPage", "input", ApiParamType.BOOLEAN, 0, $.t("nmfdih.dashboardintegrationhandler.input.needpage")));
         return patterns;
     }
 

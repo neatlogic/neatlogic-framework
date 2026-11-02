@@ -21,8 +21,8 @@ public class DashboardDatasourceHandlerFactory extends ModuleInitializedListener
     private static final ConcurrentMap<String, IDashboardDatasourceHandler> handlerMap = new ConcurrentHashMap<>();
 
     /** 仅缺省、null 和空白类型兼容旧大屏；其他非空类型精确匹配，禁止静默回退。 */
-    public static IDashboardDatasourceHandler getHandler(String datasourceType) {
-        String type = StringUtils.isBlank(datasourceType) ? DEFAULT_TYPE : datasourceType;
+    public static IDashboardDatasourceHandler getHandler(String type) {
+//        String type = StringUtils.isBlank(datasourceType) ? DEFAULT_TYPE : datasourceType;
         IDashboardDatasourceHandler handler = handlerMap.get(type);
         if (handler == null) {
             throw new DashboardDatasourceTypeNotSupportedException(type);

@@ -1540,7 +1540,7 @@
   },
   "nmfdih": {
     "dashboardintegrationhandler": {
-      "getname": "大屏数据规范",
+      "getname": "仪表板组件数据规范",
       "input": {
         "conditionlist": "过滤条件列表，由集成实现处理",
         "isexpired": "是否查询过期数据，由集成实现处理",

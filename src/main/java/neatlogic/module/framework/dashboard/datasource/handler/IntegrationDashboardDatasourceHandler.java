@@ -167,20 +167,20 @@ public class IntegrationDashboardDatasourceHandler implements IDashboardDatasour
 
         JSONArray tbodyList = new JSONArray();
         JSONArray externalRows = external.getJSONArray("tbodyList");
-        for (int i = 0; i < externalRows.size(); i++) {
-            JSONObject externalRow = externalRows.getJSONObject(i);
-            JSONObject row = new JSONObject();
-            for (int j = 0; j < headers.size(); j++) {
-                String key = headers.getJSONObject(j).getString("key");
-                // 只返回声明的字段，缺失项补 null；标量和嵌套 JSON 值均保持原类型。
-//                row.put("field_" + key, externalRow.get(key));
-                row.put(key, externalRow.get(key));
-            }
-            tbodyList.add(row);
-        }
+//        for (int i = 0; i < externalRows.size(); i++) {
+//            JSONObject externalRow = externalRows.getJSONObject(i);
+//            JSONObject row = new JSONObject();
+//            for (int j = 0; j < headers.size(); j++) {
+//                String key = headers.getJSONObject(j).getString("key");
+//                // 只返回声明的字段，缺失项补 null；标量和嵌套 JSON 值均保持原类型。
+////                row.put("field_" + key, externalRow.get(key));
+//                row.put(key, externalRow.get(key));
+//            }
+//            tbodyList.add(row);
+//        }
         JSONObject result = new JSONObject();
         result.put("theadList", theadList);
-        result.put("tbodyList", tbodyList);
+        result.put("tbodyList", externalRows);
         for (String name : new String[]{"currentPage", "pageSize", "pageCount", "rowNum"}) {
             result.put(name, external.get(name));
         }

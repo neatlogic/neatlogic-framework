@@ -17,8 +17,8 @@ import neatlogic.framework.auth.init.MaintenanceMode;
 import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.dto.UserAuthVo;
@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 /**
  * 权限校验入口，支持校验当前用户或显式指定用户，权限标识取 AuthBase 类型的简单类名。
  * 参数无效时返回 false；目标权限包含 NoAuth 时直接通过。
+ * 商业目标权限须先通过模块授权检查，历史授权及特殊身份均不能放行失效商业权限。
  * 系统用户合并代码出厂授权与页面授权，所有执行位置使用相同规则，不按身份直接放行。
  * 维护用户命中任一维护权限时直接通过，否则继续校验权限。
  * 普通目标用户与当前上下文用户一致时，信任并复用 UserContext 中的超级管理员状态和鉴权信息；
@@ -92,7 +93,7 @@ public class AuthActionChecker {
     }
 
     /**
-     * 将权限类型转换为权限名称；存在空权限类型时拒绝本次校验。
+     * 将有效权限类型转换为权限名称；空类型拒绝整次校验，失效商业权限不参与任选其一判断。
      *
      * @param actionClass 目标权限类型
      * @return 权限名称列表，参数无效时返回空列表
@@ -106,7 +107,9 @@ public class AuthActionChecker {
             if (action == null) {
                 return Collections.emptyList();
             }
-            actionList.add(action.getSimpleName());
+            if (AuthFactory.isAuthLicenseValid(action)) {
+                actionList.add(action.getSimpleName());
+            }
         }
         return actionList;
     }
@@ -191,12 +194,16 @@ public class AuthActionChecker {
      */
     private static boolean checkAuthList(String auth, List<String> authList, List<String> actionList) {
         AuthBase authBase = AuthFactory.getAuthInstance(auth.toUpperCase(Locale.ROOT));
-        if (authBase != null) {
+        if (authBase != null && AuthFactory.isAuthLicenseValid(authBase.getClass())) {
             if (actionList.contains(authBase.getAuthName())) {
                 return true;
             }
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
+                // 失效商业节点不能作为递归中转，也不能借已有记录继续授予下级权限。
+                if (!AuthFactory.isAuthLicenseValid(authClass)) {
+                    continue;
+                }
                 if (!authList.contains(authClass.getSimpleName())) {//防止回环
                     authList.add(authClass.getSimpleName());
                     if (checkAuthList(authClass.getSimpleName(), authList, actionList)) {//防止漏找后续的include权限，故不能直接return
@@ -231,9 +238,13 @@ public class AuthActionChecker {
      * @param userUuid 目标用户 UUID，展开权限不借用当前调用者身份
      */
     private static void getUserAuthListByAuth(AuthBase authBase, List<UserAuthVo> userAuthList, String userUuid) {
-        if (authBase != null) {
+        if (authBase != null && AuthFactory.isAuthLicenseValid(authBase.getClass())) {
             List<Class<? extends AuthBase>> authClassList = authBase.getIncludeAuths();
             for (Class<? extends AuthBase> authClass : authClassList) {
+                // 展示权限和运行期递归保持一致，不展开失效商业权限分支。
+                if (!AuthFactory.isAuthLicenseValid(authClass)) {
+                    continue;
+                }
                 if (userAuthList.stream().noneMatch(o -> Objects.equals(o.getAuth(), authClass.getSimpleName()))) {//防止回环
                     AuthBase auth = AuthFactory.getAuthInstance(authClass.getSimpleName());
                     if (auth != null) {

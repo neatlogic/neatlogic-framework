@@ -12,12 +12,12 @@
 
 package neatlogic.framework.auth.core;
 
-import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
-import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -94,6 +94,19 @@ public class AuthFactory {
 
     public static AuthBase getAuthInstance(String authName) {
         return authMap.get(authName);
+    }
+
+    /** 商业权限必须已注册且模块授权有效；非商业权限沿用既有鉴权行为。 */
+    public static boolean isAuthLicenseValid(Class<? extends AuthBase> authClass) {
+        if (authClass == null) {
+            return false;
+        }
+        if (!AuthCSBase.class.isAssignableFrom(authClass)) {
+            return true;
+        }
+        AuthBase auth = authMap.get(authClass.getSimpleName());
+        return auth != null && auth.getClass().equals(authClass)
+                && !ModuleUtil.isModuleInvalidated(auth.getAuthModule());
     }
 
     public static List<AuthBase> getAuthList() {

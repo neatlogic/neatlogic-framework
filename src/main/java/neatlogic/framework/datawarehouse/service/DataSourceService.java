@@ -12,6 +12,8 @@
 
 package neatlogic.framework.datawarehouse.service;
 
+import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.datawarehouse.dto.DataSourceDataVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceFieldVo;
 import neatlogic.framework.datawarehouse.dto.DataSourceVo;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,15 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface DataSourceService {
+    /** 查询完整数据源详情，不存在时返回 null，字段投影由调用方按需处理。 */
+    DataSourceVo getDataSourceById(Long id);
+
+    /** 查询数据源列表，保留筛选、分页及 defaultValue 优先转换为 ID 列表的回显行为。 */
+    JSONObject searchDataSource(DataSourceVo dataSourceVo);
+
+    /** 查询动态数据，保留过滤、排序、过期和 limit 三态及原表头、分页响应结构。 */
+    JSONObject searchDataSourceData(DataSourceDataVo dataVo);
+
     void deleteReportDataSource(DataSourceVo reportDataSourceVo);
 
     @Transactional

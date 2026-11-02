@@ -980,6 +980,20 @@
       }
     }
   },
+  "nfdde": {
+    "dashboarddatasourcetypenotsupportedexception": {
+      "message": "不支持的大屏数据源类型：{0}"
+    },
+    "dashboardintegrationconfiginvalidexception": {
+      "message": "大屏集成配置无效：{0}"
+    },
+    "dashboardintegrationrequestfailedexception": {
+      "message": "大屏集成执行失败：{0}"
+    },
+    "dashboardintegrationresultinvalidexception": {
+      "message": "大屏集成返回字段缺失或类型不符合规范：{0}"
+    }
+  },
   "nfde": {
     "databaseconnectionfailedexception": {
       "configisempty": "数据库连接配置config为空",
@@ -996,6 +1010,14 @@
     },
     "documentonlinenotfoundexception": {
       "documentonlinenotfoundexception": "在线帮助文档：“{0}”不存在"
+    }
+  },
+  "nfds": {
+    "datasourceserviceimpl": {
+      "header": {
+        "expiretime": "过期时间",
+        "inserttime": "同步时间"
+      }
     }
   },
   "nfdt": {
@@ -1502,6 +1524,41 @@
       "worktimerangenotfoundexception_a": "服务时间:“{0}”没有设置排班时间或日历",
       "worktimerangenotfoundexception_b": "服务时间:“{0}”的“{1}”年份没有设置排班日历",
       "worktimerangenotfoundexception_c": "服务时间:“{0}”的“{1}”年份排班截止时间为“{2}”，需要追加排班日历"
+    }
+  },
+  "nmfddh": {
+    "datawarehousedashboarddatasourcehandler": {
+      "gettypename": "数据仓库"
+    },
+    "integrationdashboarddatasourcehandler": {
+      "duplicatekey": "表头 key 重复：{0}",
+      "gettypename": "集成",
+      "invalidhandler": "仅支持使用大屏数据规范的集成配置",
+      "invalidthead": "表头 key 和 title 必须为非空字符串",
+      "theadrequired": "必须启用输出参数 theadList 默认值并配置非空表头数组"
+    }
+  },
+  "nmfdih": {
+    "dashboardintegrationhandler": {
+      "getname": "仪表板组件数据规范",
+      "input": {
+        "conditionlist": "过滤条件列表，由集成实现处理",
+        "isexpired": "是否查询过期数据，由集成实现处理",
+        "limit": "返回行数：不传时分页，0 不限，正数限制行数",
+        "needpage": "是否分页，由大屏根据 limit 自动设置",
+        "sortlist": "排序列表，保持字段顺序，由集成实现处理"
+      },
+      "output": {
+        "config": "条件控件配置，无配置时省略此属性",
+        "inputtype": "条件输入控件类型，默认 text",
+        "iscondition": "是否可作为过滤条件，默认 0",
+        "key": "唯一字段标识，用于组件绑定和行数据映射",
+        "rownum": "总条数，必须为整数",
+        "tbodylist": "数据行对象数组，允许为空",
+        "theadlist": "输出参数 theadList 的默认表头，必须启用且非空，用于大屏字段绑定和取数结果映射",
+        "title": "字段显示名称",
+        "type": "字段数据类型，默认 text"
+      }
     }
   },
   "nmffh": {

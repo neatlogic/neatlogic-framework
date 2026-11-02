@@ -980,6 +980,20 @@
       }
     }
   },
+  "nfdde": {
+    "dashboarddatasourcetypenotsupportedexception": {
+      "message": "Unsupported dashboard data source type: {0}"
+    },
+    "dashboardintegrationconfiginvalidexception": {
+      "message": "Invalid dashboard integration configuration: {0}"
+    },
+    "dashboardintegrationrequestfailedexception": {
+      "message": "Dashboard integration execution failed: {0}"
+    },
+    "dashboardintegrationresultinvalidexception": {
+      "message": "Dashboard integration output field is missing or has an invalid type: {0}"
+    }
+  },
   "nfde": {
     "databaseconnectionfailedexception": {
       "configisempty": "The database connection configuration config is empty",
@@ -996,6 +1010,14 @@
     },
     "documentonlinenotfoundexception": {
       "documentonlinenotfoundexception": "Online help document: {0} does not exist"
+    }
+  },
+  "nfds": {
+    "datasourceserviceimpl": {
+      "header": {
+        "expiretime": "Expiration Time",
+        "inserttime": "Sync Time"
+      }
     }
   },
   "nfdt": {
@@ -1502,6 +1524,41 @@
       "worktimerangenotfoundexception_a": "Service time: '{0}' has no scheduled time or calendar set",
       "worktimerangenotfoundexception_b": "Service time: The '{1}' year of '{0}' does not have a scheduling calendar set",
       "worktimerangenotfoundexception_c": "Service time: The deadline for scheduling in the \"{1}\" year of \"{0}\" is \"{2}\", and a scheduling calendar needs to be added"
+    }
+  },
+  "nmfddh": {
+    "datawarehousedashboarddatasourcehandler": {
+      "gettypename": "Data Warehouse"
+    },
+    "integrationdashboarddatasourcehandler": {
+      "duplicatekey": "Duplicate column key: {0}",
+      "gettypename": "Integration",
+      "invalidhandler": "Only integrations using the Dashboard Data specification are supported",
+      "invalidthead": "Column key and title must be non-empty strings",
+      "theadrequired": "Enable the output parameter theadList default value and configure a non-empty header array"
+    }
+  },
+  "nmfdih": {
+    "dashboardintegrationhandler": {
+      "getname": "Dashboard Data",
+      "input": {
+        "conditionlist": "Filter conditions handled by the integration",
+        "isexpired": "Whether to query expired data; handled by the integration",
+        "limit": "Row limit: omitted for pagination, 0 for unlimited, positive for a maximum row count",
+        "needpage": "Whether to paginate; set by the dashboard from limit",
+        "sortlist": "Ordered sort definitions handled by the integration"
+      },
+      "output": {
+        "config": "Condition control configuration; omit this property when not configured",
+        "inputtype": "Condition input control type; defaults to text",
+        "iscondition": "Whether the field supports filtering; defaults to 0",
+        "key": "Unique field identifier for widget bindings and row mapping",
+        "rownum": "Total row count; must be an integer",
+        "tbodylist": "Array of row objects; may be empty",
+        "theadlist": "Default headers for the output parameter theadList; must be enabled and non-empty, and are used for dashboard field bindings and data mapping",
+        "title": "Field display name",
+        "type": "Field data type; defaults to text"
+      }
     }
   },
   "nmffh": {

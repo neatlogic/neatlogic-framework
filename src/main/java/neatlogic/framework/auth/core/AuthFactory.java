@@ -12,12 +12,12 @@
 
 package neatlogic.framework.auth.core;
 
-import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.auth.label.NoAuth;
 import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
-import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.common.util.ModuleUtil;
+import neatlogic.framework.dto.module.ModuleVo;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -43,6 +43,10 @@ public class AuthFactory {
             try {
                 //排除抽象类
                 if (!Modifier.isAbstract(c.getModifiers()) && c != NoAuth.class) {
+                    if (AuthBase.getAuthModule(c) == null) {
+                        logger.error("权限标签缺少有效的 AuthModule 模块声明，跳过注册: " + c.getName());
+                        continue;
+                    }
                     AuthBase authIns = c.newInstance();
                     if (ModuleUtil.getModuleGroup(authIns.getAuthGroup()) == null || (authIns instanceof AuthCSBase && ModuleUtil.isModuleInvalidated(authIns.getAuthModule()))) {
                         continue;
@@ -94,6 +98,19 @@ public class AuthFactory {
 
     public static AuthBase getAuthInstance(String authName) {
         return authMap.get(authName);
+    }
+
+    /** 所有权限必须声明模块；商业权限还必须已注册且模块授权有效。 */
+    public static boolean isAuthLicenseValid(Class<? extends AuthBase> authClass) {
+        if (AuthBase.getAuthModule(authClass) == null) {
+            return false;
+        }
+        if (!AuthCSBase.class.isAssignableFrom(authClass)) {
+            return true;
+        }
+        AuthBase auth = authMap.get(authClass.getSimpleName());
+        return auth != null && auth.getClass().equals(authClass)
+                && !ModuleUtil.isModuleInvalidated(auth.getAuthModule());
     }
 
     public static List<AuthBase> getAuthList() {

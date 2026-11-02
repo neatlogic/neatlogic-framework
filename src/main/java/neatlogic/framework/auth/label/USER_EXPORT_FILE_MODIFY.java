@@ -16,7 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 
+@AuthModule("framework")
 public class USER_EXPORT_FILE_MODIFY extends AuthBase {
 
 	@Override

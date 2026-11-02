@@ -12,6 +12,6 @@
 
 package neatlogic.framework.auth.core;
 
-public abstract class AuthCSBase extends AuthBase{
-
+/** 商业权限标签，模块归属统一由具体类的 AuthModule 注解声明。 */
+public abstract class AuthCSBase extends AuthBase {
 }

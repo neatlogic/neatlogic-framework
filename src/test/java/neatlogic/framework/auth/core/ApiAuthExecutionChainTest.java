@@ -1,14 +1,15 @@
 package neatlogic.framework.auth.core;
 
-import com.alibaba.fastjson.JSONReader;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONReader;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.constvalue.systemuser.SystemUser;
+import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
-import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.dto.UserAuthVo;
+import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.type.PermissionDeniedException;
 import neatlogic.framework.restful.core.ApiComponentBase;
 import neatlogic.framework.restful.core.privateapi.binarystream.BinaryStreamApiComponentBase;
@@ -17,13 +18,7 @@ import neatlogic.framework.restful.core.privateapi.raw.RawApiComponentBase;
 import neatlogic.framework.restful.core.privateapi.sse.SseApiComponentBase;
 import neatlogic.framework.restful.dto.ApiVo;
 import neatlogic.framework.util.SpringContextUtil;
-import neatlogic.framework.config.FrameworkTenantConfig;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.context.support.StaticMessageSource;
@@ -254,10 +249,12 @@ public class ApiAuthExecutionChainTest {
     /**
      * API 执行链测试使用的受限权限。
      */
+    @AuthModule("framework")
     public static class TEST_EXEC_AUTH extends AuthActionCheckerTest.TestAuth {
     }
 
     /** 未授予的权限，用于验证接口与内部检查均不会按身份放行。 */
+    @AuthModule("framework")
     public static class TEST_OTHER_AUTH extends AuthActionCheckerTest.TestAuth {
     }
 

@@ -13,12 +13,14 @@
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 
 /**
  * @author longrf
  * @date 2022/4/8 3:49 下午
  */
 /** 权限名称与说明使用国际化键，权限标识及校验规则保持不变。 */
+@AuthModule("framework")
 public class FILE_MODIFY extends AuthBase {
 
     @Override

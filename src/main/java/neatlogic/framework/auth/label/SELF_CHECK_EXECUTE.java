@@ -13,11 +13,13 @@
 package neatlogic.framework.auth.label;
 
 import neatlogic.framework.auth.core.AuthBase;
+import neatlogic.framework.auth.core.AuthModule;
 
 import java.util.Collections;
 import java.util.List;
 
 /** 调试检查项和手工运行功能自检场景的权限。 */
+@AuthModule("framework")
 public class SELF_CHECK_EXECUTE extends AuthBase {
     @Override
     public String getAuthDisplayName() {

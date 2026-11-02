@@ -25,16 +25,21 @@ public class PathTraversalFilter implements Filter {
            "fileName", "filePath", "path", "download"
     };
 
+    /** 校验框架已解析的参数视图，检查同名参数全部值，避免只验证首项。 */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
         // 检测所有参数值
         for (String paramName : CHECKED_PARAMS) {
-            String paramValue = httpRequest.getParameter(paramName);
-            if (paramValue != null && isUnsafePath(paramValue)) {
-                httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid path detected");
-                return;
+            String[] values = httpRequest.getParameterValues(paramName);
+            if (values != null) {
+                for (String value : values) {
+                    if (value != null && isUnsafePath(value)) {
+                        httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid path detected");
+                        return;
+                    }
+                }
             }
         }
         filterChain.doFilter(request, response);

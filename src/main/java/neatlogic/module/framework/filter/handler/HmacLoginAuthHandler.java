@@ -22,7 +22,8 @@ import neatlogic.framework.filter.core.LoginAuthHandlerBase;
 import neatlogic.framework.service.UserService;
 import neatlogic.framework.util.SHA256Util;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import neatlogic.framework.filter.request.ParsedMultipartRequest;
+import neatlogic.framework.exception.request.RequestBodyException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.net.util.Base64;
@@ -37,7 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+
 
 @Service
 public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
@@ -90,28 +91,20 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
             throw new UserTokenNotFoundException(user);
         }
 
-        InputStream input = request.getInputStream();
         //System.out.println(request.getContentType());
         String bodyJsonString = StringUtils.EMPTY;
         JSONObject bodyJson = new JSONObject();
         if (ServletFileUpload.isMultipartContent(request)) {
-            DiskFileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            try {
-                List<FileItem> items = upload.parseRequest(request);
-                for (FileItem item : items) {
-                    if (item.isFormField()) {
-                        // 处理普通表单字段
-                        String fieldName = item.getFieldName();
-                        String value = item.getString();
-                        bodyJson.put(fieldName, value);
-                    }
-                }
-                bodyJsonString = bodyJson.toString();
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+            if (!(request instanceof ParsedMultipartRequest)) {
+                throw new RequestBodyException(500, "shared-multipart-required", request.getRequestURI(), null);
             }
+            // 签名保留原 FileItem 解码及重复字段最后值覆盖语义，不使用合并后的业务参数。
+            for (FileItem item : ((ParsedMultipartRequest) request).getFormItems()) {
+                bodyJson.put(item.getFieldName(), item.getString());
+            }
+            bodyJsonString = bodyJson.toString();
         } else {
+            InputStream input = request.getInputStream();
             StringBuilder sb = new StringBuilder();
             BufferedReader reader;
             if (input != null) {
@@ -131,6 +124,7 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
         if (result.equalsIgnoreCase(authorization)) {
             return userVo;
         }
+        // 验签失败时保留签名输入与计算结果，便于开启 DEBUG 后排查客户端签名差异。
         if (logger.isDebugEnabled()) {
             logger.debug("header Authorization = {}", request.getHeader("Authorization"));
             logger.debug("header x-access-key = {}", request.getHeader("x-access-key"));
@@ -142,6 +136,12 @@ public class HmacLoginAuthHandler extends LoginAuthHandlerBase {
             logger.debug("result = {}", result);
         }
         return null;
+    }
+
+    /** 上传签名仅需要普通表单项，允许认证与 Dispatcher 复用同一次解析。 */
+    @Override
+    public boolean supportsParsedMultipart() {
+        return true;
     }
 
     @Override

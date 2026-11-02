@@ -85,7 +85,7 @@
     <bean id="messageSource"
           class="neatlogic.framework.i18n.ModuleJsonMessageSource"/>
 
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+    <bean id="multipartResolver" class="neatlogic.framework.filter.request.RequestMultipartResolver">
         <property name="maxUploadSize" value="-1"></property>
         <property name="maxInMemorySize" value="40960"></property>
     </bean>

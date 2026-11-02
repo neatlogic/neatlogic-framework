@@ -15,6 +15,32 @@ public interface ILoginAuthHandler {
     String getType();
 
     /**
+     * 声明认证处理器能否使用框架统一解析的 multipart 请求，仅影响 multipart 上传的认证阶段。
+     *
+     * <p>返回 {@code true}：入口向 {@link #auth} 传入 {@code ParsedMultipartRequest}。
+     * 首次访问表单字段或文件时才解析 multipart；只读取 Header/Cookie 不触发解析。
+     * 认证处理器通过参数、文件接口或 {@code getFormItems()} 获取所需内容，
+     * 下游路径过滤器、Dispatcher 和业务复用同一份解析结果，避免认证与业务各解析一次上传。
+     * 例如 HMAC 上传使用 {@code getFormItems()} 中的普通字段计算签名，不读取文件内容参与签名。
+     * 选择此模式的处理器不得自行再次解析 multipart，也不能依赖重读完整原始 body；
+     * 解析后的文件可通过 MultipartFile 重复打开，临时资源由请求入口统一清理。</p>
+     *
+     * <p>返回 {@code false}（默认）：保留旧认证插件的原始请求读取方式。
+     * 认证阶段实际读取原始流，或调用 {@code getParameter*()} 访问 multipart 参数时，
+     * 框架缓存完整原始 body，以便后续重放并完成上传解析；仅获取流句柄或读取 Header/Cookie 不缓存。
+     * 因此，普通 JWT 上传无需覆盖此方法，也不会因为默认返回 false 而增加 body 缓存。
+     * 只有确认上传认证可完全使用共享的字段和文件接口时，才应覆盖并返回 true。</p>
+     *
+     * <p>此方法不是全局缓存开关：非 multipart 请求不受返回值影响，
+     * 仍由框架按实际读取行为及既有表单兼容规则决定是否缓存。</p>
+     *
+     * @return true 表示接受共享 multipart 解析结果；false 表示保留旧插件的原始请求兼容路径
+     */
+    default boolean supportsParsedMultipart() {
+        return false;
+    }
+
+    /**
      * 使用入口已解析的时区完成认证，并在认证成功后初始化用户上下文。
      *
      * @param timezone 已按请求或租户参数解析的时区

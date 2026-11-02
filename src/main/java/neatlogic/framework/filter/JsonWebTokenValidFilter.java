@@ -28,6 +28,10 @@ import neatlogic.framework.dto.UserVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
 import neatlogic.framework.exception.user.UserPasswordExpiredException;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
+import neatlogic.framework.filter.request.RequestBodyResources;
+import neatlogic.framework.filter.request.RequestMultipartResolver;
+import neatlogic.framework.filter.request.RequestBodyErrorHandler;
+import neatlogic.framework.exception.request.RequestBodyException;
 import neatlogic.framework.filter.core.LoginAuthFactory;
 import neatlogic.framework.service.LoginService;
 import neatlogic.framework.util.UserTimezoneResolver;
@@ -55,6 +59,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
     public static final String DEFAULT_AUTH_TYPE = "default";
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    @Resource(name = "multipartResolver")
+    private RequestMultipartResolver multipartResolver;
+
     @Resource
     private UserSessionMapper userSessionMapper;
 
@@ -102,15 +109,18 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
         //初始化request上下文
         RequestContext.init(request, request.getRequestURI(), response);
 
+        RequestBodyResources bodyResources = null;
         //判断租户
         try {
             String tenant = request.getHeader("Tenant");
-            //认证过程中可能需要从request中获取inputStream，为了后续spring也可以获取inputStream，需要做一层cached
-            HttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
             if (!TenantUtil.hasTenant(tenant)) {
                 returnErrorResponseJson(ResponseCode.TENANT_NOTFOUND, response, loginAuth, tenant);
                 return;
             }
+            // 租户不存在时不接收请求体；资源限制在请求创建时固定。
+            bodyResources = new RequestBodyResources(request, multipartResolver);
+            HttpServletRequest cachedRequest = bodyResources.forAuthentication(defaultLoginAuth.supportsParsedMultipart());
+            RequestContext.get().setRequest(cachedRequest);
             TenantContext.init();
             TenantContext.get().switchTenant(tenant);
             String timezone = UserTimezoneResolver.getRequestTimezone(request);
@@ -146,6 +156,8 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 if (StringUtils.isNotBlank(authType) && !DEFAULT_AUTH_TYPE.equalsIgnoreCase(authType)) {
                     loginAuth = LoginAuthFactory.getLoginAuth(authType);
                     if (loginAuth != null) {
+                        cachedRequest = bodyResources.forAuthentication(loginAuth.supportsParsedMultipart());
+                        RequestContext.get().setRequest(cachedRequest);
                         userVo = loginAuth.auth(cachedRequest, response, timezone);
                         if (userVo != null && StringUtils.isNotBlank(userVo.getUuid())) {
                             logger.debug("======= getUser succeed: " + userVo.getUuid());
@@ -175,13 +187,29 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 logger.debug("======= getUser succeed: " + userVo.getUuid());
             }
 
+            // 认证结束后切换为下游使用的请求：非 multipart 且未建立缓存时，去掉认证缓存包装，保留大小限制，
+            // 避免普通 JWT 请求仅由 Spring/业务读取一次 body 也触发缓存；已缓存的请求则保留重放能力。
+            // multipart 在此取得共享解析结果，供后续路径过滤器检查字段，Dispatcher 和业务复用字段及文件。
+            cachedRequest = bodyResources.forDispatch();
+            // 同步上下文中的请求引用，使通过 RequestContext 取请求的代码与 filterChain 收到同一对象，
+            // 避免继续访问认证阶段的旧包装而误触发缓存，或无法获取共享 multipart 字段和文件；此处不复制 body。
+            RequestContext.get().setRequest(cachedRequest);
             try {
                 filterChain.doFilter(cachedRequest, response);
+                if (bodyResources.getFailure() != null && !response.isCommitted()) {
+                    RequestBodyErrorHandler.write(response, bodyResources.getFailure());
+                }
             } catch (Exception ex) {
-                //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
+                // 请求资源错误可能被 Spring 包装，仍须保留 413 等状态，不能统一转换为 520。
                 logger.error(ex.getMessage(), ex);
+                RequestBodyException bodyError = RequestBodyErrorHandler.find(request, ex);
+                if (bodyError != null) { throw bodyError; }
+                //兼容“处理response,对象toString可能会异常”的场景，过了filter，应该是520异常
                 returnErrorResponseJson(ResponseCode.API_RUNTIME, response, false, loginAuth, ex.getMessage());
             }
+        } catch (RequestBodyException ex) {
+            logger.error(ex.getMessage(), ex);
+            RequestBodyErrorHandler.write(response, ex);
         } catch (ApiRuntimeException ex) {
             logger.error(ex.getMessage(), ex);
             try {
@@ -199,6 +227,9 @@ public class JsonWebTokenValidFilter extends OncePerRequestFilter {
                 logger.error(e.getMessage(), e);
                 throw new ApiRuntimeException(e);
             }
+        } finally {
+            // 预解析的上传不属于 Dispatcher，所有提前返回和失败都由此释放。
+            if (bodyResources != null) { bodyResources.close(); }
         }
     }
 

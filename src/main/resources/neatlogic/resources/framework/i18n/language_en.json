@@ -669,6 +669,10 @@
     "matrixtype": {
       "customdatasource": "Custom Data Source"
     },
+    "requestbody": {
+      "limit": "Request resource {0} exceeds its limit: maximum {1}, received {2}.",
+      "readfailed": "Request {1} failed during {0}; reason type: {2}. Check the server log for details."
+    },
     "scheduler": {
       "job": {
         "auditcleaner": {

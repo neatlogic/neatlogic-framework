@@ -1,5 +1,7 @@
 package neatlogic.framework.filter;
 
+import neatlogic.framework.filter.request.RequestMultipartResolver;
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
@@ -367,6 +369,7 @@ public class JsonWebTokenValidFilterTest {
             });
         }
         JsonWebTokenValidFilter filter = new JsonWebTokenValidFilter();
+        field(JsonWebTokenValidFilter.class, "multipartResolver").set(filter, new RequestMultipartResolver());
         field(JsonWebTokenValidFilter.class, "userSessionMapper").set(filter, sessionMapper);
         field(JsonWebTokenValidFilter.class, "userSessionContentMapper").set(filter, contentMapper);
         field(JsonWebTokenValidFilter.class, "loginService").set(filter, service);

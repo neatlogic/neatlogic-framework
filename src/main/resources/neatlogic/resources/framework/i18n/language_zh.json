@@ -669,6 +669,10 @@
     "matrixtype": {
       "customdatasource": "自定义数据源"
     },
+    "requestbody": {
+      "limit": "请求资源 {0} 超出限制：最大允许 {1}，实际已接收 {2}。",
+      "readfailed": "请求 {1} 在执行 {0} 时失败，原因类型：{2}。请查看服务端日志获取具体原因。"
+    },
     "scheduler": {
       "job": {
         "auditcleaner": {

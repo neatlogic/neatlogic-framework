@@ -35,6 +35,9 @@
 
     <mvc:annotation-driven/>
 
+    <!-- 仅在 framework MVC 中处理请求资源错误，不改变其他模块的默认异常策略。 -->
+    <bean id="requestBodyErrorHandler" class="neatlogic.framework.filter.request.RequestBodyErrorHandler"/>
+
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="neatlogic.module.framework.dao.mapper"/>
     </bean>

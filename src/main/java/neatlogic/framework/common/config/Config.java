@@ -40,6 +40,13 @@ public class Config {
     private static final String SERVER_ID_FILE = "serverid.conf";
     private static final String SERVER_GROUP_FILE = "servergroup.conf";
 
+    private static int REQUEST_BODY_MEMORY_THRESHOLD = 65536;// 请求体缓存转存磁盘的字节阈值
+    private static long REQUEST_BODY_MAX_BYTES = 10L * 1024 * 1024;// 普通请求体大小上限
+    private static long REQUEST_MULTIPART_MAX_BYTES = 1024L * 1024 * 1024;// multipart 请求总大小上限
+    private static int REQUEST_MULTIPART_MEMORY_THRESHOLD = 40960;// 单个上传项转存磁盘的字节阈值
+    private static long REQUEST_MULTIPART_FIELDS_MAX_BYTES = 10L * 1024 * 1024;// 普通表单字段累计大小上限
+    private static int REQUEST_MULTIPART_PARTS_MAX = 128;// 文件及普通字段的总项数上限
+
     public static int SCHEDULE_SERVER_ID;
     private static String SCHEDULE_SERVER_GROUP;
 
@@ -222,6 +229,30 @@ public class Config {
 
     public static int SCHEDULE_SERVER_ID_CHECK_ENABLE() {
         return SCHEDULE_SERVER_ID_CHECK_ENABLE;
+    }
+
+    public static int REQUEST_BODY_MEMORY_THRESHOLD() {
+        return REQUEST_BODY_MEMORY_THRESHOLD;
+    }
+
+    public static long REQUEST_BODY_MAX_BYTES() {
+        return REQUEST_BODY_MAX_BYTES;
+    }
+
+    public static long REQUEST_MULTIPART_MAX_BYTES() {
+        return REQUEST_MULTIPART_MAX_BYTES;
+    }
+
+    public static int REQUEST_MULTIPART_MEMORY_THRESHOLD() {
+        return REQUEST_MULTIPART_MEMORY_THRESHOLD;
+    }
+
+    public static long REQUEST_MULTIPART_FIELDS_MAX_BYTES() {
+        return REQUEST_MULTIPART_FIELDS_MAX_BYTES;
+    }
+
+    public static int REQUEST_MULTIPART_PARTS_MAX() {
+        return REQUEST_MULTIPART_PARTS_MAX;
     }
 
     public static String SCHEDULE_SERVER_GROUP() {
@@ -628,8 +659,15 @@ public class Config {
         }
     }
 
+    /** 加载本地或 Nacos 配置，统一使用各配置项的默认值和异常处理。 */
     public static void loadLocalOrNacosProperties(Properties prop) {
         try {
+            REQUEST_BODY_MEMORY_THRESHOLD = Integer.parseInt(prop.getProperty("request.body.memory.threshold", "65536"));
+            REQUEST_BODY_MAX_BYTES = Long.parseLong(prop.getProperty("request.body.max.bytes", "10485760"));
+            REQUEST_MULTIPART_MAX_BYTES = Long.parseLong(prop.getProperty("request.multipart.max.bytes", "1073741824"));
+            REQUEST_MULTIPART_MEMORY_THRESHOLD = Integer.parseInt(prop.getProperty("request.multipart.memory.threshold", "40960"));
+            REQUEST_MULTIPART_FIELDS_MAX_BYTES = Long.parseLong(prop.getProperty("request.multipart.fields.max.bytes", "10485760"));
+            REQUEST_MULTIPART_PARTS_MAX = Integer.parseInt(prop.getProperty("request.multipart.parts.max", "128"));
             SCHEDULE_SERVER_ID_CHECK_ENABLE = Integer.parseInt(prop.getProperty("schedule.serverid.check.enable", "1"));
             DATA_HOME = prop.getProperty("data.home", "/app/data");
             AUDIT_HOME = prop.getProperty("audit.home", "/app/logs/audit");

@@ -18,7 +18,5 @@ package neatlogic.module.framework.integration.handler;
 import neatlogic.framework.integration.core.IRequestFrom;
 
 public enum FrameworkRequestFrom implements IRequestFrom {
-    API, TEST, FORM, SCHEDULE, DATAWAREHOUSE,
-    // 大屏动态取数单独标识调用来源，便于集成调用日志区分。
-    DASHBOARD;
+    API, TEST, FORM, SCHEDULE, DATAWAREHOUSE, DASHBOARD;
 }

@@ -62,7 +62,7 @@ public abstract class TopicBase<T> implements ITopic<T> {
                             if (MapUtils.isNotEmpty(contentObj)) {
                                 String msg = contentObj.toString();
                                 try {
-                                    handler.send(topicName, msg);
+                                    handler.send(topicName, getMessageKey(topicVo, content), msg);
                                     //jmsTemplate.convertAndSend(TenantContext.get().getTenantUuid() + "/" + topicName, msg);
                                 } catch (Exception ex) {
                                     logger.error("发送消息到{}/{}失败，异常：{}", TenantContext.get().getTenantUuid(), topicName, ex.getMessage());
@@ -76,6 +76,11 @@ public abstract class TopicBase<T> implements ITopic<T> {
                 }
             });
         }
+    }
+
+    /** 返回消息分区键，普通主题默认不指定业务分区。 */
+    protected String getMessageKey(TopicVo topicVo, T content) {
+        return null;
     }
 
     protected abstract JSONObject generateTopicContent(TopicVo topicVo, T content);

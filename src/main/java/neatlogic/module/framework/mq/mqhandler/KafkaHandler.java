@@ -38,11 +38,9 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.listener.AcknowledgingMessageListener;
-import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.kafka.listener.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.backoff.FixedBackOff;
 
 import java.time.Duration;
 import java.util.*;
@@ -91,14 +89,8 @@ public class KafkaHandler implements IMqHandler {
             String topicName = subVo.getTopicName();
             String clientName = subVo.getName();
             clientName = clientName.toLowerCase();
-            String tenantUuid = TenantContext.get().getTenantUuid();
-
-
-            //用租户uuid+订阅id作为分组id，确保每个消费者都可以独立消费
-            consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, tenantUuid + "_" + subVo.getId());
-            //客户端id仅用于标识客户端实例，每个租户共用一个
-            consumerProps.put(ConsumerConfig.CLIENT_ID_CONFIG, tenantUuid + "_" + Config.SCHEDULE_SERVER_ID);
-            try (AdminClient adminClient = AdminClient.create(consumerProps)) {
+            Map<String, Object> properties = createConsumerProperties(subVo);
+            try (AdminClient adminClient = AdminClient.create(properties)) {
                 ListTopicsResult topics = adminClient.listTopics();
                 boolean topicExists = topics.names().get().contains(topicName);
 
@@ -107,25 +99,9 @@ public class KafkaHandler implements IMqHandler {
                     NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
                     adminClient.createTopics(Collections.singleton(newTopic)).all().get();
                 }
-                DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(consumerProps);
-                ContainerProperties containerProperties = new ContainerProperties(topicName);
                 subVo.setTenantUuid(TenantContext.get().getTenantUuid());
-                containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (consumerRecord, acknowledgment) -> {
-                    try {
-                        subscribeHandler.onMessage(subVo, consumerRecord.value());
-                        if (acknowledgment != null) {
-                            //手动提交偏移量，如果处理有问题可以重新消费
-                            acknowledgment.acknowledge();
-                        }
-                    } catch (Exception ex) {
-                        logger.error(ex.getMessage(), ex);
-                    }
-                });
-
                 ConcurrentMessageListenerContainer<String, String> container =
-                        new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
-                container.setConcurrency(1);
-                container.setAutoStartup(true);
+                        createListenerContainer(subVo, subscribeHandler, properties);
                 containerMap.put(subVo.getId(), container);
 
                 try {
@@ -137,6 +113,40 @@ public class KafkaHandler implements IMqHandler {
         }
 
         return true;
+    }
+
+    /** 按租户和订阅生成独立消费者配置，避免并发创建订阅时相互覆盖分组。 */
+    protected Map<String, Object> createConsumerProperties(SubscribeVo subVo) {
+        Map<String, Object> properties = new HashMap<>(consumerProps);
+        String tenantUuid = TenantContext.get().getTenantUuid();
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, tenantUuid + "_" + subVo.getId());
+        properties.put(ConsumerConfig.CLIENT_ID_CONFIG, tenantUuid + "_" + Config.SCHEDULE_SERVER_ID);
+        return properties;
+    }
+
+    /** 每个订阅独立消费；业务成功返回后确认，失败消息保持未提交并持续重试。 */
+    protected ConcurrentMessageListenerContainer<String, String> createListenerContainer(
+            SubscribeVo subVo, ISubscribeHandler subscribeHandler, Map<String, Object> properties) {
+        DefaultKafkaConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(properties);
+        ContainerProperties containerProperties = new ContainerProperties(subVo.getTopicName());
+        containerProperties.setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        containerProperties.setMessageListener((AcknowledgingMessageListener<String, String>) (record, acknowledgment) -> {
+            subscribeHandler.onMessage(subVo, record.value());
+            // 异常交给容器处理，不能吞掉后继续确认后续偏移量。
+            if (acknowledgment != null) {
+                acknowledgment.acknowledge();
+            }
+        });
+        ConcurrentMessageListenerContainer<String, String> container =
+                new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
+        DefaultErrorHandler errorHandler = new DefaultErrorHandler(new FixedBackOff(5000L, FixedBackOff.UNLIMITED_ATTEMPTS));
+        // 不自动丢弃分类为致命的异常；格式错误应由具体订阅明确识别并正常返回。
+        errorHandler.setClassifications(Collections.emptyMap(), true);
+        errorHandler.setAckAfterHandle(false);
+        container.setCommonErrorHandler(errorHandler);
+        container.setConcurrency(1);
+        container.setAutoStartup(true);
+        return container;
     }
 
     @Override
@@ -172,8 +182,14 @@ public class KafkaHandler implements IMqHandler {
     /** 保留旧调用方的发送配置和日志容错约定，复用发送及资源释放流程。 */
     @Override
     public void send(String topicName, String content) {
+        send(topicName, null, content);
+    }
+
+    /** 使用稳定业务键选择分区，保留原发送接口的日志容错行为。 */
+    @Override
+    public void send(String topicName, String key, String content) {
         try {
-            sendInternal(topicName, content, false);
+            sendInternal(topicName, key, content, false);
         } catch (Exception ex) {
             logger.error("发送消息到Kafka失败，异常：{}", ex.getMessage(), ex);
         }
@@ -182,11 +198,11 @@ public class KafkaHandler implements IMqHandler {
     /** 等待代理回执，Kafka 目标名称保持大小写，不附加租户前缀。 */
     @Override
     public MqSendResultVo sendWithResult(String topicName, String content) throws Exception {
-        return sendInternal(topicName, content, true);
+        return sendInternal(topicName, null, content, true);
     }
 
     /** 共享发送和资源释放，严格确认路径的超时及重试配置不改变旧调用方。 */
-    private MqSendResultVo sendInternal(String topicName, String content, boolean waitForResult) throws Exception {
+    private MqSendResultVo sendInternal(String topicName, String key, String content, boolean waitForResult) throws Exception {
         if (StringUtils.isBlank(topicName)) {
             throw new IllegalArgumentException("Topic名称不能为空");
         }
@@ -205,7 +221,7 @@ public class KafkaHandler implements IMqHandler {
         boolean restoreInterrupt = false;
         try {
             producer = createProducer(properties);
-            Future<RecordMetadata> future = producer.send(new ProducerRecord<>(topicName, content));
+            Future<RecordMetadata> future = producer.send(new ProducerRecord<>(topicName, key, content));
             if (!waitForResult) {
                 return null;
             }
@@ -270,8 +286,9 @@ public class KafkaHandler implements IMqHandler {
         List<HealthcheckResultVo> errorList = new ArrayList<>();
         String topicName = subVo.getTopicName();
         String groupId = TenantContext.get().getTenantUuid() + "_" + subVo.getId();
-        try (AdminClient adminClient = AdminClient.create(consumerProps);
-             KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps)) {
+        Map<String, Object> properties = createConsumerProperties(subVo);
+        try (AdminClient adminClient = AdminClient.create(properties);
+             KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties)) {
             // 1. 检查 topic 是否存在
             ListTopicsResult topics = adminClient.listTopics();
             boolean topicExists = topics.names().get().contains(topicName);

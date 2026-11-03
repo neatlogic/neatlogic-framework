@@ -14,6 +14,7 @@ package neatlogic.framework.sqlrunner;
 
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dao.plugin.*;
+import neatlogic.framework.exception.sql.SqlRunnerAccessDeniedException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
@@ -40,7 +41,10 @@ import java.util.stream.Collectors;
 public class SqlRunner {
     private static final String DOCTYPE = "<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">";
 
-    private static DataSource dataSource;
+    // Spring 注入的共享路由源仅作为默认值，自定义源只属于当前执行器实例。
+    private static DataSource defaultDataSource;
+
+    private DataSource dataSource;
 
     private String namespace = "neatlogic";
 
@@ -63,16 +67,20 @@ public class SqlRunner {
         this(mapperXml, null, _dataSource);
     }
 
+    /** 构建独立的报表 SQL 会话配置，所有数据源均受当前租户访问策略约束。 */
     public SqlRunner(String mapperXml, String namespace, DataSource _dataSource) {
         if (StringUtils.isNotBlank(namespace)) {
             this.namespace = namespace;
         }
         if (_dataSource != null) {
             dataSource = _dataSource;
+        } else {
+            dataSource = defaultDataSource;
         }
 
         Configuration configuration = new Configuration();
         configuration.addInterceptor(new DataSchemaInterceptor());
+        configuration.addInterceptor(new SqlRunnerAccessInterceptor());
         configuration.addInterceptor(new SqlCostInterceptor());
         configuration.addInterceptor(new LimitInterceptor());
         configuration.addInterceptor(new PageInterceptor());
@@ -115,55 +123,75 @@ public class SqlRunner {
         this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
     }
 
+    /** 保存框架默认路由源，不覆盖已经构建的执行器实例。 */
     @Resource
     public void setDataSource(DataSource _dataSource) {
-        dataSource = _dataSource;
+        defaultDataSource = _dataSource;
     }
 
     /**
-     * 执行mapper中特定某个select语句
+     * 执行 mapper 中指定查询，所有动态 SQL 均受租户库隔离约束。
      *
      * @param sqlInfo
      * @param paramMap
      * @return
      */
     public <E> List<E>  runSqlById(SqlInfo sqlInfo, Map<String, Object> paramMap) {
+        SqlRunnerAccessPolicy.validateTenant();
         MappedStatement mappedStatement = configuration.getMappedStatement(sqlInfo.getNamespace() + "." + sqlInfo.getId());
         if (mappedStatement == null) {
             return new ArrayList<>();
         }
         if (mappedStatement.getSqlCommandType() != SqlCommandType.SELECT) {
-            return new ArrayList<>();
+            throw new SqlRunnerAccessDeniedException();
         }
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
             return sqlSession.selectList(sqlInfo.getNamespace() + "." + sqlInfo.getId(), paramMap);
+        } catch (RuntimeException ex) {
+            throw sanitizeAccessException(ex);
         } finally {
             sqlSession.close();
         }
     }
 
     /**
-     * 执行mapper中特定某个select语句
+     * 执行 mapper 中指定分页查询，计数和数据查询均受租户库隔离约束。
      *
      * @param sqlInfo
      * @param paramMap
      * @return
      */
     public <E> List<E>  runSqlById(SqlInfo sqlInfo, Map<String, Object> paramMap, PageRowBounds rowBounds) {
+        SqlRunnerAccessPolicy.validateTenant();
         MappedStatement mappedStatement = configuration.getMappedStatement(sqlInfo.getNamespace() + "." + sqlInfo.getId());
         if (mappedStatement == null) {
             return new ArrayList<>();
         }
         if (mappedStatement.getSqlCommandType() != SqlCommandType.SELECT) {
-            return new ArrayList<>();
+            throw new SqlRunnerAccessDeniedException();
         }
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try {
             return sqlSession.selectList(sqlInfo.getNamespace() + "." + sqlInfo.getId(), paramMap, rowBounds);
+        } catch (RuntimeException ex) {
+            throw sanitizeAccessException(ex);
         } finally {
             sqlSession.close();
         }
+    }
+
+    /** 去掉 MyBatis 包装异常中的完整 SQL，安全拒绝只返回统一错误。 */
+    private RuntimeException sanitizeAccessException(RuntimeException exception) {
+        Throwable cause = exception;
+        java.util.Set<Throwable> visited = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
+        while (cause != null && visited.add(cause)) {
+            if (cause instanceof SqlRunnerAccessDeniedException) {
+                return new SqlRunnerAccessDeniedException();
+            }
+            cause = cause.getCause();
+        }
+        return exception;
     }
 
     /**

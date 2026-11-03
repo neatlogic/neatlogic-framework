@@ -1202,6 +1202,9 @@
     },
     "schedulepublicauthexception": {
       "schedulepublicauthexception": "No permission to test this scheduled job"
+    },
+    "sqlrunneraccessdeniedexception": {
+      "sqlrunneraccessdeniedexception": "Report SQL access denied: queries are restricted to the current tenant business and data databases."
     }
   },
   "nfet": {

@@ -138,6 +138,17 @@ public class MqSendResultTest {
         assertTrue(handler.closed);
     }
 
+    /** 带业务键发送保留键，旧发送接口仍使用空键。 */
+    @Test
+    public void kafkaKeyedSendPreservesKeyAndLegacySendRemainsUnkeyed() {
+        KafkaStub handler = new KafkaStub();
+        handler.send("informant", "0123456789abcdef0123456789abcdef", "正文");
+        assertEquals("0123456789abcdef0123456789abcdef", handler.record.key());
+        assertEquals("正文", handler.record.value());
+        handler.send("informant", "旧正文");
+        assertNull(handler.record.key());
+    }
+
     /** 验证参数错误时不创建外部资源。 */
     @Test
     public void kafkaRejectsEmptyDestinationBeforeCreatingProducer() throws Exception {

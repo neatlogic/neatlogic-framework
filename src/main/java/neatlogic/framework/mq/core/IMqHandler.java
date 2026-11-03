@@ -35,6 +35,11 @@ public interface IMqHandler {
 
     void send(String topicName, String content);
 
+    /** 按业务键发送消息；未实现分区键的消息中间件沿用原发送方式。 */
+    default void send(String topicName, String key, String content) {
+        send(topicName, content);
+    }
+
     /** 等待消息代理确认发送结果；扩展实现必须明确支持，不能将日志容错接口当作发送成功。 */
     default MqSendResultVo sendWithResult(String topicName, String content) throws Exception {
         throw new UnsupportedOperationException("当前消息队列处理器不支持发送回执：" + getName());

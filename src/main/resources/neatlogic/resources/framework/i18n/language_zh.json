@@ -1202,6 +1202,9 @@
     },
     "schedulepublicauthexception": {
       "schedulepublicauthexception": "没有权限测试该定时作业"
+    },
+    "sqlrunneraccessdeniedexception": {
+      "sqlrunneraccessdeniedexception": "报表 SQL 访问被拒绝：仅允许查询当前租户业务库和数据仓库。"
     }
   },
   "nfet": {

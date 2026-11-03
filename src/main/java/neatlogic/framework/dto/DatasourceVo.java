@@ -14,7 +14,7 @@ package neatlogic.framework.dto;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.common.config.Config;
-import neatlogic.framework.common.util.RC4Util;
+import neatlogic.framework.util.ConnectionPasswordUtil;
 import neatlogic.framework.util.PassWordUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -73,30 +73,34 @@ public class DatasourceVo implements Serializable {
         this.username = username;
     }
 
+    /** 按存储密文前缀解密，继续兼容历史明文配置。 */
     public String getPasswordPlain() {
-        if (StringUtils.isBlank(passwordPlain)) {
-            if (StringUtils.isNotBlank(passwordCipher)) {
-                this.passwordPlain = RC4Util.decrypt(this.passwordCipher);
-            }
+        if (passwordPlain == null && StringUtils.isNotBlank(passwordCipher)) {
+            this.passwordPlain = ConnectionPasswordUtil.decrypt(passwordCipher);
         }
         return passwordPlain;
     }
 
+    /** 更新明文时清除旧密文，避免保存上一次的密码。 */
     public void setPasswordPlain(String passwordPlain) {
         this.passwordPlain = passwordPlain;
+        this.passwordCipher = null;
     }
 
+    /** 新密码使用AES前缀的混合密文，已有密文保留原值，历史明文在保存时转为密文。 */
     public String getPasswordCipher() {
-        if (StringUtils.isBlank(passwordCipher)) {
-            if (StringUtils.isNotBlank(passwordPlain)) {
-                this.passwordCipher = RC4Util.encrypt(passwordPlain);
-            }
+        if (StringUtils.isNotBlank(passwordCipher)) {
+            this.passwordCipher = ConnectionPasswordUtil.toCipher(passwordCipher);
+        } else if (StringUtils.isNotBlank(passwordPlain)) {
+            this.passwordCipher = ConnectionPasswordUtil.encryptPlain(passwordPlain);
         }
         return passwordCipher;
     }
 
+    /** 更新密文时清除旧明文，后续认证按新配置解密。 */
     public void setPasswordCipher(String passwordCipher) {
         this.passwordCipher = passwordCipher;
+        this.passwordPlain = null;
     }
 
     public String getDriver() {

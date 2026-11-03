@@ -4,17 +4,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="neatlogic.framework.dao.mapper.ElasticsearchMapper">
     <insert id="insertTenantElasticsearch" parameterType="neatlogic.framework.dto.ElasticsearchVo">
-        insert into elasticsearch (`tenant_uuid`, `username`, `password`, `host`, `option`)
+        insert into elasticsearch (`tenant_uuid`, `username`, `password`, `host`, `config`)
         values (#{tenantUuid},
                 #{username},
-                #{passwordPlain},
+                #{passwordCipher},
                 #{host},
-                #{option})
+                #{configStr})
         on duplicate key
             update `username` = #{username},
                    `password` = #{passwordCipher},
                    `host`     = #{host},
-                   `option`   = #{option}
+                   `config`   = #{configStr}
     </insert>
 
     <select id="getAllActiveTenantElasticsearch" resultType="neatlogic.framework.dto.ElasticsearchVo">

@@ -16,9 +16,10 @@ import neatlogic.framework.crypto.core.ICryptoHandler;
 import java.util.List;
 
 public class RC4CryptoHandler implements ICryptoHandler {
+    /** 保留三种历史RC4前缀，使统一工厂可读取旧连接密码。 */
     @Override
     public List<String> handlers() {
-        return List.of("RC4:", "{RC4}");
+        return List.of("RC4:", "{RC4}", "{ENCRYPTED}");
     }
 
     @Override

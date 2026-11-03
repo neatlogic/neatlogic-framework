@@ -10,7 +10,7 @@
                 #{tenantUuid},
                 #{database},
                 #{username},
-                #{passwordPlain},
+                #{passwordCipher},
                 #{host},
                 #{option},
                 #{authConfig})

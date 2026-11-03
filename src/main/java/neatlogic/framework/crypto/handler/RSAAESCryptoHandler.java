@@ -27,7 +27,7 @@ import java.util.Base64;
 import java.util.List;
 
 public class RSAAESCryptoHandler implements ICryptoHandler {
-    /** 当前前后端约定的RSA包装AES密钥、AES-GCM加密密码的混合密文前缀。 */
+    /** 默认传输密文前缀，供外部调用方选择处理器及识别协议。 */
     public static final String ENCRYPTED_PREFIX = "RSA.AES:";
     /** GCM使用128位认证标签，Java加密结果会将标签附加在密文末尾。 */
     private static final int GCM_TAG_BIT_LENGTH = 128;
@@ -44,8 +44,8 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
 
     @Override
     public List<String> handlers() {
-        // 工厂通过前缀选择处理器，新旧混合协议均由本处理器负责解密。
-        return List.of(ENCRYPTED_PREFIX);
+        // 首项保持现有传输默认格式，其余别名共用相同载荷；新增前缀只需维护此列表。
+        return List.of(ENCRYPTED_PREFIX, "AES:", "{AES}");
     }
 
     @Override
@@ -74,13 +74,24 @@ public class RSAAESCryptoHandler implements ICryptoHandler {
         if (encryptedPassword == null) {
             return null;
         }
-        int separatorIndex = encryptedPassword.indexOf(HYBRID_SECTION_SEPARATOR, ENCRYPTED_PREFIX.length());
-        if (separatorIndex <= ENCRYPTED_PREFIX.length()
+        int prefixLength = 0;
+        // 与工厂共用前缀列表，避免增加别名时再维护独立解析分支。
+        for (String prefix : handlers()) {
+            if (encryptedPassword.startsWith(prefix)) {
+                prefixLength = prefix.length();
+                break;
+            }
+        }
+        if (prefixLength == 0) {
+            throw new PasswordDecryptException();
+        }
+        int separatorIndex = encryptedPassword.indexOf(HYBRID_SECTION_SEPARATOR, prefixLength);
+        if (separatorIndex <= prefixLength
                 || separatorIndex != encryptedPassword.lastIndexOf(HYBRID_SECTION_SEPARATOR)
                 || separatorIndex == encryptedPassword.length() - HYBRID_SECTION_SEPARATOR.length()) {
             throw new PasswordDecryptException();
         }
-        String encryptedAesKeyBase64 = encryptedPassword.substring(ENCRYPTED_PREFIX.length(), separatorIndex);
+        String encryptedAesKeyBase64 = encryptedPassword.substring(prefixLength, separatorIndex);
         String aesPayloadBase64 = encryptedPassword.substring(separatorIndex + HYBRID_SECTION_SEPARATOR.length());
 
         byte[] aesPayload = Base64.getDecoder().decode(aesPayloadBase64);

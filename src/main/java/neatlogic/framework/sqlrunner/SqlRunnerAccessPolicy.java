@@ -1,6 +1,9 @@
 package neatlogic.framework.sqlrunner;
 
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
+import neatlogic.framework.auth.core.AuthActionChecker;
+import neatlogic.framework.auth.label.ADMIN;
+import neatlogic.framework.common.config.Config;
 import neatlogic.framework.exception.sql.SqlRunnerAccessDeniedException;
 import neatlogic.framework.store.mysql.DatasourceManager;
 import net.sf.jsqlparser.JSQLParserException;
@@ -13,6 +16,7 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
@@ -141,6 +145,19 @@ final class SqlRunnerAccessPolicy {
     private static void inspectTable(Table table) {
         String schema = table.getSchemaName();
         String expectedName = table.getName();
+        // 没有ADMIN权限不能查询黑名单表
+        if (CollectionUtils.isNotEmpty(Config.REPORT_QUERY_TABLE_BLACKLIST()) && !AuthActionChecker.check(ADMIN.class)) {
+            String tableName = expectedName;
+            if (tableName.startsWith("`")) {
+                tableName = tableName.substring(1);
+            }
+            if (tableName.endsWith("`")) {
+                tableName = tableName.substring(0, tableName.length() - 1);
+            }
+            if (Config.REPORT_QUERY_TABLE_BLACKLIST().contains(tableName.toLowerCase(Locale.ROOT))) {
+                throw new SqlRunnerAccessDeniedException();
+            }
+        }
         if (schema != null) {
             expectedName = schema + "." + expectedName;
         }

@@ -12,6 +12,8 @@
 
 package neatlogic.framework.store.mysql;
 
+import com.mysql.cj.conf.PropertyKey;
+import com.mysql.cj.jdbc.JdbcConnection;
 import com.zaxxer.hikari.HikariDataSource;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.util.RC4Util;
@@ -25,10 +27,13 @@ import java.sql.SQLException;
 import java.sql.SQLTransientConnectionException;
 import java.sql.Statement;
 import java.util.Objects;
+import java.util.TimeZone;
 
+/** 借出连接时设置数据库会话参数与用户时区。 */
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
 
+    /** 为当前请求初始化借出的数据库连接。 */
     @Override
     public Connection getConnection() throws SQLException {
         Connection conn = null;
@@ -50,6 +55,12 @@ public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的
                 String timezone = UserContext.get().getTimezone();
                 if (StringUtils.isNotBlank(timezone)) {
                     statement.execute("SET time_zone = '" + timezone + "'");
+                    // Connector/J 编解码 TIMESTAMP 时也需要使用当前会话时区。
+                    if (conn.isWrapperFor(JdbcConnection.class)) {
+                        JdbcConnection jdbc = conn.unwrap(JdbcConnection.class);
+                        jdbc.getPropertySet().getBooleanProperty(PropertyKey.preserveInstants).setValue(true);
+                        jdbc.getSession().getServerSession().setSessionTimeZone(TimeZone.getTimeZone("GMT" + timezone));
+                    }
                 }
             }
         } catch (Exception ex) {

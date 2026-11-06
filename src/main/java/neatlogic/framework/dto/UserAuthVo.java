@@ -11,6 +11,7 @@ import neatlogic.framework.util.$;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class UserAuthVo extends BasePageVo implements Serializable {
     private static final long serialVersionUID = 6069104727643916207L;
@@ -23,6 +24,9 @@ public class UserAuthVo extends BasePageVo implements Serializable {
     private String authGroup;
     @EntityField(name = "权限名", type = ApiParamType.STRING)
     private String authName;
+    // 强类型来源列表由授权服务填充，保持角色、分组及包含链信息。
+    @EntityField(name = "权限来源路径列表", type = ApiParamType.JSONARRAY)
+    private List<SourcePathVo> sourcePathList;
 
 
     public UserAuthVo() {
@@ -36,6 +40,13 @@ public class UserAuthVo extends BasePageVo implements Serializable {
     public UserAuthVo(String _userUuid, String _auth) {
         this.userUuid = _userUuid;
         this.auth = _auth;
+    }
+
+    public UserAuthVo(String userUuid, String auth, String authGroup, List<SourcePathVo> sourcePathList) {
+        this.userUuid = userUuid;
+        this.auth = auth;
+        this.authGroup = authGroup;
+        this.sourcePathList = sourcePathList;
     }
 
     public UserAuthVo(String _userUuid, AuthBase authInstance) {
@@ -82,5 +93,13 @@ public class UserAuthVo extends BasePageVo implements Serializable {
             }
         }
         return authName;
+    }
+
+    public List<SourcePathVo> getSourcePathList() {
+        return sourcePathList;
+    }
+
+    public void setSourcePathList(List<SourcePathVo> sourcePathList) {
+        this.sourcePathList = sourcePathList;
     }
 }

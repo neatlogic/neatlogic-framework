@@ -77,10 +77,10 @@ public interface UserService {
     /** 查询用户数据库直接授权，保留原始记录，不展开包含权限或按角色权限过滤。 */
     List<UserAuthVo> getUserAuthListByUserUuid(String userUuid);
 
-    /** 查询用户直接角色原始授权，每条记录仅在sourcePath携带角色来源，不合并重复权限。 */
+    /** 查询来源资料完整的直接角色授权，sourcePath非空，保留有效原始记录的顺序及重复项。 */
     List<UserAuthVo> getRoleAuthListByUserUuid(String userUuid);
 
-    /** 查询分组原始授权，每个所属分组分别返回记录并在sourcePath附带完整来源，不展开包含权限。 */
+    /** 查询来源资料完整的分组授权，各所属分组分别返回非空sourcePath，保留有效记录顺序及重复项。 */
     List<UserAuthVo> getTeamAuthListByUserUuid(String userUuid);
 
     /** 按根权限编码排序、去重并返回包含权限列表，不同根的相同目标分别保留，完整链存入sourcePath。 */

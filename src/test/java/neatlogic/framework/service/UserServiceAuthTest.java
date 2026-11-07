@@ -13,6 +13,7 @@ import neatlogic.framework.dto.SourcePathVo;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.dto.UserAuthVo;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.After;
 import org.junit.Before;
@@ -194,9 +195,9 @@ public class UserServiceAuthTest {
         Assert.assertNull(teamList.get(0).getSourcePathList());
     }
 
-    /** 缺少角色名或所属分组路径时原始权限记录仍返回，但来源为空且不伪造最终说明。 */
+    /** 缺少角色名或所属分组路径时过滤对应记录，不生成空来源或伪造说明。 */
     @Test
-    public void shouldKeepPermissionsWithEmptySourcesWhenMetadataIsMissing() {
+    public void shouldFilterPermissionsWhenSourceMetadataIsMissing() {
         RoleAuthVo missing = auth("missing", "process", "BASE");
         directAuths.addAll(Arrays.asList(missing, missing));
         TeamVo leaf = team("leaf", "叶分组", null, 2);
@@ -206,20 +207,114 @@ public class UserServiceAuthTest {
         teamAuths.add(auth("r", "process", "BASE"));
         List<UserAuthVo> roleList = service.getRoleAuthListByUserUuid("u");
         List<UserAuthVo> teamList = service.getTeamAuthListByUserUuid("u");
-        Assert.assertEquals(2, roleList.size());
-        Assert.assertEquals(1, teamList.size());
-        Assert.assertEquals("BASE", roleList.get(0).getAuth());
-        Assert.assertEquals("u", teamList.get(0).getUserUuid());
-        roleList.forEach(auth -> {
-            Assert.assertNull(auth.getSourcePath());
-            Assert.assertNull(auth.getSourcePathList());
-        });
-        Assert.assertNull(teamList.get(0).getSourcePath());
-        Assert.assertNull(teamList.get(0).getSourcePathList());
-        // 资料不足仍由入口完整查询，但最终不生成无可信来源的说明。
+        Assert.assertTrue(roleList.isEmpty());
+        Assert.assertTrue(teamList.isEmpty());
+        // 两种汇总入口都只收到可信来源，缺失资料不会再生成空来源权限记录。
         Assert.assertTrue(service.getAuthSourcePathList("u").isEmpty());
+        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
         Assert.assertSame(missing, directAuths.get(0));
         Assert.assertEquals("missing", missing.getRoleUuid());
+    }
+
+    /** 有效和无效角色记录混合时只过滤无效项，保留有效项的顺序、重复记录及独立来源。 */
+    @Test
+    public void shouldKeepValidRoleRecordsInOriginalOrder() {
+        namedRoles.addAll(Arrays.asList(role("r", "有效角色", null), role("s", "第二角色", null),
+                role("empty", "", null), role("blank", "  ", null)));
+        RoleAuthVo first = auth("r", "process", "BASE");
+        directAuths.addAll(Arrays.asList(auth("missing", "process", "MISSING"), first,
+                auth("empty", "process", "EMPTY"), auth("s", "cmdb", "EDIT"),
+                auth("blank", "process", "BLANK"), auth(null, "process", "NULL_UUID"),
+                auth("  ", "process", "BLANK_UUID"), first));
+        List<RoleAuthVo> before = new ArrayList<>(directAuths);
+        List<UserAuthVo> result = service.getRoleAuthListByUserUuid("u");
+        Assert.assertEquals(Arrays.asList("r/process/BASE", "s/cmdb/EDIT", "r/process/BASE"), result.stream()
+                .map(row -> row.getSourcePath().getRoleUuid() + "/" + row.getAuthGroup() + "/" + row.getAuth())
+                .collect(java.util.stream.Collectors.toList()));
+        assertTrustedQuerySources(result, false);
+        Assert.assertNotSame(result.get(0).getSourcePath(), result.get(2).getSourcePath());
+        Assert.assertEquals(before, directAuths);
+        Assert.assertSame(first, directAuths.get(1));
+        Assert.assertEquals(Integer.valueOf(1), queryCounts.get("getRoleByUuidList"));
+    }
+
+    /** 同角色多分组只保留身份和路径完整的分组；空lft、原始顺序和重复权限记录均保留。 */
+    @Test
+    public void shouldFilterInvalidTeamSourcesWithoutChangingValidExpansion() {
+        TeamVo first = team("first", "第一组", "银行/第一组", 1);
+        TeamVo missing = team("missing", "缺失组", null, 2);
+        TeamVo blankPath = team("blank-path", "空层级组", "银行/  ", 3);
+        TeamVo failedFallback = team("failed", "重建失败组", null, 4);
+        TeamVo second = team("second", "第二组", "银行/第二组", 5);
+        second.setLft(null);
+        // TeamVo默认会为缺失UUID生成新值，边界测试固定返回原始空值，避免误测成有效分组。
+        TeamVo blankUuid = new TeamVo() {
+            @Override public String getUuid() { return "  "; }
+        };
+        blankUuid.setUpwardNamePath("银行/空标识组");
+        TeamVo nullUuid = new TeamVo() {
+            @Override public String getUuid() { return null; }
+        };
+        nullUuid.setUpwardNamePath("银行/无标识组");
+        userTeams.addAll(Arrays.asList(first, missing, blankPath, failedFallback, second, blankUuid, nullUuid));
+        detailedTeams.addAll(Arrays.asList(first, blankPath, failedFallback, second, blankUuid, nullUuid));
+        namedRoles.addAll(Arrays.asList(role("r", "有效角色", null), role("blank-role", " ", null)));
+        directTeamRoles.add(role("r", "有效角色", userTeams));
+        directTeamRoles.add(role("missing-role", "未查到角色", Collections.singletonList(first)));
+        directTeamRoles.add(role("blank-role", " ", Collections.singletonList(first)));
+        RoleAuthVo original = auth("r", "process", "BASE");
+        teamAuths.addAll(Arrays.asList(original, auth("missing-role", "process", "MISSING"),
+                auth("r", "cmdb", "EDIT"), auth("blank-role", "process", "BLANK"), original));
+        List<RoleAuthVo> before = new ArrayList<>(teamAuths);
+        List<UserAuthVo> result = service.getTeamAuthListByUserUuid("u");
+        Assert.assertEquals(Arrays.asList("first/r/process/BASE", "second/r/process/BASE",
+                "first/r/cmdb/EDIT", "second/r/cmdb/EDIT", "first/r/process/BASE", "second/r/process/BASE"), teamAuthKeys(result));
+        assertTrustedQuerySources(result, true);
+        Assert.assertNull(result.get(1).getSourcePath().getTeamLft());
+        Assert.assertNotSame(result.get(0).getSourcePath(), result.get(4).getSourcePath());
+        Assert.assertEquals(before, teamAuths);
+        Assert.assertSame(original, teamAuths.get(0));
+        Assert.assertEquals(Integer.valueOf(1), queryCounts.get("searchRoleAuthByRoleUuidList"));
+        Assert.assertEquals(Integer.valueOf(1), queryCounts.get("getRoleByUuidList"));
+        Assert.assertEquals(Integer.valueOf(1), queryCounts.get("getTeamByUuidList"));
+        Assert.assertEquals(1, pathQueryCount);
+    }
+
+    /** 过滤无效角色后，相同目标仍可由有效用户直接授权、角色或分组来源提供。 */
+    @Test
+    public void shouldExpandIncludesFromRemainingTrustedOrigins() throws Exception {
+        installGraph();
+        namedRoles.add(role("valid", "有效角色", null));
+        TeamVo leaf = team("leaf", "有效分组", "银行/有效分组", 2);
+        for (String origin : Arrays.asList("user", "role", "team")) {
+            userAuths.clear();
+            directAuths.clear();
+            teamAuths.clear();
+            userTeams.clear();
+            detailedTeams.clear();
+            directTeamRoles.clear();
+            directAuths.add(auth("missing", "process", "INC_SECOND_ROOT"));
+            if ("user".equals(origin)) {
+                userAuths.add(userAuth("process", "INC_ROOT"));
+            } else if ("role".equals(origin)) {
+                directAuths.add(auth("valid", "process", "INC_ROOT"));
+            } else {
+                userTeams.add(leaf);
+                detailedTeams.add(leaf);
+                directTeamRoles.add(role("valid", "有效角色", Collections.singletonList(leaf)));
+                teamAuths.add(auth("valid", "process", "INC_ROOT"));
+            }
+            for (List<UserAuthVo> rows : Arrays.asList(service.getAuthSourcePathList("u"), service.getAuthSourcePathList2("u"))) {
+                UserAuthVo target = findAuth(rows, "cmdb", "INC_TARGET");
+                Assert.assertEquals(1, target.getSourcePathList().size());
+                SourcePathVo source = target.getSourcePathList().get(0);
+                Assert.assertEquals("user".equals(origin) ? null : "valid", source.getRoleUuid());
+                Assert.assertEquals("team".equals(origin) ? "leaf" : null, source.getTeamUuid());
+                Assert.assertEquals(Arrays.asList("INC_ROOT", "INC_LEFT", "INC_TARGET"), source.getIncludeAuthPathList().stream()
+                        .map(node -> node.getString("auth")).collect(java.util.stream.Collectors.toList()));
+                Assert.assertFalse(rows.stream().anyMatch(row -> "INC_SECOND_ROOT".equals(row.getAuth())));
+            }
+        }
     }
 
     /** DTO来源字段按真实数组声明接口元数据，已有访问方法保持可用。 */
@@ -296,9 +391,9 @@ public class UserServiceAuthTest {
         Assert.assertTrue(queryCounts.isEmpty());
     }
 
-    /** 不再从旧聚合字段回退读取来源；空来源仍保留两种汇总各自既有的返回范围。 */
+    /** 手工注入不满足查询契约的记录，验证不回退读取旧列表，不改变汇总方法的边界行为。 */
     @Test
-    public void shouldReadOnlySingleSourceAndKeepMissingSourceBehavior() throws Exception {
+    public void shouldIgnoreLegacySourceListsForInjectedInputs() throws Exception {
         installGraph();
         UserAuthVo legacy = userAuth("process", "INC_ROOT");
         legacy.setSourcePathList(Collections.singletonList(sourceVo("r", "旧来源", null, null, null)));
@@ -681,7 +776,7 @@ public class UserServiceAuthTest {
         Assert.assertEquals(1, pathQueryCount);
     }
 
-    /** 缺失角色名、分组路径或完整祖先链不拼造来源，旧权限照常回显。 */
+    /** 缺失角色名、分组路径或完整祖先链时过滤记录，不拼造来源。 */
     @Test
     public void shouldOmitUntrustworthySources() throws Exception {
         directAuths.add(auth("missing", "process", "DIRECT"));
@@ -832,17 +927,16 @@ public class UserServiceAuthTest {
         Assert.assertEquals(Arrays.asList("INC_ROOT", "INC_LEFT", "INC_TARGET"), includeNames(rows.get(3)));
     }
 
-    /** 来源资料缺失时仍展开只读对象，不借用其他角色或分组伪造说明。 */
+    /** 资料缺失的角色记录被查询方法过滤，不再作为包含展开的根。 */
     @Test
-    public void shouldExpandIncludesEvenWhenRoleMetadataIsMissing() throws Exception {
+    public void shouldSkipIncludeRootsWithoutTrustedRoleMetadata() throws Exception {
         installGraph();
         directAuths.add(auth("missing", "process", "INC_ROOT"));
-        JSONObject result = search();
-        Assert.assertTrue(result.getJSONArray("userRoleAuthSourcePathList").isEmpty());
-        Assert.assertEquals(Arrays.asList("INC_ROOT", "INC_LEFT", "INC_TARGET"),
-                includedPath(service.getAuthIncludedAuthPathMap(userAuths, service.getRoleAuthListByUserUuid("u"), Collections.emptyList()),
-                        "INC_ROOT", "cmdb", "INC_TARGET").stream().map(node -> node.getString("auth"))
-                        .collect(java.util.stream.Collectors.toList()));
+        Assert.assertTrue(service.getRoleAuthListByUserUuid("u").isEmpty());
+        Assert.assertTrue(search().getJSONArray("userRoleAuthSourcePathList").isEmpty());
+        Assert.assertTrue(service.getAuthIncludedAuthPathMap(userAuths, service.getRoleAuthListByUserUuid("u"),
+                Collections.emptyList()).isEmpty());
+        Assert.assertEquals(0, ((INC_ROOT) registry.get("INC_ROOT")).includeReadCount);
     }
 
     /** 每根每目标仅保留最短链，等长菱形链选编码较小分支，循环、自包含及未注册节点跳过。 */
@@ -909,9 +1003,9 @@ public class UserServiceAuthTest {
         Assert.assertNotNull(findAuth(alternative, "cmdb", "BASE"));
     }
 
-    /** 直接授权只应为包含项提供来源；新实现目前额外返回空来源的根权限。 */
+    /** 新实现正常保留用户直接授权自身，允许其来源为空；包含项继续保留完整来源。 */
     @Test
-    public void shouldDocumentExtraDirectPermissionsInAlternative() throws Exception {
+    public void shouldReturnDirectPermissionsNormallyInAlternative() throws Exception {
         installGraph();
         for (String root : Arrays.asList("INC_DEEP", "INC_ROOT")) {
             userAuths.clear();
@@ -921,16 +1015,16 @@ public class UserServiceAuthTest {
             Assert.assertEquals("INC_DEEP".equals(root) ? 0 : 4, original.size());
             Assert.assertEquals(original.size() + 1, alternative.size());
             Assert.assertTrue(findAuth(alternative, userAuths.get(0).getAuthGroup(), root).getSourcePathList().isEmpty());
-            // 仅去掉明确的额外根记录后，目标权限及完整包含来源应相同。
+            // 单独比较包含项，两种实现的目标权限及完整包含来源应相同。
             List<UserAuthVo> targets = new ArrayList<>(alternative);
             targets.removeIf(auth -> root.equals(auth.getAuth()));
             Assert.assertEquals(normalizedResults(original), normalizedResults(targets));
         }
     }
 
-    /** 真实查询保留缺失资料的权限记录；新实现会将这些记录及其包含项作为空来源结果返回。 */
+    /** 真实查询过滤资料缺失记录后，两种汇总均不再产生相应根权限和包含权限的空来源记录。 */
     @Test
-    public void shouldDocumentEmptySourceRowsFromMissingMetadata() throws Exception {
+    public void shouldOmitMissingMetadataRowsFromBothImplementations() throws Exception {
         installGraph();
         directAuths.add(auth("missing", "process", "INC_ROOT"));
         TeamVo leaf = team("leaf", "叶分组", null, 2);
@@ -939,9 +1033,8 @@ public class UserServiceAuthTest {
         directTeamRoles.add(role("t", "分组角色", Collections.singletonList(leaf)));
         teamAuths.add(auth("t", "process", "INC_ROOT"));
         Assert.assertTrue(service.getAuthSourcePathList("u").isEmpty());
-        List<UserAuthVo> alternative = service.getAuthSourcePathList2("u");
-        Assert.assertEquals(5, alternative.size());
-        alternative.forEach(auth -> Assert.assertTrue(auth.getSourcePathList().isEmpty()));
+        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
+        Assert.assertEquals(0, ((INC_ROOT) registry.get("INC_ROOT")).includeReadCount);
     }
 
     /** 重复用户根、角色和分组记录在新实现中重复追加，规范化比较也必须保留重复项。 */
@@ -969,7 +1062,7 @@ public class UserServiceAuthTest {
         }
     }
 
-    /** 非null来源仍可能缺少角色身份或完整分组路径；新实现目前不会执行原有可信来源校验。 */
+    /** 手工绕过查询契约注入无效来源，保留两个汇总方法既有的边界差异。 */
     @Test
     public void shouldDocumentInvalidNonNullSourcesInAlternative() throws Exception {
         installGraph();
@@ -1024,7 +1117,7 @@ public class UserServiceAuthTest {
         Assert.assertEquals(1, fixed.includeCalls);
         root.includeReadCount = 0;
         List<UserAuthVo> alternative = fixed.getAuthSourcePathList2("u");
-        Assert.assertEquals(3, root.includeReadCount);
+        Assert.assertEquals(1, root.includeReadCount);
         Assert.assertEquals(1, fixed.includeCalls);
         Assert.assertEquals(normalizedResults(original), normalizedResults(alternative));
     }
@@ -1173,6 +1266,28 @@ public class UserServiceAuthTest {
         public List<UserAuthVo> getAuthIncludedAuthPathMap(List<UserAuthVo> users, List<UserAuthVo> roles, List<UserAuthVo> teams) {
             includeCalls++;
             return suppliedIncludes ? includes : super.getAuthIncludedAuthPathMap(users, roles, teams);
+        }
+    }
+
+    /** 查询返回值只使用单来源，角色和分组信息满足公开的可信来源契约。 */
+    private void assertTrustedQuerySources(List<UserAuthVo> auths, boolean hasTeam) {
+        for (UserAuthVo auth : auths) {
+            Assert.assertEquals("u", auth.getUserUuid());
+            Assert.assertNull(auth.getSourcePathList());
+            SourcePathVo source = auth.getSourcePath();
+            Assert.assertNotNull(source);
+            Assert.assertFalse(StringUtils.isBlank(source.getRoleUuid()));
+            Assert.assertFalse(StringUtils.isBlank(source.getRoleName()));
+            Assert.assertNull(source.getIncludeAuthPathList());
+            if (hasTeam) {
+                Assert.assertFalse(StringUtils.isBlank(source.getTeamUuid()));
+                Assert.assertFalse(source.getTeamPathNameList().isEmpty());
+                Assert.assertFalse(source.getTeamPathNameList().stream().anyMatch(StringUtils::isBlank));
+            } else {
+                Assert.assertNull(source.getTeamUuid());
+                Assert.assertTrue(source.getTeamPathNameList().isEmpty());
+                Assert.assertNull(source.getTeamLft());
+            }
         }
     }
 

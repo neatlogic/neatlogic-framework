@@ -282,7 +282,7 @@ public class UserServiceImpl implements UserService {
         return authList == null ? Collections.emptyList() : authList;
     }
 
-    /** 角色原始授权逐条转换并附带对应来源，保留顺序及重复记录，不修改Mapper返回对象。 */
+    /** 过滤来源资料不足的角色授权，保留有效原始记录的顺序及重复项，不修改Mapper返回对象。 */
     @Override
     public List<UserAuthVo> getRoleAuthListByUserUuid(String userUuid) {
         if (StringUtils.isBlank(userUuid)) {
@@ -296,18 +296,18 @@ public class UserServiceImpl implements UserService {
         Map<String, String> roleNameMap = getRoleNameMap(roleUuidList);
         List<UserAuthVo> result = new ArrayList<>();
         for (RoleAuthVo auth : CollectionUtils.emptyIfNull(authList)) {
-            // 原始记录只携带单个来源，缺少可信资料时保留null，不填充聚合列表。
-            SourcePathVo source = null;
             String roleName = roleNameMap.get(auth.getRoleUuid());
-            if (roleName != null) {
-                source = new SourcePathVo(auth.getRoleUuid(), roleName, null, Collections.emptyList(), null);
+            // 仅返回具有可信角色身份和名称的记录，保证单来源非空，不填充占位资料。
+            if (StringUtils.isBlank(auth.getRoleUuid()) || StringUtils.isBlank(roleName)) {
+                continue;
             }
+            SourcePathVo source = new SourcePathVo(auth.getRoleUuid(), roleName, null, Collections.emptyList(), null);
             result.add(createUserAuthWithSourcePath(userUuid, auth.getAuthGroup(), auth.getAuth(), source));
         }
         return result;
     }
 
-    /** 按用户所属分组展开原始角色权限，每条记录附带本分组来源，重复权限记录仍保留。 */
+    /** 按所属分组展开并过滤资料不足的角色权限，有效记录附带非空来源，顺序及重复项仍保留。 */
     @Override
     public List<UserAuthVo> getTeamAuthListByUserUuid(String userUuid) {
         if (StringUtils.isBlank(userUuid)) {
@@ -345,14 +345,19 @@ public class UserServiceImpl implements UserService {
         Map<String, SourcePathVo> teamSourceMap = getTeamSourceMap(teamUuidList);
         List<UserAuthVo> result = new ArrayList<>();
         for (RoleAuthVo auth : authList) {
+            // 缺少角色身份或名称时整条原始授权不参与所属分组展开。
+            String roleName = roleNameMap.get(auth.getRoleUuid());
+            if (StringUtils.isBlank(auth.getRoleUuid()) || StringUtils.isBlank(roleName)) {
+                continue;
+            }
             for (String teamUuid : roleTeamUuidMap.getOrDefault(auth.getRoleUuid(), Collections.emptySet())) {
-                // 每个所属分组展开为单独记录，仅设置该记录的单来源字段。
-                SourcePathVo source = null;
-                String roleName = roleNameMap.get(auth.getRoleUuid());
                 SourcePathVo team = teamSourceMap.get(teamUuid);
-                if (roleName != null && team != null) {
-                    source = new SourcePathVo(auth.getRoleUuid(), roleName, teamUuid, team.getTeamPathNameList(), team.getTeamLft());
+                // 完整路径无法取得或重建时过滤本分组记录；lft允许为空，不影响来源可信性。
+                if (StringUtils.isBlank(teamUuid) || team == null || CollectionUtils.isEmpty(team.getTeamPathNameList())
+                        || team.getTeamPathNameList().stream().anyMatch(StringUtils::isBlank)) {
+                    continue;
                 }
+                SourcePathVo source = new SourcePathVo(auth.getRoleUuid(), roleName, teamUuid, team.getTeamPathNameList(), team.getTeamLft());
                 result.add(createUserAuthWithSourcePath(userUuid, auth.getAuthGroup(), auth.getAuth(), source));
             }
         }

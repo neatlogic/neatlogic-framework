@@ -1,6 +1,7 @@
 package neatlogic.framework.dto;
 
 
+import com.alibaba.fastjson.annotation.JSONField;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
@@ -24,10 +25,12 @@ public class UserAuthVo extends BasePageVo implements Serializable {
     private String authGroup;
     @EntityField(name = "权限名", type = ApiParamType.STRING)
     private String authName;
-    // 强类型来源列表由授权服务填充，保持角色、分组及包含链信息。
+    // 来源汇总方法使用列表承载聚合结果，中间查询记录不填充该字段。
     @EntityField(name = "权限来源路径列表", type = ApiParamType.JSONARRAY)
     private List<SourcePathVo> sourcePathList;
-
+    // 角色、分组及包含权限的中间记录使用单来源，仅供内存计算，不参与JSON输出。
+    @JSONField(serialize = false)
+    private SourcePathVo sourcePath;
 
     public UserAuthVo() {
 
@@ -101,5 +104,13 @@ public class UserAuthVo extends BasePageVo implements Serializable {
 
     public void setSourcePathList(List<SourcePathVo> sourcePathList) {
         this.sourcePathList = sourcePathList;
+    }
+
+    public SourcePathVo getSourcePath() {
+        return sourcePath;
+    }
+
+    public void setSourcePath(SourcePathVo sourcePath) {
+        this.sourcePath = sourcePath;
     }
 }

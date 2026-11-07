@@ -77,19 +77,17 @@ public interface UserService {
     /** 查询用户数据库直接授权，保留原始记录，不展开包含权限或按角色权限过滤。 */
     List<UserAuthVo> getUserAuthListByUserUuid(String userUuid);
 
-    /** 查询用户直接角色原始授权，每条记录携带对应角色来源，不合并重复权限。 */
+    /** 查询用户直接角色原始授权，每条记录仅在sourcePath携带角色来源，不合并重复权限。 */
     List<UserAuthVo> getRoleAuthListByUserUuid(String userUuid);
 
-    /** 查询分组原始授权，每个所属分组分别返回记录并附带完整来源，不展开包含权限。 */
+    /** 查询分组原始授权，每个所属分组分别返回记录并在sourcePath附带完整来源，不展开包含权限。 */
     List<UserAuthVo> getTeamAuthListByUserUuid(String userUuid);
 
-    /** 按根权限编码排序、去重并返回包含权限列表，不同根的相同目标分别保留，完整链存入来源。 */
+    /** 按根权限编码排序、去重并返回包含权限列表，不同根的相同目标分别保留，完整链存入sourcePath。 */
     List<UserAuthVo> getAuthIncludedAuthPathMap(List<UserAuthVo> userAuthList,
                                                 List<UserAuthVo> roleAuthList,
                                                 List<UserAuthVo> teamAuthList);
 
-    /** 复用三类授权及来源，在内存中按权限合并角色、分组与包含来源，不额外加入单纯直接授权。 */
-    List<UserAuthVo> getAuthSourcePathList(String userUuid, List<UserAuthVo> userAuthList,
-                                           List<UserAuthVo> roleAuthList, List<UserAuthVo> teamAuthList,
-                                           List<UserAuthVo> includedAuthList);
+    /** 读取中间记录的sourcePath，在内存中按权限聚合到sourcePathList，不额外加入单纯直接授权。 */
+    List<UserAuthVo> getAuthSourcePathList(String userUuid);
 }

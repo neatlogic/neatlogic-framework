@@ -296,12 +296,13 @@ public class UserServiceImpl implements UserService {
         Map<String, String> roleNameMap = getRoleNameMap(roleUuidList);
         List<UserAuthVo> result = new ArrayList<>();
         for (RoleAuthVo auth : CollectionUtils.emptyIfNull(authList)) {
-            List<SourcePathVo> sources = new ArrayList<>();
+            // 原始记录只携带单个来源，缺少可信资料时保留null，不填充聚合列表。
+            SourcePathVo source = null;
             String roleName = roleNameMap.get(auth.getRoleUuid());
             if (roleName != null) {
-                sources.add(new SourcePathVo(auth.getRoleUuid(), roleName, null, Collections.emptyList(), null));
+                source = new SourcePathVo(auth.getRoleUuid(), roleName, null, Collections.emptyList(), null);
             }
-            result.add(createUserAuth(userUuid, auth.getAuthGroup(), auth.getAuth(), sources));
+            result.add(createUserAuthWithSourcePath(userUuid, auth.getAuthGroup(), auth.getAuth(), source));
         }
         return result;
     }
@@ -345,13 +346,14 @@ public class UserServiceImpl implements UserService {
         List<UserAuthVo> result = new ArrayList<>();
         for (RoleAuthVo auth : authList) {
             for (String teamUuid : roleTeamUuidMap.getOrDefault(auth.getRoleUuid(), Collections.emptySet())) {
-                List<SourcePathVo> sources = new ArrayList<>();
+                // 每个所属分组展开为单独记录，仅设置该记录的单来源字段。
+                SourcePathVo source = null;
                 String roleName = roleNameMap.get(auth.getRoleUuid());
                 SourcePathVo team = teamSourceMap.get(teamUuid);
                 if (roleName != null && team != null) {
-                    sources.add(new SourcePathVo(auth.getRoleUuid(), roleName, teamUuid, team.getTeamPathNameList(), team.getTeamLft()));
+                    source = new SourcePathVo(auth.getRoleUuid(), roleName, teamUuid, team.getTeamPathNameList(), team.getTeamLft());
                 }
-                result.add(createUserAuth(userUuid, auth.getAuthGroup(), auth.getAuth(), sources));
+                result.add(createUserAuthWithSourcePath(userUuid, auth.getAuthGroup(), auth.getAuth(), source));
             }
         }
         return result;
@@ -392,7 +394,15 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    /** 新建统一权限记录，来源列表和来源对象均独立复制，保留DTO的局部null序列化配置。 */
+    /** 新建中间权限记录，只复制单个来源，聚合来源列表保持null。 */
+    private UserAuthVo createUserAuthWithSourcePath(String userUuid, String authGroup, String auth, SourcePathVo source) {
+        UserAuthVo result = new UserAuthVo(userUuid, auth);
+        result.setAuthGroup(authGroup);
+        result.setSourcePath(source == null ? null : copySourcePath(source));
+        return result;
+    }
+
+    /** 新建聚合权限记录，只复制来源列表，单来源字段保持null。 */
     private UserAuthVo createUserAuth(String userUuid, String authGroup, String auth, List<SourcePathVo> sources) {
         UserAuthVo result = new UserAuthVo(userUuid, auth);
         result.setAuthGroup(authGroup);
@@ -432,12 +442,14 @@ public class UserServiceImpl implements UserService {
 
     /** 按权限合并已有角色、分组及包含来源，只读取输入及缓存链，整个过程不访问数据库。 */
     @Override
-    public List<UserAuthVo> getAuthSourcePathList(String userUuid, List<UserAuthVo> userAuthList,
-                                                  List<UserAuthVo> directAuthList, List<UserAuthVo> teamAuthList,
-                                                  List<UserAuthVo> includedAuthList) {
+    public List<UserAuthVo> getAuthSourcePathList(String userUuid) {
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
         }
+        List<UserAuthVo> userAuthList = getUserAuthListByUserUuid(userUuid);
+        List<UserAuthVo> directAuthList = getRoleAuthListByUserUuid(userUuid);
+        List<UserAuthVo> teamAuthList = getTeamAuthListByUserUuid(userUuid);
+        List<UserAuthVo> includedAuthList = getAuthIncludedAuthPathMap(userAuthList, directAuthList, teamAuthList);
         Map<String, Map<String, List<SourcePathVo>>> sources = new TreeMap<>();
         Map<String, List<SourcePathVo>> rootSources = new HashMap<>();
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(userAuthList)) {
@@ -465,37 +477,33 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    public List<UserAuthVo> getAuthSourcePathList2(String userUuid, List<UserAuthVo> userAuthList,
-                                                   List<UserAuthVo> directAuthList, List<UserAuthVo> teamAuthList) {
+    /** 从中间记录的单来源生成聚合列表，保留本方法原有的结果范围及追加顺序。 */
+    public List<UserAuthVo> getAuthSourcePathList2(String userUuid) {
         Map<String, UserAuthVo> userAuthMap = new HashMap<>();
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
         }
+        List<UserAuthVo> userAuthList = getUserAuthListByUserUuid(userUuid);
+        List<UserAuthVo> directAuthList = getRoleAuthListByUserUuid(userUuid);
+        List<UserAuthVo> teamAuthList = getTeamAuthListByUserUuid(userUuid);
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(userAuthList)) {
             String key = auth.getAuthGroup() + "#" + auth.getAuth();
             UserAuthVo userAuthVo = userAuthMap.get(key);
             if (userAuthVo == null) {
                 userAuthVo = new UserAuthVo(userUuid, auth.getAuth(), auth.getAuthGroup(), new ArrayList<>());
-//                userAuthVo.setUserUuid(userUuid);
-//                userAuthVo.setAuth(auth.getAuth());
-//                userAuthVo.setAuthGroup(auth.getAuthGroup());
-//                userAuthVo.setSourcePathList(new ArrayList<>());
                 userAuthMap.put(key, userAuthVo);
             }
         }
+        // 角色和分组中间记录只读取sourcePath，输出对象只填充sourcePathList。
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(directAuthList)) {
             List<SourcePathVo> sourcePathList = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(auth.getSourcePathList())) {
-                sourcePathList.add(copySourcePath(auth.getSourcePathList().get(0)));
+            if (auth.getSourcePath() != null) {
+                sourcePathList.add(copySourcePath(auth.getSourcePath()));
             }
             String key = auth.getAuthGroup() + "#" + auth.getAuth();
             UserAuthVo userAuthVo = userAuthMap.get(key);
             if (userAuthVo == null) {
                 userAuthVo = new UserAuthVo(userUuid, auth.getAuth(), auth.getAuthGroup(), sourcePathList);
-//                userAuthVo.setUserUuid(userUuid);
-//                userAuthVo.setAuth(auth.getAuth());
-//                userAuthVo.setAuthGroup(auth.getAuthGroup());
-//                userAuthVo.setSourcePathList(new ArrayList<>(List.of(sourcePathVo)));
                 userAuthMap.put(key, userAuthVo);
             } else {
                 userAuthVo.getSourcePathList().addAll(sourcePathList);
@@ -503,41 +511,32 @@ public class UserServiceImpl implements UserService {
         }
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(teamAuthList)) {
             List<SourcePathVo> sourcePathList = new ArrayList<>();
-            if (CollectionUtils.isNotEmpty(auth.getSourcePathList())) {
-                sourcePathList.add(copySourcePath(auth.getSourcePathList().get(0)));
+            if (auth.getSourcePath() != null) {
+                sourcePathList.add(copySourcePath(auth.getSourcePath()));
             }
             String key = auth.getAuthGroup() + "#" + auth.getAuth();
-//            SourcePathVo sourcePathVo = copySourcePath(auth.getSourcePathList().get(0));
             UserAuthVo userAuthVo = userAuthMap.get(key);
             if (userAuthVo == null) {
                 userAuthVo = new UserAuthVo(userUuid, auth.getAuth(), auth.getAuthGroup(), sourcePathList);
-//                userAuthVo.setUserUuid(userUuid);
-//                userAuthVo.setAuth(auth.getAuth());
-//                userAuthVo.setAuthGroup(auth.getAuthGroup());
-//                userAuthVo.setSourcePathList(new ArrayList<>(List.of(sourcePathVo)));
                 userAuthMap.put(key, userAuthVo);
             } else {
                 userAuthVo.getSourcePathList().addAll(sourcePathList);
             }
         }
+        // 包含链模板也由单来源承载，复制后再追加到最终来源列表。
         for (UserAuthVo userAuth : CollectionUtils.emptyIfNull(userAuthList)) {
             AuthBase root = AuthFactory.getAuthInstance(userAuth.getAuth());
             if (root != null) {
                 List<UserAuthVo> includeAuthList = getIncludeAuthPaths(root);
                 for (UserAuthVo auth : CollectionUtils.emptyIfNull(includeAuthList)) {
                     List<SourcePathVo> sourcePathList = new ArrayList<>();
-                    if (CollectionUtils.isNotEmpty(auth.getSourcePathList())) {
-                        sourcePathList.add(copySourcePath(auth.getSourcePathList().get(0)));
+                    if (auth.getSourcePath() != null) {
+                        sourcePathList.add(copySourcePath(auth.getSourcePath()));
                     }
-//                    SourcePathVo sourcePathVo = copySourcePath(auth.getSourcePathList().get(0));
                     String key = auth.getAuthGroup() + "#" + auth.getAuth();
                     UserAuthVo userAuthVo = userAuthMap.get(key);
                     if (userAuthVo == null) {
                         userAuthVo = new UserAuthVo(userUuid, auth.getAuth(), auth.getAuthGroup(), sourcePathList);
-//                        userAuthVo.setUserUuid(userUuid);
-//                        userAuthVo.setAuth(auth.getAuth());
-//                        userAuthVo.setAuthGroup(auth.getAuthGroup());
-//                        userAuthVo.setSourcePathList(new ArrayList<>(List.of(sourcePathVo)));
                         userAuthMap.put(key, userAuthVo);
                     } else {
                         userAuthVo.getSourcePathList().addAll(sourcePathList);
@@ -551,10 +550,10 @@ public class UserServiceImpl implements UserService {
                 List<UserAuthVo> includeAuthList = getIncludeAuthPaths(root);
                 for (UserAuthVo auth : CollectionUtils.emptyIfNull(includeAuthList)) {
                     List<SourcePathVo> sourcePathList = new ArrayList<>();
-                    if (CollectionUtils.isNotEmpty(userAuth.getSourcePathList())) {
-                        SourcePathVo sourcePathVo = copySourcePath(userAuth.getSourcePathList().get(0));
-                        if (CollectionUtils.isNotEmpty(auth.getSourcePathList())) {
-                            sourcePathVo.setIncludeAuthPathList(copySourcePath(auth.getSourcePathList().get(0)).getIncludeAuthPathList());
+                    if (userAuth.getSourcePath() != null) {
+                        SourcePathVo sourcePathVo = copySourcePath(userAuth.getSourcePath());
+                        if (auth.getSourcePath() != null) {
+                            sourcePathVo.setIncludeAuthPathList(copySourcePath(auth.getSourcePath()).getIncludeAuthPathList());
                         }
                         sourcePathList.add(sourcePathVo);
                     }
@@ -563,10 +562,6 @@ public class UserServiceImpl implements UserService {
                     UserAuthVo userAuthVo = userAuthMap.get(key);
                     if (userAuthVo == null) {
                         userAuthVo = new UserAuthVo(userUuid, auth.getAuth(), auth.getAuthGroup(), sourcePathList);
-//                        userAuthVo.setUserUuid(userUuid);
-//                        userAuthVo.setAuth(auth.getAuth());
-//                        userAuthVo.setAuthGroup(auth.getAuthGroup());
-//                        userAuthVo.setSourcePathList(new ArrayList<>(List.of(sourcePathVo)));
                         userAuthMap.put(key, userAuthVo);
                     } else {
                         userAuthVo.getSourcePathList().addAll(sourcePathList);
@@ -580,10 +575,10 @@ public class UserServiceImpl implements UserService {
                 List<UserAuthVo> includeAuthList = getIncludeAuthPaths(root);
                 for (UserAuthVo auth : CollectionUtils.emptyIfNull(includeAuthList)) {
                     List<SourcePathVo> sourcePathList = new ArrayList<>();
-                    if (CollectionUtils.isNotEmpty(userAuth.getSourcePathList())) {
-                        SourcePathVo sourcePathVo = copySourcePath(userAuth.getSourcePathList().get(0));
-                        if (CollectionUtils.isNotEmpty(auth.getSourcePathList())) {
-                            sourcePathVo.setIncludeAuthPathList(copySourcePath(auth.getSourcePathList().get(0)).getIncludeAuthPathList());
+                    if (userAuth.getSourcePath() != null) {
+                        SourcePathVo sourcePathVo = copySourcePath(userAuth.getSourcePath());
+                        if (auth.getSourcePath() != null) {
+                            sourcePathVo.setIncludeAuthPathList(copySourcePath(auth.getSourcePath()).getIncludeAuthPathList());
                         }
                         sourcePathList.add(sourcePathVo);
                     }
@@ -591,10 +586,6 @@ public class UserServiceImpl implements UserService {
                     UserAuthVo userAuthVo = userAuthMap.get(key);
                     if (userAuthVo == null) {
                         userAuthVo = new UserAuthVo(userUuid, auth.getAuth(), auth.getAuthGroup(), sourcePathList);
-//                        userAuthVo.setUserUuid(userUuid);
-//                        userAuthVo.setAuth(auth.getAuth());
-//                        userAuthVo.setAuthGroup(auth.getAuthGroup());
-//                        userAuthVo.setSourcePathList(new ArrayList<>(List.of(sourcePathVo)));
                         userAuthMap.put(key, userAuthVo);
                     } else {
                         userAuthVo.getSourcePathList().addAll(sourcePathList);
@@ -609,19 +600,19 @@ public class UserServiceImpl implements UserService {
     private void collectAuthSources(List<UserAuthVo> authList, Map<String, Map<String, List<SourcePathVo>>> sources,
                                     Map<String, List<SourcePathVo>> rootSources) {
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(authList)) {
-            for (SourcePathVo path : CollectionUtils.emptyIfNull(auth.getSourcePathList())) {
-                if (path == null || StringUtils.isBlank(path.getRoleUuid()) || StringUtils.isBlank(path.getRoleName())) {
-                    continue;
-                }
-                List<String> teamNames = path.getTeamPathNameList();
-                if (path.getTeamUuid() != null && (CollectionUtils.isEmpty(teamNames) || teamNames.stream().anyMatch(StringUtils::isBlank))) {
-                    continue;
-                }
-                // 直接读取强类型字段并复制来源，不经过JSON转换或修改调用方列表。
-                SourcePathVo source = copySourcePath(path);
-                addSourcePath(sources, auth.getAuthGroup(), auth.getAuth(), source);
-                rootSources.computeIfAbsent(auth.getAuth(), key -> new ArrayList<>()).add(source);
+            // 原始角色和分组记录只从单来源字段读取，不兼容读取聚合列表。
+            SourcePathVo path = auth.getSourcePath();
+            if (path == null || StringUtils.isBlank(path.getRoleUuid()) || StringUtils.isBlank(path.getRoleName())) {
+                continue;
             }
+            List<String> teamNames = path.getTeamPathNameList();
+            if (path.getTeamUuid() != null && (CollectionUtils.isEmpty(teamNames) || teamNames.stream().anyMatch(StringUtils::isBlank))) {
+                continue;
+            }
+            // 复制单来源，最终按权限聚合为列表，不修改调用方来源。
+            SourcePathVo source = copySourcePath(path);
+            addSourcePath(sources, auth.getAuthGroup(), auth.getAuth(), source);
+            rootSources.computeIfAbsent(auth.getAuth(), key -> new ArrayList<>()).add(source);
         }
     }
 
@@ -633,22 +624,22 @@ public class UserServiceImpl implements UserService {
             if (target == null || StringUtils.isBlank(target.getAuthGroup()) || StringUtils.isBlank(target.getAuth())) {
                 continue;
             }
-            for (SourcePathVo path : CollectionUtils.emptyIfNull(target.getSourcePathList())) {
-                if (path == null || !isIncludedAuthSource(path)) {
-                    continue;
-                }
-                List<JSONObject> chain = path.getIncludeAuthPathList();
-                // 缺少有效包含链的记录不能确定根身份，跳过而不为目标权限拼造来源。
-                if (chain.stream().anyMatch(node -> node == null || StringUtils.isBlank(node.getString("auth"))
-                        || StringUtils.isBlank(node.getString("authGroup")))) {
-                    continue;
-                }
-                String rootAuth = chain.get(0).getString("auth");
-                for (SourcePathVo source : rootSources.getOrDefault(rootAuth, Collections.emptyList())) {
-                    SourcePathVo includedSource = copySourcePath(source);
-                    includedSource.setIncludeAuthPathList(copySourcePath(path).getIncludeAuthPathList());
-                    addSourcePath(sources, target.getAuthGroup(), target.getAuth(), includedSource);
-                }
+            // 包含计算结果只携带单条链模板，再与实际用户来源匹配。
+            SourcePathVo path = target.getSourcePath();
+            if (path == null || !isIncludedAuthSource(path)) {
+                continue;
+            }
+            List<JSONObject> chain = path.getIncludeAuthPathList();
+            // 缺少有效包含链的记录不能确定根身份，跳过而不为目标权限拼造来源。
+            if (chain.stream().anyMatch(node -> node == null || StringUtils.isBlank(node.getString("auth"))
+                    || StringUtils.isBlank(node.getString("authGroup")))) {
+                continue;
+            }
+            String rootAuth = chain.get(0).getString("auth");
+            for (SourcePathVo source : rootSources.getOrDefault(rootAuth, Collections.emptyList())) {
+                SourcePathVo includedSource = copySourcePath(source);
+                includedSource.setIncludeAuthPathList(copySourcePath(path).getIncludeAuthPathList());
+                addSourcePath(sources, target.getAuthGroup(), target.getAuth(), includedSource);
             }
         }
     }
@@ -684,10 +675,10 @@ public class UserServiceImpl implements UserService {
                     item.put("auth", node.getAuthName());
                     authPath.add(item);
                 }
-                // 此阶段只计算定义关系，不绑定用户或角色；单个来源保存根到目标的完整链。
+                // 此阶段只计算定义关系，不绑定用户或角色；sourcePath保存完整链，来源列表保持null。
                 SourcePathVo source = new SourcePathVo(null, null, null, Collections.emptyList(), null);
                 source.setIncludeAuthPathList(authPath);
-                paths.add(createUserAuth(null, child.getAuthGroup(), child.getAuthName(), Collections.singletonList(source)));
+                paths.add(createUserAuthWithSourcePath(null, child.getAuthGroup(), child.getAuthName(), source));
                 queue.add(childPath);
             }
         }

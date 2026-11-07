@@ -523,11 +523,13 @@ public class UserServiceImpl implements UserService {
                 userAuthVo.getSourcePathList().addAll(sourcePathList);
             }
         }
+        Map<AuthBase, List<UserAuthVo>> includeAuthListMap = new HashMap<>();
         // 包含链模板也由单来源承载，复制后再追加到最终来源列表。
         for (UserAuthVo userAuth : CollectionUtils.emptyIfNull(userAuthList)) {
             AuthBase root = AuthFactory.getAuthInstance(userAuth.getAuth());
             if (root != null) {
                 List<UserAuthVo> includeAuthList = getIncludeAuthPaths(root);
+                includeAuthListMap.put(root, includeAuthList);
                 for (UserAuthVo auth : CollectionUtils.emptyIfNull(includeAuthList)) {
                     List<SourcePathVo> sourcePathList = new ArrayList<>();
                     if (auth.getSourcePath() != null) {
@@ -547,7 +549,11 @@ public class UserServiceImpl implements UserService {
         for (UserAuthVo userAuth : CollectionUtils.emptyIfNull(directAuthList)) {
             AuthBase root = AuthFactory.getAuthInstance(userAuth.getAuth());
             if (root != null) {
-                List<UserAuthVo> includeAuthList = getIncludeAuthPaths(root);
+                List<UserAuthVo> includeAuthList = includeAuthListMap.get(root);
+                if (includeAuthList == null) {
+                    includeAuthList = getIncludeAuthPaths(root);
+                    includeAuthListMap.put(root, includeAuthList);
+                }
                 for (UserAuthVo auth : CollectionUtils.emptyIfNull(includeAuthList)) {
                     List<SourcePathVo> sourcePathList = new ArrayList<>();
                     if (userAuth.getSourcePath() != null) {
@@ -572,7 +578,11 @@ public class UserServiceImpl implements UserService {
         for (UserAuthVo userAuth : CollectionUtils.emptyIfNull(teamAuthList)) {
             AuthBase root = AuthFactory.getAuthInstance(userAuth.getAuth());
             if (root != null) {
-                List<UserAuthVo> includeAuthList = getIncludeAuthPaths(root);
+                List<UserAuthVo> includeAuthList = includeAuthListMap.get(root);
+                if (includeAuthList == null) {
+                    includeAuthList = getIncludeAuthPaths(root);
+                    includeAuthListMap.put(root, includeAuthList);
+                }
                 for (UserAuthVo auth : CollectionUtils.emptyIfNull(includeAuthList)) {
                     List<SourcePathVo> sourcePathList = new ArrayList<>();
                     if (userAuth.getSourcePath() != null) {

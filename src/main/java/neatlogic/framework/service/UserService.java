@@ -90,4 +90,5 @@ public interface UserService {
 
     /** 读取中间记录的sourcePath，在内存中按权限聚合到sourcePathList，不额外加入单纯直接授权。 */
     List<UserAuthVo> getAuthSourcePathList(String userUuid);
+    List<UserAuthVo> getAuthSourcePathList2(String userUuid);
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** 统一保存权限的角色、所属分组及包含链来源，展示文案由调用方处理。 */
-@JSONType(serialzeFeatures = SerializerFeature.WriteMapNullValue)
+//@JSONType(serialzeFeatures = SerializerFeature.WriteMapNullValue)
 public class SourcePathVo implements Serializable {
     private static final long serialVersionUID = 1L;
 

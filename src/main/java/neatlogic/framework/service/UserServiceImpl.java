@@ -272,19 +272,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    /** 查询原始用户直接授权，不包含代码默认授权，不剔除与角色重叠的记录。 */
-    @Override
-    public List<UserAuthVo> getUserAuthListByUserUuid(String userUuid) {
-        if (StringUtils.isBlank(userUuid)) {
-            return Collections.emptyList();
-        }
-        List<UserAuthVo> authList = userMapper.searchUserAuthByUserUuid(userUuid);
-        return authList == null ? Collections.emptyList() : authList;
-    }
-
-    /** 过滤来源资料不足的角色授权，保留有效原始记录的顺序及重复项，不修改Mapper返回对象。 */
-    @Override
-    public List<UserAuthVo> getRoleAuthListByUserUuid(String userUuid) {
+    /** 仅供内部授权聚合查询角色来源；过滤资料不足项，保留有效原始记录顺序及重复项。 */
+    private List<UserAuthVo> getRoleAuthListByUserUuid(String userUuid) {
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
         }
@@ -307,9 +296,8 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    /** 按所属分组展开并过滤资料不足的角色权限，有效记录附带非空来源，顺序及重复项仍保留。 */
-    @Override
-    public List<UserAuthVo> getTeamAuthListByUserUuid(String userUuid) {
+    /** 仅供内部授权聚合查询所属分组来源；过滤资料不足项，保留有效记录顺序及重复项。 */
+    private List<UserAuthVo> getTeamAuthListByUserUuid(String userUuid) {
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
         }
@@ -407,88 +395,13 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    /** 新建聚合权限记录，只复制来源列表，单来源字段保持null。 */
-    private UserAuthVo createUserAuth(String userUuid, String authGroup, String auth, List<SourcePathVo> sources) {
-        UserAuthVo result = new UserAuthVo(userUuid, auth);
-        result.setAuthGroup(authGroup);
-        List<SourcePathVo> sourcePathList = new ArrayList<>();
-        for (SourcePathVo source : sources) {
-            sourcePathList.add(copySourcePath(source));
-        }
-        result.setSourcePathList(sourcePathList);
-        return result;
-    }
-
-    /** 按根权限编码排序并缓存包含链，数据库三类授权中的相同根只遍历一次。 */
-    @Override
-    public List<UserAuthVo> getAuthIncludedAuthPathMap(List<UserAuthVo> userAuthList,
-                                                       List<UserAuthVo> directAuthList,
-                                                       List<UserAuthVo> teamAuthList) {
-        Set<String> roots = new TreeSet<>();
-        for (UserAuthVo auth : CollectionUtils.emptyIfNull(userAuthList)) {
-            roots.add(auth.getAuth());
-        }
-        for (UserAuthVo auth : CollectionUtils.emptyIfNull(directAuthList)) {
-            roots.add(auth.getAuth());
-        }
-        for (UserAuthVo auth : CollectionUtils.emptyIfNull(teamAuthList)) {
-            roots.add(auth.getAuth());
-        }
-        List<UserAuthVo> result = new ArrayList<>();
-        for (String rootName : roots) {
-            AuthBase root = AuthFactory.getAuthInstance(rootName);
-            if (root != null) {
-                // 根按编码排序后依次追加，不合并不同根的相同目标，来源链首节点保留根身份。
-                result.addAll(getIncludeAuthPaths(root));
-            }
-        }
-        return result;
-    }
-
-    /** 按权限合并已有角色、分组及包含来源，只读取输入及缓存链，整个过程不访问数据库。 */
-    @Override
-    public List<UserAuthVo> getAuthSourcePathList(String userUuid) {
-        if (StringUtils.isBlank(userUuid)) {
-            return Collections.emptyList();
-        }
-        List<UserAuthVo> userAuthList = getUserAuthListByUserUuid(userUuid);
-        List<UserAuthVo> directAuthList = getRoleAuthListByUserUuid(userUuid);
-        List<UserAuthVo> teamAuthList = getTeamAuthListByUserUuid(userUuid);
-        List<UserAuthVo> includedAuthList = getAuthIncludedAuthPathMap(userAuthList, directAuthList, teamAuthList);
-        Map<String, Map<String, List<SourcePathVo>>> sources = new TreeMap<>();
-        Map<String, List<SourcePathVo>> rootSources = new HashMap<>();
-        for (UserAuthVo auth : CollectionUtils.emptyIfNull(userAuthList)) {
-            // 用户直接授权只为包含项提供来源，不作为普通来源加入最终结果。
-            rootSources.computeIfAbsent(auth.getAuth(), key -> new ArrayList<>())
-                    .add(new SourcePathVo(null, null, null, Collections.emptyList(), null));
-        }
-        collectAuthSources(directAuthList, sources, rootSources);
-        collectAuthSources(teamAuthList, sources, rootSources);
-        addIncludedAuthSources(rootSources, sources, includedAuthList);
-        // 保留原角色来源优先级，包含来源依次按用户直接、直接角色及分组树顺序排序。
-        Comparator<SourcePathVo> comparator = Comparator.comparing(this::isIncludedAuthSource)
-                .thenComparing(source -> source.getRoleUuid() != null)
-                .thenComparing(source -> source.getTeamUuid() != null)
-                .thenComparing(SourcePathVo::getTeamLft, Comparator.nullsLast(Integer::compareTo))
-                .thenComparing(SourcePathVo::getTeamUuid, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(SourcePathVo::getRoleName, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(SourcePathVo::getRoleUuid, Comparator.nullsFirst(String::compareTo))
-                .thenComparing(this::getSourceRootKey);
-        List<UserAuthVo> result = new ArrayList<>();
-        sources.forEach((group, authMap) -> authMap.forEach((auth, paths) -> {
-            paths.sort(comparator);
-            result.add(createUserAuth(userUuid, group, auth, paths));
-        }));
-        return result;
-    }
-
     /** 从中间记录的单来源生成聚合列表，保留本方法原有的结果范围及追加顺序。 */
     public List<UserAuthVo> getAuthSourcePathList2(String userUuid) {
         Map<String, UserAuthVo> userAuthMap = new HashMap<>();
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
         }
-        List<UserAuthVo> userAuthList = getUserAuthListByUserUuid(userUuid);
+        List<UserAuthVo> userAuthList = userMapper.searchUserAuthByUserUuid(userUuid);
         List<UserAuthVo> directAuthList = getRoleAuthListByUserUuid(userUuid);
         List<UserAuthVo> teamAuthList = getTeamAuthListByUserUuid(userUuid);
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(userAuthList)) {
@@ -611,54 +524,6 @@ public class UserServiceImpl implements UserService {
         return new ArrayList<>(userAuthMap.values());
     }
 
-    /** 复制输入记录中的可信来源，同时保留其根权限身份，不排序或修改调用方数组。 */
-    private void collectAuthSources(List<UserAuthVo> authList, Map<String, Map<String, List<SourcePathVo>>> sources,
-                                    Map<String, List<SourcePathVo>> rootSources) {
-        for (UserAuthVo auth : CollectionUtils.emptyIfNull(authList)) {
-            // 原始角色和分组记录只从单来源字段读取，不兼容读取聚合列表。
-            SourcePathVo path = auth.getSourcePath();
-            if (path == null || StringUtils.isBlank(path.getRoleUuid()) || StringUtils.isBlank(path.getRoleName())) {
-                continue;
-            }
-            List<String> teamNames = path.getTeamPathNameList();
-            if (path.getTeamUuid() != null && (CollectionUtils.isEmpty(teamNames) || teamNames.stream().anyMatch(StringUtils::isBlank))) {
-                continue;
-            }
-            // 复制单来源，最终按权限聚合为列表，不修改调用方来源。
-            SourcePathVo source = copySourcePath(path);
-            addSourcePath(sources, auth.getAuthGroup(), auth.getAuth(), source);
-            rootSources.computeIfAbsent(auth.getAuth(), key -> new ArrayList<>()).add(source);
-        }
-    }
-
-    /** 从扁平包含权限列表的链首节点匹配根来源，复制链及来源，不修改输入列表或访问数据库。 */
-    private void addIncludedAuthSources(Map<String, List<SourcePathVo>> rootSources,
-                                        Map<String, Map<String, List<SourcePathVo>>> sources,
-                                        List<UserAuthVo> includedAuthList) {
-        for (UserAuthVo target : CollectionUtils.emptyIfNull(includedAuthList)) {
-            if (target == null || StringUtils.isBlank(target.getAuthGroup()) || StringUtils.isBlank(target.getAuth())) {
-                continue;
-            }
-            // 包含计算结果只携带单条链模板，再与实际用户来源匹配。
-            SourcePathVo path = target.getSourcePath();
-            if (path == null || !isIncludedAuthSource(path)) {
-                continue;
-            }
-            List<JSONObject> chain = path.getIncludeAuthPathList();
-            // 缺少有效包含链的记录不能确定根身份，跳过而不为目标权限拼造来源。
-            if (chain.stream().anyMatch(node -> node == null || StringUtils.isBlank(node.getString("auth"))
-                    || StringUtils.isBlank(node.getString("authGroup")))) {
-                continue;
-            }
-            String rootAuth = chain.get(0).getString("auth");
-            for (SourcePathVo source : rootSources.getOrDefault(rootAuth, Collections.emptyList())) {
-                SourcePathVo includedSource = copySourcePath(source);
-                includedSource.setIncludeAuthPathList(copySourcePath(path).getIncludeAuthPathList());
-                addSourcePath(sources, target.getAuthGroup(), target.getAuth(), includedSource);
-            }
-        }
-    }
-
     /** 每个根广度优先遍历，邻接编码排序使等长路径稳定；先访问去重阻止自包含和循环。 */
     private List<UserAuthVo> getIncludeAuthPaths(AuthBase root) {
         List<UserAuthVo> paths = new ArrayList<>();
@@ -700,15 +565,6 @@ public class UserServiceImpl implements UserService {
         return paths;
     }
 
-    /** 包含来源按根权限隔离；旧角色来源使用空标识，不改变其既有去重行为。 */
-    private String getSourceRootKey(SourcePathVo source) {
-        if (isIncludedAuthSource(source)) {
-            JSONObject root = source.getIncludeAuthPathList().get(0);
-            return root.getString("authGroup") + "/" + root.getString("auth");
-        }
-        return "";
-    }
-
     /** 缺失路径时按祖先层级重建；资料不完整时留空，由前端回退原只读提示。 */
     private List<String> getTeamSourcePath(TeamVo team) {
         if (team.getLft() == null || team.getRht() == null) {
@@ -734,25 +590,6 @@ public class UserServiceImpl implements UserService {
             previous = ancestor;
         }
         return team.getUuid().equals(previous.getUuid()) ? names : null;
-    }
-
-    /** 角色来源按角色和分组去重，包含来源额外按根权限隔离，保留多个不同授权根。 */
-    private void addSourcePath(Map<String, Map<String, List<SourcePathVo>>> sources, String authGroup, String auth, SourcePathVo source) {
-        if (StringUtils.isBlank(authGroup) || StringUtils.isBlank(auth)) {
-            return;
-        }
-        List<SourcePathVo> paths = sources.computeIfAbsent(authGroup, key -> new TreeMap<>())
-                .computeIfAbsent(auth, key -> new ArrayList<>());
-        if (paths.stream().noneMatch(path -> Objects.equals(path.getRoleUuid(), source.getRoleUuid())
-                && Objects.equals(path.getTeamUuid(), source.getTeamUuid())
-                && Objects.equals(getSourceRootKey(path), getSourceRootKey(source)))) {
-            paths.add(source);
-        }
-    }
-
-    /** 至少包含根和目标两个节点才属于包含来源，替代内部子类判断并保持原有排序规则。 */
-    private boolean isIncludedAuthSource(SourcePathVo source) {
-        return source.getIncludeAuthPathList() != null && source.getIncludeAuthPathList().size() > 1;
     }
 
     /** 复制强类型来源及嵌套链节点，查询及最终聚合结果不与输入共享可变数据。 */

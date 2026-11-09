@@ -74,21 +74,6 @@ public interface UserService {
     UserVo getUserByUser(String userId);
 
 
-    /** 查询用户数据库直接授权，保留原始记录，不展开包含权限或按角色权限过滤。 */
-    List<UserAuthVo> getUserAuthListByUserUuid(String userUuid);
-
-    /** 查询来源资料完整的直接角色授权，sourcePath非空，保留有效原始记录的顺序及重复项。 */
-    List<UserAuthVo> getRoleAuthListByUserUuid(String userUuid);
-
-    /** 查询来源资料完整的分组授权，各所属分组分别返回非空sourcePath，保留有效记录顺序及重复项。 */
-    List<UserAuthVo> getTeamAuthListByUserUuid(String userUuid);
-
-    /** 按根权限编码排序、去重并返回包含权限列表，不同根的相同目标分别保留，完整链存入sourcePath。 */
-    List<UserAuthVo> getAuthIncludedAuthPathMap(List<UserAuthVo> userAuthList,
-                                                List<UserAuthVo> roleAuthList,
-                                                List<UserAuthVo> teamAuthList);
-
-    /** 读取中间记录的sourcePath，在内存中按权限聚合到sourcePathList，不额外加入单纯直接授权。 */
-    List<UserAuthVo> getAuthSourcePathList(String userUuid);
+    /** 聚合直接授权、角色和分组及其包含权限；直接授权允许空来源，其余来源存入sourcePathList。 */
     List<UserAuthVo> getAuthSourcePathList2(String userUuid);
 }

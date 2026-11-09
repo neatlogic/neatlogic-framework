@@ -108,7 +108,7 @@ public class UserServiceAuthTest {
         directTeamRoles.add(role("own", "分组角色", Collections.singletonList(leaf)));
         teamAuths.addAll(Arrays.asList(auth("ancestor", "process", "INC_ROOT"), auth("own", "process", "INC_SECOND_ROOT")));
         teamAuths.add(teamAuths.get(0));
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(Arrays.asList("null/r", "null/r", "leaf/ancestor", "leaf/ancestor"),
                 sourceIdentities(findAuth(result, "process", "INC_ROOT")));
         Assert.assertEquals(Collections.singletonList("leaf/own"), sourceIdentities(findAuth(result, "process", "INC_SECOND_ROOT")));
@@ -137,7 +137,7 @@ public class UserServiceAuthTest {
         userAuths.add(userAuth("process", "DIRECT_ONLY"));
         String before = mapperSnapshot();
         queryCounts.clear();
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         assertAuthorizationQueriesOnce();
         Assert.assertEquals(Integer.valueOf(2), queryCounts.get("getRoleByUuidList"));
         Assert.assertEquals(Integer.valueOf(1), queryCounts.get("getTeamByUuidList"));
@@ -158,7 +158,7 @@ public class UserServiceAuthTest {
         // 返回数组独立于输入记录，调用方后续清空返回来源也不会丢失原始授权来源。
         auth.getSourcePathList().clear();
         Assert.assertEquals(before, mapperSnapshot());
-        Assert.assertEquals(5, findAuth(service.getAuthSourcePathList2("u"), "process", "BASE").getSourcePathList().size());
+        Assert.assertEquals(5, findAuth(service.getUserAuthListByUserUuid("u"), "process", "BASE").getSourcePathList().size());
     }
 
     /** 缺少角色名或所属分组路径时过滤对应记录，不生成空来源或伪造说明。 */
@@ -172,7 +172,7 @@ public class UserServiceAuthTest {
         namedRoles.add(role("r", "分组角色", null));
         teamAuths.add(auth("r", "process", "BASE"));
         // 两种汇总入口都只收到可信来源，缺失资料不会再生成空来源权限记录。
-        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
+        Assert.assertTrue(service.getUserAuthListByUserUuid("u").isEmpty());
         Assert.assertSame(missing, directAuths.get(0));
         Assert.assertEquals("missing", missing.getRoleUuid());
     }
@@ -188,7 +188,7 @@ public class UserServiceAuthTest {
                 auth("blank", "process", "BLANK"), auth(null, "process", "NULL_UUID"),
                 auth("  ", "process", "BLANK_UUID"), first));
         List<RoleAuthVo> before = new ArrayList<>(directAuths);
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(2, result.size());
         UserAuthVo base = findAuth(result, "process", "BASE");
         Assert.assertEquals(Arrays.asList("null/r", "null/r"), sourceIdentities(base));
@@ -228,7 +228,7 @@ public class UserServiceAuthTest {
         teamAuths.addAll(Arrays.asList(original, auth("missing-role", "process", "MISSING"),
                 auth("r", "cmdb", "EDIT"), auth("blank-role", "process", "BLANK"), original));
         List<RoleAuthVo> before = new ArrayList<>(teamAuths);
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(2, result.size());
         UserAuthVo base = findAuth(result, "process", "BASE");
         Assert.assertEquals(Arrays.asList("first/r", "second/r", "first/r", "second/r"), sourceIdentities(base));
@@ -269,7 +269,7 @@ public class UserServiceAuthTest {
                 teamAuths.add(auth("valid", "process", "INC_ROOT"));
             }
             // 每个有效来源只执行一次公开入口，验证过滤后仍可由该来源展开包含权限。
-            List<UserAuthVo> rows = service.getAuthSourcePathList2("u");
+            List<UserAuthVo> rows = service.getUserAuthListByUserUuid("u");
             UserAuthVo target = findAuth(rows, "cmdb", "INC_TARGET");
             Assert.assertEquals(1, target.getSourcePathList().size());
             SourcePathVo source = target.getSourcePathList().get(0);
@@ -329,7 +329,7 @@ public class UserServiceAuthTest {
         teamAuths.add(auth("t", "process", "INC_ROOT"));
         userAuths.add(userAuth("process", "INC_ROOT"));
         String before = mapperSnapshot();
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         UserAuthVo root = findAuth(result, "process", "INC_ROOT");
         Assert.assertEquals(Arrays.asList("null/r", "null/r", "first/t"), sourceIdentities(root));
         UserAuthVo target = findAuth(result, "cmdb", "INC_TARGET");
@@ -403,7 +403,7 @@ public class UserServiceAuthTest {
         directTeamRoles.add(role("r", "管理员", Collections.singletonList(leaf)));
         teamAuths.add(auth("r", "process", "INC_ROOT"));
         String before = mapperSnapshot();
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         SourcePathVo normal = findAuth(result, "process", "INC_ROOT").getSourcePathList().get(0);
         List<SourcePathVo> targets = findAuth(result, "cmdb", "INC_TARGET").getSourcePathList();
         SourcePathVo inherited = targets.stream().filter(path -> "r".equals(path.getRoleUuid())).findFirst().get();
@@ -416,7 +416,7 @@ public class UserServiceAuthTest {
         Assert.assertEquals("INC_ROOT", direct.getIncludeAuthPathList().get(0).getString("auth"));
         Assert.assertEquals(before, mapperSnapshot());
         Assert.assertEquals(1, ((INC_ROOT) registry.get("INC_ROOT")).includeReadCount);
-        Assert.assertEquals("管理员", findAuth(service.getAuthSourcePathList2("u"), "process", "INC_ROOT")
+        Assert.assertEquals("管理员", findAuth(service.getUserAuthListByUserUuid("u"), "process", "INC_ROOT")
                 .getSourcePathList().get(0).getRoleName());
     }
 
@@ -434,7 +434,7 @@ public class UserServiceAuthTest {
         directTeamRoles.addAll(Arrays.asList(shared, shared));
         RoleAuthVo original = auth("r", "process", "BASE");
         teamAuths.addAll(Arrays.asList(original, auth("r", "cmdb", "EDIT"), original));
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(2, result.size());
         Assert.assertEquals(Arrays.asList("first/r", "second/r", "first/r", "second/r"),
                 sourceIdentities(findAuth(result, "process", "BASE")));
@@ -461,7 +461,7 @@ public class UserServiceAuthTest {
         directTeamRoles.add(role("r", "共享角色", userTeams));
         teamAuths.addAll(Arrays.asList(auth("r", "process", "INC_ROOT"), auth("r", "process", "INC_SECOND_ROOT")));
         String before = mapperSnapshot();
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(Arrays.asList("null/direct", "first/r", "second/r"),
                 sourceIdentities(findAuth(result, "process", "INC_ROOT")));
         List<SourcePathVo> targets = findAuth(result, "cmdb", "INC_TARGET").getSourcePathList();
@@ -482,16 +482,16 @@ public class UserServiceAuthTest {
     @Test
     public void shouldHandleBlankUsersAndEmptyInputs() {
         for (String userUuid : Arrays.asList(null, "", "  ")) {
-            Assert.assertTrue(service.getAuthSourcePathList2(userUuid).isEmpty());
+            Assert.assertTrue(service.getUserAuthListByUserUuid(userUuid).isEmpty());
         }
         Assert.assertTrue(queryCounts.isEmpty());
-        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
+        Assert.assertTrue(service.getUserAuthListByUserUuid("u").isEmpty());
         returnNullAuths = true;
-        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
+        Assert.assertTrue(service.getUserAuthListByUserUuid("u").isEmpty());
         TeamVo leaf = team("leaf", "叶分组", "银行/叶分组", 2);
         userTeams.add(leaf);
         directTeamRoles.add(role("r", "管理员", Collections.singletonList(leaf)));
-        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
+        Assert.assertTrue(service.getUserAuthListByUserUuid("u").isEmpty());
     }
 
     /** 用户、多个角色和多个分组共享同根时只展开一次，执行真实批量查询并保留全部来源。 */
@@ -508,7 +508,7 @@ public class UserServiceAuthTest {
         directTeamRoles.add(role("t", "分组角色", userTeams));
         teamAuths.add(auth("t", "process", "INC_ROOT"));
         String before = mapperSnapshot();
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(1, ((INC_ROOT) registry.get("INC_ROOT")).includeReadCount);
         Assert.assertEquals(5, findAuth(result, "cmdb", "INC_TARGET").getSourcePathList().size());
         for (UserAuthVo row : result) {
@@ -592,7 +592,7 @@ public class UserServiceAuthTest {
     @Test
     public void shouldReturnDirectPermissionWithEmptySources() throws Exception {
         userAuths.add(userAuth("process", "EDIT"));
-        List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+        List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
         Assert.assertEquals(1, result.size());
         Assert.assertTrue(findAuth(result, "process", "EDIT").getSourcePathList().isEmpty());
         Assert.assertEquals(0, roleNameQueryCount);
@@ -754,7 +754,7 @@ public class UserServiceAuthTest {
         for (String root : Arrays.asList("INC_DEEP", "INC_ROOT")) {
             userAuths.clear();
             userAuths.add(userAuth("INC_DEEP".equals(root) ? "autoexec" : "process", root));
-            List<UserAuthVo> result = service.getAuthSourcePathList2("u");
+            List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
             Assert.assertEquals("INC_DEEP".equals(root) ? 1 : 5, result.size());
             Assert.assertTrue(findAuth(result, userAuths.get(0).getAuthGroup(), root).getSourcePathList().isEmpty());
             if ("INC_ROOT".equals(root)) {
@@ -775,7 +775,7 @@ public class UserServiceAuthTest {
         namedRoles.add(role("t", "分组角色", null));
         directTeamRoles.add(role("t", "分组角色", Collections.singletonList(leaf)));
         teamAuths.add(auth("t", "process", "INC_ROOT"));
-        Assert.assertTrue(service.getAuthSourcePathList2("u").isEmpty());
+        Assert.assertTrue(service.getUserAuthListByUserUuid("u").isEmpty());
         Assert.assertEquals(0, ((INC_ROOT) registry.get("INC_ROOT")).includeReadCount);
     }
 
@@ -937,7 +937,7 @@ public class UserServiceAuthTest {
     private JSONObject search() {
         String userUuid = "service-auth-test-ordinary-user";
         JSONObject envelope = new JSONObject();
-        envelope.put("userRoleAuthSourcePathList", service.getAuthSourcePathList2(userUuid));
+        envelope.put("userRoleAuthSourcePathList", service.getUserAuthListByUserUuid(userUuid));
         return JSONObject.parseObject(envelope.toString(SerializerFeature.DisableCircularReferenceDetect));
     }
 

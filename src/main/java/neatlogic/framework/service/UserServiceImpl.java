@@ -396,7 +396,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /** 从中间记录的单来源生成聚合列表，保留本方法原有的结果范围及追加顺序。 */
-    public List<UserAuthVo> getAuthSourcePathList2(String userUuid) {
+    public List<UserAuthVo> getUserAuthListByUserUuid(String userUuid) {
         Map<String, UserAuthVo> userAuthMap = new HashMap<>();
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();

@@ -75,5 +75,5 @@ public interface UserService {
 
 
     /** 聚合直接授权、角色和分组及其包含权限；直接授权允许空来源，其余来源存入sourcePathList。 */
-    List<UserAuthVo> getAuthSourcePathList2(String userUuid);
+    List<UserAuthVo> getUserAuthListByUserUuid(String userUuid);
 }

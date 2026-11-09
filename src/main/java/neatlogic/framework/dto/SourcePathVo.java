@@ -29,6 +29,10 @@ public class SourcePathVo implements Serializable {
     @EntityField(name = "权限包含路径", type = ApiParamType.JSONARRAY)
     private List<JSONObject> includeAuthPathList;
 
+    // 仅超级管理员来源设为true，普通角色、分组和包含来源保持null。
+    @EntityField(name = "是否超级管理员来源", type = ApiParamType.BOOLEAN)
+    private Boolean isSuperAdmin;
+
     /** 支持强类型来源的JSON反序列化及按字段构造。 */
     public SourcePathVo() {
     }
@@ -88,5 +92,15 @@ public class SourcePathVo implements Serializable {
 
     public void setIncludeAuthPathList(List<JSONObject> includeAuthPathList) {
         this.includeAuthPathList = includeAuthPathList;
+    }
+
+    /** 供前端识别超级管理员来源，展示文案由语言包提供。 */
+    public Boolean getIsSuperAdmin() {
+        return isSuperAdmin;
+    }
+
+    /** 保留可空标识，避免将普通来源误标记为超级管理员。 */
+    public void setIsSuperAdmin(Boolean isSuperAdmin) {
+        this.isSuperAdmin = isSuperAdmin;
     }
 }

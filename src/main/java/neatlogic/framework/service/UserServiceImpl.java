@@ -16,6 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.*/
 package neatlogic.framework.service;
 
 import com.alibaba.fastjson.JSONObject;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.GroupSearch;
@@ -29,6 +30,7 @@ import neatlogic.framework.dto.RoleTeamVo;
 import neatlogic.framework.dto.RoleUserVo;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.exception.user.UserNotFoundException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -397,13 +399,36 @@ public class UserServiceImpl implements UserService {
 
     /** 从中间记录的单来源生成聚合列表，保留本方法原有的结果范围及追加顺序。 */
     public List<UserAuthVo> getUserAuthListByUserUuid(String userUuid) {
-        Map<String, UserAuthVo> userAuthMap = new HashMap<>();
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
+        }
+        UserVo userVo = userMapper.getUserByUuid(userUuid);
+        if (userVo == null) {
+            throw new UserNotFoundException(userUuid);
+        }
+        if (userVo.getIsSuperAdmin() != null && userVo.getIsSuperAdmin()) {
+            List<UserAuthVo> userAuthList = new ArrayList<>();
+            List<AuthBase> authBaseList = AuthFactory.getAuthList();
+            for (AuthBase authBase : authBaseList) {
+                String authGroupName = authBase.getAuthGroup();
+                if (!TenantContext.get().getActiveModuleMap().containsKey(authGroupName)) {
+                    continue;
+                }
+                List<SourcePathVo> sourcePathList = new ArrayList<>();
+                // 每条权限使用独立的超级管理员来源，非空列表使授权页只读回显。
+                SourcePathVo sourcePath = new SourcePathVo();
+                sourcePath.setIsSuperAdmin(true);
+                sourcePath.setTeamPathNameList(new ArrayList<>());
+                sourcePathList.add(sourcePath);
+                UserAuthVo userAuthVo = new UserAuthVo(userUuid, authBase.getAuthName(), authBase.getAuthGroup(), sourcePathList);
+                userAuthList.add(userAuthVo);
+            }
+            return userAuthList;
         }
         List<UserAuthVo> userAuthList = userMapper.searchUserAuthByUserUuid(userUuid);
         List<UserAuthVo> directAuthList = getRoleAuthListByUserUuid(userUuid);
         List<UserAuthVo> teamAuthList = getTeamAuthListByUserUuid(userUuid);
+        Map<String, UserAuthVo> userAuthMap = new HashMap<>();
         for (UserAuthVo auth : CollectionUtils.emptyIfNull(userAuthList)) {
             String key = auth.getAuthGroup() + "#" + auth.getAuth();
             UserAuthVo userAuthVo = userAuthMap.get(key);
@@ -596,6 +621,8 @@ public class UserServiceImpl implements UserService {
     private SourcePathVo copySourcePath(SourcePathVo source) {
         SourcePathVo result = new SourcePathVo(source.getRoleUuid(), source.getRoleName(), source.getTeamUuid(),
                 source.getTeamPathNameList(), source.getTeamLft());
+        // 单来源转为聚合来源时同步保留超级管理员身份。
+        result.setIsSuperAdmin(source.getIsSuperAdmin());
         if (source.getIncludeAuthPathList() != null) {
             List<JSONObject> chain = new ArrayList<>();
             for (JSONObject node : source.getIncludeAuthPathList()) {

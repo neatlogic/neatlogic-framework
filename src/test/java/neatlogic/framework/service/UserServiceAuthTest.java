@@ -3,8 +3,10 @@ package neatlogic.framework.service;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
+import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
@@ -13,6 +15,9 @@ import neatlogic.framework.dto.SourcePathVo;
 import neatlogic.framework.dto.RoleVo;
 import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.dto.UserAuthVo;
+import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.module.ModuleVo;
+import neatlogic.framework.exception.user.UserNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.After;
@@ -43,6 +48,8 @@ public class UserServiceAuthTest {
     private final Map<String, Integer> queryCounts = new HashMap<>();
     private final Map<String, Object[]> queryArgs = new HashMap<>();
     private boolean returnNullAuths;
+    // 普通用例提供存在的用户；异常及超级管理员用例按需替换该资料。
+    private UserVo user = new UserVo();
     private UserServiceImpl service;
     private Map<String, AuthBase> registry;
     private Map<String, AuthBase> registryBackup;
@@ -57,6 +64,7 @@ public class UserServiceAuthTest {
                     queryCounts.merge(method.getName(), 1, Integer::sum);
                     queryArgs.put(method.getName(), args);
                     switch (method.getName()) {
+                        case "getUserByUuid": return user;
                         case "searchUserAuthByUserUuid": return returnNullAuths ? null : userAuths;
                         case "searchUserRoleAuthByUserUuid": return returnNullAuths ? null : directAuths;
                         default: throw new AssertionError(method.getName());
@@ -92,6 +100,102 @@ public class UserServiceAuthTest {
                         default: throw new AssertionError(method.getName());
                     }
                 }));
+    }
+
+    /** 用户不存在时在读取授权前失败，避免把未知身份当作空权限用户。 */
+    @Test
+    public void shouldRejectMissingUserBeforeAuthorizationQueries() {
+        user = null;
+        try {
+            service.getUserAuthListByUserUuid("missing-user");
+            Assert.fail("未知用户应抛出异常");
+        } catch (UserNotFoundException expected) {
+            Assert.assertEquals(Collections.singletonMap("getUserByUuid", 1), queryCounts);
+            Assert.assertEquals("missing-user", queryArgs.get("getUserByUuid")[0]);
+        }
+    }
+
+    /** 超级管理员只返回激活模块权限，各权限来源独立，且不读取普通授权或包含定义。 */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldReturnIndependentSuperAdminSourcesForActiveModules() throws Exception {
+        installGraph();
+        registry.clear();
+        SUPER_SOURCE_A root = new SUPER_SOURCE_A();
+        registry.put(root.getAuthName(), root);
+        registry.put("SUPER_SOURCE_B", new SUPER_SOURCE_B());
+        registry.put("SUPER_SOURCE_DISABLED", new SUPER_SOURCE_DISABLED());
+        user.setIsSuperAdmin(true);
+        String tenantUuid = "super-admin-source-test";
+        Field cacheField = TenantContext.class.getDeclaredField("tenantModuleGroupListMap");
+        cacheField.setAccessible(true);
+        Map<String, List<String>> cache = (Map<String, List<String>>) cacheField.get(null);
+        List<String> previousGroups = cache.put(tenantUuid, new ArrayList<>(Collections.singletonList("super-admin-source-active")));
+        TenantContext previousContext = TenantContext.get();
+        ModuleVo module = new ModuleVo();
+        module.setId("super-admin-source-active");
+        module.setGroup("super-admin-source-active");
+        ModuleUtil.addModule(module);
+        TenantContext.init(tenantUuid);
+        try {
+            List<UserAuthVo> result = service.getUserAuthListByUserUuid("u");
+            Assert.assertEquals(2, result.size());
+            Assert.assertEquals(new HashSet<>(Arrays.asList("SUPER_SOURCE_A", "SUPER_SOURCE_B")),
+                    result.stream().map(UserAuthVo::getAuth).collect(java.util.stream.Collectors.toSet()));
+            for (UserAuthVo auth : result) {
+                Assert.assertEquals("u", auth.getUserUuid());
+                Assert.assertEquals("super-admin-source-active", auth.getAuthGroup());
+                Assert.assertNull(auth.getSourcePath());
+                Assert.assertEquals(1, auth.getSourcePathList().size());
+                SourcePathVo source = auth.getSourcePathList().get(0);
+                Assert.assertEquals(Boolean.TRUE, source.getIsSuperAdmin());
+                Assert.assertEquals(Collections.emptyList(), source.getTeamPathNameList());
+                Assert.assertNull(source.getRoleUuid());
+                Assert.assertNull(source.getRoleName());
+                Assert.assertNull(source.getTeamUuid());
+                Assert.assertNull(source.getTeamLft());
+                Assert.assertNull(source.getIncludeAuthPathList());
+            }
+            SourcePathVo first = result.get(0).getSourcePathList().get(0);
+            SourcePathVo second = result.get(1).getSourcePathList().get(0);
+            Assert.assertNotSame(first, second);
+            Assert.assertNotSame(first.getTeamPathNameList(), second.getTeamPathNameList());
+            first.setIsSuperAdmin(false);
+            first.getTeamPathNameList().add("仅修改当前输出");
+            Assert.assertEquals(Boolean.TRUE, second.getIsSuperAdmin());
+            Assert.assertTrue(second.getTeamPathNameList().isEmpty());
+            Assert.assertEquals(0, root.includeReadCount);
+            Assert.assertEquals(Collections.singletonMap("getUserByUuid", 1), queryCounts);
+        } finally {
+            ModuleUtil.removeModule(module);
+            if (previousGroups == null) {
+                cache.remove(tenantUuid);
+            } else {
+                cache.put(tenantUuid, previousGroups);
+            }
+            TenantContext.get().release();
+            TenantContext.init(previousContext);
+        }
+    }
+
+    /** 来源复制必须保留新增身份标识，并继续隔离可变分组路径和包含链。 */
+    @Test
+    public void shouldCopySuperAdminIdentityWithoutSharingMutablePaths() throws Exception {
+        SourcePathVo original = new SourcePathVo();
+        original.setIsSuperAdmin(true);
+        original.setTeamPathNameList(new ArrayList<>());
+        original.setIncludeAuthPathList(new ArrayList<>(Collections.singletonList(
+                new JSONObject().fluentPut("authGroup", "process").fluentPut("auth", "ROOT"))));
+        java.lang.reflect.Method copy = UserServiceImpl.class.getDeclaredMethod("copySourcePath", SourcePathVo.class);
+        copy.setAccessible(true);
+        SourcePathVo result = (SourcePathVo) copy.invoke(service, original);
+        Assert.assertEquals(Boolean.TRUE, result.getIsSuperAdmin());
+        result.setIsSuperAdmin(false);
+        result.getTeamPathNameList().add("修改输出");
+        result.getIncludeAuthPathList().get(0).put("auth", "CHANGED");
+        Assert.assertEquals(Boolean.TRUE, original.getIsSuperAdmin());
+        Assert.assertTrue(original.getTeamPathNameList().isEmpty());
+        Assert.assertEquals("ROOT", original.getIncludeAuthPathList().get(0).getString("auth"));
     }
 
     /** 通过公开入口验证角色、分组直接绑定和祖先继承来源，原始重复记录仍保留。 */
@@ -354,6 +458,7 @@ public class UserServiceAuthTest {
         ordinary.setTeamPathNameList(new ArrayList<>());
         ordinary.setTeamLft(null);
         ordinary.setIncludeAuthPathList(null);
+        Assert.assertNull(ordinary.getIsSuperAdmin());
         SourcePathVo included = sourceVo("r", "<管理员>角色", "leaf", "银行/叶分组", 5);
         JSONObject root = new JSONObject();
         root.put("authGroup", "process");
@@ -364,7 +469,11 @@ public class UserServiceAuthTest {
         included.setIncludeAuthPathList(new ArrayList<>(Arrays.asList(root, target)));
         UserAuthVo auth = new UserAuthVo("u", "UNREGISTERED_SERIALIZATION_PERMISSION");
         auth.setAuthGroup("cmdb");
-        auth.setSourcePathList(new ArrayList<>(Arrays.asList(ordinary, included)));
+        // 超级管理员标识同样参与JSON及Java序列化，普通来源仍省略该空字段。
+        SourcePathVo superAdmin = new SourcePathVo();
+        superAdmin.setIsSuperAdmin(true);
+        superAdmin.setTeamPathNameList(new ArrayList<>());
+        auth.setSourcePathList(new ArrayList<>(Arrays.asList(ordinary, included, superAdmin)));
         String json = JSONObject.toJSONString(auth, SerializerFeature.DisableCircularReferenceDetect);
         JSONObject wire = JSONObject.parseObject(json);
         JSONObject normal = wire.getJSONArray("sourcePathList").getJSONObject(0);
@@ -373,6 +482,9 @@ public class UserServiceAuthTest {
         Assert.assertNull(normal.get("teamUuid"));
         Assert.assertNull(normal.get("teamLft"));
         UserAuthVo fromJson = JSONObject.parseObject(json, UserAuthVo.class);
+        Assert.assertEquals(Boolean.TRUE, fromJson.getSourcePathList().get(2).getIsSuperAdmin());
+        Assert.assertEquals(new HashSet<>(Arrays.asList("isSuperAdmin", "teamPathNameList")),
+                wire.getJSONArray("sourcePathList").getJSONObject(2).keySet());
         Assert.assertEquals(SourcePathVo.class, fromJson.getSourcePathList().get(0).getClass());
         Assert.assertEquals("<管理员>角色", fromJson.getSourcePathList().get(0).getRoleName());
         Assert.assertEquals(Arrays.asList("银行", "叶分组"), fromJson.getSourcePathList().get(1).getTeamPathNameList());
@@ -385,6 +497,7 @@ public class UserServiceAuthTest {
         }
         try (ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes.toByteArray()))) {
             UserAuthVo fromJava = (UserAuthVo) in.readObject();
+            Assert.assertEquals(Boolean.TRUE, fromJava.getSourcePathList().get(2).getIsSuperAdmin());
             Assert.assertEquals(json, JSONObject.toJSONString(fromJava, SerializerFeature.DisableCircularReferenceDetect));
             Assert.assertEquals(SourcePathVo.class, fromJava.getSourcePathList().get(1).getClass());
         }
@@ -846,6 +959,24 @@ public class UserServiceAuthTest {
     }
     public static class INC_UNREGISTERED extends IncludeTestAuth { }
 
+    /** 独立模块权限用于验证超级管理员分支，不依赖实际业务模块的注册状态。 */
+    public static class SUPER_SOURCE_A extends IncludeTestAuth {
+        private int includeReadCount;
+        @Override public String getAuthGroup() { return "super-admin-source-active"; }
+        @Override public List<Class<? extends AuthBase>> getIncludeAuths() {
+            includeReadCount++;
+            return Collections.singletonList(SUPER_SOURCE_B.class);
+        }
+    }
+    /** 同激活模块的第二条权限用于验证来源对象互不共享。 */
+    public static class SUPER_SOURCE_B extends IncludeTestAuth {
+        @Override public String getAuthGroup() { return "super-admin-source-active"; }
+    }
+    /** 未激活模块权限即便已注册也不应返回。 */
+    public static class SUPER_SOURCE_DISABLED extends IncludeTestAuth {
+        @Override public String getAuthGroup() { return "super-admin-source-disabled"; }
+    }
+
     /** 按当前DTO默认序列化配置构造普通来源预期：空值字段省略，名称和路径保持原值。 */
     private JSONObject source(String roleUuid, String roleName, String teamUuid, String path, Integer lft) {
         JSONObject row = new JSONObject();
@@ -902,6 +1033,7 @@ public class UserServiceAuthTest {
 
     /** 三类原始授权各查询一次；Mapper代理的白名单同时禁止任何写入或额外查询。 */
     private void assertAuthorizationQueriesOnce() {
+        Assert.assertEquals(Integer.valueOf(1), queryCounts.get("getUserByUuid"));
         Assert.assertEquals(Integer.valueOf(1), queryCounts.get("searchUserAuthByUserUuid"));
         Assert.assertEquals(Integer.valueOf(1), queryCounts.get("searchUserRoleAuthByUserUuid"));
         Assert.assertEquals(Integer.valueOf(1), queryCounts.get("getTeamListByUserUuid"));

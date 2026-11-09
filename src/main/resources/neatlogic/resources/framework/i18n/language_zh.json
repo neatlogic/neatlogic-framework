@@ -911,6 +911,29 @@
     }
   },
   "nfd": {
+    "userauthvo": {
+      "entityfield": {
+        "name": {
+          "useruuid": "用户Uuid",
+          "auth": "权限",
+          "authgroup": "权限组",
+          "authname": "权限名",
+          "sourcepathlist": "权限来源路径列表"
+        }
+      }
+    },
+    "sourcepathvo": {
+      "entityfield": {
+        "name": {
+          "rolename": "角色名称",
+          "teamuuid": "用户所属分组uuid",
+          "teampathnamelist": "用户所属分组完整名称路径",
+          "teamlft": "用户所属分组左编码",
+          "includeauthpathlist": "权限包含路径",
+          "issuperadmin": "是否超级管理员来源"
+        }
+      }
+    },
     "licensevo": {
       "entityfield": {
         "name": {

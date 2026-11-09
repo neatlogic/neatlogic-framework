@@ -15,22 +15,22 @@ import java.util.List;
 public class SourcePathVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @EntityField(name = "角色uuid", type = ApiParamType.STRING)
+    @EntityField(name = "common.roleuuid", type = ApiParamType.STRING)
     private String roleUuid;
-    @EntityField(name = "角色名称", type = ApiParamType.STRING)
+    @EntityField(name = "nfd.sourcepathvo.entityfield.name.rolename", type = ApiParamType.STRING)
     private String roleName;
-    @EntityField(name = "用户所属分组uuid", type = ApiParamType.STRING)
+    @EntityField(name = "nfd.sourcepathvo.entityfield.name.teamuuid", type = ApiParamType.STRING)
     private String teamUuid;
-    @EntityField(name = "用户所属分组完整名称路径", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfd.sourcepathvo.entityfield.name.teampathnamelist", type = ApiParamType.JSONARRAY)
     private List<String> teamPathNameList;
-    @EntityField(name = "用户所属分组左编码", type = ApiParamType.INTEGER)
+    @EntityField(name = "nfd.sourcepathvo.entityfield.name.teamlft", type = ApiParamType.INTEGER)
     private Integer teamLft;
     // 普通来源为null并参与JSON输出；包含来源按根权限到目标权限保存完整链。
-    @EntityField(name = "权限包含路径", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfd.sourcepathvo.entityfield.name.includeauthpathlist", type = ApiParamType.JSONARRAY)
     private List<JSONObject> includeAuthPathList;
 
     // 仅超级管理员来源设为true，普通角色、分组和包含来源保持null。
-    @EntityField(name = "是否超级管理员来源", type = ApiParamType.BOOLEAN)
+    @EntityField(name = "nfd.sourcepathvo.entityfield.name.issuperadmin", type = ApiParamType.BOOLEAN)
     private Boolean isSuperAdmin;
 
     /** 支持强类型来源的JSON反序列化及按字段构造。 */

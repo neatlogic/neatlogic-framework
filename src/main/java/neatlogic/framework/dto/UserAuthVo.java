@@ -17,16 +17,16 @@ import java.util.List;
 public class UserAuthVo extends BasePageVo implements Serializable {
     private static final long serialVersionUID = 6069104727643916207L;
 
-    @EntityField(name = "用户Uuid", type = ApiParamType.STRING)
+    @EntityField(name = "nfd.userauthvo.entityfield.name.useruuid", type = ApiParamType.STRING)
     private String userUuid;
-    @EntityField(name = "权限", type = ApiParamType.STRING)
+    @EntityField(name = "nfd.userauthvo.entityfield.name.auth", type = ApiParamType.STRING)
     private String auth;
-    @EntityField(name = "权限组", type = ApiParamType.STRING)
+    @EntityField(name = "nfd.userauthvo.entityfield.name.authgroup", type = ApiParamType.STRING)
     private String authGroup;
-    @EntityField(name = "权限名", type = ApiParamType.STRING)
+    @EntityField(name = "nfd.userauthvo.entityfield.name.authname", type = ApiParamType.STRING)
     private String authName;
     // 来源汇总方法使用列表承载聚合结果，中间查询记录不填充该字段。
-    @EntityField(name = "权限来源路径列表", type = ApiParamType.JSONARRAY)
+    @EntityField(name = "nfd.userauthvo.entityfield.name.sourcepathlist", type = ApiParamType.JSONARRAY)
     private List<SourcePathVo> sourcePathList;
     // 角色、分组及包含权限的中间记录使用单来源，仅供内存计算，不参与JSON输出。
     @JSONField(serialize = false)

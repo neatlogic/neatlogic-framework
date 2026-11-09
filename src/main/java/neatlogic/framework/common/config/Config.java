@@ -28,6 +28,9 @@ import javax.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
@@ -137,6 +140,10 @@ public class Config {
     private static boolean ENABLE_METHOD_TIMING_ASPECT;// 启动方法执行耗时日志
 
     private static int SQLRUNNER_QUERY_TIMEOUT; //sql执行超时时间(s)设置，目前就报表会用到
+
+    // 缺省值在框架初始化前即生效；不可变集合和volatile保证Nacos刷新后查询线程可见。
+    private static final String DEFAULT_REPORT_QUERY_TABLE_BLACKLIST = "api,cmdb_resourcecenter_account,codehub_agent,codehub_repository_service,codehub_sync_source,mail_server,mon_import_policy,tagent_account,user_password";
+    private static volatile Set<String> REPORT_QUERY_TABLE_BLACKLIST = parseReportQueryBlacklist(DEFAULT_REPORT_QUERY_TABLE_BLACKLIST);
 
     private static int LICENSE_WILL_EXPIRED_NOTIFY_DAY;//license 即将超时提醒天数
 
@@ -523,6 +530,33 @@ public class Config {
         return SQLRUNNER_QUERY_TIMEOUT;
     }
 
+    /** 报表禁止访问的表名，支持库名.表名，返回只读集合。 */
+    public static Set<String> REPORT_QUERY_TABLE_BLACKLIST() {
+        return REPORT_QUERY_TABLE_BLACKLIST;
+    }
+
+    /** 缺少配置使用默认值，显式空值生成空集合，可单独关闭某一类黑名单。 */
+    static void loadReportQueryBlacklist(Properties prop) {
+        REPORT_QUERY_TABLE_BLACKLIST = parseReportQueryBlacklist(prop.getProperty("report.query.table.blacklist", DEFAULT_REPORT_QUERY_TABLE_BLACKLIST));
+    }
+
+    private static Set<String> parseReportQueryBlacklist(String value) {
+        Set<String> result = new LinkedHashSet<>();
+        for (String item : value.split(",")) {
+            String tableName = item.trim();
+            if (tableName.startsWith("`")) {
+                tableName = tableName.substring(1);
+            }
+            if (tableName.endsWith("`")) {
+                tableName = tableName.substring(0, tableName.length() - 1);
+            }
+            if (!tableName.isEmpty()) {
+                result.add(tableName.toLowerCase(Locale.ROOT));
+            }
+        }
+        return Collections.unmodifiableSet(result);
+    }
+
     public static Integer LICENSE_WILL_EXPIRED_NOTIFY_DAY() {
         return LICENSE_WILL_EXPIRED_NOTIFY_DAY;
     }
@@ -662,6 +696,7 @@ public class Config {
     /** 加载本地或 Nacos 配置，统一使用各配置项的默认值和异常处理。 */
     public static void loadLocalOrNacosProperties(Properties prop) {
         try {
+            loadReportQueryBlacklist(prop);
             REQUEST_BODY_MEMORY_THRESHOLD = Integer.parseInt(prop.getProperty("request.body.memory.threshold", "65536"));
             REQUEST_BODY_MAX_BYTES = Long.parseLong(prop.getProperty("request.body.max.bytes", "10485760"));
             REQUEST_MULTIPART_MAX_BYTES = Long.parseLong(prop.getProperty("request.multipart.max.bytes", "1073741824"));

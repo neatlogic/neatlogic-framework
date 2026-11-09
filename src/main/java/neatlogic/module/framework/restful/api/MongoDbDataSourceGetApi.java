@@ -16,6 +16,7 @@ import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.auth.core.AuthAction;
 import neatlogic.framework.auth.label.ADMIN;
+import neatlogic.framework.common.util.RC4Util;
 import neatlogic.framework.dto.MongoDbVo;
 import neatlogic.framework.restful.annotation.*;
 import neatlogic.framework.restful.constvalue.OperationTypeEnum;
@@ -57,6 +58,9 @@ public class MongoDbDataSourceGetApi extends PrivateApiComponentBase {
     @Override
     public Object myDoService(JSONObject jsonObj) throws Exception {
         String tenant = TenantContext.get().getTenantUuid();
-        return neatlogicMapper.getMongodbByTenant(tenant);
+        MongoDbVo mongoDbVo = neatlogicMapper.getMongodbByTenant(tenant);
+        JSONObject json = JSONObject.parseObject(JSONObject.toJSONString(mongoDbVo));
+        json.put("passwordCipher", RC4Util.encrypt(mongoDbVo.getPasswordPlain()));
+        return json;
     }
 }

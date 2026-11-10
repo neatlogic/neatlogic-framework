@@ -911,6 +911,29 @@
     }
   },
   "nfd": {
+    "userauthvo": {
+      "entityfield": {
+        "name": {
+          "useruuid": "User UUID",
+          "auth": "Permission",
+          "authgroup": "Permission Group",
+          "authname": "Permission Name",
+          "sourcepathlist": "Permission Source Path List"
+        }
+      }
+    },
+    "sourcepathvo": {
+      "entityfield": {
+        "name": {
+          "rolename": "Role Name",
+          "teamuuid": "User Team UUID",
+          "teampathnamelist": "User Team Full Name Path",
+          "teamlft": "User Team Left Index",
+          "includeauthpathlist": "Permission Inclusion Path",
+          "issuperadmin": "Super Administrator Source"
+        }
+      }
+    },
     "licensevo": {
       "entityfield": {
         "name": {

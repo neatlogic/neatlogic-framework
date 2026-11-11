@@ -28,7 +28,7 @@ import neatlogic.framework.heartbeat.dto.ServerClusterVo;
 import neatlogic.framework.heartbeat.dto.ServerCounterVo;
 import neatlogic.framework.transaction.util.TransactionUtil;
 import neatlogic.framework.util.$;
-import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,18 +113,20 @@ public class HeartbeatManager extends ModuleInitializedListenerBase {
             @Override
             protected void execute() {
                 try {
-                    // 只会接管同组的故障服务器
-                    List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
                     // 查找故障服务器
                     List<Integer> serverIdList = serverMapper.getInactivatedServerIdList(Config.SCHEDULE_SERVER_ID, Config.SERVER_HEARTBEAT_THRESHOLD());
-                    for (Integer serverId : serverIdList) {
-                        if (!sameGroupServerIdList.contains(serverId)) {
-                            continue;
-                        }
-                        if (getServerLock(serverId)) {
-                            // 如果抢到锁，开始处理
-                            for (IHeartbreakHandler observer : set) {
-                                CachedThreadPool.execute(new HeartbreakHandlerThread(observer, serverId));
+                    if (CollectionUtils.isNotEmpty(serverIdList)) {
+                        // 只会接管同组的故障服务器
+                        List<Integer> sameGroupServerIdList = getSameGroupStartupServerIdList();
+                        for (Integer serverId : serverIdList) {
+                            if (!sameGroupServerIdList.contains(serverId)) {
+                                continue;
+                            }
+                            if (getServerLock(serverId)) {
+                                // 如果抢到锁，开始处理
+                                for (IHeartbreakHandler observer : set) {
+                                    CachedThreadPool.execute(new HeartbreakHandlerThread(observer, serverId));
+                                }
                             }
                         }
                     }

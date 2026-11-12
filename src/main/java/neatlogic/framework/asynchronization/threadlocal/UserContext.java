@@ -92,15 +92,16 @@ public class UserContext implements Serializable {
         context.setUserUuid(userVo.getUuid());
         context.setUserName(userVo.getUserName());
         context.setTenant(userVo.getTenant());
-        String token = StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization();
-        if (StringUtils.isBlank(token)) {
-            try {
-                token = "GZIP_" + LoginAuthHandlerBase.buildJwt(userVo).getCc();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        context.setToken(token);
+        context.setToken(StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization());
+//        String token = StringUtils.isBlank(userVo.getAuthorization()) ? userVo.getCookieAuthorization() : userVo.getAuthorization();
+//        if (StringUtils.isBlank(token)) {
+//            try {
+//                token = "GZIP_" + LoginAuthHandlerBase.buildJwt(userVo).getCc();
+//            } catch (Exception e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        context.setToken(token);
         context.setIsSuperAdmin(userVo.getIsSuperAdmin());
         context.setTimezone(normalizeTimezone(timezone));
         context.setAuthenticationInfoVo(authenticationInfoVo);

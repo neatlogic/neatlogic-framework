@@ -12,6 +12,7 @@
 
 package neatlogic.framework.store.mysql;
 
+import com.zaxxer.hikari.HikariConfig;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
@@ -317,23 +318,24 @@ public class DatasourceManager {
         datasource.afterPropertiesSet();
     }
 
+    /** 根据租户配置创建业务库或数据仓库连接池，返回时池已同步启动。 */
     public static NeatLogicBasicDataSource getDataSource(DatasourceVo datasourceVo, Boolean isDataDB) {
-        NeatLogicBasicDataSource tenantDatasource = new NeatLogicBasicDataSource();
+        HikariConfig tenantDatasource = new HikariConfig();
         String url = datasourceVo.getUrl();
         url = url.replace("{host}", datasourceVo.getHost());
         url = url.replace("{port}", datasourceVo.getPort().toString());
         url = url.replace("{dbname}", "neatlogic_" + datasourceVo.getTenantUuid() + (isDataDB ? "_data" : StringUtils.EMPTY));
-        //tenantDatasource.setUrl(url);
         tenantDatasource.setJdbcUrl(url);
         tenantDatasource.setDriverClassName(datasourceVo.getDriver());
         tenantDatasource.setUsername(datasourceVo.getUsername());
         tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
         tenantDatasource.setPoolName("HikariCP_" + (isDataDB ? "DATA_" : StringUtils.EMPTY) + datasourceVo.getTenantUuid());
         setDataSourceConfig(tenantDatasource);
-        return tenantDatasource;
+        return new NeatLogicBasicDataSource(tenantDatasource);
     }
 
-    public static void setDataSourceConfig(NeatLogicBasicDataSource dataSource) {
+    /** 在建池之前应用共享的连接池和 MySQL 驱动参数。 */
+    public static void setDataSourceConfig(HikariConfig dataSource) {
         //连接数大小
         dataSource.setMaximumPoolSize(Config.DATASOURCE_MAXIMUN_POOL_SIZE());
         //以下是针对Mysql的参数优化

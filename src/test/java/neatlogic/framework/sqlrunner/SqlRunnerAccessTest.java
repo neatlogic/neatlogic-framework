@@ -1,5 +1,6 @@
 package neatlogic.framework.sqlrunner;
 
+import com.zaxxer.hikari.HikariConfig;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.dao.plugin.PageInterceptor;
 import neatlogic.framework.dao.plugin.PageRowBounds;
@@ -42,7 +43,7 @@ public class SqlRunnerAccessTest {
     private TenantContext originalContext;
     private final List<NeatLogicBasicDataSource> createdSources = new ArrayList<>();
 
-    /** 注册测试租户的连接池配置，不启动连接池或访问数据库。 */
+    /** 注册测试租户的连接池配置，启动空池且无需访问数据库。 */
     @Before
     @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
@@ -372,9 +373,13 @@ public class SqlRunnerAccessTest {
 
     /** 创建只包含库名元数据的测试池。 */
     private NeatLogicBasicDataSource source(String catalog) {
-        NeatLogicBasicDataSource source = new NeatLogicBasicDataSource();
-        source.setCatalog(catalog);
-        source.setJdbcUrl("jdbc:mysql://fixture.invalid:3306/" + catalog);
+        // 本用例只读取池元数据，禁用预填充与首连校验以保持离线。
+        HikariConfig config = new HikariConfig();
+        config.setMinimumIdle(0);
+        config.setInitializationFailTimeout(-1);
+        config.setCatalog(catalog);
+        config.setJdbcUrl("jdbc:mysql://fixture.invalid:3306/" + catalog);
+        NeatLogicBasicDataSource source = new NeatLogicBasicDataSource(config);
         createdSources.add(source);
         return source;
     }

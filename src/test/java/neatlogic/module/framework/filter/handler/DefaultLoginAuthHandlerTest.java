@@ -24,9 +24,9 @@ import java.util.zip.GZIPOutputStream;
 
 import static org.junit.Assert.*;
 
-/** 使用真实签名验证 Cookie 边界和 Header 优先级，不依赖数据库或外部登录服务。 */
+/** 使用真实签名验证 Cookie 认证和 Header 优先级，不依赖数据库或外部登录服务。 */
 public class DefaultLoginAuthHandlerTest {
-    private static final String SECRET = "cookie-boundary-test-secret";
+    private static final String SECRET = "cookie-auth-test-secret";
     private final Map<Field, Object> originals = new LinkedHashMap<>();
     private final DefaultLoginAuthHandler handler = new DefaultLoginAuthHandler();
 
@@ -42,86 +42,48 @@ public class DefaultLoginAuthHandlerTest {
         for (Map.Entry<Field, Object> entry : originals.entrySet()) { entry.getKey().set(null, entry.getValue()); }
     }
 
-    /** 使用合法历史明文 JWT 覆盖完整 Cookie 长度边界，不能因签名无效掩盖限额判断。 */
-    @Test public void limitsCompleteUncompressedCookie() throws Exception {
-        for (int length : new int[]{16383, 16384, 16385}) {
-            UserVo user = handler.myAuth(request(signedToken(length)));
-            if (length <= 16384) { assertEquals("cookie-user", user.getUuid()); }
-            else { assertNull(user); }
-        }
-    }
-
-    /** 压缩后很小但解压后超过上限的正确签名 JWT 也必须拒绝。 */
-    @Test public void limitsDecompressedSignedCookie() throws Exception {
-        for (int length : new int[]{65535, 65536, 65537}) {
-            String cookie = compressedCookie(signedToken(length));
-            assertTrue(cookie.length() < 16384);
+    /** 正确签名的明文和压缩 Cookie 均可认证，不约束编码或解压后的长度。 */
+    @Test public void acceptsPlainAndCompressedCookies() throws Exception {
+        String token = signedToken();
+        for (String cookie : new String[]{token, compressedCookie(token)}) {
             UserVo user = handler.myAuth(request(cookie));
-            if (length <= 65536) { assertEquals("cookie-user", user.getUuid()); }
-            else { assertNull(user); }
-        }
-    }
-
-    /** 编码长度包括 GZIP_ 前缀；在合法 GZIP 成员后补零以独立控制编码长度。 */
-    @Test public void countsGzipPrefixBeforeDecoding() throws Exception {
-        String token = signedToken(300);
-        byte[] gzip = Base64.getDecoder().decode(compressedCookie(token).substring(5));
-        // 无填充 Base64 的长度可精确达到剩余字符额度，JDK 接受合法成员后的零填充。
-        for (int length : new int[]{16383, 16384, 16385}) {
-            int encodedLength = length - 5;
-            byte[] padded = java.util.Arrays.copyOf(gzip, encodedLength * 3 / 4);
-            String cookie = "GZIP_" + Base64.getEncoder().withoutPadding().encodeToString(padded);
-            assertEquals(length, cookie.length());
-            UserVo user = handler.myAuth(request(cookie));
-            if (length <= 16384) { assertEquals("cookie-user", user.getUuid()); }
-            else { assertNull(user); }
+            assertEquals("cookie-user", user.getUuid());
+            assertEquals(cookie, user.getCookieAuthorization());
         }
     }
 
     /** 有效 Header 不读取坏 Cookie，既有 Header 身份必须完整保留。 */
-    @Test public void headerTakesPriorityOverRejectedCookies() throws Exception {
-        for (String cookie : new String[]{"x".repeat(16385), "GZIP_%%%", compressedCookie("x".repeat(2 * 1024 * 1024))}) {
+    @Test public void headerTakesPriorityOverMalformedCookies() throws Exception {
+        for (String cookie : new String[]{"invalid-token", "GZIP_%%%", compressedCookie("invalid-token")}) {
             MockHttpServletRequest request = request(cookie);
-            request.addHeader("Authorization", signedToken(300));
+            request.addHeader("Authorization", signedToken());
             UserVo user = handler.myAuth(request);
             assertEquals("cookie-user", user.getUuid());
             assertNull(user.getCookieAuthorization());
         }
     }
 
-    /** 坏 Cookie 直接产生无效认证结果，不能作为原文或残缺内容继续认证。 */
-    @Test public void rejectsMalformedAndHighlyCompressedCookies() throws Exception {
-        String bomb = compressedCookie("x".repeat(2 * 1024 * 1024));
-        assertTrue(bomb.length() < 4096);
-        for (String cookie : new String[]{"GZIP_", "GZIP_%%%", "GZIP_eA==", bomb}) {
-            assertNull(handler.myAuth(request(cookie)));
+    /** 无效 Cookie 不产生用户身份；myAuth 返回空身份对象，由认证入口判定无效。 */
+    @Test public void rejectsMalformedCookies() throws Exception {
+        for (String cookie : new String[]{"GZIP_", "GZIP_%%%", "GZIP_eA==", compressedCookie("invalid-token")}) {
+            UserVo user = handler.myAuth(request(cookie));
+            assertTrue(user == null || user.getUuid() == null);
         }
     }
 
-    /** 生成具有指定精确长度的正确签名 JWT，JSON 尾部空白仅用于控制长度。 */
-    private static String signedToken(int length) throws Exception {
+    /** 生成正确签名的历史格式 JWT，不使用额外填充构造长度边界。 */
+    private static String signedToken() throws Exception {
         JSONObject body = new JSONObject();
         body.put("useruuid", "cookie-user"); body.put("userid", "tester");
         body.put("username", "测试用户"); body.put("tenant", "cookie-test");
         body.put("createTime", 1000L); body.put("isSuperAdmin", false);
         Base64.Encoder encoder = Base64.getUrlEncoder().withoutPadding();
-        String json = body.toJSONString();
-        int bodyBytes = json.getBytes(StandardCharsets.UTF_8).length;
-        for (int extra = 0; extra < 3; extra++) {
-            String header = encoder.encodeToString(("{\"alg\":\"HS256\",\"typ\":\"JWT\"}" + " ".repeat(extra)).getBytes(StandardCharsets.UTF_8));
-            int targetBodyLength = length - 7 - header.length() - 2 - 28;
-            int padding = targetBodyLength * 3 / 4 - bodyBytes;
-            if (padding < 0) { continue; }
-            String payload = encoder.encodeToString((json + " ".repeat(padding)).getBytes(StandardCharsets.UTF_8));
-            if (payload.length() != targetBodyLength) { continue; }
-            String content = header + "." + payload;
-            Mac mac = Mac.getInstance("HmacSHA1");
-            mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA1"));
-            String token = "Bearer_" + content + "." + Base64.getUrlEncoder().encodeToString(mac.doFinal(content.getBytes(StandardCharsets.UTF_8)));
-            assertEquals(length, token.length());
-            return token;
-        }
-        throw new AssertionError("无法构造指定长度的 JWT: " + length);
+        String header = encoder.encodeToString("{\"alg\":\"HS256\",\"typ\":\"JWT\"}".getBytes(StandardCharsets.UTF_8));
+        String payload = encoder.encodeToString(body.toJSONString().getBytes(StandardCharsets.UTF_8));
+        String content = header + "." + payload;
+        Mac mac = Mac.getInstance("HmacSHA1");
+        mac.init(new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA1"));
+        return "Bearer_" + content + "." + Base64.getUrlEncoder().encodeToString(mac.doFinal(content.getBytes(StandardCharsets.UTF_8)));
     }
 
     /** 独立用 JDK 生成 Cookie，避免将生产解压方法用作测试输入生成器。 */

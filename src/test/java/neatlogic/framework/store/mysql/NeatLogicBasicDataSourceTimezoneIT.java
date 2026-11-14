@@ -1,5 +1,6 @@
 package neatlogic.framework.store.mysql;
 
+import com.zaxxer.hikari.HikariConfig;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.dto.UserVo;
 import org.apache.ibatis.annotations.Insert;
@@ -86,22 +87,24 @@ public class NeatLogicBasicDataSourceTimezoneIT {
 
         UserContext previousUser = UserContext.get();
         String previousMdcUser = MDC.get("userId");
-        try (NeatLogicBasicDataSource source = new NeatLogicBasicDataSource()) {
-            source.setJdbcUrl(url);
-            source.setUsername(user);
-            String password = System.getenv("TIMEZONE_MYSQL_TEST_PASSWORD");
-            source.setPassword(password == null ? "" : password);
-            source.addDataSourceProperty("connectionTimeZone", DRIVER_TIMEZONE);
-            source.addDataSourceProperty("preserveInstants", !serverPrepare);
-            source.addDataSourceProperty("useServerPrepStmts", serverPrepare);
-            source.addDataSourceProperty("cachePrepStmts", true);
-            source.addDataSourceProperty("rewriteBatchedStatements", true);
-            source.addDataSourceProperty("forceConnectionTimeZoneToSession", "false");
-            source.setMaximumPoolSize(1);
-            source.setMinimumIdle(1);
-            source.setMaxLifetime(0);
-            source.setConnectionTimeout(10000);
-            source.setPoolName("timezone-integration-test-" + serverPrepare);
+        // 借用连接之前按生产路径完成测试池初始化。
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(url);
+        config.setUsername(user);
+        String password = System.getenv("TIMEZONE_MYSQL_TEST_PASSWORD");
+        config.setPassword(password == null ? "" : password);
+        config.addDataSourceProperty("connectionTimeZone", DRIVER_TIMEZONE);
+        config.addDataSourceProperty("preserveInstants", !serverPrepare);
+        config.addDataSourceProperty("useServerPrepStmts", serverPrepare);
+        config.addDataSourceProperty("cachePrepStmts", true);
+        config.addDataSourceProperty("rewriteBatchedStatements", true);
+        config.addDataSourceProperty("forceConnectionTimeZoneToSession", "false");
+        config.setMaximumPoolSize(1);
+        config.setMinimumIdle(1);
+        config.setMaxLifetime(0);
+        config.setConnectionTimeout(10000);
+        config.setPoolName("timezone-integration-test-" + serverPrepare);
+        try (NeatLogicBasicDataSource source = new NeatLogicBasicDataSource(config)) {
             Configuration configuration = new Configuration(new Environment("timezone-it",
                     new JdbcTransactionFactory(), source));
             configuration.addMapper(TimeMapper.class);

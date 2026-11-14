@@ -53,25 +53,22 @@ public class DashboardDatasourceHandlerFactoryTest {
         }
     }
 
-    /** 缺省、null、空字符串及空白类型都使用已注册的数据仓库 Handler。 */
+    /** 显式指定数据仓库类型时，返回模块事件注册的 Handler。 */
     @Test
-    public void shouldResolveDefaultTypeAfterModuleEvent() {
+    public void shouldResolveExplicitTypeAfterModuleEvent() {
         IDashboardDatasourceHandler handler = new StubHandler("datawarehouse");
         refresh("tenant", handler);
-        assertSame(handler, DashboardDatasourceHandlerFactory.getHandler(new JSONObject().getString("datasourceType")));
-        for (String type : new String[]{null, "", " \t\r\n", "datawarehouse"}) {
-            assertSame(handler, DashboardDatasourceHandlerFactory.getHandler(type));
-        }
+        assertSame(handler, DashboardDatasourceHandlerFactory.getHandler("datawarehouse"));
         assertEquals(1, handlers.size());
     }
 
-    /** 未注册类型明确报错，非空类型不裁剪空格、不忽略大小写且不回退。 */
+    /** 未注册的显式类型明确报错，空字符串、大小写和空格均按原值匹配。 */
     @Test
-    public void shouldRejectUnknownAndUnregisteredDefaultTypes() {
+    public void shouldRejectUnknownAndUnregisteredExplicitTypes() {
         assertThrows(DashboardDatasourceTypeNotSupportedException.class,
-                () -> DashboardDatasourceHandlerFactory.getHandler(null));
+                () -> DashboardDatasourceHandlerFactory.getHandler("datawarehouse"));
         refresh("tenant", new StubHandler("datawarehouse"));
-        for (String type : new String[]{"integration", "unknown", " datawarehouse ", "DATAWAREHOUSE"}) {
+        for (String type : new String[]{"", " \t\r\n", "integration", "unknown", " datawarehouse ", "DATAWAREHOUSE"}) {
             assertThrows(DashboardDatasourceTypeNotSupportedException.class,
                     () -> DashboardDatasourceHandlerFactory.getHandler(type));
         }

@@ -36,7 +36,7 @@ public class DashboardIntegrationHandlerTest {
         assertEquals(Integer.valueOf(1), handler.allowEditInputParam());
         assertEquals(Integer.valueOf(1), handler.allowEditOutputParam());
         List<PatternVo> input = handler.getInputPattern();
-        assertEquals(set("conditionList", "sortList", "currentPage", "pageSize", "limit", "needPage", "isExpired"), names(input));
+        assertEquals(set("conditionList", "sortList", "currentPage", "pageSize", "limit"), names(input));
         assertFalse(names(input).contains("theadList"));
         PatternVo header = find(handler.getOutputPattern(), "theadList");
         assertEquals("output", header.getMode());
@@ -56,7 +56,9 @@ public class DashboardIntegrationHandlerTest {
         for (String name : Arrays.asList("currentPage", "pageSize", "limit")) {
             assertEquals(ApiParamType.INTEGER.getValue(), find(input, name).getType());
         }
-        assertEquals(ApiParamType.BOOLEAN.getValue(), find(input, "needPage").getType());
+        // 适配器内部传递的控制参数不属于当前固定输入规范。
+        assertFalse(names(input).contains("needPage"));
+        assertFalse(names(input).contains("isExpired"));
         assertFalse(names(input).contains("datasourceType"));
         assertFalse(names(input).contains("dataSourceId"));
     }

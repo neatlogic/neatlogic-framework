@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.auth.core.AuthActionChecker;
-import neatlogic.framework.common.dto.ValueTextVo;
 import neatlogic.framework.dao.mapper.UserMapper;
 import neatlogic.framework.dto.AuthenticationInfoVo;
 import neatlogic.framework.exception.core.ApiRuntimeException;
@@ -47,7 +46,8 @@ public class IntegrationDashboardDatasourceHandlerTest {
     private IntegrationVo integration;
     private IntegrationVo listQuery;
     private IntegrationVo countQuery;
-    private List<ValueTextVo> listRows;
+    private List<IntegrationVo> listRows;
+    private List<String> selectedUuids;
     private int countCalls;
     private int authorityCalls;
     private int authority = 1;
@@ -73,12 +73,15 @@ public class IntegrationDashboardDatasourceHandlerTest {
         integration.setUrl("https://must-not-call.invalid/private-token");
         integration.setMethod("post");
         integration.setConfig(config(headers()).toJSONString());
-        listRows = Collections.singletonList(new ValueTextVo(UUID, "子作业集成"));
+        listRows = Collections.singletonList(integration);
         IntegrationMapper mapper = (IntegrationMapper) Proxy.newProxyInstance(IntegrationMapper.class.getClassLoader(),
                 new Class<?>[]{IntegrationMapper.class}, (proxy, method, args) -> {
                     switch (method.getName()) {
-                        case "searchIntegrationForSelect":
+                        case "searchIntegration":
                             listQuery = (IntegrationVo) args[0];
+                            return listRows;
+                        case "getIntegrationListByUuidList":
+                            selectedUuids = (List<String>) args[0];
                             return listRows;
                         case "searchIntegrationCount":
                             countCalls++;
@@ -169,33 +172,36 @@ public class IntegrationDashboardDatasourceHandlerTest {
         assertEquals(0, outbound.calls);
     }
 
-    /** UUID 精确回显优先 defaultValue，实际查询禁止 LIMIT，不受默认页容量影响。 */
+    /** defaultValue 使用独立 UUID 列表查询，不执行普通分页查询和计数。 */
     @Test
     public void selectedUuidsOverrideIdListWithoutPaginationOrCountQuery() {
         JSONArray ids = new JSONArray();
         listRows = new ArrayList<>();
         for (int i = 0; i < 25; i++) {
             ids.add(UUID + "-" + i);
-            listRows.add(new ValueTextVo(UUID + "-" + i, "来源" + i));
+            IntegrationVo row = new IntegrationVo();
+            row.setUuid(UUID + "-" + i);
+            row.setName("来源" + i);
+            listRows.add(row);
         }
         JSONObject params = new JSONObject().fluentPut("defaultValue", ids).fluentPut("idList", Collections.singletonList("wrong"))
                 .fluentPut("currentPage", 3).fluentPut("pageSize", 1).fluentPut("keyword", "ignored");
         JSONObject result = handler.listDatasource(params);
-        assertEquals(ids, listQuery.getDefaultValue());
-        assertEquals(Boolean.FALSE, listQuery.getNeedPage());
+        assertEquals(ids.toJavaList(String.class), selectedUuids);
+        assertNull(listQuery);
         assertEquals(25, result.getJSONArray("tbodyList").size());
         assertEquals(25, result.getIntValue("rowNum"));
         assertEquals(0, countCalls);
-        assertEquals(HANDLER, listQuery.getHandler());
-        assertEquals(Integer.valueOf(1), listQuery.getIsActive());
     }
 
-    /** 空 defaultValue 回退到 idList，保留 UUID 字符串且空查询保留分页容器。 */
+    /** 空 defaultValue 走普通分页查询，idList 不触发 UUID 回显，空结果仍保留分页容器。 */
     @Test
-    public void echoesIdListAndPreservesEmptyResults() {
+    public void emptyDefaultValueUsesRegularSearchAndPreservesEmptyResults() {
         handler.listDatasource(new JSONObject().fluentPut("defaultValue", new JSONArray()).fluentPut("idList", Collections.singletonList(UUID)));
-        assertEquals(Collections.singletonList(UUID), listQuery.getDefaultValue());
-        assertEquals(Boolean.FALSE, listQuery.getNeedPage());
+        assertTrue(listQuery.getDefaultValue().isEmpty());
+        assertEquals(Boolean.TRUE, listQuery.getNeedPage());
+        assertNull(selectedUuids);
+        assertEquals(1, countCalls);
         listRows = Collections.emptyList();
         JSONObject result = handler.listDatasource(new JSONObject());
         assertTrue(result.getJSONArray("tbodyList").isEmpty());
@@ -205,7 +211,7 @@ public class IntegrationDashboardDatasourceHandlerTest {
         assertTrue(result.containsKey("pageCount"));
     }
 
-    /** 使用原 MyBatis XML 生成 BoundSql，验证局部回显开关确实移除 LIMIT，且保留绑定参数。 */
+    /** 使用真实 Mapper XML，分别验证普通查询分页和 UUID 列表查询的参数绑定。 */
     @Test
     public void selectedUuidQueryOmitsLimitInExistingMybatisSql() throws Exception {
         Configuration configuration = new Configuration();
@@ -216,16 +222,19 @@ public class IntegrationDashboardDatasourceHandlerTest {
             assertNotNull("复用的 Mapper XML 应进入模块资源", input);
             new XMLMapperBuilder(input, configuration, resource, configuration.getSqlFragments()).parse();
         }
-        String statement = IntegrationMapper.class.getName() + ".searchIntegrationForSelect";
+        String statement = IntegrationMapper.class.getName() + ".searchIntegration";
         handler.listDatasource(new JSONObject().fluentPut("keyword", "job").fluentPut("currentPage", 2));
         String normalSql = configuration.getMappedStatement(statement).getBoundSql(listQuery).getSql();
         assertTrue(normalSql.contains("LIMIT"));
         handler.listDatasource(new JSONObject().fluentPut("defaultValue", Collections.singletonList(UUID)));
-        String echoSql = configuration.getMappedStatement(statement).getBoundSql(listQuery).getSql();
+        assertTrue(normalSql.contains("handler = ?"));
+        assertTrue(normalSql.contains("is_active = ?"));
+        String echoStatement = IntegrationMapper.class.getName() + ".getIntegrationListByUuidList";
+        String echoSql = configuration.getMappedStatement(echoStatement)
+                .getBoundSql(Collections.singletonMap("list", selectedUuids)).getSql();
         assertFalse(echoSql.contains("LIMIT"));
-        assertTrue(echoSql.contains("uuid in"));
-        assertTrue(echoSql.contains("handler = ?"));
-        assertTrue(echoSql.contains("is_active = ?"));
+        assertTrue(echoSql.contains("`uuid` IN"));
+        assertEquals(Collections.singletonList(UUID), selectedUuids);
         assertFalse(echoSql.contains(UUID));
     }
 
@@ -337,16 +346,16 @@ public class IntegrationDashboardDatasourceHandlerTest {
         assertEquals("name", fields.getJSONObject(0).getString("id"));
         assertEquals("duration", fields.getJSONObject(1).getString("id"));
         JSONObject result = handler.searchDatasourceData(request());
-        assertEquals("field_name", result.getJSONArray("theadList").getJSONObject(0).getString("key"));
+        assertEquals("name", result.getJSONArray("theadList").getJSONObject(0).getString("key"));
         assertEquals(headers(), JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("theadList"));
         assertFalse(outbound.parameters.containsKey("theadList"));
         assertEquals(config, integration.getConfig());
         assertEquals(1, outbound.sends);
     }
 
-    /** 外部显式表头按公共规则保留在执行结果中，大屏详情与行映射仍始终使用配置的输出默认表头。 */
+    /** 取数保留远端显式表头及原始行字段，详情仍读取配置中的输出默认表头。 */
     @Test
-    public void ignoresDifferentRemoteHeaderWhenMappingConfiguredFields() throws PermissionDeniedException {
+    public void preservesRemoteHeadersAndRowsWhileDetailUsesConfiguredFields() throws PermissionDeniedException {
         JSONObject remote = JSON.parseObject(outbound.response.getTransformedResult());
         JSONArray remoteHeaders = JSON.parseArray("[{\"key\":\"remote\",\"title\":\"远端字段\"}]");
         remote.put("theadList", remoteHeaders);
@@ -355,15 +364,8 @@ public class IntegrationDashboardDatasourceHandlerTest {
         JSONObject result = handler.searchDatasourceData(request());
         assertEquals(remoteHeaders, JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("theadList"));
         assertEquals("name", handler.getDatasource(request()).getJSONArray("fieldList").getJSONObject(0).getString("id"));
-        JSONArray head = result.getJSONArray("theadList");
-        assertEquals(2, head.size());
-        assertEquals("field_name", head.getJSONObject(0).getString("key"));
-        assertEquals("field_duration", head.getJSONObject(1).getString("key"));
-        JSONObject row = result.getJSONArray("tbodyList").getJSONObject(0);
-        assertEquals(set("field_name", "field_duration"), row.keySet());
-        assertEquals("作业A", row.getString("field_name"));
-        assertEquals(6, row.getIntValue("field_duration"));
-        assertFalse(result.toJSONString().contains("不得映射"));
+        assertEquals(remoteHeaders, result.getJSONArray("theadList"));
+        assertEquals(remote.getJSONArray("tbodyList"), result.getJSONArray("tbodyList"));
         assertFalse(outbound.parameters.containsKey("theadList"));
     }
 
@@ -383,9 +385,9 @@ public class IntegrationDashboardDatasourceHandlerTest {
         assertEquals(0, outbound.calls);
     }
 
-    /** 执行输入只接受既定白名单，字段来自服务端配置，用户不能覆盖来源或注入任意参数。 */
+    /** 执行输入只接受白名单，取数保留远端原始行字段，缺失表头由配置默认值补齐。 */
     @Test
-    public void forwardsOnlyQueryParametersAndMapsDeclaredRowsWithMissingValues() throws PermissionDeniedException {
+    public void forwardsOnlyQueryParametersAndPreservesRemoteRows() throws PermissionDeniedException {
         JSONObject params = request().fluentPut("conditionList", JSON.parseArray("[{\"id\":\"duration\",\"value\":5}]"))
                 .fluentPut("sortList", JSON.parseArray("[{\"fieldId\":\"duration\",\"type\":\"DESC\"}]"))
                 .fluentPut("currentPage", 2).fluentPut("pageSize", 5).fluentPut("isExpired", 0)
@@ -405,18 +407,13 @@ public class IntegrationDashboardDatasourceHandlerTest {
         assertFalse(outbound.parameters.containsKey("theadList"));
         // 远端未给出表头时，发送基类公共输出补齐链路提供配置默认值，且不反向写入输入。
         assertEquals(headers(), JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("theadList"));
-        JSONArray head = result.getJSONArray("theadList");
-        assertEquals("field_name", head.getJSONObject(0).getString("key"));
-        assertEquals("name", head.getJSONObject(0).getString("name"));
-        assertEquals("作业名", head.getJSONObject(0).getString("title"));
-        assertEquals("field_duration", head.getJSONObject(1).getString("key"));
+        assertEquals(headers(), result.getJSONArray("theadList"));
         JSONArray rows = result.getJSONArray("tbodyList");
-        assertEquals(set("field_name", "field_duration"), rows.getJSONObject(0).keySet());
-        assertEquals(0, rows.getJSONObject(0).getIntValue("field_duration"));
-        assertEquals("作业B", rows.getJSONObject(1).getString("field_name"));
-        assertTrue(rows.getJSONObject(1).containsKey("field_duration"));
-        assertNull(rows.getJSONObject(1).get("field_duration"));
-        assertFalse(result.toJSONString().contains("hidden"));
+        assertEquals(JSON.parseObject(outbound.response.getTransformedResult()).getJSONArray("tbodyList"), rows);
+        assertEquals(set("name", "duration", "private"), rows.getJSONObject(0).keySet());
+        assertEquals(0, rows.getJSONObject(0).getIntValue("duration"));
+        assertEquals("作业B", rows.getJSONObject(1).getString("name"));
+        assertFalse(rows.getJSONObject(1).containsKey("duration"));
         assertEquals(7, result.getIntValue("currentPage"));
         assertEquals(3, result.getIntValue("pageSize"));
         assertEquals(12, result.getIntValue("rowNum"));

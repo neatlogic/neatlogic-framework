@@ -12,6 +12,7 @@
 
 package neatlogic.framework.service;
 
+import neatlogic.framework.dto.UserAuthVo;
 import neatlogic.framework.dto.UserVo;
 
 import java.util.List;
@@ -72,4 +73,7 @@ public interface UserService {
      */
     UserVo getUserByUser(String userId);
 
+
+    /** 聚合直接授权、角色和分组及其包含权限；直接授权允许空来源，其余来源存入sourcePathList。 */
+    List<UserAuthVo> getUserAuthListByUserUuid(String userUuid);
 }

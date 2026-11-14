@@ -6,6 +6,7 @@ import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.constvalue.ApiParamType;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.config.ConfigManager;
 import neatlogic.framework.config.FrameworkTenantConfig;
 import neatlogic.framework.filter.core.ILoginAuthHandler;
@@ -83,12 +84,14 @@ public class JwtVo implements Serializable {
 
     public JwtVo(UserVo checkUserVo, Long tokenCreateTime, AuthenticationInfoVo authenticationInfoVo, String authType) {
         JSONObject jwtBodyObj = getJwtBodyObj(checkUserVo, tokenCreateTime, authenticationInfoVo);
-        String needPwdExpiredCheck = ConfigManager.getConfig(FrameworkTenantConfig.PASSWORD_NEED_EXPIRED_CHECK);
-        if (Objects.equals(needPwdExpiredCheck, "1") && StringUtils.isNotBlank(authType)) {
-            ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
-            if (loginAuth != null) {
-                if (loginAuth.checkPwdExpired(checkUserVo)) {
-                    jwtBodyObj.put("pwdExpired", true);
+        if (SystemUserFactory.getSystemUserByUser(checkUserVo.getUuid()) == null) {
+            String needPwdExpiredCheck = ConfigManager.getConfig(FrameworkTenantConfig.PASSWORD_NEED_EXPIRED_CHECK);
+            if (Objects.equals(needPwdExpiredCheck, "1") && StringUtils.isNotBlank(authType)) {
+                ILoginAuthHandler loginAuth = LoginAuthFactory.getLoginAuth(authType);
+                if (loginAuth != null) {
+                    if (loginAuth.checkPwdExpired(checkUserVo)) {
+                        jwtBodyObj.put("pwdExpired", true);
+                    }
                 }
             }
         }

@@ -114,8 +114,6 @@ public class DashboardIntegrationRegistrationTest {
                     DashboardDatasourceHandlerFactory.getHandler("integration"));
             assertSame(context.getBean(DatawarehouseDashboardDatasourceHandler.class),
                     DashboardDatasourceHandlerFactory.getHandler("datawarehouse"));
-            assertSame(DashboardDatasourceHandlerFactory.getHandler("datawarehouse"),
-                    DashboardDatasourceHandlerFactory.getHandler(null));
             // 使用真实已注册组件和 framework 语言资源验证类型选项随请求语言刷新。
             assertLocalizedDatasourceTypes();
 

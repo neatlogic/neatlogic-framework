@@ -6,21 +6,19 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
+import neatlogic.framework.common.constvalue.systemuser.ISystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUser;
+import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
 import neatlogic.framework.common.util.ModuleUtil;
 import neatlogic.framework.dao.mapper.RoleMapper;
 import neatlogic.framework.dao.mapper.TeamMapper;
 import neatlogic.framework.dao.mapper.UserMapper;
-import neatlogic.framework.dto.RoleAuthVo;
-import neatlogic.framework.dto.SourcePathVo;
-import neatlogic.framework.dto.RoleVo;
-import neatlogic.framework.dto.TeamVo;
-import neatlogic.framework.dto.UserAuthVo;
-import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dto.*;
 import neatlogic.framework.dto.module.ModuleVo;
 import neatlogic.framework.exception.user.UserNotFoundException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -112,6 +110,60 @@ public class UserServiceAuthTest {
         } catch (UserNotFoundException expected) {
             Assert.assertEquals(Collections.singletonMap("getUserByUuid", 1), queryCounts);
             Assert.assertEquals("missing-user", queryArgs.get("getUserByUuid")[0]);
+        }
+    }
+
+    /** 内置用户无用户表记录时仍按其 UUID 读取已保存权限及包含权限。 */
+    @Test
+    public void shouldReadBuiltInUserAuthWithoutUserTableRecord() throws Exception {
+        installGraph();
+        user = null;
+        userAuths.add(userAuth("process", "INC_ROOT"));
+        for (SystemUser systemUser : SystemUser.values()) {
+            List<UserAuthVo> result = service.getUserAuthListByUserUuid(systemUser.getUserUuid());
+            Assert.assertNotNull(findAuth(result, "process", "INC_ROOT"));
+            Assert.assertTrue(findAuth(result, "process", "INC_ROOT").getSourcePathList().isEmpty());
+            Assert.assertFalse(findAuth(result, "cmdb", "INC_TARGET").getSourcePathList().isEmpty());
+            for (UserAuthVo auth : result) {
+                Assert.assertEquals(systemUser.getUserUuid(), auth.getUserUuid());
+            }
+            Assert.assertEquals(systemUser.getUserUuid(), queryArgs.get("searchUserAuthByUserUuid")[0]);
+        }
+    }
+
+    /** 扩展内置身份只接受注册 UUID，查询不应构造用户对象、令牌或认证信息。 */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void shouldAcceptRegisteredUuidWithoutGeneratingCredentialsAndRejectAlias() throws Exception {
+        Field field = SystemUserFactory.class.getDeclaredField("systemUserMap");
+        field.setAccessible(true);
+        Map<String, ISystemUser> systemUsers = (Map<String, ISystemUser>) field.get(null);
+        Map<String, ISystemUser> backup = new HashMap<>(systemUsers);
+        ISystemUser extension = (ISystemUser) Proxy.newProxyInstance(ISystemUser.class.getClassLoader(),
+                new Class<?>[]{ISystemUser.class}, (proxy, method, args) -> {
+                    if ("getUserId".equals(method.getName())) {
+                        return "extension-id";
+                    }
+                    if ("getUserUuid".equals(method.getName())) {
+                        return "extension-uuid";
+                    }
+                    throw new AssertionError("授权查询不应调用：" + method.getName());
+                });
+        try {
+            systemUsers.put("extension-id", extension);
+            user = null;
+            Assert.assertTrue(service.getUserAuthListByUserUuid("extension-uuid").isEmpty());
+            Assert.assertEquals("extension-uuid", queryArgs.get("searchUserAuthByUserUuid")[0]);
+            queryCounts.clear();
+            try {
+                service.getUserAuthListByUserUuid("extension-id");
+                Assert.fail("内置用户 ID 不应作为 UUID 查询授权");
+            } catch (UserNotFoundException expected) {
+                Assert.assertEquals(Collections.singletonMap("getUserByUuid", 1), queryCounts);
+            }
+        } finally {
+            systemUsers.clear();
+            systemUsers.putAll(backup);
         }
     }
 

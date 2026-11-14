@@ -1008,4 +1008,18 @@ public class TimeUtil {
         list.add(Math.round(value) + new I18n("秒").toString());
         return String.join(separator, list);
     }
+
+    /**
+     * 将持续时间段毫秒数格式化，输出为HH:mm:ss.SSS
+     * @param millis
+     * @return
+     */
+    public static String formatDuration(long millis) {
+        Duration duration = Duration.ofMillis(millis);
+        return String.format("%02d:%02d:%02d.%03d",
+                duration.toHours(),
+                duration.toMinutesPart(),
+                duration.toSecondsPart(),
+                duration.toMillisPart());
+    }
 }

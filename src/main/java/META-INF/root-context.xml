@@ -64,6 +64,10 @@
                 <property name="leakDetectionThreshold">
                     <value>${datasource.leakDetectionThreshold}</value>
                 </property>
+                <!-- 记录主库连接池的建连、借用和归还耗时。 -->
+                <property name="metricsTrackerFactory">
+                    <bean class="neatlogic.framework.store.mysql.ConnectionTimeMetricsFactory"/>
+                </property>
             </bean>
         </constructor-arg>
     </bean>

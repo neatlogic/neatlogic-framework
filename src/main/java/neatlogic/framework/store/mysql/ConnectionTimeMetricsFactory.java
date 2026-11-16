@@ -70,7 +70,15 @@ public class ConnectionTimeMetricsFactory implements MetricsTrackerFactory {
                 if (logger.isDebugEnabled()) {
                     double millis = elapsedAcquiredNanos / 1_000_000.0;
                     if (millis > 500) {
-                        logger.debug("HikariCP [{}] 获取连接耗时: {} ms", poolName, millis);
+                        logger.debug("HikariCP [{}] 获取连接耗时: {} ms，活跃连接数: {}，空闲连接数: {}，总连接数: {}，等待连接线程数: {}，最小空闲连接数: {}，允许最大连接数: {}",
+                                poolName, millis,
+                                poolStats.getActiveConnections(),
+                                poolStats.getIdleConnections(),
+                                poolStats.getTotalConnections(),
+                                poolStats.getPendingThreads(),
+                                poolStats.getMinConnections(),
+                                poolStats.getMaxConnections()
+                        );
                     }
                 }
             }
@@ -96,7 +104,15 @@ public class ConnectionTimeMetricsFactory implements MetricsTrackerFactory {
             @Override
             public void recordConnectionTimeout() {
                 if (logger.isWarnEnabled()) {
-                    logger.warn("HikariCP [{}] 从连接池获取连接超时", poolName);
+                    logger.warn("HikariCP [{}] 从连接池获取连接超时，活跃连接数: {}，空闲连接数: {}，总连接数: {}，等待连接线程数: {}，最小空闲连接数: {}，允许最大连接数: {}",
+                            poolName,
+                            poolStats.getActiveConnections(),
+                            poolStats.getIdleConnections(),
+                            poolStats.getTotalConnections(),
+                            poolStats.getPendingThreads(),
+                            poolStats.getMinConnections(),
+                            poolStats.getMaxConnections()
+                    );
                 }
             }
 

@@ -39,10 +39,6 @@ public class TeamServiceImpl implements TeamService {
             for (TeamVo ancestor : ancestorsAndSelf) {
                 pathNameList.add(ancestor.getName());
             }
-//            if (CollectionUtils.isNotEmpty(pathNameList)) {
-//                team.setFullPath(String.join("->", pathNameList));
-//                team.setParentPathList(pathNameList);
-//            }
         }
         return pathNameList;
     }

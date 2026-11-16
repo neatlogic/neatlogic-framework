@@ -365,5 +365,11 @@ public class DatasourceManager {
         dataSource.setConnectionTimeout(Config.DATASOURCE_CONNECT_TIMEOUT());
         //心跳防止防火墙强行关闭会话
         dataSource.setKeepaliveTime(Config.DATASOURCE_KEEPALIVE_TIME());
+        // 告诉 MySQL JDBC 驱动（Connector/J），不要将 MySQL 数据库中的 TINYINT(1) 字段自动识别为 BIT（布尔类型），而是按照普通的 TINYINT 整数类型处理。
+        dataSource.addDataSourceProperty("tinyInt1isBit", false);
+        // 关闭 MySQL JDBC 驱动（Connector/J）自身的 OpenTelemetry 链路追踪功能，避免驱动在建立连接、执行 SQL 等操作时生成 OpenTelemetry 追踪数据。
+        dataSource.addDataSourceProperty("openTelemetry", "DISABLED");
+        // 为 HikariCP 数据库连接池注册一个自定义性能监控器，用于采集连接创建耗时、获取连接耗时、连接占用时长和连接获取超时等指标。
+        dataSource.setMetricsTrackerFactory(new ConnectionTimeMetricsFactory());
     }
 }

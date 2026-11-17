@@ -22,6 +22,7 @@ import neatlogic.framework.dto.TeamVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchOptionVo;
 import neatlogic.framework.restful.groupsearch.core.GroupSearchVo;
 import neatlogic.framework.restful.groupsearch.core.IGroupSearchHandler;
+import neatlogic.framework.service.TeamService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,9 @@ public class TeamGroupHandler implements IGroupSearchHandler {
     private TeamMapper teamMapper;
     @Resource
     private RoleMapper roleMapper;
+
+    @Resource
+    private TeamService teamService;
 
     @Override
     public String getName() {
@@ -165,16 +169,10 @@ public class TeamGroupHandler implements IGroupSearchHandler {
             if (CollectionUtils.isNotEmpty(nameRepeatedCount)) {
                 Map<String, Integer> map = nameRepeatedCount.stream().collect(Collectors.toMap(TeamVo::getName, TeamVo::getNameRepeatCount));
                 for (TeamVo team : teamList) {
-                    List<TeamVo> ancestorsAndSelf = teamMapper.getAncestorsAndSelfByLftRht(team.getLft(), team.getRht(), null);
-                    if (CollectionUtils.isNotEmpty(ancestorsAndSelf)) {
-                        List<String> pathNameList = new ArrayList<>();
-                        for (TeamVo ancestor : ancestorsAndSelf) {
-                            pathNameList.add(ancestor.getName());
-                        }
-                        if (CollectionUtils.isNotEmpty(pathNameList)) {
-                            team.setFullPath(String.join("->", pathNameList));
-                            team.setParentPathList(pathNameList);
-                        }
+                    List<String> pathNameList = teamService.getParentPathList(team);
+                    if (CollectionUtils.isNotEmpty(pathNameList)) {
+                        team.setFullPath(String.join("->", pathNameList));
+                        team.setParentPathList(pathNameList);
                     }
                     /* 如果有重名的分组，找出其父分组的名称 */
                     if (MapUtils.isNotEmpty(map) && map.get(team.getName()) != null && map.get(team.getName()) > 1) {

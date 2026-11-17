@@ -27897,8 +27897,8 @@
       "target": "The knowledge document attachment can be used for related queries in the knowledge base and report queries."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/index.json#tables[8].description": {
-      "source": "知识文档调用 可用于知识库相关的关联查询等报表查询场景。",
-      "target": "The knowledge document call can be used for related queries in knowledge bases, such as reporting scenarios."
+      "source": "记录知识版本首次创建时的来源类型和来源记录标识。历史关联未绑定版本时使用文档当前激活版本。",
+      "target": "Records the source type and record ID that created a knowledge version. Historical entries without a version ID resolve to the active document version."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/index.json#tables[9].description": {
       "source": "知识文档行 可用于知识库相关的关联查询等报表查询场景。",
@@ -28113,28 +28113,28 @@
       "target": "Primary key index covering the knowledge_document_id, knowledge_document_version_id, file_id fields, suitable for uniquely identifying records and queries that join the primary table."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#description": {
-      "source": "知识文档调用 可用于知识库相关的关联查询等报表查询场景。",
-      "target": "The knowledge document call can be used for related queries in knowledge bases, such as reporting scenarios."
+      "source": "记录知识版本首次创建时的来源类型和来源记录标识。历史关联未绑定版本时使用文档当前激活版本。",
+      "target": "Records the source type and record ID that created a knowledge version. Historical entries without a version ID resolve to the active document version."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#fields[0].description": {
-      "source": "知识文档id，作为当前表记录的主键或唯一定位字段。",
-      "target": "Knowledge document ID, used as the primary key or unique identifier for records in this table."
+      "source": "关联的知识文档 ID。",
+      "target": "ID of the associated knowledge document."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#fields[1].description": {
-      "source": "调用者id，数据库中要求唯一，适合用于精确查询和去重判断。",
-      "target": "The call identifier. This value must be unique in the database and is suitable for exact-match queries and duplicate detection."
+      "source": "创建来源的业务记录 ID。手动工单转知识取工单 ID，告警处理取工单步骤实例 ID。",
+      "target": "ID of the business record that created the version. Manual task conversion uses the process task ID. Alert handling uses the process task step instance ID."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#fields[2].description": {
-      "source": "来源。",
-      "target": "SOURCE."
+      "source": "创建该版本的业务来源类型。",
+      "target": "Business source type that created the version."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#indexes[0].description": {
-      "source": "主键索引，覆盖 knowledge_document_id 字段，适合用于唯一定位记录和主表关联查询。",
-      "target": "Primary key index covering the knowledge_document_id field, suitable for uniquely identifying records and queries that join the primary table."
+      "source": "确保每个已绑定版本只有一个创建来源。",
+      "target": "Ensures that each associated version has only one creation source."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#indexes[1].description": {
-      "source": "唯一索引，覆盖 invoke_id 字段，适合用于精确检索、唯一性判断和去重查询。",
-      "target": "Unique index covering the invoke_id field, suitable for exact-match retrieval, uniqueness checks, and duplicate detection."
+      "source": "按业务来源类型和来源记录标识查询。",
+      "target": "Supports queries by business source type and source record identifier."
     },
     "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_line.json#description": {
       "source": "知识文档行 可用于知识库相关的关联查询等报表查询场景。",
@@ -31515,6 +31515,14 @@
     "neatlogic-tagent/src/main/resources/neatlogic/resources/tagent/sqldefine/tables/tagent_version.json#indexes[0].description": {
       "source": "主键索引，覆盖 id 字段，适合用于唯一定位记录和主表关联查询。",
       "target": "Primary key index covering the ID field, suitable for uniquely identifying records and queries that join the primary table."
+    },
+    "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#fields[3].description": {
+      "source": "创建时关联的版本 ID，每个版本最多一个来源，历史关联可为空。",
+      "target": "Version ID recorded at creation. Each version has at most one source. Historical associations may omit this value."
+    },
+    "neatlogic-knowledge/src/main/resources/neatlogic/resources/knowledge/sqldefine/tables/knowledge_document_invoke.json#indexes[2].description": {
+      "source": "按文档定位其来源关联。",
+      "target": "Locates source associations for a document."
     }
   },
   "labels": {
@@ -32219,7 +32227,8 @@
     "预案阶段任务人员表": "Task Personnel Table for Preparedness Phase",
     "预案阶段任务表": "Pre-Plan Task Schedule",
     "预案阶段表": "Pre-Plan Stage Table",
-    "飞书云文档与知识文档映射": "Mapping of FlyBird Cloud Document to Knowledge Document"
+    "飞书云文档与知识文档映射": "Mapping of FlyBird Cloud Document to Knowledge Document",
+    "知识版本创建来源": "Knowledge Version Creation Source"
   },
   "fragments": {
     "'user','team','role'": "'User','team','role'",

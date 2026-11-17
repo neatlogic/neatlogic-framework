@@ -56,7 +56,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
     private static final List<ApiHandlerVo> apiHandlerList = new ArrayList<>();
     private static final Map<String, ApiHandlerVo> apiHandlerMap = new HashMap<>();
     private static final List<ApiVo> apiList = new ArrayList<>();
-    private static final List<ApiVo> apiTokenList = new ArrayList<>();
+//    private static final List<ApiVo> apiTokenList = new ArrayList<>();
     private static final Map<String, ApiVo> apiMap = new HashMap<>();
     // public static Map<String, RateLimiter> interfaceRateMap = new
     // ConcurrentHashMap<>();
@@ -115,9 +115,9 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
         return apiList;
     }
 
-    public static List<ApiVo> getApiTokenList() {
-        return apiTokenList;
-    }
+//    public static List<ApiVo> getApiTokenList() {
+//        return apiTokenList;
+//    }
 
     public static ApiHandlerVo getApiHandlerByHandler(String handler) {
         return apiHandlerMap.get(handler);
@@ -150,6 +150,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
 
     @Override
     protected void onInitialized(NeatLogicWebApplicationContext context) {
+        List<ApiVo> apiTokenList = new ArrayList<>();
         Map<String, IPublicApiComponent> myMap = context.getBeansOfType(IPublicApiComponent.class);
         Map<String, IPublicJsonStreamApiComponent> myStreamMap = context.getBeansOfType(IPublicJsonStreamApiComponent.class);
         Map<String, IPublicBinaryStreamApiComponent> myBinaryMap = context.getBeansOfType(IPublicBinaryStreamApiComponent.class);
@@ -167,7 +168,10 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setType(ApiType.OBJECT.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
+                ApiVo apiVo = initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
+                if (apiVo != null) {
+                    apiTokenList.add(apiVo);
+                }
             }
         }
 
@@ -185,7 +189,10 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setType(ApiType.STREAM.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
+                ApiVo apiVo = initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
+                if (apiVo != null) {
+                    apiTokenList.add(apiVo);
+                }
             }
         }
 
@@ -203,14 +210,17 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 restComponentVo.setType(ApiType.BINARY.getValue());
                 apiHandlerList.add(restComponentVo);
                 apiHandlerMap.put(component.getClassName(), restComponentVo);
-                initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
+                ApiVo apiVo = initApiTokenList(JSON.parseObject(JSON.toJSONString(restComponentVo)), context.getId());
+                if (apiVo != null) {
+                    apiTokenList.add(apiVo);
+                }
             }
         }
 
         //insert public token api
         List<TenantVo> tenantList = tenantMapper.getAllActiveTenant();
         for (TenantVo tenantVo : tenantList) {
-            CachedThreadPool.execute(new InsertPublicTokenApiRunner(tenantVo.getUuid()));
+            CachedThreadPool.execute(new InsertPublicTokenApiRunner(tenantVo.getUuid(), apiTokenList));
         }
     }
 
@@ -226,7 +236,7 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
      *
      * @param componentJson component入参
      */
-    private void initApiTokenList(JSONObject componentJson, String moduleId) {
+    private ApiVo initApiTokenList(JSONObject componentJson, String moduleId) {
         String token = componentJson.getString("token");
         if (StringUtils.isNotBlank(token)) {
             if (token.startsWith("/")) {
@@ -268,13 +278,15 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
                 }
             }
             if (!apiMap.containsKey(token)) {
-                apiTokenList.add(apiVo);
+//                apiTokenList.add(apiVo);
                 apiMap.put(token, apiVo);
             } else {
                 logger.error("接口：" + token + "已存在，请重新定义访问路径");
                 System.exit(1);
             }
+            return apiVo;
         }
+        return null;
     }
 
     /**
@@ -283,10 +295,11 @@ public class PublicApiComponentFactory extends ModuleInitializedListenerBase {
      */
     class InsertPublicTokenApiRunner extends NeatLogicThread {
         private final String tenantUuid;
-
-        public InsertPublicTokenApiRunner(String tenantUuid) {
+        private final List<ApiVo> apiTokenList;
+        public InsertPublicTokenApiRunner(String tenantUuid, List<ApiVo> apiTokenList) {
             super("PUBLIC-TOKEN-API-INIT-" + tenantUuid);
             this.tenantUuid = tenantUuid;
+            this.apiTokenList = apiTokenList;
         }
 
         @Override

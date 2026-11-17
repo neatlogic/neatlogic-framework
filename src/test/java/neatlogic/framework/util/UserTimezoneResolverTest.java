@@ -17,6 +17,7 @@
 
 package neatlogic.framework.util;
 
+import com.zaxxer.hikari.HikariConfig;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.asynchronization.threadlocal.RequestContext;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
@@ -324,10 +325,12 @@ public class UserTimezoneResolverTest {
         DataSource source = (DataSource) Proxy.newProxyInstance(DataSource.class.getClassLoader(),
                 new Class<?>[]{DataSource.class}, (proxy, method, args) ->
                         "getConnection".equals(method.getName()) ? connection : jdbcDefault(method));
-        try (NeatLogicBasicDataSource pool = new NeatLogicBasicDataSource()) {
-            pool.setDataSource(source);
-            pool.setMaximumPoolSize(1);
-            pool.setMinimumIdle(0);
+        // 借用连接之前按生产路径完成测试池初始化。
+        HikariConfig config = new HikariConfig();
+        config.setDataSource(source);
+        config.setMaximumPoolSize(1);
+        config.setMinimumIdle(0);
+        try (NeatLogicBasicDataSource pool = new NeatLogicBasicDataSource(config)) {
             try (Connection ignored = pool.getConnection()) {
                 assertTrue(statements.contains("SET time_zone = '+05:45'"));
                 assertEquals(queriesAfterInit, queryCount);

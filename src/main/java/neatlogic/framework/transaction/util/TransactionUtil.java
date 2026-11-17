@@ -27,6 +27,14 @@ public class TransactionUtil {
     }
 
     /**
+     * 开启无事务作用域并挂起调用方事务，结束时仍须提交或回滚以恢复调用方。
+     * 挂起不会暂停调用方事务的超时计时。
+     */
+    public static TransactionStatus openNonTx() {
+        return openTxWithPropagationBehavior(TransactionDefinition.PROPAGATION_NOT_SUPPORTED);
+    }
+
+    /**
      * 使用指定的传播行为开启事务，如果不指定，则默认使用PROPAGATION_REQUIRED
      *
      * @param propagationBehavior TransactionDefinition中定义的传播行为

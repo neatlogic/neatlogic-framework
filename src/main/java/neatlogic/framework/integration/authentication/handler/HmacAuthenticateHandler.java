@@ -42,7 +42,7 @@ public class HmacAuthenticateHandler implements IAuthenticateHandler {
     }
 
     /** 保存和运行共用校验，原始值必须是单个用户字符串，不能接受数组隐式转换。 */
-    public static void validateConfig(JSONObject config) {
+    private void validateConfig(JSONObject config) {
         Object value = config == null ? null : config.get("user");
         if (!(value instanceof String)) {
             throw new AuthenticateException("auth.hmacuserinvalid");
@@ -59,7 +59,7 @@ public class HmacAuthenticateHandler implements IAuthenticateHandler {
     }
 
     /** 指定用户必须仍然存在；沿用已有 Mapper，不新增 SQL。 */
-    private static UserVo getSelectedUser(String uuid) {
+    private UserVo getSelectedUser(String uuid) {
         UserVo user = SpringContextUtil.getBean(UserMapper.class).getUserByUuid(uuid);
         if (user == null || StringUtils.isBlank(user.getUserId())) {
             throw new UserNotFoundException(uuid);

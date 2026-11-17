@@ -21,15 +21,10 @@ import neatlogic.framework.auth.core.AuthBase;
 import neatlogic.framework.auth.core.AuthFactory;
 import neatlogic.framework.common.constvalue.GroupSearch;
 import neatlogic.framework.common.constvalue.systemuser.SystemUserFactory;
-import neatlogic.framework.dao.mapper.*;
-import neatlogic.framework.dto.RoleAuthVo;
-import neatlogic.framework.dto.SourcePathVo;
-import neatlogic.framework.dto.RoleVo;
-import neatlogic.framework.dto.UserAuthVo;
-import neatlogic.framework.dto.RoleTeamVo;
-import neatlogic.framework.dto.RoleUserVo;
-import neatlogic.framework.dto.TeamVo;
-import neatlogic.framework.dto.UserVo;
+import neatlogic.framework.dao.mapper.RoleMapper;
+import neatlogic.framework.dao.mapper.TeamMapper;
+import neatlogic.framework.dao.mapper.UserMapper;
+import neatlogic.framework.dto.*;
 import neatlogic.framework.exception.user.UserNotFoundException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -397,16 +392,18 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
-    /** 从中间记录的单来源生成聚合列表，保留本方法原有的结果范围及追加顺序。 */
+    /** 查询普通用户或已注册内置用户的授权，并将单个来源聚合为来源列表。 */
     public List<UserAuthVo> getUserAuthListByUserUuid(String userUuid) {
         if (StringUtils.isBlank(userUuid)) {
             return Collections.emptyList();
         }
         UserVo userVo = userMapper.getUserByUuid(userUuid);
-        if (userVo == null) {
+        // 内置用户由工厂注册，不要求存在用户表记录；这里只校验 UUID，不构造包含凭据的用户对象。
+        if (userVo == null && SystemUserFactory.getSystemUserList().stream()
+                .noneMatch(systemUser -> userUuid.equals(systemUser.getUserUuid()))) {
             throw new UserNotFoundException(userUuid);
         }
-        if (userVo.getIsSuperAdmin() != null && userVo.getIsSuperAdmin()) {
+        if (userVo != null && Boolean.TRUE.equals(userVo.getIsSuperAdmin())) {
             List<UserAuthVo> userAuthList = new ArrayList<>();
             List<AuthBase> authBaseList = AuthFactory.getAuthList();
             for (AuthBase authBase : authBaseList) {

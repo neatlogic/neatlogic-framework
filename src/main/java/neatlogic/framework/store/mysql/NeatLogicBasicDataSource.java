@@ -14,6 +14,7 @@ package neatlogic.framework.store.mysql;
 
 import com.mysql.cj.conf.PropertyKey;
 import com.mysql.cj.jdbc.JdbcConnection;
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import neatlogic.framework.asynchronization.threadlocal.UserContext;
 import neatlogic.framework.common.util.RC4Util;
@@ -32,6 +33,11 @@ import java.util.TimeZone;
 /** 借出连接时设置数据库会话参数与用户时区。 */
 public class NeatLogicBasicDataSource extends HikariDataSource {//替换dbcp2的BasicDataSource
     private final Logger logger = LoggerFactory.getLogger(NeatLogicBasicDataSource.class);
+
+    /** 使用完整配置，在构造时同步启动池。 */
+    public NeatLogicBasicDataSource(HikariConfig config) {
+        super(config);
+    }
 
     /** 为当前请求初始化借出的数据库连接。 */
     @Override

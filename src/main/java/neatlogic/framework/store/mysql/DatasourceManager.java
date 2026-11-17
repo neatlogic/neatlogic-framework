@@ -12,6 +12,7 @@
 
 package neatlogic.framework.store.mysql;
 
+import com.zaxxer.hikari.HikariConfig;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
@@ -317,23 +318,24 @@ public class DatasourceManager {
         datasource.afterPropertiesSet();
     }
 
+    /** 根据租户配置创建业务库或数据仓库连接池，返回时池已同步启动。 */
     public static NeatLogicBasicDataSource getDataSource(DatasourceVo datasourceVo, Boolean isDataDB) {
-        NeatLogicBasicDataSource tenantDatasource = new NeatLogicBasicDataSource();
+        HikariConfig tenantDatasource = new HikariConfig();
         String url = datasourceVo.getUrl();
         url = url.replace("{host}", datasourceVo.getHost());
         url = url.replace("{port}", datasourceVo.getPort().toString());
         url = url.replace("{dbname}", "neatlogic_" + datasourceVo.getTenantUuid() + (isDataDB ? "_data" : StringUtils.EMPTY));
-        //tenantDatasource.setUrl(url);
         tenantDatasource.setJdbcUrl(url);
         tenantDatasource.setDriverClassName(datasourceVo.getDriver());
         tenantDatasource.setUsername(datasourceVo.getUsername());
         tenantDatasource.setPassword(datasourceVo.getPasswordPlain());
         tenantDatasource.setPoolName("HikariCP_" + (isDataDB ? "DATA_" : StringUtils.EMPTY) + datasourceVo.getTenantUuid());
         setDataSourceConfig(tenantDatasource);
-        return tenantDatasource;
+        return new NeatLogicBasicDataSource(tenantDatasource);
     }
 
-    public static void setDataSourceConfig(NeatLogicBasicDataSource dataSource) {
+    /** 在建池之前应用共享的连接池和 MySQL 驱动参数。 */
+    public static void setDataSourceConfig(HikariConfig dataSource) {
         //连接数大小
         dataSource.setMaximumPoolSize(Config.DATASOURCE_MAXIMUN_POOL_SIZE());
         //以下是针对Mysql的参数优化
@@ -363,5 +365,11 @@ public class DatasourceManager {
         dataSource.setConnectionTimeout(Config.DATASOURCE_CONNECT_TIMEOUT());
         //心跳防止防火墙强行关闭会话
         dataSource.setKeepaliveTime(Config.DATASOURCE_KEEPALIVE_TIME());
+        // 告诉 MySQL JDBC 驱动（Connector/J），不要将 MySQL 数据库中的 TINYINT(1) 字段自动识别为 BIT（布尔类型），而是按照普通的 TINYINT 整数类型处理。
+        dataSource.addDataSourceProperty("tinyInt1isBit", false);
+        // 关闭 MySQL JDBC 驱动（Connector/J）自身的 OpenTelemetry 链路追踪功能，避免驱动在建立连接、执行 SQL 等操作时生成 OpenTelemetry 追踪数据。
+        dataSource.addDataSourceProperty("openTelemetry", "DISABLED");
+        // 为 HikariCP 数据库连接池注册一个自定义性能监控器，用于采集连接创建耗时、获取连接耗时、连接占用时长和连接获取超时等指标。
+        dataSource.setMetricsTrackerFactory(new ConnectionTimeMetricsFactory());
     }
 }

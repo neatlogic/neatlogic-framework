@@ -130,6 +130,17 @@ public class JavascriptUtil {
      * @return 执行结果
      */
     public static boolean runExpression(JSONObject paramObj, String expression, Map<String, JavascriptResult> resultMap) throws ScriptException {
+        return runExpression(paramObj, expression, resultMap, false);
+    }
+
+    /** 执行表达式并让调用方处理脚本异常，用于需要区分计算失败和条件不满足的场景。 */
+    public static boolean runExpressionStrict(JSONObject paramObj, String expression, Map<String, JavascriptResult> resultMap) throws ScriptException {
+        return runExpression(paramObj, expression, resultMap, true);
+    }
+
+    /** 共用表达式编译与计算逻辑，按调用方要求处理执行异常。 */
+    private static boolean runExpression(JSONObject paramObj, String expression, Map<String, JavascriptResult> resultMap,
+                                         boolean propagateException) throws ScriptException {
         expression = expression.replace("-", "");
         Bindings params = new SimpleBindings();
         if (MapUtils.isNotEmpty(paramObj)) {
@@ -158,6 +169,9 @@ public class JavascriptUtil {
                 return Boolean.parseBoolean(rv.toString());
             }
         } catch (Exception ex) {
+            if (propagateException) {
+                throw ex;
+            }
             logger.error(ex.getMessage(), ex);
         } finally {
             if (instance.get() != null) {

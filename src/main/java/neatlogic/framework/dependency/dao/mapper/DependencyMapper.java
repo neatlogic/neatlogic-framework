@@ -74,6 +74,9 @@ public interface DependencyMapper {
 
     int deleteDependency(DependencyVo dependencyVo);
 
+    /** 由处理器类型、被引用者及引用者共同限定一次解除的范围。 */
+    int deleteDependencyReference(DependencyVo dependencyVo);
+
     int deleteDependencyByFrom(DependencyVo dependencyVo);
 
     List<Map<Object, Integer>> getBatchDependencyCountByFrom(@Param("fromList") List<Object> fromList, @Param("type") String type);

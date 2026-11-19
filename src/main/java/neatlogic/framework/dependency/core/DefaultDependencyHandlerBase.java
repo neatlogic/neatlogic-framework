@@ -72,6 +72,13 @@ public abstract class DefaultDependencyHandlerBase implements IDependencyHandler
     }
 
     /**
+     * 精确解除本处理器的一对上下游关系，返回实际删除条数；重复解除返回零。
+     */
+    public int deleteReference(Object from, Object to) {
+        return dependencyMapper.deleteDependencyReference(new DependencyVo(getHandler(), from.toString(), to.toString()));
+    }
+
+    /**
      * 删除引用关系
      *
      * @param to 引用者（下游）值（如：服务uuid）

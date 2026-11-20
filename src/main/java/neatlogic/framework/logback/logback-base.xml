@@ -324,6 +324,8 @@
 
     <!--异步输出 -->
     <appender name="dataSourceConnectionTimeMetricsAsyncAppender" class="ch.qos.logback.classic.AsyncAppender">
+        <!-- 在进入异步队列前过滤连接池巡检等日志，保留建连结果用于对照耗时。 -->
+        <filter class="neatlogic.framework.logback.boolex.HikariConnectionEventFilter"/>
         <discardingThreshold>0</discardingThreshold>
         <queueSize>50</queueSize>
         <appender-ref ref="dataSourceConnectionTimeMetricsAppender"/>
@@ -365,6 +367,10 @@
     </logger>
     <!-- mysql连接指标日志 -->
     <logger name="dataSourceConnectionTimeMetrics" level="debug" additivity="false">
+        <appender-ref ref="dataSourceConnectionTimeMetricsAsyncAppender"/>
+    </logger>
+
+    <logger name="com.zaxxer.hikari.pool" level="DEBUG">
         <appender-ref ref="dataSourceConnectionTimeMetricsAsyncAppender"/>
     </logger>
     <include resource="neatlogic/module/process/logback/logback-itsm.xml"/>

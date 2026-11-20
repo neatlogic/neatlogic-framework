@@ -347,7 +347,7 @@
     <logger name="jdbc.connection" level="INFO" additivity="false"/>
 
     <!-- 通知审计 -->
-    <logger name="notifyAudit" level="INFO" additivity="false">
+    <logger name="notifyAudit" level="${log4j.priority}" additivity="false">
         <appender-ref ref="notifyAuditAsyncAppender"/>
     </logger>
     <!-- mysql死锁日志 -->
@@ -366,11 +366,11 @@
         <appender-ref ref="sqlTimeoutAuditAsyncAppender"/>
     </logger>
     <!-- mysql连接指标日志 -->
-    <logger name="dataSourceConnectionTimeMetrics" level="debug" additivity="false">
+    <logger name="dataSourceConnectionTimeMetrics" level="${log4j.priority}" additivity="false">
         <appender-ref ref="dataSourceConnectionTimeMetricsAsyncAppender"/>
     </logger>
 
-    <logger name="com.zaxxer.hikari.pool" level="DEBUG">
+    <logger name="com.zaxxer.hikari.pool" level="${log4j.priority}" additivity="false">
         <appender-ref ref="dataSourceConnectionTimeMetricsAsyncAppender"/>
     </logger>
     <include resource="neatlogic/module/process/logback/logback-itsm.xml"/>

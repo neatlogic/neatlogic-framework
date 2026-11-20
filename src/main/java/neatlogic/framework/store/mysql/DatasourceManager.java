@@ -13,12 +13,15 @@
 package neatlogic.framework.store.mysql;
 
 import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariConfigMXBean;
+import com.zaxxer.hikari.HikariPoolMXBean;
 import neatlogic.framework.asynchronization.threadlocal.TenantContext;
 import neatlogic.framework.common.RootComponent;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.common.util.TenantUtil;
 import neatlogic.framework.dao.mapper.DatasourceMapper;
 import neatlogic.framework.dto.DatasourceVo;
+import neatlogic.framework.dto.healthcheck.DataSourceInfoVo;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.PostConstruct;
@@ -27,6 +30,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RootComponent
@@ -84,6 +88,18 @@ public class DatasourceManager {
             return null;
         }
         return (NeatLogicBasicDataSource) (datasourceMap.get(tenantUuid));
+    }
+
+    public static NeatLogicBasicDataSource getDatasourceByPoolName(String poolName) {
+        for (Map.Entry<Object, Object> entry : datasourceMap.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof NeatLogicBasicDataSource neatLogicBasicDataSource) {
+                if (Objects.equals(neatLogicBasicDataSource.getPoolName(), poolName)) {
+                    return neatLogicBasicDataSource;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -371,5 +387,34 @@ public class DatasourceManager {
         dataSource.addDataSourceProperty("openTelemetry", "DISABLED");
         // 为 HikariCP 数据库连接池注册一个自定义性能监控器，用于采集连接创建耗时、获取连接耗时、连接占用时长和连接获取超时等指标。
         dataSource.setMetricsTrackerFactory(new ConnectionTimeMetricsFactory());
+    }
+
+    public static DataSourceInfoVo getDataSourceInfo(NeatLogicBasicDataSource neatLogicBasicDataSource) {
+        if (neatLogicBasicDataSource != null) {
+            DataSourceInfoVo dataSourceInfoVo = new DataSourceInfoVo();
+            dataSourceInfoVo.setDatabase(DatasourceManager.getDatabaseId());
+            dataSourceInfoVo.setDatabaseVersion(DatasourceManager.getDatabaseVersion());
+            dataSourceInfoVo.setPoolName(neatLogicBasicDataSource.getPoolName());
+            HikariPoolMXBean hikariPoolMXBean = neatLogicBasicDataSource.getHikariPoolMXBean();
+            if (hikariPoolMXBean != null) {
+                dataSourceInfoVo.setIdleConnections(hikariPoolMXBean.getIdleConnections());
+                dataSourceInfoVo.setActiveConnections(hikariPoolMXBean.getActiveConnections());
+                dataSourceInfoVo.setThreadsAwaitingConnection(hikariPoolMXBean.getThreadsAwaitingConnection());
+                dataSourceInfoVo.setTotalConnections(hikariPoolMXBean.getTotalConnections());
+            }
+            HikariConfigMXBean hikariConfigMXBean = neatLogicBasicDataSource.getHikariConfigMXBean();
+            if (hikariConfigMXBean != null) {
+                dataSourceInfoVo.setCatalog(hikariConfigMXBean.getCatalog());
+                dataSourceInfoVo.setConnectionTimeout(hikariConfigMXBean.getConnectionTimeout());
+                dataSourceInfoVo.setIdleTimeout(hikariConfigMXBean.getIdleTimeout());
+                dataSourceInfoVo.setLeakDetectionThreshold(hikariConfigMXBean.getLeakDetectionThreshold());
+                dataSourceInfoVo.setMaximumPoolSize(hikariConfigMXBean.getMaximumPoolSize());
+                dataSourceInfoVo.setMaxLifetime(hikariConfigMXBean.getMaxLifetime());
+                dataSourceInfoVo.setMinimumIdle(hikariConfigMXBean.getMinimumIdle());
+                dataSourceInfoVo.setValidationTimeout(hikariConfigMXBean.getValidationTimeout());
+            }
+            return dataSourceInfoVo;
+        }
+        return null;
     }
 }

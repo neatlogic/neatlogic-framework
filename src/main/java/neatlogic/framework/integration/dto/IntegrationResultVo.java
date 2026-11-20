@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 
 public class IntegrationResultVo {
 	private int statusCode;
+	private Integer rawStatusCode;
+	private String statusCodeTransformDetail;
 	private StringBuffer resultBuffer;
 	private String transformedResult;
 	private StringBuffer errorBuffer;
@@ -19,6 +21,26 @@ public class IntegrationResultVo {
 
 	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
+	}
+
+	/** 返回从第三方实际收到的 HTTP 状态码，未收到响应时为空。 */
+	public Integer getRawStatusCode() {
+		return rawStatusCode;
+	}
+
+	/** 保存状态码转换前的 HTTP 状态码。 */
+	public void setRawStatusCode(Integer rawStatusCode) {
+		this.rawStatusCode = rawStatusCode;
+	}
+
+	/** 返回本次状态码转换的匹配或兜底说明。 */
+	public String getStatusCodeTransformDetail() {
+		return statusCodeTransformDetail;
+	}
+
+	/** 记录从响应字段得出生效状态码的原因。 */
+	public void setStatusCodeTransformDetail(String statusCodeTransformDetail) {
+		this.statusCodeTransformDetail = statusCodeTransformDetail;
 	}
 
 	public String getRawResult() {

@@ -20,6 +20,11 @@ public interface IIntegrationHandler {
         return new String[]{"get", "post"};
     }
 
+    /** 处理器是否通过公共 HTTP 调用链转换响应状态码。 */
+    default boolean supportsStatusCodeTransform() {
+        return false;
+    }
+
     IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom);
 
     Integer hasPattern();

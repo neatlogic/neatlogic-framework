@@ -8,6 +8,8 @@ import neatlogic.framework.importexport.core.ImportExportHandlerType;
 import neatlogic.framework.importexport.dto.ImportExportBaseInfoVo;
 import neatlogic.framework.importexport.dto.ImportExportPrimaryChangeVo;
 import neatlogic.framework.importexport.dto.ImportExportVo;
+import neatlogic.framework.integration.core.IntegrationHandlerFactory;
+import neatlogic.framework.integration.core.IntegrationStatusCodeTransformUtil;
 import neatlogic.framework.integration.dao.mapper.IntegrationMapper;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import org.springframework.stereotype.Component;
@@ -54,6 +56,10 @@ public class IntegrationImportExportHandler extends ImportExportHandlerBase {
     @Override
     public Object importData(ImportExportVo importExportVo, List<ImportExportPrimaryChangeVo> primaryChangeList) {
         IntegrationVo integration = importExportVo.getData().toJavaObject(IntegrationVo.class);
+        // 导入与编辑共用转换规则校验，避免未经校验的映射进入执行链。
+        if (integration.getConfig() != null && integration.getConfig().containsKey("statusCodeTransform")) {
+            IntegrationStatusCodeTransformUtil.validate(IntegrationHandlerFactory.getHandler(integration.getHandler()), integration.getConfig());
+        }
         IntegrationVo oldIntegration = integrationMapper.getIntegrationByName(importExportVo.getName());
         if (oldIntegration != null) {
             integration.setUuid(oldIntegration.getUuid());

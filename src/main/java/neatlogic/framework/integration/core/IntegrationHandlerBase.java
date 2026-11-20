@@ -38,8 +38,8 @@ import neatlogic.framework.integration.dto.IntegrationAuditVo;
 import neatlogic.framework.integration.dto.IntegrationResultVo;
 import neatlogic.framework.integration.dto.IntegrationVo;
 import neatlogic.framework.integration.dto.PatternVo;
-import neatlogic.framework.param.validate.core.ParamValidatorBase;
 import neatlogic.framework.param.validate.core.ApiParamValidatorBase;
+import neatlogic.framework.param.validate.core.ParamValidatorBase;
 import neatlogic.framework.param.validate.core.ParamValidatorFactory;
 import neatlogic.framework.util.javascript.JavascriptUtil;
 import neatlogic.module.framework.integration.audit.IntegrationAuditAppendPostProcessor;
@@ -178,6 +178,13 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
         }
     }
 
+    /** 使用公共 HTTP 调用链的集成可配置响应状态码转换。 */
+    @Override
+    public boolean supportsStatusCodeTransform() {
+        return true;
+    }
+
+    @Override
     public IntegrationResultVo sendRequest(IntegrationVo integrationVo, IRequestFrom iRequestFrom) {
 
         String url = integrationVo.getUrl();
@@ -328,9 +335,14 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 }
             }
 
+            // 转换得到错误状态时保留原始响应，跳过成功响应的输出处理。
+            boolean statusTransformFailed = false;
             // 处理返回值
             try {
                 int code = connection.getResponseCode();
+                if (code > 0) {
+                    resultVo.setRawStatusCode(code);
+                }
                 resultVo.setStatusCode(code);
                 /* 请求失败时，getInputStream方法会根据状态码抛出不同的异常，比如404时抛出FileNotFoundException
                   故只有请求成功时才能使用getInputStream，否则应该使用getErrorStream
@@ -353,6 +365,14 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 IOUtils.copy(reader, writer);
                 if (String.valueOf(code).startsWith("2") || String.valueOf(code).startsWith("52")) {
                     resultVo.appendResult(writer.toString());
+                    if (code >= 200 && code < 300 && !"failed".equals(integrationAuditVo.getStatus())) {
+                        IntegrationStatusCodeTransformUtil.apply(config, resultVo);
+                        if (resultVo.getStatusCode() >= 400) {
+                            statusTransformFailed = true;
+                            integrationAuditVo.appendError(resultVo.getError());
+                            integrationAuditVo.setStatus("failed");
+                        }
+                    }
                 } else {
                     throw new RuntimeException(writer.toString());
                 }
@@ -363,7 +383,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                 integrationAuditVo.setStatus("failed");
             }
             boolean hasTransferred = false;
-            if (outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
+            if (!statusTransformFailed && outputConfig != null && StringUtils.isNotBlank(resultVo.getRawResult())) {
                 String content = outputConfig.getString("content");
                 if (StringUtils.isNotBlank(content)) {
                     try {
@@ -381,7 +401,7 @@ public abstract class IntegrationHandlerBase implements IIntegrationHandler {
                     }
                 }
             }
-            if (!hasTransferred) {
+            if (!statusTransformFailed && !hasTransferred) {
                 resultVo.setTransformedResult(resultVo.getRawResult());
             }
 

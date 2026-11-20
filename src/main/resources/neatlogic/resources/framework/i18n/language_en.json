@@ -1394,6 +1394,26 @@
         "undeclaredfield": "The field is not in the declared object column structure.",
         "unsupportedtype": "The data type is not supported."
       }
+    },
+    "integrationstatuscodetransformutil": {
+      "duplicatemapping": "Duplicate business code {0}",
+      "emptybody": "empty response body",
+      "emptymappings": "Specify at least one business code mapping",
+      "fallbackdetail": "Fallback for field {0} ({1}). Original HTTP status {2}, effective status {3}",
+      "invalidconfig": "Status code conversion requires a configuration object",
+      "invalidfallback": "Select a fallback strategy",
+      "invalidfallbackcode": "The fallback error code must be 4xx or 5xx",
+      "invalidjson": "invalid JSON response",
+      "invalidmapping": "A business code must be a nonempty string or a number",
+      "invalidmode": "Select direct extraction or business code mapping",
+      "invalidpath": "Specify a response field path with a nonempty name at each level",
+      "invalidtarget": "The target status code for {0} must be 2xx, 4xx or 5xx",
+      "invalidtype": "unsupported field type {0}",
+      "invalidvalue": "invalid target status code {0}",
+      "matched": "Field {0} has value {1}. Original HTTP status {2}, effective status {3}",
+      "missingvalue": "missing or null field",
+      "unmapped": "unmapped business code {0}",
+      "unsupported": "This integration handler does not support status code conversion"
     }
   },
   "nfid": {

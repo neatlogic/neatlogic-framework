@@ -1394,6 +1394,26 @@
         "undeclaredfield": "字段不在已声明的对象列结构中",
         "unsupportedtype": "不支持的数据类型"
       }
+    },
+    "integrationstatuscodetransformutil": {
+      "duplicatemapping": "业务码 {0} 重复",
+      "emptybody": "响应体为空",
+      "emptymappings": "请至少配置一条业务码映射",
+      "fallbackdetail": "字段 {0} 已使用兜底策略（{1}），原始 HTTP 状态码 {2}，生效状态码 {3}",
+      "invalidconfig": "状态码转换配置必须是对象",
+      "invalidfallback": "请选择无法转换时使用的策略",
+      "invalidfallbackcode": "兜底错误码必须为 4xx 或 5xx",
+      "invalidjson": "响应体不是有效 JSON",
+      "invalidmapping": "业务码必须是非空字符串或数字",
+      "invalidmode": "请选择直接取值或业务码映射",
+      "invalidpath": "请填写响应字段路径，每级字段名均不能为空",
+      "invalidtarget": "业务码 {0} 的目标状态码必须为 2xx、4xx 或 5xx",
+      "invalidtype": "字段类型 {0} 不支持转换",
+      "invalidvalue": "字段值 {0} 不是有效的目标状态码",
+      "matched": "字段 {0} 的值为 {1}，原始 HTTP 状态码 {2}，生效状态码 {3}",
+      "missingvalue": "字段缺失或值为 null",
+      "unmapped": "业务码 {0} 未匹配映射",
+      "unsupported": "当前集成处理器不支持状态码转换"
     }
   },
   "nfid": {

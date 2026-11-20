@@ -118,6 +118,12 @@ public class IntegrationHandlerVo {
 		this.hasOutputPattern = hasOutputPattern;
 	}
 
+	/** 从处理器读取转换能力，供配置页选择可用的响应处理方式。 */
+	public boolean getSupportsStatusCodeTransform() {
+		IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);
+		return integrationHandler != null && integrationHandler.supportsStatusCodeTransform();
+	}
+
 	public String[] getMethodList() {
 		if (methodList == null && StringUtils.isNotBlank(handler)) {
 			IIntegrationHandler integrationHandler = IntegrationHandlerFactory.getHandler(handler);

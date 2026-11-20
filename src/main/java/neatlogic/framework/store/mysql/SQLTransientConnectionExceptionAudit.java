@@ -13,7 +13,6 @@
 package neatlogic.framework.store.mysql;
 
 import com.alibaba.fastjson.JSON;
-import com.zaxxer.hikari.HikariPoolMXBean;
 import neatlogic.framework.common.config.Config;
 import neatlogic.framework.dto.healthcheck.DataSourceInfoVo;
 import neatlogic.framework.util.ThreadUtil;
@@ -88,16 +87,8 @@ public class SQLTransientConnectionExceptionAudit {
 
     private static synchronized void doAudit() {
         try {
-            DataSourceInfoVo dataSourceInfoVo = new DataSourceInfoVo();
             NeatLogicBasicDataSource datasource = DatasourceManager.getDatasource();
-            dataSourceInfoVo.setPoolName(datasource.getPoolName());
-            HikariPoolMXBean hikariPoolMXBean = datasource.getHikariPoolMXBean();
-            if (hikariPoolMXBean != null) {
-                dataSourceInfoVo.setIdleConnections(hikariPoolMXBean.getIdleConnections());
-                dataSourceInfoVo.setActiveConnections(hikariPoolMXBean.getActiveConnections());
-                dataSourceInfoVo.setThreadsAwaitingConnection(hikariPoolMXBean.getThreadsAwaitingConnection());
-                dataSourceInfoVo.setTotalConnections(hikariPoolMXBean.getTotalConnections());
-            }
+            DataSourceInfoVo dataSourceInfoVo = DatasourceManager.getDataSourceInfo(datasource);
             Map<String, String> executingSQLSnapshotMap = new HashMap<>(executingSQLMap);
             StringWriter writer = new StringWriter();
             ThreadUtil.dumpTraces(writer);
